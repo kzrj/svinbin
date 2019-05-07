@@ -7,14 +7,14 @@ from sows.models import Sow
 
 class WorkShop(models.Model):
     number = models.IntegerField()
-    title = models.CharField(max_lenght=128)
+    title = models.CharField(max_length=128)
 
     def __str__(self):
         return self.title
 
 
 class WorkShopEmployee(models.Model):
-    user = models.OneToOneField(User)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -23,7 +23,7 @@ class WorkShopEmployee(models.Model):
 
 class Section(models.Model):
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
-    name = models.CharField(max_lenght=5)
+    name = models.CharField(max_length=5)
 
     def __str__(self):
         return 'Section {} at workshop {}'.format(self.name, self.workshop.title)
@@ -31,7 +31,7 @@ class Section(models.Model):
 
 class Cell(models.Model):
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
-    number = models.CharField(max_lenght=4)
+    number = models.CharField(max_length=4)
     # pigletsQuantity = models.IntegerField(default=0)
     # sow = models.OneToOneField(Sow, null=True)
     
@@ -46,7 +46,7 @@ class Cell(models.Model):
 # Here I can create just one cell class for all types instead separation.
 
 class SingleCell(Cell):
-    sow = models.OneToOneField(Sow, null=True)
+    sow = models.OneToOneField(Sow, on_delete=models.SET_NULL, null=True)
 
 
 class GroupCell(Cell):
@@ -54,5 +54,5 @@ class GroupCell(Cell):
 
 
 class SowAndPigletsCell(Cell):
-    sow = models.OneToOneField(Sow, null=True)
+    sow = models.OneToOneField(Sow, on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0)

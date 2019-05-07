@@ -30,7 +30,7 @@ ALLOWED_HOSTS = ['*']
 
 # Application definition
 
-INSTALLED_APPS = [
+DJANGO_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -38,6 +38,20 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 ]
+
+
+OWN_APPS = [
+    'sows.apps.SowsConfig',
+    'workshops.apps.WorkshopsConfig',
+    'transactions.apps.TransactionsConfig',
+]
+
+
+WEB_APPS = [
+]
+
+
+INSTALLED_APPS = DJANGO_APPS + OWN_APPS + WEB_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -121,3 +135,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, "static/")
+
+
+MEDIA_ROOT = os.path.join(BASE_DIR, '../media')
+MEDIA_URL = '/media/'

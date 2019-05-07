@@ -1,24 +1,28 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
-from workshops.models import WorkShopEmployee, WorkShop, SingleCell, Section, GroupCell,
+from sows.models import Sow, Gilt
+from workshops.models import WorkShopEmployee, WorkShop, SingleCell, Section, GroupCell, \
     SowAndPigletsCell
-from sows.models import SowLocation, Sow, Gilt
 
 
 class Location(models.Model):
-    workshop = models.ForeingKey(WorkShop, null=True, on_delete=models.SET_NULL)
-    section = models.ForeingKey(Section, null=True, on_delete=models.SET_NULL)
-    singleCell = models.ForeingKey(SingleCell, null=True, on_delete=models.SET_NULL)
-    groupCell = models.ForeingKey(groupCell, null=True, on_delete=models.SET_NULL)
-    sowAndPigletsCell = models.ForeingKey(SowAndPigletsCell, null=True, on_delete=models.SET_NULL)
+    workshop = models.ForeignKey(WorkShop, null=True, on_delete=models.SET_NULL)
+    section = models.ForeignKey(Section, null=True, on_delete=models.SET_NULL)
+    singleCell = models.ForeignKey(SingleCell, null=True, on_delete=models.SET_NULL)
+    groupCell = models.ForeignKey(GroupCell, null=True, on_delete=models.SET_NULL)
+    sowAndPigletsCell = models.ForeignKey(SowAndPigletsCell, null=True, on_delete=models.SET_NULL)
+
+
+# class PigLocation(Location):
+#     pass
 
 
 class Transaction(models.Model):
-    date = models.DateTimefield(auto_now_add=True)
-    initiator = models.ForeingKey(WorkShopEmployee, on_delete=models.SET_NULL, null=True)
-    from_location = models.ForeingKey(Location, on_delete=models.CASCADE, related_name="from_location")
-    to_location = models.ForeingKey(Location, on_delete=models.CASCADE, related_name="to_location")
+    date = models.DateTimeField(auto_now_add=True)
+    initiator = models.ForeignKey(WorkShopEmployee, on_delete=models.SET_NULL, null=True)
+    # from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="from_location")
+    # to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="to_location")
     finished = models.BooleanField(default=False)
     # reason = models.CharField(max_lenght=)
 
@@ -27,12 +31,18 @@ class Transaction(models.Model):
 
 
 class SowTransaction(Transaction):
-    sow = models.ForeingKey(Sow, on_delete=models.CASCADE)
+    from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_from_location")
+    to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_to_location")
+    sow = models.ForeignKey(Sow, on_delete=models.CASCADE)
 
 
 class PigletsTransaction(Transaction):
+    from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_from_location")
+    to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_to_location")
     quantity = models.IntegerField()
 
 
 class GiltTransaction(Transaction):
-    gilt = models.ForeingKey(Gilt, on_delete=models.CASCADE)
+    from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_from_location")
+    to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_to_location")
+    gilt = models.ForeignKey(Gilt, on_delete=models.CASCADE)
