@@ -19,11 +19,14 @@ class GiltStatus(models.Model):
 
 
 class Pig(models.Model):
-    birth_id = models.CharField(max_length=10)
+    birth_id = models.CharField(max_length=10, unique=True)
     location = models.OneToOneField("transactions.Location", on_delete=models.SET_NULL, null=True)
 
     class Meta:
         abstract = True
+
+    # def move_to(self):
+
 
 
 class Sow(Pig):

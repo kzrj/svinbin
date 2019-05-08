@@ -23,7 +23,8 @@ class WorkShopEmployee(models.Model):
 
 class Section(models.Model):
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
-    name = models.CharField(max_length=5)
+    name = models.CharField(max_length=20)
+    number = models.IntegerField()
 
     def __str__(self):
         return 'Section {} at workshop {}'.format(self.name, self.workshop.title)
@@ -45,11 +46,15 @@ class Cell(models.Model):
 
 # Here I can create just one cell class for all types instead separation.
 
-class SingleCell(Cell):
+class SowSingleCell(Cell):
     sow = models.OneToOneField(Sow, on_delete=models.SET_NULL, null=True)
 
 
-class GroupCell(Cell):
+class SowGroupCell(Cell):
+    quantity = models.IntegerField(default=0)
+
+
+class PigletsGroupCell(Cell):
     quantity = models.IntegerField(default=0)
 
 

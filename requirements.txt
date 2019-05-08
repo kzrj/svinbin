@@ -2,3 +2,6 @@ Django
 gunicorn
 psycopg2-binary
 mixer
+pytest
+pytest-django
+pytest-cov

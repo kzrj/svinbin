@@ -2,20 +2,17 @@
 from django.db import models
 
 from sows.models import Sow, Gilt
-from workshops.models import WorkShopEmployee, WorkShop, SingleCell, Section, GroupCell, \
-    SowAndPigletsCell
+from workshops.models import WorkShopEmployee, WorkShop, SowSingleCell, Section, PigletsGroupCell, \
+    SowAndPigletsCell, SowGroupCell
 
 
 class Location(models.Model):
     workshop = models.ForeignKey(WorkShop, null=True, on_delete=models.SET_NULL)
     section = models.ForeignKey(Section, null=True, on_delete=models.SET_NULL)
-    singleCell = models.ForeignKey(SingleCell, null=True, on_delete=models.SET_NULL)
-    groupCell = models.ForeignKey(GroupCell, null=True, on_delete=models.SET_NULL)
+    sowSingleCell = models.ForeignKey(SowSingleCell, null=True, on_delete=models.SET_NULL)
+    pigletsGroupCell = models.ForeignKey(PigletsGroupCell, null=True, on_delete=models.SET_NULL)
     sowAndPigletsCell = models.ForeignKey(SowAndPigletsCell, null=True, on_delete=models.SET_NULL)
-
-
-# class PigLocation(Location):
-#     pass
+    sowGroupCell = models.ForeignKey(SowGroupCell, null=True, on_delete=models.SET_NULL)
 
 
 class Transaction(models.Model):
