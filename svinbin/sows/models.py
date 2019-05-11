@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
-# from transactions.models import Location
+from transactions.models import Location, SowTransaction, GiltTransaction
 
 
 class SowStatus(models.Model):
@@ -25,8 +25,8 @@ class Pig(models.Model):
     class Meta:
         abstract = True
 
-    # def move_to(self):
-
+    # def move_to_workshop(self, location, initiator):
+    #     pass
 
 
 class Sow(Pig):
@@ -34,6 +34,10 @@ class Sow(Pig):
 
     def __str__(self):
         return 'Sow #%s' % self.birth_id
+
+    # def move_to_workshop(self, location, initiator):
+    #     SowTransaction.objects.create(sow=self, from_location=self.location,
+    #      to_location=location, initiator=initiator)
 
 
 class Gilt(Pig):

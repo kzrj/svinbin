@@ -2,8 +2,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-from sows.models import Sow
-
 
 class WorkShop(models.Model):
     number = models.IntegerField()
@@ -47,7 +45,7 @@ class Cell(models.Model):
 # Here I can create just one cell class for all types instead separation.
 
 class SowSingleCell(Cell):
-    sow = models.OneToOneField(Sow, on_delete=models.SET_NULL, null=True)
+    sow = models.OneToOneField('sows.Sow', on_delete=models.SET_NULL, null=True)
 
 
 class SowGroupCell(Cell):
@@ -59,5 +57,5 @@ class PigletsGroupCell(Cell):
 
 
 class SowAndPigletsCell(Cell):
-    sow = models.OneToOneField(Sow, on_delete=models.SET_NULL, null=True)
+    sow = models.OneToOneField('sows.Sow', on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField(default=0)

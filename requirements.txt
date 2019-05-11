@@ -5,3 +5,4 @@ mixer
 pytest
 pytest-django
 pytest-cov
+djangorestframework

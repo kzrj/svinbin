@@ -16,4 +16,5 @@ class TestingUtilsTest(TestCase):
 
     def test_create_sow_and_put_in_workshop_one(self):
         sow = sows_testing.create_sow_and_put_in_workshop_one(1, '100')
+        
         self.assertEqual(sow.location.sowSingleCell.number, '100')
