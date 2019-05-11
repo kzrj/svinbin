@@ -10,6 +10,7 @@ from rest_framework.test import APITestCase
 
 import workshops.testing_utils as workshops_testing
 import sows.testing_utils as sows_testing
+from transactions.views import WorkShopSowTransactionViewSet
 from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
 SowAndPigletsCell
 from sows.models import Sow
@@ -67,4 +68,13 @@ class WorkshopOneSowTransactionTest(APITestCase):
         self.assertEqual(sow.location.pigletsGroupCell, None)
         self.assertEqual(sow.location.sowAndPigletsCell, None)
         self.assertEqual(sow.location.sowGroupCell, None)
+
+    def test_move_to(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_two(2, '2')
+        test_view = WorkShopSowTransactionViewSet()
+        test_view._move_to(sow, Section.objects.get(workshop__number=1, number=1))
+        # test_view._move_to(sow, 'HUo')
+
+        sow.refresh_from_db()
+        self.assertEqual(sow.location.section.number, 1)
 
