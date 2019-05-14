@@ -49,6 +49,7 @@ class SowSingleCell(Cell):
 
 
 class SowGroupCell(Cell):
+    sows = models.ManyToManyField('sows.Sow', related_name='sows_in_cell')
     quantity = models.IntegerField(default=0)
 
 

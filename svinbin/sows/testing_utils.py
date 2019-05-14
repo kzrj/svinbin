@@ -11,9 +11,12 @@ def create_sow_and_put_in_workshop_one(section_number, cell_number=None):
     if cell_number:
         cell = SowSingleCell.objects.get(section=section, number=cell_number)
         location = Location.objects.create(sowSingleCell=cell)
+        sow = Sow.objects.create(birth_id=random.randint(1, 1000), location=location)
+        cell.sow = sow
+        cell.save()
     else:
         location = Location.objects.create(section=section)
-    sow = Sow.objects.create(birth_id=random.randint(1, 1000), location=location)
+        sow = Sow.objects.create(birth_id=random.randint(1, 1000), location=location)
     return sow
 
 def create_sow_and_put_in_workshop_two(section_number, cell_number):

@@ -45,3 +45,12 @@ class Gilt(Pig):
 
     def __str__(self):
         return 'Gilt #%s' % self.birth_id
+
+
+class PigletsGroup(models.Model):
+    location = models.OneToOneField('transactions.Location', on_delete=models.SET_NULL, null=True)
+    birth_date = models.DateTimeField(null=True)
+    quantity = models.IntegerField()
+
+    def __str__(self):
+        return 'Piglets group #%s' % self.pk

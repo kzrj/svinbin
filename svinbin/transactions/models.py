@@ -5,6 +5,26 @@ from workshops.models import WorkShopEmployee, WorkShop, SowSingleCell, Section,
     PigletsGroupCell, SowAndPigletsCell, SowGroupCell
 
 
+
+class LocationManager(models.Manager):
+    def create_location(self, pre_location):
+        if isinstance(pre_location, WorkShop):
+            location = self.create(workshop=pre_location)
+        elif isinstance(pre_location, Section):
+            location = self.create(section=pre_location)
+        elif isinstance(pre_location, SowSingleCell):
+            location = self.create(sowSingleCell=pre_location)
+        elif isinstance(pre_location, SowGroupCell):
+            location = self.create(sowGroupCell=pre_location)
+        elif isinstance(pre_location, PigletsGroupCell):
+            location = self.create(pigletsGroupCell=pre_location)
+        elif isinstance(pre_location, SowAndPigletsCell):
+            location = self.create(sowAndPigletsCell=pre_location)
+        # else:
+        #     raise error?
+        return location
+
+
 class Location(models.Model):
     workshop = models.ForeignKey(WorkShop, null=True, on_delete=models.SET_NULL)
     section = models.ForeignKey(Section, null=True, on_delete=models.SET_NULL)
@@ -13,15 +33,7 @@ class Location(models.Model):
     sowAndPigletsCell = models.ForeignKey(SowAndPigletsCell, null=True, on_delete=models.SET_NULL)
     sowGroupCell = models.ForeignKey(SowGroupCell, null=True, on_delete=models.SET_NULL)
 
-    # def __str__(self):
-    #     return self.title
-
-    @property
-    def get_location2(self):
-        for field in self._meta.get_fields():
-            if field:
-
-                yield field.name
+    objects = LocationManager()
 
     @property
     def get_location(self):
@@ -64,21 +76,13 @@ class Location(models.Model):
         if self.sowGroupCell:
             return self.sowGroupCell.section.workshop
 
-# class TransactionObject(models.Model):
-#     sow = models.ForeignKey('sows.Sow', on_delete=models.SET_NULL, null=True)
-#     gilt = models.ForeignKey('sows.Gilt', on_delete=models.SET_NULL, null=True)
-#     pigletsQuantity = models.IntegerField(null=True)
-
 
 class Transaction(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     initiator = models.ForeignKey(WorkShopEmployee, on_delete=models.SET_NULL, null=True)
-    # from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="from_location")
-    # to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="to_location")
     finished = models.BooleanField(default=False)
     returned = models.BooleanField(default=False)
     # reason = models.CharField(max_lenght=)
-    # transactionObject = models.OneToOneField(TransactionObject)
 
     class Meta:
         abstract = True
@@ -93,15 +97,66 @@ class SowTransaction(Transaction):
     sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
+        # need to refractor to atomic transactions.
+        self.to_empty_from_location_single_cell
+        self.to_fill_to_location_single_cell
+
+        self.to_empty_from_location_group_cell
+        self.to_fill_to_location_group_cell        
+
+        self.change_sow_current_location
+        super(SowTransaction, self).save(*args, **kwargs)
+
+    @property
+    def to_empty_from_location_single_cell(self):
+        if self.from_location.sowSingleCell:
+            self.from_location.sowSingleCell.sow = None
+            self.from_location.sowSingleCell.save()
+
+    @property
+    def to_fill_to_location_single_cell(self):
+        if self.to_location.sowSingleCell:
+            self.to_location.sowSingleCell.sow = self.sow
+            self.to_location.sowSingleCell.save()
+
+    @property
+    def to_empty_from_location_group_cell(self):
+        if self.from_location.sowGroupCell:
+            self.from_location.sowGroupCell.sows_in_cell.remove(self.sow)
+
+    @property
+    def to_fill_to_location_group_cell(self):
+        if self.to_location.sowGroupCell:
+            self.from_location.sowGroupCell.sows_in_cell.add(self.sow)
+
+    # add empty , fill for SowAndPigletsCell
+
+    @property
+    def change_sow_current_location(self):
         self.sow.location = self.to_location
         self.sow.save()
-        super(SowTransaction, self).save(*args, **kwargs)
 
 
 class PigletsTransaction(Transaction):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_from_location")
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_to_location")
     quantity = models.IntegerField()
+
+    def save(self, *args, **kwargs):
+        # need to refractor to atomic transactions.
+        self.to_empty_from_location_cell
+        self.to_fill_to_location_cell
+        super(PigletsTransaction, self).save(*args, **kwargs)
+
+    @property
+    def to_empty_from_location_cell(self):
+        self.from_location.sowAndPigletsCell.quantity = self.from_location.sowAndPigletsCell.quantity - self.quantity
+        self.from_location.sowAndPigletsCell.save()
+
+    @property
+    def to_fill_to_location_cell(self):
+        self.to_location.sowAndPigletsCell.quantity = self.from_location.sowAndPigletsCell.quantity + self.quantity
+        self.to_location.sowAndPigletsCell.save()
 
 
 class GiltTransaction(Transaction):

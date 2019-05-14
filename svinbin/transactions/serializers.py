@@ -17,3 +17,12 @@ class PutSowInCellSerializer(serializers.ModelSerializer):
     class Meta:
         model = SowTransaction
         fields = ('sow', 'cell_number')
+
+
+class PutPigletsInCellSerializer(serializers.Serializer):
+    piglets_transaction_id = serializers.IntegerField()
+    to_cell_number = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+    
+    class Meta:
+        fields = ('piglets_transaction_id', 'quantity', 'to_cell_number')
