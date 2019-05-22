@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action, api_view
 from rest_framework import status, exceptions
 
-from sows.models import Sow
+from sows.models import Sow, PigletsGroup
 from workshops.models import WorkShop, Section, SowSingleCell, SowGroupCell
 from transactions.models import SowTransaction, Location
 from transactions.serializers import MoveToWorshopOneSerializer, PutSowInCellSerializer
@@ -133,30 +133,91 @@ class WorkShopPigletsTransactionViewSet(viewsets.ViewSet):
     # permission_classes = (TotalOrderPermissions,)
     
     # It should be in transaction model manager >
-    def move_from_to(self, quantity, from_location, to_location, initiator=None):
-        from_location = Location.objects.create_location(from_location)
-        to_location = Location.objects.create_location(to_location)
+    def move_to(self, piglets_group, pre_location, initiator=None):
+        to_location = Location.objects.create_location(pre_location)
         PigletsTransaction.objects.create(
                 date=timezone.now(),
                 initiator=initiator,
-                from_location=sow.location,
+                from_location=piglets_group.location,
                 to_location=location,
-                quantity=quantity
+                piglets_group=piglets_group
                 )
 
+    # to model manager
+    def create_new_group_from_parent_group(self, parent_piglets_group, quantity):
+        new_piglets_group = PigletsGroup.objetcs.create(quantity=quantity, \
+            location=parent_piglets_group.location,
+            )
+        parent_piglets_group.quantity = parent_piglets_group.quantity - quantity
+        parent_piglets_group.save()
+        new_piglets_group.parent_groups.add(parent_piglets_group)
+        # fix
+        new_piglets_group.tours.add(parent_piglets_group.tours)
+        return new_piglets_group
 
-class WorkShopThreePigletsTransactionViewSet(WorkShopSowTransactionViewSet):
+    def union_groups(self, cell):
+        # If there are two or more groups in same cell we need to union these groups in one.
+        # Assing tour of biggert group to new group
+        # Create mixing record in db.
+
+
+
+class WorkShopThreePigletsTransactionViewSet(WorkShopPigletsTransactionViewSet):
+
+# methods could be detail. Piglets_group by pk
 
     @action(methods=['post'], detail=False)
     def move_to_workshop_four(self, request):
         serializer = PutSowInCellSerializer(data=request.data)
         
         if serializer.is_valid():
-            from_cell = SowAndPigletsCell.objects.get(number=serializer.validated_data['cell_number'])
             to_location = WorkShop.objects.get(number=4)
-            quantity = serializer.validated_data['quantity']
+            piglets_group = serializer.validated_data['piglets_group']
             # initiator = request.user.workshopemployee
-            self.move_from_to(quantity, from_cell, to_location)
+            self.move_from_to(piglets_group, to_location)
+            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False)
+    def move_to_workshop_four_split_group(self, request):
+        serializer = PutSowInCellSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            to_location = WorkShop.objects.get(number=4)
+            parent_piglets_group = serializer.validated_data['piglets_group']
+
+            # quantity should be equal or less than piglet_group quantity
+            quantity = serializer.validated_data['quantity']
+
+            # move to model manager
+            # decrease parent_piglets_group quantity.
+            new_piglets_group = self.split_group_return_child_group(parent_piglets_group, quantity)
+
+            # initiator = request.user.workshopemployee
+            self.move_from_to(new_piglets_group, to_location)
+            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['post'], detail=False)
+    def move_to_workshop_four_mixed_cell(self, request):
+        serializer = PutSowInCellSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            to_location = WorkShop.objects.get(number=4)
+            parent_piglets_group = serializer.validated_data['piglets_group']
+
+            # quantity should be equal or less than piglet_group quantity
+            quantity = serializer.validated_data['quantity']
+
+            # move to model manager
+            # decrease parent_piglets_group quantity.
+            new_piglets_group = self.split_group_return_child_group(parent_piglets_group, quantity)
+
+            # initiator = request.user.workshopemployee
+            self.move_from_to(new_piglets_group, to_location)
             return Response({'msg': 'success'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -166,17 +227,41 @@ class WorkShopThreePigletsTransactionViewSet(WorkShopSowTransactionViewSet):
         serializer = PutSowInCellSerializer(data=request.data)
         
         if serializer.is_valid():
-            from_cell = SowAndPigletsCell.objects.get(number=serializer.validated_data['from_cell_number'])
-            to_cell = SowAndPigletsCell.objects.get(number=serializer.validated_data['to_cell_number'])
-            quantity = serializer.validated_data['quantity']
+            piglets_group = serializer.validated_data['piglets_group']
+            to_location = SowAndPigletsCell.objects.get(number=serializer.validated_data['to_cell_number'])
+            
             # initiator = request.user.workshopemployee
-            self.move_from_to(quantity, from_cell, to_cell)
+            self.move_from_to(piglets_group, to_location)
+            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False)
+    def internal_move_from_cell_to_cell_split_group(self, request):
+        serializer = PutSowInCellSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            to_location = SowAndPigletsCell.objects.get(number=serializer.validated_data['to_cell_number'])
+            parent_piglets_group = serializer.validated_data['piglets_group']
+
+            # quantity should be equal or less than piglet_group quantity
+            quantity = serializer.validated_data['quantity']
+
+            # move to model manager
+            # decrease parent_piglets_group quantity.
+            new_piglets_group = PigletsGroup.objetcs.create(quantity=quantity, location=parent_piglets_group.location)
+            parent_piglets_group.quantity = parent_piglets_group.quantity - quantity
+            parent_piglets_group.save()
+            new_piglets_group.parent_groups.add(parent_piglets_group)
+
+            # initiator = request.user.workshopemployee
+            self.move_from_to(new_piglets_group, to_location)
             return Response({'msg': 'success'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class WorkShopFourPigletsTransactionViewSet(WorkShopSowTransactionViewSet):
+class WorkShopFourPigletsTransactionViewSet(WorkShopPigletsTransactionViewSet):
     @action(methods=['post'], detail=False)
     def move_to_workshop_eight(self, request):
         serializer = PutSowInCellSerializer(data=request.data)

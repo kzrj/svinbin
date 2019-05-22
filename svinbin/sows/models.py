@@ -48,9 +48,15 @@ class Gilt(Pig):
 
 
 class PigletsGroup(models.Model):
-    location = models.OneToOneField('transactions.Location', on_delete=models.SET_NULL, null=True)
+    # location = models.OneToOneField('transactions.Location', on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey('transactions.Location', on_delete=models.SET_NULL, null=True)
     birth_date = models.DateTimeField(null=True)
     quantity = models.IntegerField()
+    # parent_group = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
+    parent_groups = models.ManyToManyField('self', related_name="parent_groups")
+    tours = models.ManyToManyField('tours.Tour', related_name="tours")
+
+    # add oporos on other side of OneToOne
 
     def __str__(self):
         return 'Piglets group #%s' % self.pk
