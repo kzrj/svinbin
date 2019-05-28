@@ -2,6 +2,28 @@
 from rest_framework import serializers, status
 
 from transactions.models import SowTransaction
+from pigs.models import Sow
+
+
+class SowFarmIdSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Sow
+        fields = ('farm_id',)
+
+
+class SowFarmIdAndCellSerializer(serializers.ModelSerializer):
+    cell_number = serializers.IntegerField()
+    
+    class Meta:
+        model = Sow
+        fields = ('farm_id', 'cell_number')
+
+# class MoveToSeminationRowSerializer(serializers.Serializer):
+#     sows_farm_ids = SowFarmIdSerializer(many=True)
+
+
+class MoveToSeminationRowSerializer(serializers.Serializer):
+    sow_farm_id = serializers.IntegerField()
 
 
 class MoveToWorshopOneSerializer(serializers.ModelSerializer):

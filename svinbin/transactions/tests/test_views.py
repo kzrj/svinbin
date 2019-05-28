@@ -9,11 +9,11 @@ from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
 import workshops.testing_utils as workshops_testing
-import sows.testing_utils as sows_testing
+import pigs.testing_utils as sows_testing
 from transactions.views import WorkShopSowTransactionViewSet
 from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
 SowAndPigletsCell
-from sows.models import Sow
+from pigs.models import Sow
 from transactions.models import Location, SowTransaction
 
 

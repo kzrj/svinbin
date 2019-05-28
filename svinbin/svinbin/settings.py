@@ -41,9 +41,11 @@ DJANGO_APPS = [
 
 
 OWN_APPS = [
-    'sows.apps.SowsConfig',
     'workshops.apps.WorkshopsConfig',
+    'pigs.apps.PigsConfig',
     'transactions.apps.TransactionsConfig',
+    'tours.apps.ToursConfig',
+    'events.apps.EventsConfig',
 ]
 
 

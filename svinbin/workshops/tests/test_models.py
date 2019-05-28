@@ -12,13 +12,13 @@ class TestingUtilsTest(TestCase):
         testing.create_workshops()
 
     def test_create_workshops(self):
-        self.assertEqual(WorkShop.objects.all().count(), 10)
+        self.assertEqual(WorkShop.objects.all().count(), 11)
 
     def test_create_workshop_one(self):
         testing.create_sections_and_cell_for_workshop_one()
         workshop = WorkShop.objects.get(number=1)
 
-        self.assertEqual(Section.objects.filter(workshop=workshop).count(), 2)
+        self.assertEqual(Section.objects.filter(workshop=workshop).count(), 3)
 
         section1 = Section.objects.filter(workshop=workshop).first()
         self.assertEqual(SowSingleCell.objects.filter(section=section1).count(), 480)

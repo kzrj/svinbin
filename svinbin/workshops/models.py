@@ -45,35 +45,35 @@ class Cell(models.Model):
 # Here I can create just one cell class for all types instead separation.
 
 class SowSingleCell(Cell):
-    sow = models.OneToOneField('sows.Sow', on_delete=models.SET_NULL, null=True)
+    sow = models.OneToOneField('pigs.Sow', on_delete=models.SET_NULL, null=True)
 
 
 class SowGroupCell(Cell):
-    sows = models.ManyToManyField('sows.Sow', related_name='sows_in_cell')
+    sows = models.ManyToManyField('pigs.Sow', related_name='sows_in_cell')
     quantity = models.IntegerField(default=0)
 
 
 class PigletsGroupCell(Cell):
-    piglets_groups = models.ManyToManyField('sows.PigletsGroup', related_name='piglets_groups_in_cell')
+    piglets_groups = models.ManyToManyField('pigs.PigletsGroup', related_name='piglets_groups_in_cell')
     quantity = models.IntegerField(default=0)
 
 
 class SowAndPigletsCell(Cell):
-    sow = models.OneToOneField('sows.Sow', on_delete=models.SET_NULL, null=True)
-    piglets_groups = models.ManyToManyField('sows.PigletsGroup', related_name='piglets_groups_in_cell')
+    sow = models.OneToOneField('pigs.Sow', on_delete=models.SET_NULL, null=True)
+    piglets_groups = models.ManyToManyField('pigs.PigletsGroup', related_name='piglets_groups_in_sow_cell')
 
 
-class WeighingCell(Cell):
-    piglets_groups = models.ManyToManyField('sows.PigletsGroup', related_name='piglets_groups_in_cell')
-    sows = models.ManyToManyField('sows.Sow', related_name='sows_in_cell')
+# class WeighingCell(Cell):
+#     piglets_groups = models.ManyToManyField('sows.PigletsGroup', related_name='piglets_groups_in_cell')
+#     sows = models.ManyToManyField('sows.Sow', related_name='sows_in_cell')
 
 
-class MixingRecord(models.Model):
-    date = models.DateTimeField(auto_add=True)
-    location =  models.ForeignKey('transactions.Location', null=True, on_delete=models.SET_NULL)
-    sitting_in_cell_group = models.OneToOneField('sows.PigletsGroup', null=True, on_delete=models.SET_NULL,
-        related_name="mixing_records_sitting_in_cell_group")
-    incoming_group = models.OneToOneField('sows.PigletsGroup', null=True, on_delete=models.SET_NULL,
-        related_name="mixing_records_incoming_group")
-    created_group = models.OneToOneField('sows.PigletsGroup', null=True, on_delete=models.SET_NULL,
-        related_name="mixing_records_created_group")
+# class MixingRecord(models.Model):
+#     date = models.DateTimeField(null=True)
+#     location =  models.ForeignKey('transactions.Location', null=True, on_delete=models.SET_NULL)
+#     sitting_in_cell_group = models.OneToOneField('sows.PigletsGroup', null=True, on_delete=models.SET_NULL,
+#         related_name="mixing_records_sitting_in_cell_group")
+#     incoming_group = models.OneToOneField('sows.PigletsGroup', null=True, on_delete=models.SET_NULL,
+#         related_name="mixing_records_incoming_group")
+#     created_group = models.OneToOneField('sows.PigletsGroup', null=True, on_delete=models.SET_NULL,
+#         related_name="mixing_records_created_group")

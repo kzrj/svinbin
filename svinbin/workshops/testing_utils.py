@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from workshops.models import WorkShop, WorkShopEmployee, Section, SowSingleCell, \
-    PigletsGroupCell, SowAndPigletsCell, SowGroupCell, WeighingCell
+    PigletsGroupCell, SowAndPigletsCell, SowGroupCell
 
 
 def create_workshops():
@@ -23,7 +23,8 @@ def create_sections_and_cell_for_workshop_one():
     workshop_one = WorkShop.objects.get(number=1)
 
     Section.objects.bulk_create([Section(workshop=workshop_one, name='Змейка', number=1),
-     Section(workshop=workshop_one, name='Ряд осеменения', number=2)])
+     Section(workshop=workshop_one, name='Ряд осеменения', number=2),
+     Section(workshop=workshop_one, name='Групповые клетки', number=3)])
 
     workshop_one_section_1 = Section.objects.get(name='Змейка')
     SowSingleCell.objects.bulk_create([
@@ -67,10 +68,10 @@ def create_sections_and_cell_for_workshop_with_group_cells(number):
             PigletsGroupCell(section=section, number=cellNumber) for cellNumber in range(1, 7)
             ])
 
-def create_sections_and_cell_for_workshop_eleven():
-    workshop = WorkShop.objects.get(number=11)
-    section = Section.objects.create(workshop=workshop, number=1, name='Секция взвешивания')
-    WeighingCell.objects.create(section=section, number=1)
+# def create_sections_and_cell_for_workshop_eleven():
+#     workshop = WorkShop.objects.get(number=11)
+#     section = Section.objects.create(workshop=workshop, number=1, name='Секция взвешивания')
+#     WeighingCell.objects.create(section=section, number=1)
 
 
 def create_workshops_sections_and_cells():
