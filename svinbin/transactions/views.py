@@ -58,7 +58,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=False)
+    @action(detail=False, methods=['post'])
     def from_semination_row_to_cell(self, request):
         # put sows in semination row from anywhere.
         serializer = serializers.SowFarmIdAndCellSerializer(data=request.data)

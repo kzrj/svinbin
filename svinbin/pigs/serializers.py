@@ -7,6 +7,7 @@ from pigs.models import Sow
 class SowSerializer(serializers.ModelSerializer):
     location = serializers.StringRelatedField()
     status = serializers.StringRelatedField()
+    tour = serializers.StringRelatedField()
 
     class Meta:
         model = Sow
