@@ -1,5 +1,9 @@
 from django.db import models
 from django.utils import timezone
+from django.apps import apps
+
+from pigs.models import Sow
+from events import models as events_models
 
 
 class TourManager(models.Manager):
@@ -8,6 +12,9 @@ class TourManager(models.Manager):
         if not tour:
             return self.create(start_date=timezone.now(), week_number=week_number, year=timezone.now().year)
         return tour
+
+    def get_tour_by_week_in_current_year(self, week_number):
+        return Tour.objects.filter(week_number=week_number, year=timezone.now().year).first()
 
 
 class Tour(models.Model):
@@ -20,6 +27,26 @@ class Tour(models.Model):
 
     def __str__(self):
         return "Tour #%s" % self.week_number
+
+    @property
+    def get_inseminated_sows(self):
+        seminations = events_models.Semination.objects.filter(tour=self)
+        return Sow.objects.filter(semination__in=seminations)
+
+    @property
+    def get_ultrasounded_sows(self):
+        ultrasounds = events_models.Ultrasound.objects.filter(tour=self)
+        return Sow.objects.filter(ultrasound__in=ultrasounds)
+
+    @property
+    def get_ultrasounded_sows_success(self):
+        ultrasounds = events_models.Ultrasound.objects.filter(tour=self, result=True)
+        return Sow.objects.filter(ultrasound__in=ultrasounds)
+
+    @property
+    def get_ultrasounded_sows_fail(self):
+        ultrasounds = events_models.Ultrasound.objects.filter(tour=self, result=False)
+        return Sow.objects.filter(ultrasound__in=ultrasounds)
 
 
 # class SowInfoTourManager(models.Manager):

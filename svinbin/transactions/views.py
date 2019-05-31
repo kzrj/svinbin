@@ -11,42 +11,30 @@ from rest_framework import status, exceptions
 from pigs.models import Sow, PigletsGroup
 from workshops.models import WorkShop, Section, SowSingleCell, SowGroupCell
 from transactions.models import SowTransaction, Location
-from transactions.serializers import MoveToWorshopOneSerializer, PutSowInCellSerializer, \
-    MoveToSeminationRowSerializer, SowFarmIdAndCellSerializer
+from transactions import serializers
 
 
-class WorkShopSowTransactionViewSet(viewsets.ModelViewSet):
-    queryset = Sow.objects.all()
-    # serializer_class = SowTransactionSerializer
+class SowTransactionViewSet(viewsets.ViewSet):
+    # queryset = None
+    # serializer_class = FarmIdSerializer
     # permission_classes = (TotalOrderPermissions,)
-
-    # @action(methods=['post'], detail=True)
-    # def return_sow(self, request):
-    #     sow = self.get_object()
-    #     serializer = MoveToWorshopOneSerializer(data=request.data)
-    #     # where should I do validation? Here or in serializer?
-    #     # sow not dead, not sick, etc
-    #     if serializer.is_valid():
-    #         previous_transaction = SowTransaction.objects.get(sow=sow, to_location=sow.location)
-    #         # if it already returned raise error
-    #         # pre_location = previous_transaction.from_location.get_workshop
-    #         # initiator = request.user.workshopemployee
-    #         self.move_to(sow, previous_transaction.from_location.get_workshop)
-
-    #         return Response({'msg': 'success'}, status=status.HTTP_200_OK)
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    pass
 
 
-class WorkShopOneSowTransactionViewSet(WorkShopSowTransactionViewSet):
+class WorkShopOneTwoSowTransactionViewSet(SowTransactionViewSet):
+
+    def get_serializer_class(self):
+        if self.action == 'from_semination_row_to_cell':
+            return SowFarmIdAndCellSerializer
+        return SowFarmIdAndCellSerializer
 
     @action(methods=['post'], detail=False)
     def put_in_semination_row(self, request):
         # put sows in semination row from anywhere.
-        serializer = MoveToSeminationRowSerializer(data=request.data)
+        serializer = serializers.FarmIdSerializer(data=request.data)
         # initiator = request.user.workshopemployee
         if serializer.is_valid():
-            Sow.objects.move_to(serializer.validation_data['farm_id'],
+            Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
              Section.objects.get(workshop__number=1, number=2))
             return Response({'msg': 'success'}, status=status.HTTP_200_OK)
         else:
@@ -54,63 +42,74 @@ class WorkShopOneSowTransactionViewSet(WorkShopSowTransactionViewSet):
 
     @action(methods=['post'], detail=False)
     def put_in_cell_for_ultrasound(self, request):
-        # put sows in semination row from anywhere.
-        serializer = SowFarmIdAndCellSerializer(data=request.data)
+        serializer = serializers.SowFarmIdAndCellSerializer(data=request.data)
         # initiator = request.user.workshopemployee
         if serializer.is_valid():
-            Sow.objects.move_to(serializer.validated_data['farm_id'],
+            sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
                 SowSingleCell.objects.get(number=serializer.validated_data['cell_number']))
             sow.change_status_waiting_ultrasound
             return Response({'msg': 'success'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # @action(methods=['post'], detail=True)
-    # def move_to_workshop_two(self, request, pk=None):
-    #     sow = self.get_object()
-    #     # validate sow
-    #     # initiator = request.user.workshopemployee
-    #     self.move_to(sow, WorkShop.objects.get(number=2))
-    #     return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+    @action(methods=['post'], detail=False)
+    def from_semination_row_to_cell(self, request):
+        # put sows in semination row from anywhere.
+        serializer = serializers.SowFarmIdAndCellSerializer(data=request.data)
+        # initiator = request.user.workshopemployee
+        if serializer.is_valid():
+            sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
+                SowSingleCell.objects.get(number=serializer.validated_data['cell_number']))
+            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # @action(methods=['post'], detail=True)
-    # def put_sow_in_cell(self, request, pk=None):
-    #     serializer = PutSowInCellSerializer(data=request.data)
-    #     sow = self.get_object()
-    #     # where should I do validation? Here or in serializer?
-    #     # sow not dead, not sick, etc
-    #     if serializer.is_valid():
-    #         pre_location = SowSingleCell.objects.get(number=serializer.validated_data['cell_number'])
-    #         # initiator = request.user.workshopemployee
-    #         self.move_to(sow, pre_location)
-            
-    #         return Response({'msg': 'success'}, status=status.HTTP_200_OK)
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    @action(methods=['post'], detail=False)
+    def move_all_pregnant_to_workshop_two(self, request):
+        serializer = WeekNumberSerializer()
+        if serializer.is_valid():
+            # initiator = request.user.workshopemployee    
+            sows = Sow.objects.get_all_pregnant_in_workshop_one()
+            Sow.objects.move_many(sows, WorkShop.objects.get(number=2), initiator=None)
+            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['post'], detail=False)
+    def move_pregnant_to_workshop_two(self, request):
+        serializer = serializers.WeekNumberFarmIdSerializer()
+        if serializer.is_valid():
+            # initiator = request.user.workshopemployee    
+            sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
+                WorkShop.objects.get(number=2))
+            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
-# class WorkShopTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
+   # делает сотрудник 3 цеха
+    @action(methods=['post'], detail=False)
+    def move_to_workshop_three(self, request):
+        serializer = serializers.WeekNumberFarmIdSerializer()
+        if serializer.is_valid():
+            # initiator = request.user.workshopemployee    
+            sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
+                WorkShop.objects.get(number=3))
+            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-#     @action(methods=['post'], detail=True)
-#     def put_sow_in_cell(self, request, pk=None):
-#         sow = self.get_object()
-#         serializer = PutSowInCellSerializer(data=request.data)
-#         # where should I do validation? Here or in serializer?
-#         # sow not dead, not sick, etc
-#         if serializer.is_valid():
-#             pre_location = SowGroupCell.objects.get(number=serializer.validated_data['cell_number'])
-#             # initiator = request.user.workshopemployee
-#             self.move_to(sow, pre_location)
-#             return Response({'msg': 'success'}, status=status.HTTP_200_OK)
-#         else:
-#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-#     @action(methods=['post'], detail=True)
-#     def move_to_workshop_three(self, request, pk=None):
-#         sow = self.get_object()
-#         # initiator = request.user.workshopemployee
-#         self.move_to(sow, WorkShop.objects.get(number=3))
-#         return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+    # делает сотрудник 1 цеха
+    @action(methods=['post'], detail=False)
+    def move_to_workshop_one(self, request):
+        serializer = serializers.WeekNumberFarmIdSerializer()
+        if serializer.is_valid():
+            # initiator = request.user.workshopemployee    
+            sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
+                WorkShop.objects.get(number=1))
+            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # class WorkShopThreeSowTransactionViewSet(WorkShopSowTransactionViewSet):

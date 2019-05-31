@@ -75,10 +75,11 @@ def create_sections_and_cell_for_workshop_with_group_cells(number):
 
 
 def create_workshops_sections_and_cells():
-    create_workshops()
-    create_sections_and_cell_for_workshop_one()
-    create_sections_and_cell_for_workshop_two()
-    create_sections_and_cell_for_workshop_three()
-    
-    for workshop_number in range(4, 9):
-        create_sections_and_cell_for_workshop_with_group_cells(workshop_number)
+    if WorkShop.objects.all().count() < 1:
+        create_workshops()
+        create_sections_and_cell_for_workshop_one()
+        create_sections_and_cell_for_workshop_two()
+        create_sections_and_cell_for_workshop_three()
+        
+        for workshop_number in range(4, 9):
+            create_sections_and_cell_for_workshop_with_group_cells(workshop_number)

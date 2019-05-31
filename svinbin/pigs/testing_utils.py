@@ -9,8 +9,9 @@ from pigs.models import Sow, SowStatus
 def create_statuses():
     SowStatus.objects.bulk_create([
         SowStatus(title='waiting ultrasound'),
-        SowStatus(title='pregnant'),
+        SowStatus(title='pregnant in workshop one'),
         SowStatus(title='proholost'),
+        SowStatus(title='pregnant in workshop two'),
         ])
 
 

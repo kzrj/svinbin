@@ -3,17 +3,18 @@ from django.db import models
 
 from transactions.models import Location, SowTransaction, GiltTransaction
 from workshops.models import Section, SowGroupCell, WorkShop
+# from events.models import Semination, Ultrasound
 
 
 class SowStatus(models.Model):
-    title = models.CharField(max_length=20)
+    title = models.CharField(max_length=100)
 
     def __str__(self):
         return self.title
 
 
 class GiltStatus(models.Model):
-    title = models.CharField(max_length=20)
+    title = models.CharField(max_length=100)
 
     def __str__(self):
         return self.title
@@ -49,14 +50,22 @@ class SowManager(models.Manager):
         #     raise error
         return sow
 
-    def move_to(self, farm_id, pre_location, initiator=None):
-        sow = self.get_by_farm_id(farm_id)
+    def move_to(self, sow, pre_location, initiator=None):
         location = Location.objects.create_location(pre_location)
         SowTransaction.objects.create_transaction(                
                 initiator=initiator,
                 to_location=location,
                 sow=sow
                 )
+
+    def move_to_by_farm_id(self, farm_id, pre_location, initiator=None):
+        sow = self.get_or_create_by_farm_id(farm_id)
+        self.move_to(sow, pre_location, initiator)
+        return sow
+
+    def move_many(self, sows, pre_location, initiator=None):
+        for sow in sows.all():
+            self.move_to(sow, pre_location, initiator)
 
 
 class Sow(Pig):
@@ -73,8 +82,18 @@ class Sow(Pig):
     #      to_location=location, initiator=initiator)
 
     @property
-    def change_status_waiting_ultrasound(self):
+    def change_status_to_waiting_ultrasound(self):
         self.status = SowStatus.objects.get(title='waiting ultrasound')
+        self.save()
+
+    @property
+    def change_status_to_pregnant_in_workshop_one(self):
+        self.status = SowStatus.objects.get(title='pregnant in workshop one')
+        self.save()
+
+    @property
+    def change_status_to_proholost(self):
+        self.status = SowStatus.objects.get(title='proholost')
         self.save()
 
 

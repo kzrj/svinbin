@@ -2,33 +2,58 @@
 from django.db import models
 from django.utils import timezone
 
-from tours.models import Tour
 from pigs.models import Sow
+from tours.models import Tour
 
 
 class Event(models.Model):
     date = models.DateTimeField(null=True)
     initiator = models.ForeignKey('workshops.WorkShopEmployee',
-     on_delete=models.SET_NULL, null=True, related_name="initiator")
+     on_delete=models.SET_NULL, null=True)
     
     class Meta:
         abstract = True
 
 
+class SowEvent(Event):
+    sow = models.ForeignKey('pigs.Sow', on_delete=models.CASCADE)
+    tour = models.ForeignKey('tours.Tour', null=True, on_delete=models.CASCADE)
+
+    class Meta:
+        abstract = True
+
+    
 class SeminationManager(models.Manager):
-	def create_semination(self, sow_farm_id, week, initiator=None, semination_employee=None):
-		sow = Sow.objects.filter(farm_id=sow_farm_id).first()
-		tour = Tour.objects.get_or_create_by_week_in_current_year(week)
-		semination = self.create(sow=sow, tour=tour, initiator=initiator,
-		 semination_employee=semination_employee, date=timezone.now())
-		return semination
+    def create_semination(self, sow_farm_id, week, initiator=None, semination_employee=None):
+        sow = Sow.objects.get_by_farm_id(sow_farm_id)
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week)
+        semination = self.create(sow=sow, tour=tour, initiator=initiator,
+         semination_employee=semination_employee, date=timezone.now())
+        return semination
 
 
-class Semination(Event):
-	sow = models.ForeignKey('pigs.Sow', on_delete=models.CASCADE)
-	semination_employee = models.ForeignKey('workshops.WorkShopEmployee',
-	 on_delete=models.SET_NULL, null=True, related_name="semination_employee")
-	# boar 
-	tour = models.ForeignKey('tours.Tour', null=True, on_delete=models.CASCADE)
+class Semination(SowEvent):
+    semination_employee = models.ForeignKey('workshops.WorkShopEmployee',
+     on_delete=models.SET_NULL, null=True, related_name="semination_employee")
+    # boar 
 
-	objects = SeminationManager()
+    objects = SeminationManager()
+
+
+class UltrasoundManager(models.Manager):
+    def create_ultrasound(self, sow_farm_id, week, initiator=None, result=False):
+        sow = Sow.objects.get_by_farm_id(sow_farm_id)
+        tour = Tour.objects.get_tour_by_week_in_current_year(week)
+        ultrasound = self.create(sow=sow, tour=tour, initiator=initiator,
+         date=timezone.now(), result=result)
+        if result:
+            sow.change_status_to_pregnant_in_workshop_one
+        else:
+            sow.change_status_to_proholost
+        return ultrasound
+
+
+class Ultrasound(SowEvent):
+    result = models.BooleanField()
+
+    objects = UltrasoundManager()

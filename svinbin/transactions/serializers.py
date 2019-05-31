@@ -22,6 +22,14 @@ class SowFarmIdAndCellSerializer(serializers.ModelSerializer):
 #     sows_farm_ids = SowFarmIdSerializer(many=True)
 
 
+class WeekNumberSerializer(serializers.Serializer):
+    week_number = serializers.IntegerField()
+
+
+class FarmIdSerializer(serializers.Serializer):
+    farm_id = serializers.IntegerField()
+
+
 class MoveToSeminationRowSerializer(serializers.Serializer):
     sow_farm_id = serializers.IntegerField()
 

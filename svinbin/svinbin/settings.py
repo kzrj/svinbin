@@ -44,12 +44,14 @@ OWN_APPS = [
     'workshops.apps.WorkshopsConfig',
     'pigs.apps.PigsConfig',
     'transactions.apps.TransactionsConfig',
-    'tours.apps.ToursConfig',
     'events.apps.EventsConfig',
+    'tours.apps.ToursConfig',
 ]
 
 
 WEB_APPS = [
+    'rest_framework',
+    'rest_framework_swagger'
 ]
 
 
@@ -70,7 +72,7 @@ ROOT_URLCONF = 'svinbin.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR + '/templates/'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

@@ -4,9 +4,10 @@ from rest_framework import serializers
 from pigs.models import Sow
 
 
-class SeminationSerializer(serializers.ModelSerializer):
+class SeminationSerializer(serializers.Serializer):
     week = serializers.IntegerField()
+    farm_id = serializers.IntegerField()
 
-    class Meta:
-        model = Sow
-        fields = ('farm_id', 'week')
+
+class UltrasoundSerializer(SeminationSerializer)
+    result = serializers.BooleanField()

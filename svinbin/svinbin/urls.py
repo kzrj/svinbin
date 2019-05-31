@@ -9,12 +9,16 @@ from django.conf import settings
 
 from rest_framework import routers
 
-from transactions.views import WorkShopOneSowTransactionViewSet
+from transactions import views as transaction_views
+from workshops.views import CreateWorkshopsView
 
 router = routers.DefaultRouter()
-router.register(r'workshopone/sowtransactions', WorkShopOneSowTransactionViewSet)
+router.register(r'sowtransactions', transaction_views.WorkShopOneTwoSowTransactionViewSet,
+    basename='sowtransactions')
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^api/', include(router.urls)),    
+    url(r'^api/', include(router.urls)),
+    url(r'^api/create_workshops/', CreateWorkshopsView.as_view()),
+
     ]
