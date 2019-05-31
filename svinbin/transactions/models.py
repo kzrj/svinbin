@@ -83,6 +83,9 @@ class Location(models.Model):
         if self.sowGroupCell:
             return self.sowGroupCell.section.workshop
 
+    def __str__(self):
+        return str(self.get_location)
+
 
 class Transaction(models.Model):
     date = models.DateTimeField(auto_now_add=True)

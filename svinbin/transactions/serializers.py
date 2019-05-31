@@ -1,8 +1,27 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers, status
 
-from transactions.models import SowTransaction
+from transactions.models import SowTransaction, Location
 from pigs.models import Sow
+
+
+class LocationSerializer(serializers.ModelSerializer):
+    workshop = serializers.StringRelatedField()
+    section = serializers.StringRelatedField()
+
+    class Meta:
+        model = Location  
+        fields = '__all__'
+
+
+class SowTransactionSerializer(serializers.ModelSerializer):
+    from_location = serializers.StringRelatedField()
+    to_location = serializers.StringRelatedField()
+    sow = serializers.StringRelatedField()
+
+    class Meta:
+        model = SowTransaction  
+        fields = '__all__'
 
 
 class SowFarmIdSerializer(serializers.ModelSerializer):

@@ -13,7 +13,9 @@ from transactions import views as transaction_views
 from workshops.views import CreateWorkshopsView
 
 router = routers.DefaultRouter()
-router.register(r'sowtransactions', transaction_views.WorkShopOneTwoSowTransactionViewSet,
+router.register(r'sowtransactions/workshops', transaction_views.WorkShopOneTwoSowTransactionViewSet,
+    basename='workshop-sowtransactions')
+router.register(r'sowtransactions/transactions', transaction_views.SowTransactions,
     basename='sowtransactions')
 
 urlpatterns = [

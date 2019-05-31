@@ -14,14 +14,20 @@ from transactions.models import SowTransaction, Location
 from transactions import serializers
 
 
-class SowTransactionViewSet(viewsets.ViewSet):
+
+class SowTransactions(viewsets.ModelViewSet):
+    queryset = SowTransaction.objects.all()
+    serializer_class = serializers.SowTransactionSerializer
+
+
+class WorkShopSowTransactionViewSet(viewsets.ViewSet):
     # queryset = None
     # serializer_class = FarmIdSerializer
     # permission_classes = (TotalOrderPermissions,)
     pass
 
 
-class WorkShopOneTwoSowTransactionViewSet(SowTransactionViewSet):
+class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
 
     def get_serializer_class(self):
         if self.action == 'from_semination_row_to_cell':
