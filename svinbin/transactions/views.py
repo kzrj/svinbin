@@ -115,7 +115,7 @@ class WorkShopOneTwoSowTransactionViewSet(SowTransactionViewSet):
 # class WorkShopThreeSowTransactionViewSet(WorkShopSowTransactionViewSet):
 
 #     @action(methods=['post'], detail=True)
-#     def put_sow_in_cell(self, request, pk=None):
+#     def put_sow_in_cell(self, request, pk=None):3
 #         sow = self.get_object()
 #         serializer = PutSowInCellSerializer(data=request.data)
 #         # where should I do validation? Here or in serializer?
@@ -159,7 +159,6 @@ class WorkShopOneTwoSowTransactionViewSet(SowTransactionViewSet):
 #         # If there are two or more groups in same cell we need to union these groups in one.
 #         # Assing tour of biggert group to new group
 #         # Create mixing record in db.
-
 
 
 # class WorkShopThreePigletsTransactionViewSet(WorkShopPigletsTransactionViewSet):
