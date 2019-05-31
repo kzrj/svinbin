@@ -1,0 +1,13 @@
+# -*- coding: utf-8 -*-
+from rest_framework import serializers, status
+
+from pigs.models import Sow
+
+
+class SowSerializer(serializers.ModelSerializer):
+    location = serializers.StringRelatedField()
+    status = serializers.StringRelatedField()
+
+    class Meta:
+        model = Sow
+        fields = '__all__'

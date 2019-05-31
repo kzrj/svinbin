@@ -29,6 +29,8 @@ class SeminationManager(models.Manager):
         tour = Tour.objects.get_or_create_by_week_in_current_year(week)
         semination = self.create(sow=sow, tour=tour, initiator=initiator,
          semination_employee=semination_employee, date=timezone.now())
+        sow.tour = tour
+        sow.save()
         return semination
 
 

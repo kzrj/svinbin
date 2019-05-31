@@ -10,13 +10,16 @@ from django.conf import settings
 from rest_framework import routers
 
 from transactions import views as transaction_views
+from pigs import views as pigs_views
 from workshops.views import CreateWorkshopsView
 
 router = routers.DefaultRouter()
 router.register(r'sowtransactions/workshops', transaction_views.WorkShopOneTwoSowTransactionViewSet,
     basename='workshop-sowtransactions')
-router.register(r'sowtransactions/transactions', transaction_views.SowTransactions,
+router.register(r'sowtransactions/transactions', transaction_views.SowTransactionsViewSet,
     basename='sowtransactions')
+router.register(r'sows', pigs_views.SowViewSet, basename='sows')
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),

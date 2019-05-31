@@ -15,7 +15,7 @@ from transactions import serializers
 
 
 
-class SowTransactions(viewsets.ModelViewSet):
+class SowTransactionsViewSet(viewsets.ModelViewSet):
     queryset = SowTransaction.objects.all()
     serializer_class = serializers.SowTransactionSerializer
 
