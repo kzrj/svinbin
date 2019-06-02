@@ -7,12 +7,15 @@ from pigs.models import Sow, SowStatus
 
 
 def create_statuses():
-    SowStatus.objects.bulk_create([
-        SowStatus(title='waiting ultrasound'),
-        SowStatus(title='pregnant in workshop one'),
-        SowStatus(title='proholost'),
-        SowStatus(title='pregnant in workshop two'),
-        ])
+    if SowStatus.objects.all().count() < 1:
+        SowStatus.objects.bulk_create([
+            SowStatus(title='just seminated'),
+            SowStatus(title='waiting ultrasound'),
+            SowStatus(title='pregnant in workshop one'),
+            SowStatus(title='proholost'),
+            SowStatus(title='pregnant in workshop two'),
+            SowStatus(title='has slaughtered special'),
+            ])
 
 
 def create_sow_and_put_in_workshop_one(section_number=None, cell_number=None):

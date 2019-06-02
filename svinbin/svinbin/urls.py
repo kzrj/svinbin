@@ -22,6 +22,7 @@ router.register(r'sowtransactions/transactions', transaction_views.SowTransactio
 router.register(r'sows', pigs_views.SowViewSet, basename='sows')
 router.register(r'events/seminations', events_views.SeminationViewSet, basename='seminations')
 router.register(r'events/ultrasounds', events_views.UltrasoundViewSet, basename='ultrasounds')
+router.register(r'events/spec_uboi', events_views.SlaughterSowViewSet, basename='spec_uboi')
 
 
 urlpatterns = [

@@ -59,3 +59,20 @@ class Ultrasound(SowEvent):
     result = models.BooleanField()
 
     objects = UltrasoundManager()
+
+
+class SlaughterSowManager(models.Manager):
+    def create_slaughter(self, sow_farm_id, slaughter_type, initiator=None, result=False):
+        sow = Sow.objects.get_by_farm_id(sow_farm_id)
+        slaughter = self.create(sow=sow, initiator=initiator,
+         date=timezone.now(), slaughter_type=slaughter_type)
+        sow.change_status_to(status_title='has slaughtered special', alive=False)
+
+        return slaughter
+
+
+class SlaughterSow(SowEvent):
+    SLAUGHTER_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka')]
+    slaughter_type = models.CharField(max_length=50, choices=SLAUGHTER_TYPES)
+
+    objects = SlaughterSowManager()

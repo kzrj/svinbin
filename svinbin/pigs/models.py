@@ -72,6 +72,7 @@ class Sow(Pig):
     farm_id = models.IntegerField(null=True, unique=True)
     status = models.ForeignKey(SowStatus, on_delete=models.SET_NULL, null=True)
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
+    alive = models.BooleanField(default=True)
 
     objects = SowManager()
 
@@ -81,6 +82,11 @@ class Sow(Pig):
     # def move_to_workshop(self, location, initiator):
     #     SowTransaction.objects.create(sow=self, from_location=self.location,
     #      to_location=location, initiator=initiator)
+
+    def change_status_to(self, status_title, alive=True):
+        self.status = SowStatus.objects.get(title=status_title)
+        self.alive = alive
+        self.save()
 
     @property
     def change_status_to_waiting_ultrasound(self):
