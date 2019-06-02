@@ -30,7 +30,7 @@ class SeminationManager(models.Manager):
         semination = self.create(sow=sow, tour=tour, initiator=initiator,
          semination_employee=semination_employee, date=timezone.now())
         sow.tour = tour
-        sow.save()
+        sow.change_status_to('just seminated')
         return semination
 
 

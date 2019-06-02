@@ -53,7 +53,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
         if serializer.is_valid():
             sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
                 SowSingleCell.objects.get(number=serializer.validated_data['cell_number']))
-            sow.change_status_waiting_ultrasound
+            sow.change_status_to('waiting ultrasound')
             return Response({'msg': 'success'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -70,24 +70,25 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=False)
-    def move_all_pregnant_to_workshop_two(self, request):
-        serializer = WeekNumberSerializer()
-        if serializer.is_valid():
-            # initiator = request.user.workshopemployee    
-            sows = Sow.objects.get_all_pregnant_in_workshop_one()
-            Sow.objects.move_many(sows, WorkShop.objects.get(number=2), initiator=None)
-            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # @action(methods=['post'], detail=False)
+    # def move_all_pregnant_to_workshop_two(self, request):
+    #     serializer = WeekNumberSerializer()
+    #     if serializer.is_valid():
+    #         # initiator = request.user.workshopemployee    
+    #         sows = Sow.objects.get_all_pregnant_in_workshop_one()
+    #         Sow.objects.move_many(sows, WorkShop.objects.get(number=2), initiator=None)
+    #         return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=False)
     def move_pregnant_to_workshop_two(self, request):
-        serializer = serializers.WeekNumberFarmIdSerializer()
+        serializer = serializers.FarmIdSerializer(data=request.data)
         if serializer.is_valid():
             # initiator = request.user.workshopemployee    
             sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
                 WorkShop.objects.get(number=2))
+            sow.change_status_to("pregnant in workshop two")
             return Response({'msg': 'success'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -96,7 +97,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
    # делает сотрудник 3 цеха
     @action(methods=['post'], detail=False)
     def move_to_workshop_three(self, request):
-        serializer = serializers.WeekNumberFarmIdSerializer()
+        serializer = serializers.FarmIdSerializer(data=request.data)
         if serializer.is_valid():
             # initiator = request.user.workshopemployee    
             sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],

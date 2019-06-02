@@ -30,12 +30,13 @@ class SowFarmIdSerializer(serializers.ModelSerializer):
         fields = ('farm_id',)
 
 
-class SowFarmIdAndCellSerializer(serializers.ModelSerializer):
+class SowFarmIdAndCellSerializer(serializers.Serializer):
     cell_number = serializers.IntegerField()
+    farm_id = serializers.IntegerField()
     
-    class Meta:
-        model = Sow
-        fields = ('farm_id', 'cell_number')
+    # class Meta:
+    #     model = Sow
+    #     fields = ('farm_id', 'cell_number')
 
 # class MoveToSeminationRowSerializer(serializers.Serializer):
 #     sows_farm_ids = SowFarmIdSerializer(many=True)

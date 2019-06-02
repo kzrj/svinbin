@@ -15,6 +15,7 @@ def create_statuses():
             SowStatus(title='proholost'),
             SowStatus(title='pregnant in workshop two'),
             SowStatus(title='has slaughtered special'),
+            SowStatus(title='waiting delivery in workshop three'),
             ])
 
 

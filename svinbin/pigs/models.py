@@ -59,7 +59,7 @@ class SowManager(models.Manager):
                 )
 
     def move_to_by_farm_id(self, farm_id, pre_location, initiator=None):
-        sow = self.get_or_create_by_farm_id(farm_id)
+        sow = self.get_by_farm_id(farm_id)
         self.move_to(sow, pre_location, initiator)
         return sow
 
