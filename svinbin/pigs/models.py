@@ -52,16 +52,22 @@ class SowManager(models.Manager):
 
     def move_to(self, sow, pre_location, initiator=None):
         location = Location.objects.create_location(pre_location)
-        SowTransaction.objects.create_transaction(                
+        transaction = SowTransaction.objects.create_transaction(                
                 initiator=initiator,
                 to_location=location,
                 sow=sow
                 )
+        return transaction
+
+    def create_and_move_to_by_farm_id(self, farm_id, pre_location, initiator=None):
+        sow = self.get_or_create_by_farm_id(farm_id)
+        transaction = self.move_to(sow, pre_location, initiator)
+        return sow, transaction
 
     def move_to_by_farm_id(self, farm_id, pre_location, initiator=None):
         sow = self.get_by_farm_id(farm_id)
-        self.move_to(sow, pre_location, initiator)
-        return sow
+        transaction = self.move_to(sow, pre_location, initiator)
+        return sow, transaction
 
     def move_many(self, sows, pre_location, initiator=None):
         for sow in sows.all():

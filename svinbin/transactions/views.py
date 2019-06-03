@@ -12,6 +12,7 @@ from pigs.models import Sow, PigletsGroup
 from workshops.models import WorkShop, Section, SowSingleCell, SowGroupCell
 from transactions.models import SowTransaction, Location
 from transactions import serializers
+from pigs import serializers as sow_serializers
 
 
 
@@ -41,9 +42,12 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
         serializer = serializers.FarmIdSerializer(data=request.data)
         # initiator = request.user.workshopemployee
         if serializer.is_valid():
-            Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
+            sow, transaction = Sow.objects.create_and_move_to_by_farm_id(serializer.validated_data['farm_id'],
              Section.objects.get(workshop__number=1, number=2))
-            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+            return Response(
+                {"transaction": serializers.SowTransactionSerializer(transaction).data,
+                 "sow": sow_serializers.SowSerializer(sow).data, },
+                status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -52,10 +56,13 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
         serializer = serializers.SowFarmIdAndCellSerializer(data=request.data)
         # initiator = request.user.workshopemployee
         if serializer.is_valid():
-            sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
+            sow, transaction = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
                 SowSingleCell.objects.get(number=serializer.validated_data['cell_number']))
             sow.change_status_to('waiting ultrasound')
-            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+            return Response(
+                {"transaction": serializers.SowTransactionSerializer(transaction).data,
+                 "sow": sow_serializers.SowSerializer(sow).data, },
+                status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -87,10 +94,13 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
         serializer = serializers.FarmIdSerializer(data=request.data)
         if serializer.is_valid():
             # initiator = request.user.workshopemployee    
-            sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
+            sow, transaction = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
                 WorkShop.objects.get(number=2))
             sow.change_status_to("pregnant in workshop two")
-            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+            return Response(
+                {"transaction": serializers.SowTransactionSerializer(transaction).data,
+                 "sow": sow_serializers.SowSerializer(sow).data, },
+                status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -100,7 +110,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
         serializer = serializers.FarmIdSerializer(data=request.data)
         if serializer.is_valid():
             # initiator = request.user.workshopemployee    
-            sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
+            sow, transaction = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
                 WorkShop.objects.get(number=3))
             return Response({'msg': 'success'}, status=status.HTTP_200_OK)
         else:
