@@ -5,8 +5,8 @@ from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework import viewsets, status
 from rest_framework.response import Response
-from rest_framework.decorators import action, api_view
-from rest_framework import status, exceptions
+from rest_framework.decorators import action
+from rest_framework import status, generics
 
 from pigs.models import Sow, PigletsGroup
 from workshops.models import WorkShop, Section, SowSingleCell, SowGroupCell
@@ -20,19 +20,20 @@ class SowTransactionsViewSet(viewsets.ModelViewSet):
     serializer_class = serializers.SowTransactionSerializer
 
 
-class WorkShopSowTransactionViewSet(viewsets.ViewSet):
-    # queryset = None
-    # serializer_class = FarmIdSerializer
+class WorkShopSowTransactionViewSet(viewsets.ModelViewSet):
+    queryset = Sow.objects.all()
+    serializer_class = serializers.FarmIdSerializer
     # permission_classes = (TotalOrderPermissions,)
-    pass
-
+    
 
 class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
 
     def get_serializer_class(self):
         if self.action == 'from_semination_row_to_cell':
-            return SowFarmIdAndCellSerializer
-        return SowFarmIdAndCellSerializer
+            return serializers.SowFarmIdAndCellSerializer
+        if self.action == 'put_in_cell_for_ultrasound':
+            return serializers.SowFarmIdAndCellSerializer
+        return serializers.FarmIdSerializer
 
     @action(methods=['post'], detail=False)
     def put_in_semination_row(self, request):
@@ -93,7 +94,6 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
    # делает сотрудник 3 цеха
     @action(methods=['post'], detail=False)
     def move_to_workshop_three(self, request):
@@ -109,7 +109,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
     # делает сотрудник 1 цеха
     @action(methods=['post'], detail=False)
     def move_to_workshop_one(self, request):
-        serializer = serializers.WeekNumberFarmIdSerializer()
+        serializer = serializers.FarmIdSerializer()
         if serializer.is_valid():
             # initiator = request.user.workshopemployee    
             sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
