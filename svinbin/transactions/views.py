@@ -9,7 +9,7 @@ from rest_framework.decorators import action
 from rest_framework import status, generics
 
 from pigs.models import Sow, PigletsGroup
-from workshops.models import WorkShop, Section, SowSingleCell, SowGroupCell
+from workshops.models import WorkShop, Section, SowSingleCell, SowGroupCell, SowAndPigletsCell
 from transactions.models import SowTransaction, Location
 from transactions import serializers
 from pigs import serializers as sow_serializers
@@ -32,7 +32,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
     def get_serializer_class(self):
         if self.action == 'from_semination_row_to_cell':
             return serializers.SowFarmIdAndCellSerializer
-        if self.action == 'put_in_cell_for_ultrasound':
+        if self.action == 'put_in_cell_for_ultrasound' or self.action == 'move_to_workshop_three':
             return serializers.SowFarmIdAndCellSerializer
         return serializers.FarmIdSerializer
 
@@ -107,12 +107,16 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
    # делает сотрудник 3 цеха
     @action(methods=['post'], detail=False)
     def move_to_workshop_three(self, request):
-        serializer = serializers.FarmIdSerializer(data=request.data)
+        serializer = serializers.SowFarmIdAndCellSerializer(data=request.data)
         if serializer.is_valid():
             # initiator = request.user.workshopemployee    
             sow, transaction = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
-                WorkShop.objects.get(number=3))
-            return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+                SowAndPigletsCell.objects.get(number=serializer.validated_data['cell_number']))
+            sow.change_status_to("waiting delivery in workshop three")
+            return Response(
+                {"transaction": serializers.SowTransactionSerializer(transaction).data,
+                 "sow": sow_serializers.SowSerializer(sow).data, },
+                status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

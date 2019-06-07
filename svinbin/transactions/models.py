@@ -109,11 +109,8 @@ class SowTransactionManager(models.Manager):
                 sow=sow
                 )
 
-        transaction.to_empty_from_location_single_cell
-        transaction.to_fill_to_location_single_cell
-
-        transaction.to_empty_from_location_group_cell
-        transaction.to_fill_to_location_group_cell        
+        transaction.to_empty_from_location
+        transaction.to_fill_to_location
 
         transaction.change_sow_current_location
 
@@ -128,28 +125,28 @@ class SowTransaction(Transaction):
     objects = SowTransactionManager()
 
     @property
-    def to_empty_from_location_single_cell(self):
+    def to_empty_from_location(self):
         if self.from_location.sowSingleCell:
             self.from_location.sowSingleCell.sow = None
             self.from_location.sowSingleCell.save()
 
+        if self.from_location.sowGroupCell:
+            self.from_location.sowGroupCell.sows.remove(self.sow)
+
+        if self.from_location.SowAndPigletsCell:
+            self.from_location.SowAndPigletsCell.sows.remove(self.sow)
+
     @property
-    def to_fill_to_location_single_cell(self):
+    def to_fill_to_location(self):
         if self.to_location.sowSingleCell:
             self.to_location.sowSingleCell.sow = self.sow
             self.to_location.sowSingleCell.save()
 
-    @property
-    def to_empty_from_location_group_cell(self):
-        if self.from_location.sowGroupCell:
-            self.from_location.sowGroupCell.sows.remove(self.sow)
-
-    @property
-    def to_fill_to_location_group_cell(self):
         if self.to_location.sowGroupCell:
             self.to_location.sowGroupCell.sows.add(self.sow)
 
-    # add empty , fill for SowAndPigletsCell
+        if self.to_location.SowAndPigletsCell:
+            self.to_location.SowAndPigletsCell.sows.add(self.sow)
 
     @property
     def change_sow_current_location(self):
