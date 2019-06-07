@@ -85,28 +85,9 @@ class Sow(Pig):
     def __str__(self):
         return 'Sow #%s' % self.farm_id
 
-    # def move_to_workshop(self, location, initiator):
-    #     SowTransaction.objects.create(sow=self, from_location=self.location,
-    #      to_location=location, initiator=initiator)
-
     def change_status_to(self, status_title, alive=True):
         self.status = SowStatus.objects.get(title=status_title)
         self.alive = alive
-        self.save()
-
-    @property
-    def change_status_to_waiting_ultrasound(self):
-        self.status = SowStatus.objects.get(title='waiting ultrasound')
-        self.save()
-
-    @property
-    def change_status_to_pregnant_in_workshop_one(self):
-        self.status = SowStatus.objects.get(title='pregnant in workshop one')
-        self.save()
-
-    @property
-    def change_status_to_proholost(self):
-        self.status = SowStatus.objects.get(title='proholost')
         self.save()
 
 

@@ -49,9 +49,9 @@ class UltrasoundManager(models.Manager):
         ultrasound = self.create(sow=sow, tour=tour, initiator=initiator,
          date=timezone.now(), result=result)
         if result:
-            sow.change_status_to_pregnant_in_workshop_one
+            sow.change_status_to('pregnant in workshop one')
         else:
-            sow.change_status_to_proholost
+            sow.change_status_to('proholost')
         return ultrasound
 
 
