@@ -157,7 +157,7 @@ class SowTransaction(Transaction):
 class PigletsTransaction(Transaction):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_from_location")
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_to_location")
-    piglets_group = models.ForeignKey('pigs.PigletsGroup', on_delete=models.CASCADE)
+    piglets_group = models.ForeignKey('pigs.NomadPigletsGroup', on_delete=models.CASCADE)
 
     def save(self, *args, **kwargs):
         # need to refractor to atomic transactions.

@@ -99,15 +99,26 @@ class Gilt(Pig):
 
 
 class PigletsGroup(models.Model):
-    # location = models.OneToOneField('transactions.Location', on_delete=models.SET_NULL, null=True)
     location = models.ForeignKey('transactions.Location', on_delete=models.SET_NULL, null=True)
-    birth_date = models.DateTimeField(null=True)
+    start_quantity = models.IntegerField()
     quantity = models.IntegerField()
-    # parent_group = models.ForeignKey('self', on_delete=models.SET_NULL, null=True)
-    # parent_groups = models.ManyToManyField('self', related_name="parent_groups")
-    # tours = models.ManyToManyField('tours.Tour', related_name="tours")
+    active = models.BooleanField(default=True)
 
-    # add oporos on other side of OneToOne
+    class Meta:
+        abstract = True
+
+
+class NewBornPigletsGroup(PigletsGroup):
+    merger = models.ForeignKey('events.NewBornPigletsMerger', on_delete=models.SET_NULL, null=True,
+        related_name='piglets_groups')
+    tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
-        return 'Piglets group #%s' % self.pk
+        return 'NomadPiglets group #%s' % self.pk
+
+
+class NomadPigletsGroup(PigletsGroup):
+    merger = models.ForeignKey('events.NewBornPigletsMerger', on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return 'NomadPiglets group #%s' % self.pk

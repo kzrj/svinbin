@@ -61,6 +61,13 @@ class Ultrasound(SowEvent):
     objects = UltrasoundManager()
 
 
+class SowFarrow(SowEvent):
+    new_born_piglets_group = models.ForeignKey('pigs.NewBornPigletsGroup', on_delete=models.SET_NULL, null=True)
+    alive_quantity = models.IntegerField(default=0)
+    dead_quantity = models.IntegerField(default=0)
+    mummy_quantity = models.IntegerField(default=0)
+
+
 class SlaughterSowManager(models.Manager):
     def create_slaughter(self, sow_farm_id, slaughter_type, initiator=None, result=False):
         sow = Sow.objects.get_by_farm_id(sow_farm_id)
@@ -76,3 +83,17 @@ class SlaughterSow(SowEvent):
     slaughter_type = models.CharField(max_length=50, choices=SLAUGHTER_TYPES)
 
     objects = SlaughterSowManager()
+
+
+class PigletsMerger(Event):
+    pass
+
+
+class NewBornPigletsMerger(PigletsMerger):
+
+    @property
+    def is_single_tour_merge(self):
+        self.piglets_groups.all()
+        
+    
+

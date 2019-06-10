@@ -54,13 +54,13 @@ class SowGroupCell(Cell):
 
 
 class PigletsGroupCell(Cell):
-    piglets_groups = models.ManyToManyField('pigs.PigletsGroup', related_name='piglets_groups_in_cell')
+    piglets_groups = models.ManyToManyField('pigs.NomadPigletsGroup', related_name='piglets_groups_in_cell')
     quantity = models.IntegerField(default=0)
 
 
 class SowAndPigletsCell(Cell):
     sow = models.OneToOneField('pigs.Sow', on_delete=models.SET_NULL, null=True)
-    piglets_groups = models.ManyToManyField('pigs.PigletsGroup', related_name='piglets_groups_in_sow_cell')
+    piglets_groups = models.ManyToManyField('pigs.NewBornPigletsGroup', related_name='piglets_groups_in_sow_cell')
 
 
 # class WeighingCell(Cell):
