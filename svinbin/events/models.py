@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils import timezone
 
-from pigs.models import Sow
+from pigs.models import Sow, NewBornPigletsGroup
 from tours.models import Tour
 
 
@@ -61,11 +61,39 @@ class Ultrasound(SowEvent):
     objects = UltrasoundManager()
 
 
+class SowFarrowManager(models.Manager):
+    def create_sow_farrow(self, sow_farm_id, week, initiator=None,
+        alive_quantity=0, dead_quantity=0, mummy_quantity=0):
+        sow = Sow.objects.get_by_farm_id(sow_farm_id)
+        tour = Tour.objects.get_tour_by_week_in_current_year(week)
+
+        # check is it first sow_farrow in courrent tour
+        farrow = SowFarrow.objects.filter(sow=sow, tour=tour).first()
+        if farrow:
+            farrow.new_born_piglets_group.add_piglets(alive_quantity)
+        else:
+            new_born_piglets_group = NewBornPigletsGroup.objects.create(
+                location=sow.location,
+                start_quantity=alive_quantity,
+                quantity=alive_quantity,
+                tour=tour
+                )
+            farrow = self.create(sow=sow, tour=tour, initiator=initiator,
+                date=timezone.now(), alive_quantity=alive_quantity,
+                dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
+                new_born_piglets_group=new_born_piglets_group
+                )
+
+        return farrow
+
+
 class SowFarrow(SowEvent):
     new_born_piglets_group = models.ForeignKey('pigs.NewBornPigletsGroup', on_delete=models.SET_NULL, null=True)
     alive_quantity = models.IntegerField(default=0)
     dead_quantity = models.IntegerField(default=0)
     mummy_quantity = models.IntegerField(default=0)
+
+    objects = SowFarrowManager()
 
 
 class SlaughterSowManager(models.Manager):

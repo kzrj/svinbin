@@ -113,8 +113,12 @@ class NewBornPigletsGroup(PigletsGroup):
         related_name='piglets_groups')
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
 
+    def add_piglets(self, quantity):
+        self.quantity = self.quantity + quantity
+        self.save()
+
     def __str__(self):
-        return 'NomadPiglets group #%s' % self.pk
+        return 'NewBornPiglets group #%s' % self.pk
 
 
 class NomadPigletsGroup(PigletsGroup):
