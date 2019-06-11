@@ -3,7 +3,8 @@ from mixer.backend.django import mixer
 
 from django.test import TestCase
 
-from events.models import Semination, Ultrasound, SowFarrow, NewBornPigletsMerger
+from events.models import Semination, Ultrasound, SowFarrow, NewBornPigletsMerger, \
+ SplitNomadPigletsGroup
 from pigs.models import Sow, NewBornPigletsGroup
 from tours.models import Tour
 
@@ -156,6 +157,7 @@ class NewBornMergerModelTest(TestCase):
         print(new_born_merger_two_tours.create_records())
         self.assertEqual(new_born_merger_two_tours.create_records().first().tour.week_number, 1)
         self.assertEqual(new_born_merger_two_tours.create_records().first().quantity, 22)
+        self.assertEqual(new_born_merger_two_tours.records.all().count(), 2)
 
         nomad_group = new_born_merger_two_tours.create_nomad_group()
         self.assertEqual(nomad_group.quantity, 37)
@@ -171,3 +173,24 @@ class NewBornMergerModelTest(TestCase):
         piglets_group3.refresh_from_db()
         self.assertEqual(piglets_group3.quantity, 0)
         self.assertEqual(piglets_group3.active, False)
+
+
+class SplitNomadPigletsGroupManagerTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        pigs_testing.create_statuses()
+
+    def test_split_group(self):
+        # quantity 37
+        nomad_group = pigs_testing.create_nomad_group_from_three_new_born()
+
+        first_group, second_group = SplitNomadPigletsGroup.objects.split_group(nomad_group, 5)
+        self.assertEqual(first_group.quantity, 32)
+        self.assertEqual(second_group.quantity, 5)
+
+        self.assertEqual(first_group.location, nomad_group.location)
+        self.assertEqual(second_group.location, nomad_group.location)
+
+        self.assertEqual(nomad_group.quantity, 0)
+        self.assertEqual(nomad_group.active, False)
+

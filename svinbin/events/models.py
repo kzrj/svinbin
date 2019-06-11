@@ -134,7 +134,8 @@ class NewBornPigletsMergerManager(models.Manager):
         
 
 class NewBornPigletsMerger(PigletsMerger):
-    nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True)
+    nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
+     related_name='merger')
 
     objects = NewBornPigletsMergerManager()
 
@@ -206,9 +207,10 @@ class MergerRecord(models.Model):
 
 class NewBornMergerRecordManager(models.Manager):
     def create_records(self, merger):
-        for init_data in merger.count_quantity_and_percentage_by_tours():
-            self.create(merger=merger, tour=init_data[0], quantity=init_data[1],
-             percentage=init_data[2])
+        if not merger.records.all().first():
+            for init_data in merger.count_quantity_and_percentage_by_tours():
+                self.create(merger=merger, tour=init_data[0], quantity=init_data[1],
+                 percentage=init_data[2])
 
         return merger.records.all()
 
@@ -220,3 +222,48 @@ class NewBornMergerRecord(MergerRecord):
     percentage = models.FloatField()
 
     objects = NewBornMergerRecordManager()
+
+
+class SplitPigletsGroup(Event):
+    class Meta:
+        abstract = True
+
+
+class SplitNomadPigletsGroupManager(models.Manager):
+    def split_group(self, parent_nomad_group, new_group_piglets_amount, initiator=None):
+        split_event = self.create(date=timezone.now(), initiator=initiator,
+            parent_group=parent_nomad_group)
+
+        first_group = NomadPigletsGroup.objects.create(location=parent_nomad_group.location,
+            start_quantity=(parent_nomad_group.quantity - new_group_piglets_amount),
+            quantity=(parent_nomad_group.quantity - new_group_piglets_amount),
+            split_record=split_event
+            )
+
+        second_group = NomadPigletsGroup.objects.create(location=parent_nomad_group.location,
+            start_quantity=new_group_piglets_amount,
+            quantity=new_group_piglets_amount,
+            split_record=split_event
+            )
+
+        parent_nomad_group.reset_quantity_and_deactivate()
+
+        return first_group, second_group
+       
+
+class SplitNomadPigletsGroup(SplitPigletsGroup):
+    parent_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True)
+
+    objects = SplitNomadPigletsGroupManager()
+
+
+class NomadPigletsGroupMergerManager(models.Manager):
+    def create_nomad_merger(self, nomad_groups):
+        pass
+
+
+class NomadPigletsGroupMerger(PigletsMerger):
+    nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
+     related_name='creating_merger')
+
+    objects =  NomadPigletsGroupMergerManager()

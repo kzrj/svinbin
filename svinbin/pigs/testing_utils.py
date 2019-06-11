@@ -3,7 +3,8 @@ import random
 
 from workshops.models import SowSingleCell, SowGroupCell, Section, WorkShop, SowAndPigletsCell
 from transactions.models import Location
-from pigs.models import Sow, SowStatus
+from pigs.models import Sow, SowStatus, NewBornPigletsGroup
+from events.models import Semination, SowFarrow, NewBornPigletsMerger
 
 
 def create_statuses():
@@ -59,3 +60,39 @@ def create_sow_with_farm_id(location, farm_id):
 def create_sow_without_farm_id(location):
     sow = Sow.objects.create(birth_id=random.randint(1, 1000), location=location)
     return sow
+
+
+def create_nomad_group_from_three_new_born():
+    sow1 = create_sow_and_put_in_workshop_three(1, 1)
+    Semination.objects.create_semination(sow_farm_id=sow1.farm_id, week=1,
+     initiator=None, semination_employee=None)
+
+    farrow1 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow1.farm_id, week=1,
+     alive_quantity=10)
+
+    sow2 = create_sow_and_put_in_workshop_three(1, 2)
+    Semination.objects.create_semination(sow_farm_id=sow2.farm_id, week=1,
+     initiator=None, semination_employee=None)
+    farrow2 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow2.farm_id, week=1,
+        alive_quantity=12)
+
+    sow3 = create_sow_and_put_in_workshop_three(1, 3)
+    Semination.objects.create_semination(sow_farm_id=sow3.farm_id, week=2,
+     initiator=None, semination_employee=None)
+    farrow3 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow3.farm_id, week=2,
+        alive_quantity=15)
+
+    piglets_group1 = farrow1.new_born_piglets_group
+    piglets_group2 = farrow2.new_born_piglets_group
+    piglets_group3 = farrow3.new_born_piglets_group
+
+    piglets_groups_two_tours = NewBornPigletsGroup.objects.filter(pk__in=
+        [piglets_group1.pk, piglets_group2.pk, piglets_group3.pk])
+
+    new_born_merger_two_tours = NewBornPigletsMerger.objects.create_merger(piglets_groups_two_tours)
+
+    new_born_merger_two_tours.create_records()
+
+    nomad_group = new_born_merger_two_tours.create_nomad_group()
+
+    return nomad_group

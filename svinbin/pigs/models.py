@@ -5,7 +5,7 @@ from django.db import models
 
 from transactions.models import Location, SowTransaction, GiltTransaction
 from workshops.models import Section, SowGroupCell, WorkShop
-# from events.models import Semination, Ultrasound
+# import events.models as event_models
 
 
 class SowStatus(models.Model):
@@ -100,6 +100,11 @@ class Gilt(Pig):
         return 'Gilt #%s' % self.birth_id
 
 
+class PigletsGroupManager(models.Manager):
+    def reset_quantity_and_deactivate(self):
+        self.update(quantity=0, active=False)
+
+
 class PigletsGroup(models.Model):
     location = models.ForeignKey('transactions.Location', on_delete=models.SET_NULL, null=True)
     start_quantity = models.IntegerField()
@@ -110,9 +115,8 @@ class PigletsGroup(models.Model):
         abstract = True
 
 
-class NewBornPigletsGroupManager(models.Manager):
-    def reset_quantity_and_deactivate(self):
-        self.update(quantity=0, active=False)
+class NewBornPigletsGroupManager(PigletsGroupManager):
+    pass
 
 
 class NewBornPigletsGroup(PigletsGroup):
@@ -131,8 +135,25 @@ class NewBornPigletsGroup(PigletsGroup):
         return 'NewBornPiglets group #%s' % self.pk
 
 
+class NomadPigletsGroupManager(PigletsGroupManager):
+    pass
+    # def create_two_from_split(self, split_event):
+    #     # self.create
+    #     pass
+
+
 class NomadPigletsGroup(PigletsGroup):
-    # merger = models.ForeignKey('events.NewBornPigletsMerger', on_delete=models.SET_NULL, null=True)
+    split_record = models.ForeignKey('events.SplitNomadPigletsGroup', on_delete=models.SET_NULL, null=True)
+    merger = models.ForeignKey('events.NewBornPigletsMerger', on_delete=models.SET_NULL, null=True)
+
+    objects = NomadPigletsGroupManager()
 
     def __str__(self):
         return 'NomadPiglets group #%s' % self.pk
+
+    def reset_quantity_and_deactivate(self):
+        self.quantity = 0
+        self.active = False
+        self.save()
+
+
