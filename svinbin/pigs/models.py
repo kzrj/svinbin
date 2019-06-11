@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+# from django_bulk_update.helper import bulk_update
+
 from transactions.models import Location, SowTransaction, GiltTransaction
 from workshops.models import Section, SowGroupCell, WorkShop
 # from events.models import Semination, Ultrasound
@@ -111,7 +113,8 @@ class PigletsGroup(models.Model):
 class NewBornPigletsGroup(PigletsGroup):
     merger = models.ForeignKey('events.NewBornPigletsMerger', on_delete=models.SET_NULL, null=True,
         related_name='piglets_groups')
-    tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
+    tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True,
+     related_name="new_born_piglets")
 
     def add_piglets(self, quantity):
         self.quantity = self.quantity + quantity
@@ -122,7 +125,7 @@ class NewBornPigletsGroup(PigletsGroup):
 
 
 class NomadPigletsGroup(PigletsGroup):
-    merger = models.ForeignKey('events.NewBornPigletsMerger', on_delete=models.SET_NULL, null=True)
+    # merger = models.ForeignKey('events.NewBornPigletsMerger', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return 'NomadPiglets group #%s' % self.pk
