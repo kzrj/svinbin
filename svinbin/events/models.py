@@ -195,6 +195,7 @@ class NewBornPigletsMerger(PigletsMerger):
          start_quantity=self.count_all_piglets(), quantity=self.count_all_piglets())
         self.nomad_group = nomad_group
         self.save()
+        self.piglets_groups.reset_quantity_and_deactivate()
         return nomad_group
 
 

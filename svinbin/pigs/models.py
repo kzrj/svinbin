@@ -110,11 +110,18 @@ class PigletsGroup(models.Model):
         abstract = True
 
 
+class NewBornPigletsGroupManager(models.Manager):
+    def reset_quantity_and_deactivate(self):
+        self.update(quantity=0, active=False)
+
+
 class NewBornPigletsGroup(PigletsGroup):
     merger = models.ForeignKey('events.NewBornPigletsMerger', on_delete=models.SET_NULL, null=True,
         related_name='piglets_groups')
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True,
      related_name="new_born_piglets")
+
+    objects = NewBornPigletsGroupManager()
 
     def add_piglets(self, quantity):
         self.quantity = self.quantity + quantity

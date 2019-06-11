@@ -159,3 +159,15 @@ class NewBornMergerModelTest(TestCase):
 
         nomad_group = new_born_merger_two_tours.create_nomad_group()
         self.assertEqual(nomad_group.quantity, 37)
+
+        piglets_group1.refresh_from_db()
+        self.assertEqual(piglets_group1.quantity, 0)
+        self.assertEqual(piglets_group1.active, False)
+
+        piglets_group2.refresh_from_db()
+        self.assertEqual(piglets_group2.quantity, 0)
+        self.assertEqual(piglets_group2.active, False)
+
+        piglets_group3.refresh_from_db()
+        self.assertEqual(piglets_group3.quantity, 0)
+        self.assertEqual(piglets_group3.active, False)
