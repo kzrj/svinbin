@@ -96,3 +96,38 @@ def create_nomad_group_from_three_new_born():
     nomad_group = new_born_merger_two_tours.create_nomad_group()
 
     return nomad_group
+
+def create_nomad_group_from_three_new_born2():
+    sow1 = create_sow_and_put_in_workshop_three(1, 4)
+    Semination.objects.create_semination(sow_farm_id=sow1.farm_id, week=2,
+     initiator=None, semination_employee=None)
+
+    farrow1 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow1.farm_id, week=2,
+     alive_quantity=10)
+
+    sow2 = create_sow_and_put_in_workshop_three(1, 5)
+    Semination.objects.create_semination(sow_farm_id=sow2.farm_id, week=2,
+     initiator=None, semination_employee=None)
+    farrow2 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow2.farm_id, week=2,
+        alive_quantity=10)
+
+    sow3 = create_sow_and_put_in_workshop_three(1, 6)
+    Semination.objects.create_semination(sow_farm_id=sow3.farm_id, week=3,
+     initiator=None, semination_employee=None)
+    farrow3 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow3.farm_id, week=3,
+        alive_quantity=10)
+
+    piglets_group1 = farrow1.new_born_piglets_group
+    piglets_group2 = farrow2.new_born_piglets_group
+    piglets_group3 = farrow3.new_born_piglets_group
+
+    piglets_groups_two_tours = NewBornPigletsGroup.objects.filter(pk__in=
+        [piglets_group1.pk, piglets_group2.pk, piglets_group3.pk])
+
+    new_born_merger_two_tours = NewBornPigletsMerger.objects.create_merger(piglets_groups_two_tours)
+
+    new_born_merger_two_tours.create_records()
+
+    nomad_group = new_born_merger_two_tours.create_nomad_group()
+
+    return nomad_group

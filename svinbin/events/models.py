@@ -135,7 +135,7 @@ class NewBornPigletsMergerManager(models.Manager):
 
 class NewBornPigletsMerger(PigletsMerger):
     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
-     related_name='merger')
+     related_name='creating_new_born_merger')
 
     objects = NewBornPigletsMergerManager()
 
@@ -258,12 +258,54 @@ class SplitNomadPigletsGroup(SplitPigletsGroup):
 
 
 class NomadPigletsGroupMergerManager(models.Manager):
-    def create_nomad_merger(self, nomad_groups):
-        pass
+    def create_nomad_merger(self, nomad_groups, initiator=None):
+        nomad_groups_merger = self.create(date=timezone.now(), initiator=initiator)
+        nomad_groups.update(groups_merger=nomad_groups_merger)
+        # nomad_groups_merger.create_records()
+
+        return nomad_groups_merger
 
 
 class NomadPigletsGroupMerger(PigletsMerger):
     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
-     related_name='creating_merger')
+     related_name='creating_nomad_merger')
 
     objects =  NomadPigletsGroupMergerManager()
+
+    def count_all_piglets(self):
+        return self.groups_merger.aggregate(models.Sum('quantity'))['quantity__sum']
+
+    def create_records(self):
+        return NomadMergerRecord.objects.create_records(self)
+
+    def create_nomad_group(self):
+        quantity = self.count_all_piglets()
+        pre_location = self.groups_merger.all().first().location.get_location()
+        location = Location.objects.create_location(pre_location)
+        nomad_group = NomadPigletsGroup.objects.create(start_quantity=quantity,
+            quantity=quantity)
+        # self.create_records()
+        self.groups_merger.reset_quantity_and_deactivate(quantity=0)
+        return nomad_group
+
+
+class NomadMergerRecordManager(models.Manager):
+    def create_records(self, merger):
+        if not merger.records.all().first():
+            for merge_nomad_group in merger.groups_merger.all():
+                percentage = (merge_nomad_group.quantity * 100) / merger.count_all_piglets()
+                self.create(merger=merger, quantity=merge_nomad_group.quantity,
+                 nomad_group=merge_nomad_group,
+                 percentage=percentage)
+
+        return merger.records.all()
+
+
+class NomadMergerRecord(MergerRecord):
+    merger = models.ForeignKey(NomadPigletsGroupMerger, on_delete=models.CASCADE,
+     related_name="records")
+    nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField()
+    percentage = models.FloatField()
+
+    objects = NomadMergerRecordManager()

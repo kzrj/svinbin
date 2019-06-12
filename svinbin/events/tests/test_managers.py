@@ -4,8 +4,8 @@ from mixer.backend.django import mixer
 from django.test import TestCase
 
 from events.models import Semination, Ultrasound, SowFarrow, NewBornPigletsMerger, \
- SplitNomadPigletsGroup
-from pigs.models import Sow, NewBornPigletsGroup
+ SplitNomadPigletsGroup, NomadPigletsGroupMerger, NomadMergerRecord
+from pigs.models import Sow, NewBornPigletsGroup, NomadPigletsGroup
 from tours.models import Tour
 
 import workshops.testing_utils as workshop_testing
@@ -194,3 +194,41 @@ class SplitNomadPigletsGroupManagerTest(TestCase):
         self.assertEqual(nomad_group.quantity, 0)
         self.assertEqual(nomad_group.active, False)
 
+
+class NomadPigletsGroupMergerManagerTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        pigs_testing.create_statuses()
+
+    def test_split_group(self):
+        # quantity 37
+        nomad_group1 = pigs_testing.create_nomad_group_from_three_new_born()
+        first_group, second_group = SplitNomadPigletsGroup.objects.split_group(nomad_group1, 5)
+
+        # quantity 30
+        nomad_group2 = pigs_testing.create_nomad_group_from_three_new_born2()
+        third_group, fourth_group = SplitNomadPigletsGroup.objects.split_group(nomad_group2, 7)
+        self.assertEqual(third_group.quantity, 23)
+
+        merge_groups = NomadPigletsGroup.objects.filter(pk__in=[first_group.pk, fourth_group.pk])
+        nomad_merger = NomadPigletsGroupMerger.objects.create_nomad_merger(merge_groups)
+
+        first_group.refresh_from_db()
+        fourth_group.refresh_from_db()
+        self.assertEqual(first_group.groups_merger, nomad_merger)
+        self.assertEqual(fourth_group.groups_merger, nomad_merger)
+
+        merge_records = NomadMergerRecord.objects.create_records(nomad_merger)
+        print(merge_records)
+        self.assertEqual(merge_records.first().quantity, 32)
+        self.assertEqual(merge_records.first().nomad_group, first_group)
+        print(merge_records.first().percentage)
+
+        print(merge_records[1])
+        self.assertEqual(merge_records[1].quantity, 7)
+        self.assertEqual(merge_records[1].nomad_group, fourth_group)
+        print(merge_records[1].percentage)
+
+        print(merge_records[0].nomad_group.location)
+        print(merge_records[0].nomad_group.location.get_location)
+        print(type(merge_records[0].nomad_group.location.get_location))
