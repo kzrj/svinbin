@@ -75,8 +75,9 @@ class SowFarrowManager(models.Manager):
         if farrow:
             farrow.new_born_piglets_group.add_piglets(alive_quantity)
         else:
+            location = Location.objects.create_location(sow.location.get_location)
             new_born_piglets_group = NewBornPigletsGroup.objects.create(
-                location=sow.location,
+                location=location,
                 start_quantity=alive_quantity,
                 quantity=alive_quantity,
                 tour=tour
@@ -233,14 +234,15 @@ class SplitNomadPigletsGroupManager(models.Manager):
     def split_group(self, parent_nomad_group, new_group_piglets_amount, initiator=None):
         split_event = self.create(date=timezone.now(), initiator=initiator,
             parent_group=parent_nomad_group)
+        location = Location.objects.create_location(parent_nomad_group.location.get_location)
 
-        first_group = NomadPigletsGroup.objects.create(location=parent_nomad_group.location,
+        first_group = NomadPigletsGroup.objects.create(location=location,
             start_quantity=(parent_nomad_group.quantity - new_group_piglets_amount),
             quantity=(parent_nomad_group.quantity - new_group_piglets_amount),
             split_record=split_event
             )
 
-        second_group = NomadPigletsGroup.objects.create(location=parent_nomad_group.location,
+        second_group = NomadPigletsGroup.objects.create(location=location,
             start_quantity=new_group_piglets_amount,
             quantity=new_group_piglets_amount,
             split_record=split_event
@@ -280,7 +282,7 @@ class NomadPigletsGroupMerger(PigletsMerger):
 
     def create_nomad_group(self):
         quantity = self.count_all_piglets()
-        pre_location = self.groups_merger.all().first().location.get_location()
+        pre_location = self.groups_merger.all().first().location.get_location
         location = Location.objects.create_location(pre_location)
         nomad_group = NomadPigletsGroup.objects.create(start_quantity=quantity,
             quantity=quantity)

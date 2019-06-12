@@ -76,7 +76,7 @@ class SowFarrowModelManagerTest(TestCase):
         self.assertEqual(sow.status.title, 'farrow, feed')
         piglets_group1 = farrow1.new_born_piglets_group
         self.assertEqual(sow.tour, piglets_group1.tour)
-        self.assertEqual(sow.location, piglets_group1.location)
+        self.assertEqual(sow.location.get_location, piglets_group1.location.get_location)
 
         self.assertEqual(piglets_group1.quantity, farrow1.alive_quantity)
         self.assertEqual(piglets_group1.start_quantity, farrow1.alive_quantity)
@@ -188,8 +188,8 @@ class SplitNomadPigletsGroupManagerTest(TestCase):
         self.assertEqual(first_group.quantity, 32)
         self.assertEqual(second_group.quantity, 5)
 
-        self.assertEqual(first_group.location, nomad_group.location)
-        self.assertEqual(second_group.location, nomad_group.location)
+        self.assertEqual(first_group.location.get_location, nomad_group.location.get_location)
+        self.assertEqual(second_group.location.get_location, nomad_group.location.get_location)
 
         self.assertEqual(nomad_group.quantity, 0)
         self.assertEqual(nomad_group.active, False)
