@@ -159,28 +159,16 @@ class PigletsTransaction(Transaction):
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_to_location")
     piglets_group = models.ForeignKey('pigs.NomadPigletsGroup', on_delete=models.CASCADE)
 
-    def save(self, *args, **kwargs):
+    # def save(self, *args, **kwargs):
         # need to refractor to atomic transactions.
-        # self.to_empty_from_location_cell
-        # self.to_fill_to_location_cell
-        self.change_piglets_group_current_location
-        super(PigletsTransaction, self).save(*args, **kwargs)
+        # super(PigletsTransaction, self).save(*args, **kwargs)
 
     @property
     def change_piglets_group_current_location(self):
         self.piglets_group.location = self.to_location
         self.piglets_group.save()
 
-    # def to_empty_from_location_cell(self):
-    #     self.from_location.sowAndPigletsCell.quantity = self.from_location.sowAndPigletsCell.quantity - self.quantity
-    #     self.from_location.sowAndPigletsCell.save()
-
-    # @property
-    # def to_fill_to_location_cell(self):
-    #     self.to_location.sowAndPigletsCell.quantity = self.from_location.sowAndPigletsCell.quantity + self.quantity
-    #     self.to_location.sowAndPigletsCell.save()
-
-
+    
 class GiltTransaction(Transaction):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_from_location")
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_to_location")

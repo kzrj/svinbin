@@ -211,7 +211,7 @@ class NomadPigletsGroupMergerManagerTest(TestCase):
         self.assertEqual(third_group.quantity, 23)
 
         merge_groups = NomadPigletsGroup.objects.filter(pk__in=[first_group.pk, fourth_group.pk])
-        nomad_merger = NomadPigletsGroupMerger.objects.create_nomad_merger(merge_groups)
+        nomad_merger = NomadPigletsGroupMerger.objects.create_nomad_merger(merge_groups, first_group)
 
         first_group.refresh_from_db()
         fourth_group.refresh_from_db()
@@ -232,3 +232,17 @@ class NomadPigletsGroupMergerManagerTest(TestCase):
         print(merge_records[0].nomad_group.location)
         print(merge_records[0].nomad_group.location.get_location)
         print(type(merge_records[0].nomad_group.location.get_location))
+
+        nomad_group = nomad_merger.create_nomad_group()
+        first_group.refresh_from_db()
+        fourth_group.refresh_from_db()
+        self.assertEqual(first_group.quantity, 0)
+        self.assertEqual(first_group.active, False)
+        self.assertEqual(fourth_group.quantity, 0)
+        self.assertEqual(fourth_group.active, False)
+
+        self.assertEqual(nomad_group.quantity, 39)
+        self.assertEqual(nomad_group.start_quantity, 39)
+        self.assertEqual(nomad_group.location.get_location, first_group.location.get_location)
+        self.assertEqual(nomad_group.creating_nomad_merger, nomad_merger)
+

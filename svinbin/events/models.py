@@ -122,7 +122,11 @@ class PigletsMerger(Event):
         abstract = True
 
 
-class NewBornPigletsMergerManager(models.Manager):
+class PigletsMergerManager(models.Manager):
+    pass
+
+
+class NewBornPigletsMergerManager(PigletsMergerManager):
     def create_merger(self, new_born_piglets_groups, initiator=None):
         new_born_merger = self.create(initiator=initiator, date=timezone.now())
         new_born_piglets_groups.update(merger=new_born_merger)
@@ -206,7 +210,11 @@ class MergerRecord(models.Model):
         abstract = True
 
 
-class NewBornMergerRecordManager(models.Manager):
+class MergerRecordManager(models.Manager):
+    pass
+
+
+class NewBornMergerRecordManager(MergerRecordManager):
     def create_records(self, merger):
         if not merger.records.all().first():
             for init_data in merger.count_quantity_and_percentage_by_tours():
@@ -231,22 +239,23 @@ class SplitPigletsGroup(Event):
 
 
 class SplitNomadPigletsGroupManager(models.Manager):
+    def _create_split_group(self, split_event, quantity, initiator=None):
+        parent_nomad_group = split_event.parent_group
+        location = Location.objects.create_location(parent_nomad_group.location.get_location)
+        return NomadPigletsGroup.objects.create(location=location,
+            start_quantity=quantity,
+            quantity=quantity,
+            split_record=split_event
+            )
+
     def split_group(self, parent_nomad_group, new_group_piglets_amount, initiator=None):
         split_event = self.create(date=timezone.now(), initiator=initiator,
             parent_group=parent_nomad_group)
-        location = Location.objects.create_location(parent_nomad_group.location.get_location)
+        
+        first_group = self._create_split_group(split_event,
+         (parent_nomad_group.quantity - new_group_piglets_amount), initiator)
 
-        first_group = NomadPigletsGroup.objects.create(location=location,
-            start_quantity=(parent_nomad_group.quantity - new_group_piglets_amount),
-            quantity=(parent_nomad_group.quantity - new_group_piglets_amount),
-            split_record=split_event
-            )
-
-        second_group = NomadPigletsGroup.objects.create(location=location,
-            start_quantity=new_group_piglets_amount,
-            quantity=new_group_piglets_amount,
-            split_record=split_event
-            )
+        second_group = self._create_split_group(split_event, new_group_piglets_amount, initiator)
 
         parent_nomad_group.reset_quantity_and_deactivate()
 
@@ -259,18 +268,26 @@ class SplitNomadPigletsGroup(SplitPigletsGroup):
     objects = SplitNomadPigletsGroupManager()
 
 
-class NomadPigletsGroupMergerManager(models.Manager):
-    def create_nomad_merger(self, nomad_groups, initiator=None):
-        nomad_groups_merger = self.create(date=timezone.now(), initiator=initiator)
+class NomadPigletsGroupMergerManager(PigletsMergerManager):
+    def create_nomad_merger(self, nomad_groups, nomad_group_join_to, initiator=None):
+        nomad_groups_merger = self.create(date=timezone.now(), nomad_group_join_to=nomad_group_join_to,
+         initiator=initiator)
         nomad_groups.update(groups_merger=nomad_groups_merger)
-        # nomad_groups_merger.create_records()
-
         return nomad_groups_merger
+
+    def create_merger_and_return_nomad_piglets_group(self, nomad_groups, nomad_group_join_to,
+     initiator=None):
+        nomad_merger = self.create_nomad_merger(nomad_groups, nomad_group_join_to=nomad_group_join_to,
+         initiator=initiator, date=timezone.now())
+        nomad_merger.create_records()
+        return nomad_merger.create_nomad_group()
 
 
 class NomadPigletsGroupMerger(PigletsMerger):
     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
      related_name='creating_nomad_merger')
+    nomad_group_join_to = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
+     related_name='nomad_group_join_to')
 
     objects =  NomadPigletsGroupMergerManager()
 
@@ -282,16 +299,16 @@ class NomadPigletsGroupMerger(PigletsMerger):
 
     def create_nomad_group(self):
         quantity = self.count_all_piglets()
-        pre_location = self.groups_merger.all().first().location.get_location
-        location = Location.objects.create_location(pre_location)
+        location = Location.objects.create_location(self.nomad_group_join_to.location.get_location)
         nomad_group = NomadPigletsGroup.objects.create(start_quantity=quantity,
-            quantity=quantity)
-        # self.create_records()
-        self.groups_merger.reset_quantity_and_deactivate(quantity=0)
+            quantity=quantity, location=location)
+        self.nomad_group = nomad_group
+        self.save()
+        self.groups_merger.reset_quantity_and_deactivate()
         return nomad_group
 
 
-class NomadMergerRecordManager(models.Manager):
+class NomadMergerRecordManager(MergerRecordManager):
     def create_records(self, merger):
         if not merger.records.all().first():
             for merge_nomad_group in merger.groups_merger.all():
