@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers, status
 
-from pigs.models import Sow
+from pigs.models import Sow, NomadPigletsGroup
 
 
 class SowSerializer(serializers.ModelSerializer):
@@ -11,4 +11,16 @@ class SowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sow
+        fields = '__all__'
+
+
+class NomadPigletsGroupPkSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NomadPigletsGroup
+        fields = ('pk',)
+
+
+class NomadPigletsGroupSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NomadPigletsGroup
         fields = '__all__'

@@ -92,6 +92,10 @@ class Sow(Pig):
         self.alive = alive
         self.save()
 
+    def change_sow_current_location(self, to_location):
+        self.location = to_location
+        self.save()
+
 
 class Gilt(Pig):
     status = models.ForeignKey(SowStatus, on_delete=models.SET_NULL, null=True)
@@ -136,10 +140,15 @@ class NewBornPigletsGroup(PigletsGroup):
 
 
 class NomadPigletsGroupManager(PigletsGroupManager):
-    pass
-    # def create_two_from_split(self, split_event):
-    #     # self.create
-    #     pass
+    def move_to(self, piglets_group_pk, pre_location, initiator=None):
+        location = Location.objects.create_location(pre_location)
+        piglets_group = self.get(pk=piglets_group_pk)
+        transaction = PigletsTransactionManager.objects.create_transaction(                
+                initiator=initiator,
+                to_location=location,
+                piglets_group=piglets_group
+                )
+        return piglets_group, transaction
 
 
 class NomadPigletsGroup(PigletsGroup):
@@ -156,5 +165,10 @@ class NomadPigletsGroup(PigletsGroup):
         self.quantity = 0
         self.active = False
         self.save()
+
+    def change_current_location(self, to_location):
+        self.location = to_location
+        self.save()
+
 
 

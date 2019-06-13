@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers, status
 
-from transactions.models import SowTransaction, Location
-from pigs.models import Sow
+from transactions.models import SowTransaction, Location, PigletsTransaction
+from pigs.models import Sow, NomadPigletsGroup
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -76,3 +76,9 @@ class PutPigletsInCellSerializer(serializers.Serializer):
     
     class Meta:
         fields = ('piglets_transaction_id', 'quantity', 'to_cell_number')
+
+
+class NomadPigletsTransactionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PigletsTransaction
+        fields = '__all__'

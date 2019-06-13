@@ -112,7 +112,7 @@ class SowTransactionManager(models.Manager):
         transaction.to_empty_from_location
         transaction.to_fill_to_location
 
-        transaction.change_sow_current_location
+        sow.change_sow_current_location(to_location)
 
         return transaction
 
@@ -133,8 +133,8 @@ class SowTransaction(Transaction):
         if self.from_location.sowGroupCell:
             self.from_location.sowGroupCell.sows.remove(self.sow)
 
-        if self.from_location.SowAndPigletsCell:
-            self.from_location.SowAndPigletsCell.sows.remove(self.sow)
+        if self.from_location.sowAndPigletsCell:
+            self.from_location.sowAndPigletsCell.sows.remove(self.sow)
 
     @property
     def to_fill_to_location(self):
@@ -145,13 +145,24 @@ class SowTransaction(Transaction):
         if self.to_location.sowGroupCell:
             self.to_location.sowGroupCell.sows.add(self.sow)
 
-        if self.to_location.SowAndPigletsCell:
-            self.to_location.SowAndPigletsCell.sows.add(self.sow)
+        if self.to_location.sowAndPigletsCell:
+            self.to_location.sowAndPigletsCell.sows.add(self.sow)
 
-    @property
-    def change_sow_current_location(self):
-        self.sow.location = self.to_location
-        self.sow.save()
+
+
+class PigletsTransactionManager(models.Manager):
+    def create_transaction_without_merge(self, to_location, piglets_group, initiator=None):
+        transaction = PigletsTransaction.objects.create(
+                date=timezone.now(),
+                initiator=initiator,
+                from_location=piglets_group.location,
+                to_location=to_location,
+                piglets_group=piglets_group
+                )
+
+        piglets_group.change_current_location(to_location)
+
+        return transaction
 
 
 class PigletsTransaction(Transaction):
@@ -159,14 +170,7 @@ class PigletsTransaction(Transaction):
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_to_location")
     piglets_group = models.ForeignKey('pigs.NomadPigletsGroup', on_delete=models.CASCADE)
 
-    # def save(self, *args, **kwargs):
-        # need to refractor to atomic transactions.
-        # super(PigletsTransaction, self).save(*args, **kwargs)
-
-    @property
-    def change_piglets_group_current_location(self):
-        self.piglets_group.location = self.to_location
-        self.piglets_group.save()
+    objects = PigletsTransactionManager()
 
     
 class GiltTransaction(Transaction):

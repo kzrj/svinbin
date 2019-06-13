@@ -8,11 +8,11 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework import status, generics
 
-from pigs.models import Sow, PigletsGroup
+from pigs.models import Sow, NomadPigletsGroup
 from workshops.models import WorkShop, Section, SowSingleCell, SowGroupCell, SowAndPigletsCell
-from transactions.models import SowTransaction, Location
+from transactions.models import SowTransaction, Location, PigletsTransaction
 from transactions import serializers
-from pigs import serializers as sow_serializers
+from pigs import serializers as pigs_serializers
 
 
 
@@ -46,7 +46,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
              Section.objects.get(workshop__number=1, number=2))
             return Response(
                 {"transaction": serializers.SowTransactionSerializer(transaction).data,
-                 "sow": sow_serializers.SowSerializer(sow).data, },
+                 "sow": pigs_serializers.SowSerializer(sow).data, },
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -61,7 +61,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
             sow.change_status_to('waiting ultrasound')
             return Response(
                 {"transaction": serializers.SowTransactionSerializer(transaction).data,
-                 "sow": sow_serializers.SowSerializer(sow).data, },
+                 "sow": pigs_serializers.SowSerializer(sow).data, },
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -88,7 +88,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
             sow.change_status_to("pregnant in workshop two")
             return Response(
                 {"transaction": serializers.SowTransactionSerializer(transaction).data,
-                 "sow": sow_serializers.SowSerializer(sow).data, },
+                 "sow": pigs_serializers.SowSerializer(sow).data, },
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -104,7 +104,7 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
             sow.change_status_to("waiting delivery in workshop three")
             return Response(
                 {"transaction": serializers.SowTransactionSerializer(transaction).data,
-                 "sow": sow_serializers.SowSerializer(sow).data, },
+                 "sow": pigs_serializers.SowSerializer(sow).data, },
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -118,5 +118,37 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
             sow = Sow.objects.move_to_by_farm_id(serializer.validated_data['farm_id'],
                 WorkShop.objects.get(number=1))
             return Response({'msg': 'success'}, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NomadPigletsGroupTransactionsViewSet(viewsets.ModelViewSet):
+    queryset = PigletsTransaction.objects.all()
+    serializer_class = serializers.NomadPigletsTransactionSerializer
+
+
+class WorkShopNomadPigletsTransactionViewSet(viewsets.ModelViewSet):
+    queryset = NomadPigletsGroup.objects.all()
+    serializer_class = pigs_serializers.NomadPigletsGroupPkSerializer
+    # permission_classes = (TotalOrderPermissions,)
+    
+    # def get_serializer_class(self):
+    #     pass
+
+    # делает сотрудник 3 цеха
+    @action(methods=['post'], detail=False)
+    def move_to_workshop_four(self, request):
+        serializer = serializers.NomadPigletsGroupPkSerializer(data=request.data)
+        if serializer.is_valid():
+            # initiator = request.user.workshopemployee    
+            nomad_piglets_group, transaction = \
+                NomadPigletsGroup.objects.move_to(
+                    serializer.validated_data['pk'],
+                    WorkShop.objects.get(number=4))
+            # sow.change_status_to("waiting delivery in workshop three")
+            return Response(
+                {"transaction": serializers.NomadPigletsTransactionSerializer(transaction).data,
+                 "nomad_piglets_group": pigs_serializers.NomadPigletsGroupSerializer(nomad_piglets_group).data, },
+                status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
