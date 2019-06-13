@@ -53,14 +53,14 @@ def create_sections_and_cell_for_workshop_three():
             SowAndPigletsCell(section=section, number=cellNumber) for cellNumber in range(1, 7)
             ])
 
-def create_sections_and_cell_for_workshop_with_group_cells(number):
-    workshop = WorkShop.objects.get(number=number)
+def create_sections_and_cell_for_workshop_with_group_cells(workshop_number):
+    workshop = WorkShop.objects.get(number=workshop_number)
 
-    Section.objects.bulk_create([Section(workshop=workshop, name='Секция %s-1' % number, number=1),
-     Section(workshop=workshop, name='Секция %s-2' % number, number=2),
-     Section(workshop=workshop, name='Секция %s-3' % number, number=3),
-     Section(workshop=workshop, name='Секция %s-4' % number, number=4),
-     Section(workshop=workshop, name='Секция %s-5' % number, number=5),
+    Section.objects.bulk_create([Section(workshop=workshop, name='Секция %s-1' % workshop_number, number=1),
+     Section(workshop=workshop, name='Секция %s-2' % workshop_number, number=2),
+     Section(workshop=workshop, name='Секция %s-3' % workshop_number, number=3),
+     Section(workshop=workshop, name='Секция %s-4' % workshop_number, number=4),
+     Section(workshop=workshop, name='Секция %s-5' % workshop_number, number=5),
      ])
 
     for section in Section.objects.filter(workshop=workshop):

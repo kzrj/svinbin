@@ -2,6 +2,9 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+# from transactions.models import Location
+import transactions
+
 
 class WorkShop(models.Model):
     number = models.IntegerField()
@@ -25,7 +28,7 @@ class Section(models.Model):
     number = models.IntegerField()
 
     def __str__(self):
-        return 'Section {} at workshop {}'.format(self.name, self.workshop.title)
+        return '{}, {}'.format(self.name, self.workshop.title)
 
 
 class Cell(models.Model):
@@ -50,17 +53,26 @@ class SowSingleCell(Cell):
 
 class SowGroupCell(Cell):
     sows = models.ManyToManyField('pigs.Sow', related_name='sows_in_cell')
-    quantity = models.IntegerField(default=0)
+    sows_quantity = models.IntegerField(default=0)
 
 
 class PigletsGroupCell(Cell):
-    piglets_groups = models.ManyToManyField('pigs.NomadPigletsGroup', related_name='piglets_groups_in_cell')
-    quantity = models.IntegerField(default=0)
+    # piglets_groups = models.ManyToManyField('pigs.NomadPigletsGroup', related_name='piglets_groups_in_cell')
+    # quantity = models.IntegerField(default=0)
+
+    def __str__(self):
+        return 'Групповая клетка № {}, {}'.format(self.number, str(self.section))
+
+    def get_residents(self):
+        print('get_residents')
+        return transactions.models.Location.objects.all()
+
+
 
 
 class SowAndPigletsCell(Cell):
     sow = models.OneToOneField('pigs.Sow', on_delete=models.SET_NULL, null=True)
-    piglets_groups = models.ManyToManyField('pigs.NewBornPigletsGroup', related_name='piglets_groups_in_sow_cell')
+    # piglets_groups = models.ManyToManyField('pigs.NewBornPigletsGroup', related_name='piglets_groups_in_sow_cell')
 
 
 # class WeighingCell(Cell):

@@ -30,13 +30,12 @@ class LocationManager(models.Manager):
 
 
 class Location(models.Model):
-    workshop = models.ForeignKey(WorkShop, null=True, on_delete=models.SET_NULL)
-    section = models.ForeignKey(Section, null=True, on_delete=models.SET_NULL)
-    sowSingleCell = models.ForeignKey(SowSingleCell, null=True, on_delete=models.SET_NULL)
-    pigletsGroupCell = models.ForeignKey(PigletsGroupCell, null=True, on_delete=models.SET_NULL)
-    sowAndPigletsCell = models.ForeignKey(SowAndPigletsCell, null=True, on_delete=models.SET_NULL)
-    sowGroupCell = models.ForeignKey(SowGroupCell, null=True, on_delete=models.SET_NULL)
-    # weighingCell = models.ForeignKey(WeighingCell, null=True, on_delete=models.SET_NULL)
+    workshop = models.ForeignKey(WorkShop, null=True, on_delete=models.SET_NULL, related_name='locations')
+    section = models.ForeignKey(Section, null=True, on_delete=models.SET_NULL, related_name='locations')
+    sowSingleCell = models.ForeignKey(SowSingleCell, null=True, on_delete=models.SET_NULL, related_name='locations')
+    pigletsGroupCell = models.ForeignKey(PigletsGroupCell, null=True, on_delete=models.SET_NULL, related_name='locations')
+    sowAndPigletsCell = models.ForeignKey(SowAndPigletsCell, null=True, on_delete=models.SET_NULL, related_name='locations')
+    sowGroupCell = models.ForeignKey(SowGroupCell, null=True, on_delete=models.SET_NULL, related_name='locations')
 
     objects = LocationManager()
 
