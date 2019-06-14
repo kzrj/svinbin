@@ -115,9 +115,25 @@ class PigletsGroup(models.Model):
     start_quantity = models.IntegerField()
     quantity = models.IntegerField()
     active = models.BooleanField(default=True)
+    transfer_label = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
+
+    def is_quantities_same(self, quantity):
+        return self.quantity == quantity
+
+    def mark_for_transfer(self):
+        self.transfer_label = True
+        self.save()
+
+    def change_quantity(self, quantity):
+        self.quantity = quantity
+        self.save()
+
+    def change_current_location(self, to_location):
+        self.location = to_location
+        self.save()
 
 
 class NewBornPigletsGroupManager(PigletsGroupManager):
@@ -125,10 +141,17 @@ class NewBornPigletsGroupManager(PigletsGroupManager):
 
 
 class NewBornPigletsGroup(PigletsGroup):
+    LABELS = [
+        ('s', 'Small'),
+        ('m', 'Medium'),
+        ('l', 'Large'),
+    ]
     merger = models.ForeignKey('events.NewBornPigletsMerger', on_delete=models.SET_NULL, null=True,
         related_name='piglets_groups')
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True,
      related_name="new_born_piglets")
+
+    size_label = models.CharField(max_length=1, choices=LABELS, null=True)
 
     objects = NewBornPigletsGroupManager()
 
@@ -138,6 +161,10 @@ class NewBornPigletsGroup(PigletsGroup):
 
     def __str__(self):
         return 'NewBornPiglets group #%s' % self.pk
+
+    def mark_size_label(self, size_label):
+        self.size_label = size_label
+        self.save()
 
 
 class NomadPigletsGroupManager(PigletsGroupManager):
@@ -166,10 +193,3 @@ class NomadPigletsGroup(PigletsGroup):
         self.quantity = 0
         self.active = False
         self.save()
-
-    def change_current_location(self, to_location):
-        self.location = to_location
-        self.save()
-
-
-

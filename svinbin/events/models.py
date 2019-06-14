@@ -100,24 +100,29 @@ class SowFarrow(SowEvent):
     objects = SowFarrowManager()
 
 
-class SlaughterSowManager(models.Manager):
-    def create_slaughter(self, sow_farm_id, slaughter_type, initiator=None, result=False):
+class CullingSowManager(models.Manager):
+    def create_slaughter(self, sow_farm_id, culling_type, initiator=None, result=False):
         sow = Sow.objects.get_by_farm_id(sow_farm_id)
-        slaughter = self.create(sow=sow, initiator=initiator,
-         date=timezone.now(), slaughter_type=slaughter_type)
+        culling = self.create(sow=sow, initiator=initiator,
+         date=timezone.now(), culling_type=culling_type)
         sow.change_status_to(status_title='has slaughtered special', alive=False)
 
-        return slaughter
+        return culling
 
 
-class SlaughterSow(SowEvent):
-    SLAUGHTER_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka')]
-    slaughter_type = models.CharField(max_length=50, choices=SLAUGHTER_TYPES)
+class CullingSow(SowEvent):
+    CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka')]
+    culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
 
-    objects = SlaughterSowManager()
+    objects = CullingSowManager()
 
 
-class PigletsMerger(Event):
+class PigletsEvent(Event):
+    class Meta:
+        abstract = True
+
+
+class PigletsMerger(PigletsEvent):
     class Meta:
         abstract = True
 
@@ -134,7 +139,7 @@ class NewBornPigletsMergerManager(PigletsMergerManager):
 
     def create_merger_and_return_nomad_piglets_group(self, new_born_piglets_groups, initiator=None):
         new_born_merger = self.create_merger(new_born_piglets_groups, initiator=initiator, date=timezone.now())
-        new_born_merger.create_records()
+        # new_born_merger.create_records()
         return new_born_merger.create_nomad_group()
         
 
@@ -197,12 +202,17 @@ class NewBornPigletsMerger(PigletsMerger):
 
     def create_nomad_group(self):
         location = Location.objects.create_location(WorkShop.objects.get(number=3))
+        self.create_records()
         nomad_group = NomadPigletsGroup.objects.create(location=location,
          start_quantity=self.count_all_piglets(), quantity=self.count_all_piglets())
         self.nomad_group = nomad_group
         self.save()
         self.piglets_groups.reset_quantity_and_deactivate()
         return nomad_group
+
+    def add_new_born_group(self, new_born_group):
+        new_born_group.merger = self
+        new_born_group.save()
 
 
 class MergerRecord(models.Model):
@@ -233,7 +243,7 @@ class NewBornMergerRecord(MergerRecord):
     objects = NewBornMergerRecordManager()
 
 
-class SplitPigletsGroup(Event):
+class SplitPigletsGroup(PigletsEvent):
     class Meta:
         abstract = True
 
@@ -328,3 +338,57 @@ class NomadMergerRecord(MergerRecord):
     percentage = models.FloatField()
 
     objects = NomadMergerRecordManager()
+
+
+class RecountManager(models.Manager):
+    def create_recount(self, piglets_group, quantity, initiator=None):
+        if not piglets_group.is_quantities_same(quantity):
+            recount = self.create(date=timezone.now(), initiator=initiator, piglets_group=piglets_group,
+                quantity_after=quantity, quantity_before=piglets_group.quantity,
+                balance=quantity-piglets_group.quantity)
+            piglets_group.change_quantity(quantity)
+            return recount
+        return None
+
+
+class Recount(PigletsEvent):
+    quantity_before = models.IntegerField()
+    quantity_after = models.IntegerField()
+    balance = models.IntegerField()
+
+    objects = RecountManager()
+
+    class Meta:
+        abstract = True
+
+
+class NewBornPigletsGroupRecount(Recount):
+    piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.CASCADE)
+
+
+class NomadPigletsGroupRecount(Recount):
+    piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE)
+
+
+
+class CullingPigletsManager(models.Manager):
+    def create_culling_piglets(self, piglets_group):
+        
+
+
+class CullingPiglets(PigletsEvent):
+    CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka')]
+    culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
+    reason = models.CharField(max_length=200, null=True)
+
+    class Meta:
+        abstract = True
+
+
+class CullingNewBornPiglets(CullingPiglets):
+    piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.CASCADE)
+
+
+class CullingNomadPiglets(CullingPiglets):
+    piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE)
+

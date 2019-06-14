@@ -4,7 +4,8 @@ from mixer.backend.django import mixer
 from django.test import TestCase
 
 from events.models import Semination, Ultrasound, SowFarrow, NewBornPigletsMerger, \
- SplitNomadPigletsGroup, NomadPigletsGroupMerger, NomadMergerRecord
+ SplitNomadPigletsGroup, NomadPigletsGroupMerger, NomadMergerRecord, \
+ NewBornPigletsGroupRecount, NomadPigletsGroupRecount
 from pigs.models import Sow, NewBornPigletsGroup, NomadPigletsGroup
 from tours.models import Tour
 
@@ -246,3 +247,24 @@ class NomadPigletsGroupMergerManagerTest(TestCase):
         self.assertEqual(nomad_group.location.get_location, first_group.location.get_location)
         self.assertEqual(nomad_group.creating_nomad_merger, nomad_merger)
 
+
+class RecountManagerTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        pigs_testing.create_statuses()
+
+    def test_create_recount_nomad_group(self):
+        # quantity 37
+        nomad_group = pigs_testing.create_nomad_group_from_three_new_born()
+        recount = NomadPigletsGroupRecount.objects.create_recount(nomad_group, 35)
+        self.assertEqual(recount.quantity_before, 37)
+        self.assertEqual(recount.quantity_after, 35)
+        self.assertEqual(recount.balance, -2)
+
+    def test_create_recount_new_born_group(self):
+        # quantity 10
+        new_born_group = pigs_testing.create_new_born_group()
+        recount = NewBornPigletsGroupRecount.objects.create_recount(new_born_group, 8)
+        self.assertEqual(recount.quantity_before, 10)
+        self.assertEqual(recount.quantity_after, 8)
+        self.assertEqual(recount.balance, -2)

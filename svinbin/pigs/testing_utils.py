@@ -143,3 +143,13 @@ def create_nomad_and_move_to_cell_in_workshop_four():
             nomad_group)
 
     return nomad_group
+
+def create_new_born_group():
+    sow1 = create_sow_and_put_in_workshop_three(1, 4)
+    Semination.objects.create_semination(sow_farm_id=sow1.farm_id, week=2,
+     initiator=None, semination_employee=None)
+    
+    farrow1 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow1.farm_id, week=2,
+     alive_quantity=10)
+
+    return farrow1.new_born_piglets_group
