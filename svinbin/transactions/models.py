@@ -28,6 +28,12 @@ class LocationManager(models.Manager):
         #     raise error?
         return location
 
+    def get_with_active_nomad_group(self):
+        return self.filter(nomadpigletsgroup__active=True).select_related('nomadpigletsgroup')
+
+    # def get_nomad_piglets_groups(self):
+    #     self.get_with_active_nomad_group()
+
 
 class Location(models.Model):
     workshop = models.ForeignKey(WorkShop, null=True, on_delete=models.SET_NULL, related_name='locations')

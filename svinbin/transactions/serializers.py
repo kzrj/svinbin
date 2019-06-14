@@ -1,18 +1,40 @@
 # -*- coding: utf-8 -*-
+from django.db.models import FieldDoesNotExist
+
 from rest_framework import serializers, status
 
 from transactions.models import SowTransaction, Location, PigletsTransaction
 from pigs.models import Sow, NomadPigletsGroup
 
+import pigs.serializers as pigs_serializers
+
 
 class LocationSerializer(serializers.ModelSerializer):
     workshop = serializers.StringRelatedField()
     section = serializers.StringRelatedField()
+    pigletsGroupCell = serializers.StringRelatedField()
 
     class Meta:
         model = Location  
         fields = '__all__'
 
+
+class LocationPigletsSerializer(serializers.ModelSerializer):
+    pigletsGroupCell = serializers.StringRelatedField()
+    nomadpigletsgroup = pigs_serializers.NomadPigletsGroupSerializer()
+
+    class Meta:
+        model = Location  
+        fields = ['id', 'pigletsGroupCell', 'nomadpigletsgroup']
+
+
+class NomadGroupsListingFromLocationsField(serializers.RelatedField):
+    def to_representation(self, value):
+        nomad_group = NomadPigletsGroup.objects.filter(location=value).first()
+        if nomad_group:
+            return pigs_serializers.NomadPigletsGroupSerializer(nomad_group).data
+        return 'No group'
+            
 
 class SowTransactionSerializer(serializers.ModelSerializer):
     from_location = serializers.StringRelatedField()

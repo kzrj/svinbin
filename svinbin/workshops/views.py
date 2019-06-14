@@ -1,8 +1,13 @@
+# -*- coding: utf-8 -*-
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import viewsets, status
 
 import workshops.testing_utils as workshops_testing
 import pigs.testing_utils as pigs_testing
+
+from workshops.models import PigletsGroupCell
+from workshops import serializers
 
 
 class CreateWorkshopsView(APIView):
@@ -12,4 +17,10 @@ class CreateWorkshopsView(APIView):
     def get(self, request, format=None):
         workshops_testing.create_workshops_sections_and_cells()
         pigs_testing.create_statuses()
+        pigs_testing.create_nomad_and_move_to_cell_in_workshop_four()
         return Response({'msg': 'success'})
+
+
+class PigletsGroupCellViewSet(viewsets.ModelViewSet):
+    queryset = PigletsGroupCell.objects.all()
+    serializer_class = serializers.PigletsGroupCellSerializer

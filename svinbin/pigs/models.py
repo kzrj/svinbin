@@ -110,7 +110,8 @@ class PigletsGroupManager(models.Manager):
 
 
 class PigletsGroup(models.Model):
-    location = models.OneToOneField('transactions.Location', on_delete=models.SET_NULL, null=True)
+    location = models.OneToOneField('transactions.Location', on_delete=models.SET_NULL,
+     null=True)
     start_quantity = models.IntegerField()
     quantity = models.IntegerField()
     active = models.BooleanField(default=True)

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 import random
 
-from workshops.models import SowSingleCell, SowGroupCell, Section, WorkShop, SowAndPigletsCell
-from transactions.models import Location
+from workshops.models import SowSingleCell, SowGroupCell, Section, WorkShop, SowAndPigletsCell, PigletsGroupCell
+from transactions.models import Location, PigletsTransaction
 from pigs.models import Sow, SowStatus, NewBornPigletsGroup
 from events.models import Semination, SowFarrow, NewBornPigletsMerger
 
@@ -129,5 +129,17 @@ def create_nomad_group_from_three_new_born2():
     new_born_merger_two_tours.create_records()
 
     nomad_group = new_born_merger_two_tours.create_nomad_group()
+
+    return nomad_group
+
+def create_nomad_and_move_to_cell_in_workshop_four():
+    nomad_group = create_nomad_group_from_three_new_born()
+
+    section = Section.objects.get(workshop__number=4, number=1)
+    piglet_group_cell = PigletsGroupCell.objects.get(section=section, number=1)
+    to_location = Location.objects.create_location(piglet_group_cell)
+
+    transaction = PigletsTransaction.objects.create_transaction_without_merge(to_location,
+            nomad_group)
 
     return nomad_group
