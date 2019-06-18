@@ -2,11 +2,12 @@ from django.db import models
 from django.utils import timezone
 from django.apps import apps
 
+from core.models import CoreModel, CoreModelManager
 from sows.models import Sow
 from sows_events import models as events_models
 
 
-class TourManager(models.Manager):
+class TourManager(CoreModelManager):
     def get_or_create_by_week_in_current_year(self, week_number):
         tour = Tour.objects.filter(week_number=week_number, year=timezone.now().year).first()
         if not tour:
@@ -17,7 +18,7 @@ class TourManager(models.Manager):
         return Tour.objects.filter(week_number=week_number, year=timezone.now().year).first()
 
 
-class Tour(models.Model):
+class Tour(CoreModel):
     start_date = models.DateTimeField()
     week_number = models.IntegerField()
     year = models.IntegerField()

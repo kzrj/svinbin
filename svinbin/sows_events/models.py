@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils import timezone
 
-from core.models import Event
+from core.models import Event, CoreModel, CoreModelManager
 from sows.models import Sow
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
 from tours.models import Tour
@@ -18,7 +18,7 @@ class SowEvent(Event):
         abstract = True
 
     
-class SeminationManager(models.Manager):
+class SeminationManager(CoreModelManager):
     def create_semination(self, sow_farm_id, week, initiator=None, semination_employee=None):
         sow = Sow.objects.get_by_farm_id(sow_farm_id)
         tour = Tour.objects.get_or_create_by_week_in_current_year(week)
@@ -37,7 +37,7 @@ class Semination(SowEvent):
     objects = SeminationManager()
 
 
-class UltrasoundManager(models.Manager):
+class UltrasoundManager(CoreModelManager):
     def create_ultrasound(self, sow_farm_id, week, initiator=None, result=False):
         sow = Sow.objects.get_by_farm_id(sow_farm_id)
         tour = Tour.objects.get_tour_by_week_in_current_year(week)
@@ -56,7 +56,7 @@ class Ultrasound(SowEvent):
     objects = UltrasoundManager()
 
 
-class SowFarrowManager(models.Manager):
+class SowFarrowManager(CoreModelManager):
     def create_sow_farrow(self, sow_farm_id, week, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
         sow = Sow.objects.get_by_farm_id(sow_farm_id)
@@ -93,7 +93,7 @@ class SowFarrow(SowEvent):
     objects = SowFarrowManager()
 
 
-class CullingSowManager(models.Manager):
+class CullingSowManager(CoreModelManager):
     def create_slaughter(self, sow_farm_id, culling_type, initiator=None, result=False):
         sow = Sow.objects.get_by_farm_id(sow_farm_id)
         culling = self.create(sow=sow, initiator=initiator,

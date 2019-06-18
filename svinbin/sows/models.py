@@ -1,25 +1,26 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+from core.models import CoreModel, CoreModelManager
 from transactions.models import Location, SowTransaction, GiltTransaction
 from workshops.models import Section, SowGroupCell, WorkShop
 
 
-class SowStatus(models.Model):
+class SowStatus(CoreModel):
     title = models.CharField(max_length=100)
 
     def __str__(self):
         return self.title
 
 
-class GiltStatus(models.Model):
+class GiltStatus(CoreModel):
     title = models.CharField(max_length=100)
 
     def __str__(self):
         return self.title
 
 
-class Pig(models.Model):
+class Pig(CoreModel):
     birth_id = models.CharField(max_length=10, unique=True, null=True)
     location = models.OneToOneField("transactions.Location", on_delete=models.SET_NULL, null=True)
 
@@ -30,7 +31,7 @@ class Pig(models.Model):
     #     pass
 
 
-class SowManager(models.Manager):
+class SowManager(CoreModelManager):
     def create_new_from_gilt_and_put_in_workshop_one(self, farm_id):
         # DECREASE GILT QUANTITY!!!
         

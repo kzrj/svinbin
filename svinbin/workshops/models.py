@@ -3,10 +3,11 @@ from django.contrib.auth.models import User
 from django.db import models
 
 # from transactions.models import Location
+from core.models import CoreModel, CoreModelManager
 import transactions
 
 
-class WorkShop(models.Model):
+class WorkShop(CoreModel):
     number = models.IntegerField()
     title = models.CharField(max_length=128)
 
@@ -14,7 +15,7 @@ class WorkShop(models.Model):
         return self.title
 
 
-class WorkShopEmployee(models.Model):
+class WorkShopEmployee(CoreModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
 
@@ -22,7 +23,7 @@ class WorkShopEmployee(models.Model):
         return 'Employee {} at workshop {}'.format(self.user.username, self.workshop.title)
 
 
-class Section(models.Model):
+class Section(CoreModel):
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)
     number = models.IntegerField()
@@ -31,7 +32,7 @@ class Section(models.Model):
         return '{}, {}'.format(self.name, self.workshop.title)
 
 
-class Cell(models.Model):
+class Cell(CoreModel):
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     number = models.CharField(max_length=4)
     # pigletsQuantity = models.IntegerField(default=0)

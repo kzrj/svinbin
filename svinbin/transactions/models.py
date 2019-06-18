@@ -2,12 +2,13 @@
 from django.db import models
 from django.utils import timezone
 
+from core.models import CoreModel, CoreModelManager
 from workshops.models import WorkShopEmployee, WorkShop, SowSingleCell, Section, \
     PigletsGroupCell, SowAndPigletsCell, SowGroupCell
     # WeighingCell
 
 
-class LocationManager(models.Manager):
+class LocationManager(CoreModelManager):
     def create_location(self, pre_location):
         if isinstance(pre_location, WorkShop):
             location = self.create(workshop=pre_location)
@@ -27,7 +28,7 @@ class LocationManager(models.Manager):
         return self.filter(nomadpigletsgroup__active=True).select_related('nomadpigletsgroup')
 
 
-class Location(models.Model):
+class Location(CoreModel):
     workshop = models.ForeignKey(WorkShop, null=True, on_delete=models.SET_NULL, related_name='locations')
     section = models.ForeignKey(Section, null=True, on_delete=models.SET_NULL, related_name='locations')
     sowSingleCell = models.ForeignKey(SowSingleCell, null=True, on_delete=models.SET_NULL, related_name='locations')
@@ -84,7 +85,7 @@ class Location(models.Model):
         return str(self.get_location)
 
 
-class Transaction(models.Model):
+class Transaction(CoreModel):
     date = models.DateTimeField(auto_now_add=True)
     initiator = models.ForeignKey(WorkShopEmployee, on_delete=models.SET_NULL, null=True)
     finished = models.BooleanField(default=False)
@@ -95,7 +96,7 @@ class Transaction(models.Model):
         abstract = True
 
 
-class SowTransactionManager(models.Manager):
+class SowTransactionManager(CoreModelManager):
     def create_transaction(self, to_location, sow, initiator):
         # need to refractor to atomic transactions.
         transaction = SowTransaction.objects.create(
@@ -147,7 +148,7 @@ class SowTransaction(Transaction):
 
 
 
-class PigletsTransactionManager(models.Manager):
+class PigletsTransactionManager(CoreModelManager):
     def create_transaction_without_merge(self, to_location, piglets_group, initiator=None):
         transaction = PigletsTransaction.objects.create(
                 date=timezone.now(),

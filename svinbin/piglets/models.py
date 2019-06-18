@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 
+from core.models import CoreModel, CoreModelManager
 
-class PigletsGroupManager(models.Manager):
+
+class PigletsGroupManager(CoreModelManager):
     def reset_quantity_and_deactivate(self):
         self.update(quantity=0, active=False)
 
 
-class PigletsGroup(models.Model):
+class PigletsGroup(CoreModel):
     location = models.OneToOneField('transactions.Location', on_delete=models.SET_NULL,
      null=True)
     start_quantity = models.IntegerField()

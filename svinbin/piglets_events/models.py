@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils import timezone
 
-from core.models import Event
+from core.models import Event, CoreModel, CoreModelManager
 from sows.models import Sow
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
 from tours.models import Tour
@@ -20,7 +20,7 @@ class PigletsMerger(PigletsEvent):
         abstract = True
 
 
-class PigletsMergerManager(models.Manager):
+class PigletsMergerManager(CoreModelManager):
     pass
 
 
@@ -115,12 +115,12 @@ class NewBornPigletsMerger(PigletsMerger):
         new_born_group.save()
 
 
-class MergerRecord(models.Model):
+class MergerRecord(CoreModel):
     class Meta:
         abstract = True
 
 
-class MergerRecordManager(models.Manager):
+class MergerRecordManager(CoreModelManager):
     pass
 
 
@@ -148,7 +148,7 @@ class SplitPigletsGroup(PigletsEvent):
         abstract = True
 
 
-class SplitNomadPigletsGroupManager(models.Manager):
+class SplitNomadPigletsGroupManager(CoreModelManager):
     def _create_split_group(self, split_event, quantity, initiator=None):
         parent_nomad_group = split_event.parent_group
         location = Location.objects.create_location(parent_nomad_group.location.get_location)
@@ -240,7 +240,7 @@ class NomadMergerRecord(MergerRecord):
     objects = NomadMergerRecordManager()
 
 
-class RecountManager(models.Manager):
+class RecountManager(CoreModelManager):
     def create_recount(self, piglets_group, quantity, initiator=None):
         if not piglets_group.is_quantities_same(quantity):
             recount = self.create(date=timezone.now(), initiator=initiator, piglets_group=piglets_group,
@@ -272,7 +272,7 @@ class NomadPigletsGroupRecount(Recount):
         related_name="recounts")
 
 
-class CullingPigletsManager(models.Manager):
+class CullingPigletsManager(CoreModelManager):
     def create_culling_piglets(self, piglets_group, culling_type, quantity=1, reason=None, initiator=None):
         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
             date=timezone.now(), initiator=initiator, quantity=1)
