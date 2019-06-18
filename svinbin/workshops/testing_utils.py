@@ -16,7 +16,7 @@ def create_workshops():
         WorkShop(number=7, title='Цех 7 Откорм 7'),
         WorkShop(number=9, title='Цех 9 Убойный цех'),
         WorkShop(number=10, title='Цех 10 Крематорий'),
-        WorkShop(number=11, title='Цех 11 Взвешивание'),
+        WorkShop(number=11, title='Цех Взвешивание 3/4'),
         ])
 
 def create_sections_and_cell_for_workshop_one():

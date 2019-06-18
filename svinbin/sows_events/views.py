@@ -8,8 +8,8 @@ from rest_framework.response import Response
 from rest_framework.decorators import action, api_view
 from rest_framework import status, exceptions
 
-from events.models import Semination, Ultrasound, CullingSow
-from events import serializers
+from sows_events.models import Semination, Ultrasound, CullingSow
+from sows_events import serializers
 
 
 class SeminationViewSet(viewsets.ModelViewSet):

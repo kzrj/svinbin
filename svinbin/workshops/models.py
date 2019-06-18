@@ -48,16 +48,16 @@ class Cell(models.Model):
 # Here I can create just one cell class for all types instead separation.
 
 class SowSingleCell(Cell):
-    sow = models.OneToOneField('pigs.Sow', on_delete=models.SET_NULL, null=True)
+    sow = models.OneToOneField('sows.Sow', on_delete=models.SET_NULL, null=True)
 
 
 class SowGroupCell(Cell):
-    sows = models.ManyToManyField('pigs.Sow', related_name='sows_in_cell')
+    sows = models.ManyToManyField('sows.Sow', related_name='sows_in_cell')
     sows_quantity = models.IntegerField(default=0)
 
 
 class PigletsGroupCell(Cell):
-    # piglets_groups = models.ManyToManyField('pigs.NomadPigletsGroup', related_name='piglets_groups_in_cell')
+    # piglets_groups = models.ManyToManyField('sows.NomadPigletsGroup', related_name='piglets_groups_in_cell')
     # quantity = models.IntegerField(default=0)
 
     def __str__(self):
@@ -73,8 +73,8 @@ class PigletsGroupCell(Cell):
 
 
 class SowAndPigletsCell(Cell):
-    sow = models.OneToOneField('pigs.Sow', on_delete=models.SET_NULL, null=True)
-    # piglets_groups = models.ManyToManyField('pigs.NewBornPigletsGroup', related_name='piglets_groups_in_sow_cell')
+    sow = models.OneToOneField('sows.Sow', on_delete=models.SET_NULL, null=True)
+    # piglets_groups = models.ManyToManyField('sows.NewBornPigletsGroup', related_name='piglets_groups_in_sow_cell')
 
 
 # class WeighingCell(Cell):

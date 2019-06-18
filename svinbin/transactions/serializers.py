@@ -4,9 +4,11 @@ from django.db.models import FieldDoesNotExist
 from rest_framework import serializers, status
 
 from transactions.models import SowTransaction, Location, PigletsTransaction
-from pigs.models import Sow, NomadPigletsGroup
+from sows.models import Sow
+from piglets.models import NomadPigletsGroup
 
-import pigs.serializers as pigs_serializers
+import sows.serializers as sows_serializers
+import piglets.serializers as piglets_serializers
 
 
 class LocationSerializer(serializers.ModelSerializer):
@@ -21,7 +23,7 @@ class LocationSerializer(serializers.ModelSerializer):
 
 class LocationPigletsSerializer(serializers.ModelSerializer):
     pigletsGroupCell = serializers.StringRelatedField()
-    nomadpigletsgroup = pigs_serializers.NomadPigletsGroupSerializer()
+    nomadpigletsgroup = piglets_serializers.NomadPigletsGroupSerializer()
 
     class Meta:
         model = Location  
@@ -32,7 +34,7 @@ class NomadGroupsListingFromLocationsField(serializers.RelatedField):
     def to_representation(self, value):
         nomad_group = NomadPigletsGroup.objects.filter(location=value).first()
         if nomad_group:
-            return pigs_serializers.NomadPigletsGroupSerializer(nomad_group).data
+            return piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data
         return 'No group'
             
 
@@ -101,6 +103,9 @@ class PutPigletsInCellSerializer(serializers.Serializer):
 
 
 class NomadPigletsTransactionSerializer(serializers.ModelSerializer):
+    from_location = serializers.StringRelatedField()
+    to_location = serializers.StringRelatedField()
+    
     class Meta:
         model = PigletsTransaction
         fields = '__all__'

@@ -2,8 +2,8 @@
 from rest_framework import serializers
 
 import transactions.serializers as transactions_serializers
-from pigs.models import NewBornPigletsGroup
-from events.models import NewBornPigletsMerger
+from piglets.models import NewBornPigletsGroup
+from piglets_events.models import NewBornPigletsMerger
 
 
 class NewBornPigletsGroupSizeSerializer(serializers.ModelSerializer):

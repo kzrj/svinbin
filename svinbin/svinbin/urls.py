@@ -11,8 +11,8 @@ from rest_framework import routers
 from rest_framework_swagger.views import get_swagger_view
 
 from transactions import views as transaction_views
-from pigs import views as pigs_views
-from events import views as events_views
+from sows import views as sows_views
+from sows_events import views as sows_events_views
 from workshops import views as workshops_views
 from workshopthree import views as workshopthree_views
 
@@ -25,12 +25,12 @@ router.register(r'sowtransactions/transactions', transaction_views.SowTransactio
     basename='sowtransactions')
 
 # pigs
-router.register(r'sows', pigs_views.SowViewSet, basename='sows')
+router.register(r'sows', sows_views.SowViewSet, basename='sows')
 
 # events
-router.register(r'events/seminations', events_views.SeminationViewSet, basename='seminations')
-router.register(r'events/ultrasounds', events_views.UltrasoundViewSet, basename='ultrasounds')
-router.register(r'events/spec_uboi', events_views.CullingSowViewSet, basename='spec_uboi')
+router.register(r'sows_events/seminations', sows_events_views.SeminationViewSet, basename='seminations')
+router.register(r'sows_events/ultrasounds', sows_events_views.UltrasoundViewSet, basename='ultrasounds')
+router.register(r'sows_events/spec_uboi', sows_events_views.CullingSowViewSet, basename='spec_uboi')
 
 # cells
 router.register(r'pigletsgroupcells', workshops_views.PigletsGroupCellViewSet, basename='pigletsgroupcell')

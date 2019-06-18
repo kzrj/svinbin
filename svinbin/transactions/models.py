@@ -7,7 +7,6 @@ from workshops.models import WorkShopEmployee, WorkShop, SowSingleCell, Section,
     # WeighingCell
 
 
-
 class LocationManager(models.Manager):
     def create_location(self, pre_location):
         if isinstance(pre_location, WorkShop):
@@ -22,17 +21,10 @@ class LocationManager(models.Manager):
             location = self.create(pigletsGroupCell=pre_location)
         elif isinstance(pre_location, SowAndPigletsCell):
             location = self.create(sowAndPigletsCell=pre_location)
-        # elif isinstance(pre_location, WeighingCell):
-        #     location = self.create(weighingCell=pre_location)
-        # else:
-        #     raise error?
         return location
 
     def get_with_active_nomad_group(self):
         return self.filter(nomadpigletsgroup__active=True).select_related('nomadpigletsgroup')
-
-    # def get_nomad_piglets_groups(self):
-    #     self.get_with_active_nomad_group()
 
 
 class Location(models.Model):
@@ -125,7 +117,7 @@ class SowTransactionManager(models.Manager):
 class SowTransaction(Transaction):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_from_location")
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_to_location")
-    sow = models.ForeignKey('pigs.Sow', on_delete=models.CASCADE)
+    sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE)
 
     objects = SowTransactionManager()
 
@@ -173,7 +165,7 @@ class PigletsTransactionManager(models.Manager):
 class PigletsTransaction(Transaction):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_from_location")
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_to_location")
-    piglets_group = models.ForeignKey('pigs.NomadPigletsGroup', on_delete=models.CASCADE)
+    piglets_group = models.ForeignKey('piglets.NomadPigletsGroup', on_delete=models.CASCADE)
 
     objects = PigletsTransactionManager()
 
@@ -181,4 +173,4 @@ class PigletsTransaction(Transaction):
 class GiltTransaction(Transaction):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_from_location")
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_to_location")
-    gilt = models.ForeignKey('pigs.Gilt', on_delete=models.CASCADE)
+    gilt = models.ForeignKey('sows.Gilt', on_delete=models.CASCADE)

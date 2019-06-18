@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from pigs.models import Sow
-from events.models import Semination, Ultrasound, CullingSow, NewBornPigletsGroupRecount, NewBornPigletsMerger
+from sows.models import Sow
+from sows_events.models import Semination, Ultrasound, CullingSow
+from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger
 
-from pigs.serializers import SowSerializer
+from sows.serializers import SowSerializer
 
 
 class SeminationSerializer(serializers.ModelSerializer):

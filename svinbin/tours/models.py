@@ -2,8 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.apps import apps
 
-from pigs.models import Sow
-from events import models as events_models
+from sows.models import Sow
+from sows_events import models as events_models
 
 
 class TourManager(models.Manager):

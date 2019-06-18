@@ -3,10 +3,10 @@ from mixer.backend.django import mixer
 from django.test import TestCase
 
 import workshops.testing_utils as workshop_testing
-import pigs.testing_utils as pigs_testings
+import sows.testing_utils as sows_testings
 from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
 SowAndPigletsCell
-from pigs.models import Sow
+from sows.models import Sow
 from transactions.models import Location
 
 
