@@ -15,3 +15,13 @@ class PigletsGroupCellSerializer(serializers.ModelSerializer):
     class Meta:
         model = PigletsGroupCell
         fields = ['id', 'section', 'number', 'locations']
+
+
+# class SowAndPigletsCellSerializer(serializers.ModelSerializer):
+#     section = serializers.StringRelatedField()
+#     # locations = serializers.StringRelatedField(many=True)
+#     locations = transactions_serializers.NomadGroupsListingFromLocationsField(many=True, read_only=True)
+    
+#     class Meta:
+#         model = PigletsGroupCell
+#         fields = ['id', 'section', 'number', 'locations']

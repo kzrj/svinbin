@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action, api_view
 from rest_framework import status, exceptions
 
-from events.models import Semination, Ultrasound, SlaughterSow
+from events.models import Semination, Ultrasound, CullingSow
 from events import serializers
 
 
@@ -60,24 +60,24 @@ class UltrasoundViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class SlaughterSowViewSet(viewsets.ModelViewSet):
-    queryset = SlaughterSow.objects.all()
-    serializer_class = serializers.SlaughterSowSerializer
+class CullingSowViewSet(viewsets.ModelViewSet):
+    queryset = CullingSow.objects.all()
+    serializer_class = serializers.CullingSowSerializer
 
     def get_serializer_class(self):
         if self.action == 'create':
-            return serializers.CreateSlaughterSowSerializer
-        return serializers.SlaughterSowSerializer
+            return serializers.CreateCullingSowSerializer
+        return serializers.CullingSowSerializer
 
     def create(self, request):
-        serializer = serializers.CreateSlaughterSowSerializer(data=request.data)
+        serializer = serializers.CreateCullingSowSerializer(data=request.data)
         # initiator = request.user.workshopemployee
         if serializer.is_valid():
-            slaughter = SlaughterSow.objects.create_slaughter(
+            culling = CullingSow.objects.create_culling(
                 sow_farm_id=serializer.validated_data['farm_id'],
-                slaughter_type=serializer.validated_data['slaughter_type'],
+                culling_type=serializer.validated_data['culling_type'],
                 # initiator=request.user.workshopemployee,
                 )
-            return Response(serializers.SlaughterSowSerializer(slaughter).data, status=status.HTTP_200_OK)
+            return Response(serializers.CullingSowSerializer(culling).data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

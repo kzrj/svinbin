@@ -46,6 +46,7 @@ OWN_APPS = [
     'transactions.apps.TransactionsConfig',
     'events.apps.EventsConfig',
     'tours.apps.ToursConfig',
+    'workshopthree.apps.WorkshopthreeConfig',
 ]
 
 
@@ -101,6 +102,25 @@ DATABASES = {
     }
 }
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        # 'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter'
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.AllowAny',
+    ),
+    # 'DEFAULT_AUTHENTICATION_CLASSES': ( 
+    #     'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    #     'rest_framework.authentication.SessionAuthentication', 
+    #     'rest_framework.authentication.BasicAuthentication',
+    # ),
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    'PAGE_SIZE': 20,
+    'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler'
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/2.1/ref/settings/#auth-password-validators

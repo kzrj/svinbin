@@ -2,7 +2,7 @@
 from rest_framework import serializers
 
 from pigs.models import Sow
-from events.models import Semination, Ultrasound, SlaughterSow
+from events.models import Semination, Ultrasound, CullingSow, NewBornPigletsGroupRecount, NewBornPigletsMerger
 
 from pigs.serializers import SowSerializer
 
@@ -34,18 +34,30 @@ class CreateUltrasoundSerializer(CreateSeminationSerializer):
     result = serializers.BooleanField()
 
 
-class SlaughterSowSerializer(serializers.ModelSerializer):
+class CullingSowSerializer(serializers.ModelSerializer):
     sow = SowSerializer()
     tour = serializers.StringRelatedField()
 
     class Meta:
-        model = SlaughterSow
+        model = CullingSow
         fields = "__all__"
 
 
-class CreateSlaughterSowSerializer(serializers.ModelSerializer):
+class CreateCullingSowSerializer(serializers.ModelSerializer):
     farm_id = serializers.IntegerField()
 
     class Meta:
-        model = SlaughterSow
-        fields = ('farm_id', 'slaughter_type')
+        model = CullingSow
+        fields = ('farm_id', 'culling_type')
+
+
+class NewBornPigletsGroupRecountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewBornPigletsGroupRecount
+        fields = "__all__"
+
+
+class NewBornPigletsGroupMerger(serializers.ModelSerializer):
+    class Meta:
+        model = NewBornPigletsMerger
+        fields = "__all__"    

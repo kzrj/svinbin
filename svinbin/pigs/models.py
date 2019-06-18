@@ -135,6 +135,14 @@ class PigletsGroup(models.Model):
         self.location = to_location
         self.save()
 
+    def add_piglets(self, quantity):
+        self.quantity = self.quantity + quantity
+        self.save()
+
+    def remove_piglets(self, quantity):
+        self.quantity = self.quantity - quantity
+        self.save()        
+
 
 class NewBornPigletsGroupManager(PigletsGroupManager):
     pass
@@ -155,16 +163,11 @@ class NewBornPigletsGroup(PigletsGroup):
 
     objects = NewBornPigletsGroupManager()
 
-    def add_piglets(self, quantity):
-        self.quantity = self.quantity + quantity
-        self.save()
-
     def __str__(self):
         return 'NewBornPiglets group #%s' % self.pk
 
     def mark_size_label(self, size_label):
         self.size_label = size_label
-        self.save()
 
 
 class NomadPigletsGroupManager(PigletsGroupManager):

@@ -132,16 +132,23 @@ class PigletsMergerManager(models.Manager):
 
 
 class NewBornPigletsMergerManager(PigletsMergerManager):
+    def create_merger_without_groups(self, initiator=None):
+        new_born_merger = self.create(initiator=initiator, date=timezone.now())
+        return new_born_merger
+
     def create_merger(self, new_born_piglets_groups, initiator=None):
         new_born_merger = self.create(initiator=initiator, date=timezone.now())
+        if isinstance(new_born_piglets_groups, list):
+            pks = [group.pk for group in new_born_piglets_groups]
+            new_born_piglets_groups = NewBornPigletsGroup.objects.filter(pk__in=pks)
+        
         new_born_piglets_groups.update(merger=new_born_merger)
         return new_born_merger
 
     def create_merger_and_return_nomad_piglets_group(self, new_born_piglets_groups, initiator=None):
-        new_born_merger = self.create_merger(new_born_piglets_groups, initiator=initiator, date=timezone.now())
-        # new_born_merger.create_records()
+        new_born_merger = self.create_merger(new_born_piglets_groups, initiator=initiator)
         return new_born_merger.create_nomad_group()
-        
+
 
 class NewBornPigletsMerger(PigletsMerger):
     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
@@ -363,22 +370,27 @@ class Recount(PigletsEvent):
 
 
 class NewBornPigletsGroupRecount(Recount):
-    piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.CASCADE)
+    piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.CASCADE, 
+        related_name="recounts")
 
 
 class NomadPigletsGroupRecount(Recount):
-    piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE)
-
+    piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE,
+        related_name="recounts")
 
 
 class CullingPigletsManager(models.Manager):
-    def create_culling_piglets(self, piglets_group):
-        
+    def create_culling_piglets(self, piglets_group, culling_type, quantity=1, reason=None, initiator=None):
+        culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
+            date=timezone.now(), initiator=initiator, quantity=1)
+        piglets_group.remove_piglets(quantity)
+        return culling      
 
 
 class CullingPiglets(PigletsEvent):
     CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka')]
     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
+    quantity = models.IntegerField(default=1)
     reason = models.CharField(max_length=200, null=True)
 
     class Meta:
