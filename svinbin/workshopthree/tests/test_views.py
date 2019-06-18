@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import unicode_literals
 import datetime
 import random
 
@@ -12,8 +11,10 @@ import workshops.testing_utils as workshops_testing
 import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
-from piglets.models import NewBornPigletsGroup
-from piglets_events.models import NewBornPigletsGroupRecount
+from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
+from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger, CullingNewBornPiglets
+from workshops.models import WorkShop
+from transactions.models import PigletsTransaction
 
 
 class WorkshopThreeViewSetTest(APITestCase):
@@ -54,8 +55,29 @@ class WorkshopThreeViewSetTest(APITestCase):
 
         response = self.client.post('/api/workshopthree/piglets/create_nomad_group_from_merge_and_transfer_to_weight/',
          {'piglets_groups': [newBornPigletsGroup1.pk, newBornPigletsGroup2.pk]})
-        print(response.data)
+
+        nomad_group = NomadPigletsGroup.objects.filter(pk=response.data['nomad_group']['id']).first()
+        self.assertNotEqual(nomad_group, None)
+        self.assertEqual(nomad_group.location.get_location, WorkShop.objects.get(number=11))
+
+        new_born_merger = NewBornPigletsMerger.objects.filter(nomad_group=nomad_group).first()
+        self.assertNotEqual(new_born_merger, None)
+        self.assertEqual(new_born_merger.piglets_groups.all()[0], newBornPigletsGroup1)
+        self.assertEqual(new_born_merger.piglets_groups.all()[1], newBornPigletsGroup2)
+
+        transaction = nomad_group.transactions.all().first()
+        self.assertNotEqual(transaction, None)
+        self.assertEqual(transaction.from_location.get_location, WorkShop.objects.get(number=3))
+        self.assertEqual(transaction.to_location.get_location, WorkShop.objects.get(number=11))
+
+
+    def test_culling_piglets(self):
+        newBornPigletsGroup = piglets_testing.create_new_born_group()
+        response = self.client.post('/api/workshopthree/piglets/%s/culling_piglets/' %
+          newBornPigletsGroup.pk, {'culling_type': 'padej', 'reason': 'xz'})
         
-        # newBornPigletsGroup.refresh_from_db()
-        # self.assertEqual(newBornPigletsGroup.transfer_label, True)
-        # self.assertEqual(newBornPigletsGroup.size_label, 'l')
+        culling = CullingNewBornPiglets.objects.filter(piglets_group=newBornPigletsGroup).first()
+        self.assertNotEqual(culling, None)
+        self.assertEqual(culling.reason, 'xz')
+        self.assertEqual(culling.culling_type, 'padej')
+

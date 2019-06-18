@@ -1,16 +1,28 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger
+from piglets_events import models
 
 
 class NewBornPigletsGroupRecountSerializer(serializers.ModelSerializer):
     class Meta:
-        model = NewBornPigletsGroupRecount
+        model = models.NewBornPigletsGroupRecount
         fields = "__all__"
 
 
-class NewBornPigletsGroupMerger(serializers.ModelSerializer):
+class NewBornPigletsGroupMergerSerializer(serializers.ModelSerializer):
     class Meta:
-        model = NewBornPigletsMerger
+        model = models.NewBornPigletsMerger
         fields = "__all__"    
+
+
+class CullingPigletsTypesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CullingNewBornPiglets
+        fields = ['culling_type', 'reason']
+
+
+class CullingNewBornPigletsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CullingNewBornPiglets
+        fields = '__all__'

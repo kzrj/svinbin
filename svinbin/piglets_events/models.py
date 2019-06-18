@@ -293,7 +293,11 @@ class CullingPiglets(PigletsEvent):
 class CullingNewBornPiglets(CullingPiglets):
     piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.CASCADE)
 
+    objects = CullingPigletsManager()
+
 
 class CullingNomadPiglets(CullingPiglets):
     piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE)
+
+    objects = CullingPigletsManager()
 

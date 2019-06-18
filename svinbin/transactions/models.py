@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 from core.models import CoreModel, CoreModelManager
 from workshops.models import WorkShopEmployee, WorkShop, SowSingleCell, Section, \
@@ -87,7 +88,7 @@ class Location(CoreModel):
 
 class Transaction(CoreModel):
     date = models.DateTimeField(auto_now_add=True)
-    initiator = models.ForeignKey(WorkShopEmployee, on_delete=models.SET_NULL, null=True)
+    initiator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
     finished = models.BooleanField(default=False)
     returned = models.BooleanField(default=False)
     # reason = models.CharField(max_lenght=)
@@ -166,7 +167,7 @@ class PigletsTransactionManager(CoreModelManager):
 class PigletsTransaction(Transaction):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_from_location")
     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_to_location")
-    piglets_group = models.ForeignKey('piglets.NomadPigletsGroup', on_delete=models.CASCADE)
+    piglets_group = models.ForeignKey('piglets.NomadPigletsGroup', on_delete=models.CASCADE, related_name="transactions")
 
     objects = PigletsTransactionManager()
 

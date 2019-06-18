@@ -24,22 +24,31 @@ class WorkShopThreePigletsViewSet(viewsets.GenericViewSet):
     queryset = NewBornPigletsGroup.objects.all()
     serializer_class = piglets_serializers.NewBornPigletsGroupSerializer
 
-    def get_serializer_class(self):
-        if self.action == 'mark_to_transfer_and_mark_size':
-            return piglets_serializers.NewBornPigletsGroupSerializer
-        return piglets_serializers.NewBornPigletsGroupSerializer
-
+    # def get_serializer_class(self):
+    #     if self.action == 'mark_to_transfer_and_mark_size':
+    #         return piglets_serializers.NewBornPigletsGroupSerializer
+    #     return piglets_serializers.NewBornPigletsGroupSerializer
 
     @action(methods=['post'], detail=True)
     def culling_piglets(self, request, pk=None):        
-        piglets_group = self.get_object()
-        
-    
-        return Response(
-            {"new_born_piglet_group": piglets_serializers.NewBornPigletsGroupSerializer(piglets_group).data,
-             "message": 'piglets marked for transaction, marked as %s.' % serializer.validated_data['size_label'],
-             "recount": piglets_events_serializers.NewBornPigletsGroupRecountSerializer(recount).data},
-            status=status.HTTP_200_OK)
+        serializer = piglets_events_serializers.CullingPigletsTypesSerializer(data=request.data)
+        if serializer.is_valid():
+            piglets_group = self.get_object()
+            culling = piglets_events_models.CullingNewBornPiglets.objects.create_culling_piglets(
+                piglets_group=piglets_group,
+                culling_type=serializer.validated_data['culling_type'],
+                quantity=1,
+                reason=serializer.validated_data['reason'],
+                initiator=None
+                )
+
+            return Response(
+                {"new_born_piglet_group": piglets_serializers.NewBornPigletsGroupSerializer(piglets_group).data,
+                 "message": '%s piglet from piglet group' % serializer.validated_data['culling_type'],
+                 "culling": piglets_events_serializers.CullingNewBornPigletsSerializer(culling).data},
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True)
     def mark_to_transfer_mark_size_and_recount(self, request, pk=None):
@@ -82,3 +91,13 @@ class WorkShopThreePigletsViewSet(viewsets.GenericViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
+# class WorkShopThreeSowsViewSet(viewsets.GenericViewSet):
+#     queryset = Sows.objects.all()
+#     serializer_class = sows_serializers.SowSerializer
+
+
+# class WorkShopThreeSowsViewSet(viewsets.GenericViewSet):
+#     queryset = Sows.objects.all()
+#     serializer_class = sows_serializers.SowSerializer
