@@ -57,13 +57,12 @@ class Ultrasound(SowEvent):
 
 
 class SowFarrowManager(CoreModelManager):
-    def create_sow_farrow(self, sow_farm_id, week, initiator=None,
+    def create_sow_farrow_by_sow_object(self, sow, week, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
-        sow = Sow.objects.get_by_farm_id(sow_farm_id)
         sow.change_status_to('farrow, feed')
         tour = Tour.objects.get_tour_by_week_in_current_year(week)
 
-        # check is it first sow_farrow in courrent tour
+        # check is it first sow_farrow in current tour
         farrow = SowFarrow.objects.filter(sow=sow, tour=tour).first()
         if farrow:
             farrow.new_born_piglets_group.add_piglets(alive_quantity)
@@ -83,6 +82,12 @@ class SowFarrowManager(CoreModelManager):
 
         return farrow
 
+    def create_sow_farrow(self, sow_farm_id, week, initiator=None,
+        alive_quantity=0, dead_quantity=0, mummy_quantity=0):
+        sow = Sow.objects.get_by_farm_id(sow_farm_id)
+        return self.create_sow_farrow_by_sow_object(sow, week, initiator, \
+            alive_quantity, dead_quantity, mummy_quantity)
+
 
 class SowFarrow(SowEvent):
     new_born_piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.SET_NULL, null=True)
@@ -94,17 +99,20 @@ class SowFarrow(SowEvent):
 
 
 class CullingSowManager(CoreModelManager):
-    def create_slaughter(self, sow_farm_id, culling_type, initiator=None, result=False):
-        sow = Sow.objects.get_by_farm_id(sow_farm_id)
-        culling = self.create(sow=sow, initiator=initiator,
+    def create_culling(self, sow, culling_type, reason, initiator=None):
+        culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason,
          date=timezone.now(), culling_type=culling_type)
         sow.change_status_to(status_title='has slaughtered special', alive=False)
-
         return culling
+
+    def create_culling_from_farm_id(self, sow_farm_id, culling_type, reason, initiator=None):
+        sow = Sow.objects.get_by_farm_id(sow_farm_id)
+        return self.create_culling(sow, culling_type, reason, initiator)
 
 
 class CullingSow(SowEvent):
     CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka')]
     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
+    reason = models.CharField(max_length=300, null=True)
 
     objects = CullingSowManager()

@@ -48,21 +48,22 @@ def create_sow_and_put_in_workshop_two(section_number, cell_number):
     cell.sows.add(sow)
     return sow
 
-def create_sow_and_put_in_workshop_three(section_number, cell_number):
+def create_sow_and_put_in_workshop_three(section_number=1, cell_number=1):
     section = Section.objects.get(workshop=WorkShop.objects.get(number=3), number=section_number)
     cell = SowAndPigletsCell.objects.get(section=section, number=cell_number)
     location = Location.objects.create(sowAndPigletsCell=cell)
     sow = Sow.objects.create(farm_id=random.randint(1, 1000), location=location)
     return sow
+
+def create_sow_with_semination_and_put_in_workshop_three(week=1, section_number=1, cell_number=1):
+    sow = create_sow_and_put_in_workshop_three(section_number, cell_number)
+    Semination.objects.create_semination(sow_farm_id=sow.farm_id, week=week,
+     initiator=None, semination_employee=None)
+    return sow
     
-def create_sow_with_farm_id(location, farm_id):
+def create_sow_with_location(location):
     sow = Sow.objects.create(farm_id=random.randint(1, 1000), location=location)
     return sow
-
-def create_sow_without_farm_id(location):
-    sow = Sow.objects.create(birth_id=random.randint(1, 1000), location=location)
-    return sow
-
 
 def create_nomad_group_from_three_new_born():
     sow1 = create_sow_and_put_in_workshop_three(1, 1)

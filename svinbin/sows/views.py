@@ -8,3 +8,8 @@ from sows.serializers import SowSerializer
 class SowViewSet(viewsets.ModelViewSet):
     queryset = Sow.objects.all()
     serializer_class = SowSerializer
+
+
+class WorkShopSowViewSet(viewsets.GenericViewSet):
+    queryset = Sow.objects.all()
+    serializer_class = SowSerializer

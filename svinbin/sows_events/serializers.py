@@ -1,11 +1,14 @@
 # -*- coding: utf-8 -*-
-from rest_framework import serializers
+from rest_framework import serializers, status
 
 from sows.models import Sow
-from sows_events.models import Semination, Ultrasound, CullingSow
+from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow
 from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger
+from tours.models import Tour
 
 from sows.serializers import SowSerializer
+
+from core.utils import CustomValidation
 
 
 class SeminationSerializer(serializers.ModelSerializer):
@@ -36,7 +39,7 @@ class CreateUltrasoundSerializer(CreateSeminationSerializer):
 
 
 class CullingSowSerializer(serializers.ModelSerializer):
-    sow = SowSerializer()
+    sow = serializers.StringRelatedField()
     tour = serializers.StringRelatedField()
 
     class Meta:
@@ -49,16 +52,32 @@ class CreateCullingSowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CullingSow
-        fields = ('farm_id', 'culling_type')
+        fields = ('farm_id', 'culling_type',)
 
 
-class NewBornPigletsGroupRecountSerializer(serializers.ModelSerializer):
+class CreateCullingSowPkSerializer(serializers.ModelSerializer):
     class Meta:
-        model = NewBornPigletsGroupRecount
-        fields = "__all__"
+        model = CullingSow
+        fields = ('culling_type', 'reason')        
+ 
 
+class CreateSowFarrowSerializer(serializers.ModelSerializer):
+    week = serializers.IntegerField()
 
-class NewBornPigletsGroupMerger(serializers.ModelSerializer):
+    def validate_week(self, value):
+        # get tour with week in current year
+        if Tour.objects.filter(week_number=value).first():
+            return value
+        else:
+            raise CustomValidation('There is no tour with this week number.', 
+                'week', status_code=status.HTTP_400_BAD_REQUEST)
+
     class Meta:
-        model = NewBornPigletsMerger
-        fields = "__all__"    
+        model = SowFarrow
+        fields = ['alive_quantity', 'dead_quantity', 'mummy_quantity', 'week']
+
+
+class SowFarrowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SowFarrow
+        fields = '__all__'

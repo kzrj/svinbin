@@ -2,8 +2,10 @@
 from rest_framework import serializers
 
 import transactions.serializers as transactions_serializers
+import sows.serializers as sows_serializers
 from piglets.models import NewBornPigletsGroup
 from piglets_events.models import NewBornPigletsMerger
+from sows.models import Sow
 
 
 class NewBornPigletsGroupSizeSerializer(serializers.ModelSerializer):
@@ -20,13 +22,15 @@ class NewBornPigletsGroupPkSerializer(serializers.ModelSerializer):
         fields = ['pk']
 
 
-# class NewBornGroupsToMerge(serializers.Serializer):
-#   groups = NewBornPigletsGroupPkSerializer(many=True)
+class NewBornGroupsToMerge(serializers.Serializer):
+    groups = serializers.PrimaryKeyRelatedField(queryset=NewBornPigletsGroup.objects.all(), many=True)
 
 
 class NewBornGroupsToMerge(serializers.ModelSerializer):
-    # piglets_groups = serializers.PrimaryKeyRelatedField(many=True, queryset=NewBornPigletsGroup.objects.all())
-
     class Meta:
         model = NewBornPigletsMerger
         fields = ['piglets_groups', ]
+
+
+class SowsIdsSerializer(serializers.Serializer):
+    sows = serializers.PrimaryKeyRelatedField(queryset=Sow.objects.all(), many=True)

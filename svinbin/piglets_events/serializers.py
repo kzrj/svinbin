@@ -26,3 +26,9 @@ class CullingNewBornPigletsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CullingNewBornPiglets
         fields = '__all__'
+
+
+class NewBornPigletsGroupRecountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.NewBornPigletsGroupRecount
+        fields = "__all__"

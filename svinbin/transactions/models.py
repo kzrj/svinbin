@@ -28,6 +28,12 @@ class LocationManager(CoreModelManager):
     def get_with_active_nomad_group(self):
         return self.filter(nomadpigletsgroup__active=True).select_related('nomadpigletsgroup')
 
+    def create_workshop_location(self, workshop_number):
+        return self.create_location(WorkShop.objects.get(number=workshop_number))
+
+    def duplicate_location(self, location):
+        return self.create_location(location.get_location)
+
 
 class Location(CoreModel):
     workshop = models.ForeignKey(WorkShop, null=True, on_delete=models.SET_NULL, related_name='locations')
@@ -115,6 +121,14 @@ class SowTransactionManager(CoreModelManager):
 
         return transaction
 
+    def create_many_transactions(self, sows, to_location, initiator):
+        transactions_ids = list()
+        for sow in sows:
+            location = Location.objects.duplicate_location(to_location)
+            transaction = self.create_transaction(location, sow, initiator)
+            transactions_ids.append(transaction.pk)
+        return transactions_ids
+
 
 class SowTransaction(Transaction):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_from_location")
@@ -133,7 +147,8 @@ class SowTransaction(Transaction):
             self.from_location.sowGroupCell.sows.remove(self.sow)
 
         if self.from_location.sowAndPigletsCell:
-            self.from_location.sowAndPigletsCell.sows.remove(self.sow)
+            self.from_location.sowAndPigletsCell.sow = None
+            self.from_location.sowAndPigletsCell.save()
 
     @property
     def to_fill_to_location(self):
@@ -145,7 +160,8 @@ class SowTransaction(Transaction):
             self.to_location.sowGroupCell.sows.add(self.sow)
 
         if self.to_location.sowAndPigletsCell:
-            self.to_location.sowAndPigletsCell.sows.add(self.sow)
+            self.to_location.sowAndPigletsCell.sow = self.sow
+            self.to_location.sowAndPigletsCell.save()
 
 
 

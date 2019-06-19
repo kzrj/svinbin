@@ -37,7 +37,9 @@ router.register(r'pigletsgroupcells', workshops_views.PigletsGroupCellViewSet, b
 
 # by workshops
 router.register(r'workshopthree/piglets', workshopthree_views.WorkShopThreePigletsViewSet, \
- basename='workshopthree')
+ basename='workshopthree-piglets')
+router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsViewSet, \
+ basename='workshopthree-sows')
 
 schema_view = get_swagger_view(title='API Docs')
 
