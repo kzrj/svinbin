@@ -301,3 +301,25 @@ class CullingNomadPiglets(CullingPiglets):
 
     objects = CullingPigletsManager()
 
+
+class WeighingPigletsManager(CoreModelManager):
+    def create_weighing(self, piglets_group, total_weight, place, initiator=None):
+        weighing_record = self.create(piglets_group=piglets_group, total_weight=total_weight,
+            average_weight=(total_weight / piglets_group.quantity), place=place,
+            piglets_quantity=piglets_group.quantity,
+            initiator=initiator, date=timezone.now())
+        return weighing_record
+
+
+class WeighingPiglets(PigletsEvent):
+    WEIGHING_PLACES = [('3/4', '3/4'), ('4/8', '4/8'), ('8/5', '8/5'), ('8/6', '8/6'),
+        ('8/7', '8/7')]
+
+    piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE)
+    total_weight = models.FloatField()
+    average_weight = models.FloatField()
+    piglets_quantity = models.IntegerField()
+    place = models.CharField(max_length=10, choices=WEIGHING_PLACES)
+
+    objects = WeighingPigletsManager()
+

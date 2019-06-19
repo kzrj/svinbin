@@ -49,6 +49,7 @@ OWN_APPS = [
     'transactions.apps.TransactionsConfig',
     'tours.apps.ToursConfig',
     'workshopthree.apps.WorkshopthreeConfig',
+    'workshopfour.apps.WorkshopfourConfig',
 ]
 
 

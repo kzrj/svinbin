@@ -82,7 +82,7 @@ def create_nomad_group_from_three_new_born2():
     return nomad_group
 
 def create_nomad_and_move_to_cell_in_workshop_four():
-    nomad_group = sows_testing_utils.create_nomad_group_from_three_new_born()
+    nomad_group = create_nomad_group_from_three_new_born()
 
     section = Section.objects.get(workshop__number=4, number=1)
     piglet_group_cell = PigletsGroupCell.objects.get(section=section, number=1)
