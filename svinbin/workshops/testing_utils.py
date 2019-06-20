@@ -16,7 +16,6 @@ def create_workshops():
         WorkShop(number=7, title='Цех 7 Откорм 7'),
         WorkShop(number=9, title='Цех 9 Убойный цех'),
         WorkShop(number=10, title='Цех 10 Крематорий'),
-        WorkShop(number=11, title='Цех Взвешивание 3/4'),
         ])
 
 def create_sections_and_cell_for_workshop_one():
@@ -28,7 +27,7 @@ def create_sections_and_cell_for_workshop_one():
 
     workshop_one_section_1 = Section.objects.get(name='Змейка')
     SowSingleCell.objects.bulk_create([
-        SowSingleCell(section=workshop_one_section_1, number=cellNumber) for cellNumber in range(1, 481)
+        SowSingleCell(workshop=workshop_one, section=workshop_one_section_1, number=cellNumber) for cellNumber in range(1, 481)
         ])
 
 def create_sections_and_cell_for_workshop_two():
@@ -39,7 +38,7 @@ def create_sections_and_cell_for_workshop_two():
 
     for section in Section.objects.filter(workshop=workshop_two):
         SowGroupCell.objects.bulk_create([
-            SowGroupCell(section=section, number=cellNumber) for cellNumber in range(1, 7)]
+            SowGroupCell(workshop=workshop_two, section=section, number=cellNumber) for cellNumber in range(1, 7)]
             )
 
 def create_sections_and_cell_for_workshop_three():
@@ -50,7 +49,7 @@ def create_sections_and_cell_for_workshop_three():
 
     for section in Section.objects.filter(workshop=workshop_three):
         SowAndPigletsCell.objects.bulk_create([
-            SowAndPigletsCell(section=section, number=cellNumber) for cellNumber in range(1, 7)
+            SowAndPigletsCell(workshop=workshop_three, section=section, number=cellNumber) for cellNumber in range(1, 7)
             ])
 
 def create_sections_and_cell_for_workshop_with_group_cells(workshop_number):
@@ -65,7 +64,7 @@ def create_sections_and_cell_for_workshop_with_group_cells(workshop_number):
 
     for section in Section.objects.filter(workshop=workshop):
         PigletsGroupCell.objects.bulk_create([
-            PigletsGroupCell(section=section, number=cellNumber) for cellNumber in range(1, 7)
+            PigletsGroupCell(workshop=section.workshop, section=section, number=cellNumber) for cellNumber in range(1, 7)
             ])
 
 # def create_sections_and_cell_for_workshop_eleven():

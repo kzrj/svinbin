@@ -7,6 +7,7 @@ from core.models import CoreModel, CoreModelManager
 from workshops.models import WorkShopEmployee, WorkShop, SowSingleCell, Section, \
     PigletsGroupCell, SowAndPigletsCell, SowGroupCell
     # WeighingCell
+import piglets_events
 
 
 class LocationManager(CoreModelManager):
@@ -88,6 +89,9 @@ class Location(CoreModel):
         if self.sowGroupCell:
             return self.sowGroupCell.section.workshop
 
+    # @property
+    # def is
+
     def __str__(self):
         return str(self.get_location)
 
@@ -164,8 +168,14 @@ class SowTransaction(Transaction):
             self.to_location.sowAndPigletsCell.save()
 
 
-
 class PigletsTransactionManager(CoreModelManager):
+    def create_transaction_to_group_cell(self, to_location, piglets_group, initiator=None):
+        cell = to_location.get_location
+        if cell.is_empty:
+            # self.create_transaction_without_merge()
+            return self.create_transaction_without_merge(to_location, piglets_group, initiator)
+        pass
+
     def create_transaction_without_merge(self, to_location, piglets_group, initiator=None):
         transaction = PigletsTransaction.objects.create(
                 date=timezone.now(),
@@ -178,6 +188,17 @@ class PigletsTransactionManager(CoreModelManager):
         piglets_group.change_current_location(to_location)
 
         return transaction
+
+    def create_transactions_with_nomad_merge(self, to_location, piglets_group, initiator=None):
+        cell = to_location.get_location
+        nomad_group_in_cell = cell.get_residents().first()
+        new_created_group = piglets_events.models.NewBornPigletsMerger.create_merger_and_return_nomad_piglets_group(
+            nomad_groups=[piglets_group, nomad_group_in_cell],
+            nomad_group_join_to=nomad_group_in_cell,
+            initiator=initiator
+            )
+
+
 
 
 class PigletsTransaction(Transaction):

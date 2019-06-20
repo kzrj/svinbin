@@ -3,9 +3,7 @@ from django.db import models
 from django.utils import timezone
 
 from core.models import Event, CoreModel, CoreModelManager
-from sows.models import Sow
-from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
-from tours.models import Tour
+from piglets.models import NewBornPigletsGroup, NomadPigletsGroup, PigletsStatus
 from workshops.models import WorkShop
 from transactions.models import Location
 
@@ -40,7 +38,7 @@ class NewBornPigletsMergerManager(PigletsMergerManager):
 
     def create_merger_and_return_nomad_piglets_group(self, new_born_piglets_groups, initiator=None):
         new_born_merger = self.create_merger(new_born_piglets_groups, initiator=initiator)
-        return new_born_merger.create_nomad_group()
+        return new_born_merger, new_born_merger.create_nomad_group()
 
 
 class NewBornPigletsMerger(PigletsMerger):
@@ -104,10 +102,13 @@ class NewBornPigletsMerger(PigletsMerger):
         location = Location.objects.create_location(WorkShop.objects.get(number=3))
         self.create_records()
         nomad_group = NomadPigletsGroup.objects.create(location=location,
-         start_quantity=self.count_all_piglets(), quantity=self.count_all_piglets())
+         start_quantity=self.count_all_piglets(), quantity=self.count_all_piglets(),
+         status=PigletsStatus.objects.get(title='Готовы ко взвешиванию')
+         )
         self.nomad_group = nomad_group
         self.save()
         self.piglets_groups.reset_quantity_and_deactivate()
+
         return nomad_group
 
     def add_new_born_group(self, new_born_group):
@@ -179,6 +180,19 @@ class SplitNomadPigletsGroup(SplitPigletsGroup):
 
 
 class NomadPigletsGroupMergerManager(PigletsMergerManager):
+    # def create_nomad_merger(self, nomad_groups, nomad_group_join_to, initiator=None):
+    #     nomad_groups_merger = self.create(date=timezone.now(), nomad_group_join_to=nomad_group_join_to,
+    #      initiator=initiator)
+    #     nomad_groups.update(groups_merger=nomad_groups_merger)
+    #     return nomad_groups_merger
+
+    # def create_merger_and_return_nomad_piglets_group(self, nomad_groups, nomad_group_join_to,
+    #  initiator=None):
+    #     nomad_merger = self.create_nomad_merger(nomad_groups, nomad_group_join_to=nomad_group_join_to,
+    #      initiator=initiator, date=timezone.now())
+    #     nomad_merger.create_records()
+    #     return nomad_merger.create_nomad_group()
+
     def create_nomad_merger(self, nomad_groups, nomad_group_join_to, initiator=None):
         nomad_groups_merger = self.create(date=timezone.now(), nomad_group_join_to=nomad_group_join_to,
          initiator=initiator)
@@ -190,7 +204,7 @@ class NomadPigletsGroupMergerManager(PigletsMergerManager):
         nomad_merger = self.create_nomad_merger(nomad_groups, nomad_group_join_to=nomad_group_join_to,
          initiator=initiator, date=timezone.now())
         nomad_merger.create_records()
-        return nomad_merger.create_nomad_group()
+        return nomad_merger.create_nomad_group()    
 
 
 class NomadPigletsGroupMerger(PigletsMerger):
@@ -308,6 +322,7 @@ class WeighingPigletsManager(CoreModelManager):
             average_weight=(total_weight / piglets_group.quantity), place=place,
             piglets_quantity=piglets_group.quantity,
             initiator=initiator, date=timezone.now())
+        piglets_group.change_status_to('Взвешены, готовы к заселению')
         return weighing_record
 
 
@@ -315,7 +330,8 @@ class WeighingPiglets(PigletsEvent):
     WEIGHING_PLACES = [('3/4', '3/4'), ('4/8', '4/8'), ('8/5', '8/5'), ('8/6', '8/6'),
         ('8/7', '8/7')]
 
-    piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE)
+    piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE,
+     related_name="weighing_records")
     total_weight = models.FloatField()
     average_weight = models.FloatField()
     piglets_quantity = models.IntegerField()

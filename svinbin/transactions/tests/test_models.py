@@ -4,11 +4,13 @@ from django.test import TestCase
 from django.utils import timezone
 
 import workshops.testing_utils as workshops_testing
-import pigs.testing_utils as pigs_testing
+import sows.testing_utils as sows_testing
+import piglets.testing_utils as piglets_testing
 
 from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
 SowAndPigletsCell
-from pigs.models import Sow, NomadPigletsGroup
+from sows.models import Sow
+from piglets.models import NomadPigletsGroup
 from transactions.models import Location, SowTransaction, PigletsTransaction
 
 
@@ -17,7 +19,7 @@ class SowTransactionModelTest(TestCase):
         workshops_testing.create_workshops_sections_and_cells()
 
     def test_to_empty_fill_single_cell(self):
-        sow = pigs_testing.create_sow_and_put_in_workshop_one(1, '100')
+        sow = sows_testing.create_sow_and_put_in_workshop_one(1, '100')
         to_location = Location.objects.create_location(SowSingleCell.objects.get(number='2'))
 
         transaction = SowTransaction(from_location=sow.location, to_location=to_location,
@@ -36,7 +38,7 @@ class SowTransactionModelTest(TestCase):
         self.assertEqual(sow.location, to_location)
 
     def test_to_empty_fill_group_cell(self):
-        sow = pigs_testing.create_sow_and_put_in_workshop_two(1, 1)
+        sow = sows_testing.create_sow_and_put_in_workshop_two(1, 1)
         section = Section.objects.get(workshop__number=2, number=2)
         to_location = Location.objects.create_location(SowGroupCell.objects.get(section=section, number=2))
 
@@ -62,7 +64,7 @@ class SowTransactionManagerTest(TestCase):
         workshops_testing.create_workshops_sections_and_cells()
 
     def test_create_transaction(self):
-        sow = pigs_testing.create_sow_and_put_in_workshop_one(1, '100')
+        sow = sows_testing.create_sow_and_put_in_workshop_one(1, '100')
         to_location = Location.objects.create_location(SowSingleCell.objects.get(number='2'))
         transaction = SowTransaction.objects.create_transaction(
             to_location=to_location,
@@ -153,16 +155,15 @@ class LocationModelTest(TestCase):
 class PigletsTransactionManagerTest(TestCase):
     def setUp(self):
         workshops_testing.create_workshops_sections_and_cells()
-        pigs_testing.create_statuses()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
-
-    def test_create_transaction(self):
-        nomad_group = pigs_testing.create_nomad_group_from_three_new_born()
+    def test_create_transaction_without_merge(self):
+        nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
         self.assertEqual(nomad_group.location.get_location, WorkShop.objects.get(number=3))
 
         to_location = Location.objects.create_location(WorkShop.objects.get(number=4))
         transaction = PigletsTransaction.objects.create_transaction_without_merge(to_location, nomad_group)
-        print(transaction)
 
         self.assertEqual(transaction.from_location.get_location, WorkShop.objects.get(number=3))
         self.assertEqual(transaction.to_location.get_location, WorkShop.objects.get(number=4))
@@ -170,5 +171,11 @@ class PigletsTransactionManagerTest(TestCase):
 
         nomad_group.refresh_from_db()
         self.assertEqual(nomad_group.location.get_location, WorkShop.objects.get(number=4))
+
+    def test_create_transaction_to_group_cell(self):
+        nomad_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+        nomad_group2 = piglets_testing.create_nomad_group_from_three_new_born()
+        nomad_group3 = piglets_testing.create_nomad_group_from_three_new_born()
+
 
 

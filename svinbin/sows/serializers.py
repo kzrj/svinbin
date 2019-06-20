@@ -8,6 +8,7 @@ class SowSerializer(serializers.ModelSerializer):
     location = serializers.StringRelatedField()
     status = serializers.StringRelatedField()
     tour = serializers.StringRelatedField()
+    status = serializers.StringRelatedField()
 
     class Meta:
         model = Sow

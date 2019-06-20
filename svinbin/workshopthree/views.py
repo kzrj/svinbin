@@ -46,6 +46,7 @@ class WorkShopThreePigletsViewSet(viewsets.GenericViewSet):
                 reason=serializer.validated_data['reason'],
                 initiator=None
                 )
+            # piglets_group.change_status_to()
 
             return Response(
                 {"new_born_piglet_group": piglets_serializers.NewBornPigletsGroupSerializer(piglets_group).data,
@@ -81,17 +82,21 @@ class WorkShopThreePigletsViewSet(viewsets.GenericViewSet):
         serializer = serializers.NewBornGroupsToMerge(data=request.data)
         if serializer.is_valid():
             groups_to_merge = serializer.validated_data['piglets_groups']
-            nomad_group = piglets_events_models.NewBornPigletsMerger.objects.create_merger_and_return_nomad_piglets_group(
+            merger, nomad_group = piglets_events_models.NewBornPigletsMerger.objects.create_merger_and_return_nomad_piglets_group(
             new_born_piglets_groups=groups_to_merge, initiator=None)     
 
             to_location = transactions_models.Location.objects.create_location(
-                workshops_models.WorkShop.objects.get(number=11))
+                workshops_models.WorkShop.objects.get(number=4))
             transaction = transactions_models.PigletsTransaction.objects.create_transaction_without_merge(
                 to_location, nomad_group, None)
+            # nomad_group.change_status_to('Готовы ко взвешиванию')
 
             return Response(
-                {"nomad_group": piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data,
-                 "transaction": transactions_serializers.NomadPigletsTransactionSerializer(transaction).data},
+                {
+                 "nomad_group": piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data,
+                 "transaction": transactions_serializers.NomadPigletsTransactionSerializer(transaction).data,
+                 "merger": piglets_events_serializers.NewBornPigletsGroupMergerSerializer(merger).data
+                 },
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -59,7 +59,7 @@ class Ultrasound(SowEvent):
 class SowFarrowManager(CoreModelManager):
     def create_sow_farrow_by_sow_object(self, sow, week, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
-        sow.change_status_to('farrow, feed')
+        sow.change_status_to('Опоросилась, кормит')
         tour = Tour.objects.get_tour_by_week_in_current_year(week)
 
         # check is it first sow_farrow in current tour

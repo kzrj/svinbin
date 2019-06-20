@@ -32,3 +32,15 @@ class NewBornPigletsGroupRecountSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.NewBornPigletsGroupRecount
         fields = "__all__"
+
+
+class WeighingPigletsCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.WeighingPiglets
+        fields = ['total_weight', 'place']
+
+
+class WeighingPigletsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.WeighingPiglets
+        fields = '__all__'

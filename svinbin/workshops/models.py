@@ -33,6 +33,7 @@ class Section(CoreModel):
 
 
 class Cell(CoreModel):
+    workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     number = models.CharField(max_length=4)
     # pigletsQuantity = models.IntegerField(default=0)
@@ -65,12 +66,16 @@ class PigletsGroupCell(Cell):
         return 'Групповая клетка № {}, {}'.format(self.number, str(self.section))
 
     def get_all_locations(self):
-        print('get all locations')
         return self.locations.all()
 
     def get_residents(self):
-        print('get_residents')
         return self.locations.get_with_active_nomad_group()
+
+    @property
+    def is_empty():
+        if self.get_residents().first() == None:
+            return True
+        return False
 
 
 class SowAndPigletsCell(Cell):

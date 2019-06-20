@@ -4,11 +4,22 @@ import random
 from workshops.models import SowSingleCell, SowGroupCell, Section, WorkShop, SowAndPigletsCell, PigletsGroupCell
 from transactions.models import Location, PigletsTransaction
 from sows.models import Sow, SowStatus
-from piglets.models import NewBornPigletsGroup
+from piglets.models import NewBornPigletsGroup, PigletsStatus
 from sows_events.models import Semination, SowFarrow
 from piglets_events.models import NewBornPigletsMerger
 
 from sows import testing_utils as sows_testing_utils
+
+
+def create_piglets_statuses():
+    if PigletsStatus.objects.all().count() < 1:
+        PigletsStatus.objects.bulk_create([
+            PigletsStatus(title='Родились, кормятся'),
+            PigletsStatus(title='Готовы ко взвешиванию'),
+            PigletsStatus(title='Взвешены, готовы к заселению'),
+            PigletsStatus(title='Кормятся'),
+            # PigletsStatus(title='Родились, кормятся'),
+            ])
 
 
 def create_nomad_group_from_three_new_born():

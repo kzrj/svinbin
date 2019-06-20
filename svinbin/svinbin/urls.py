@@ -15,6 +15,7 @@ from sows import views as sows_views
 from sows_events import views as sows_events_views
 from workshops import views as workshops_views
 from workshopthree import views as workshopthree_views
+from workshopfour import views as workshopfour_views
 
 router = routers.DefaultRouter()
 
@@ -36,10 +37,16 @@ router.register(r'sows_events/spec_uboi', sows_events_views.CullingSowViewSet, b
 router.register(r'pigletsgroupcells', workshops_views.PigletsGroupCellViewSet, basename='pigletsgroupcell')
 
 # by workshops
+# workshop three
 router.register(r'workshopthree/piglets', workshopthree_views.WorkShopThreePigletsViewSet, \
  basename='workshopthree-piglets')
 router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsViewSet, \
  basename='workshopthree-sows')
+
+# workshop four
+router.register(r'workshopfour/piglets', workshopfour_views.WorkShopFourPigletsViewSet, \
+ basename='workshopfour-piglets')
+
 
 schema_view = get_swagger_view(title='API Docs')
 
