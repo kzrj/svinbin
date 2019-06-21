@@ -16,6 +16,10 @@ class PigletsGroupCellSerializer(serializers.ModelSerializer):
         fields = ['id', 'section', 'number', 'locations']
 
 
+class PigletsGroupCellPkSerializer(serializers.Serializer):
+    cell = serializers.PrimaryKeyRelatedField(queryset=PigletsGroupCell.objects.all())
+
+
 class SowAndPigletsCellSerializer(serializers.ModelSerializer):
     class Meta:
         model = SowAndPigletsCell

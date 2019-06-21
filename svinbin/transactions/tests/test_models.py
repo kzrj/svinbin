@@ -172,10 +172,25 @@ class PigletsTransactionManagerTest(TestCase):
         nomad_group.refresh_from_db()
         self.assertEqual(nomad_group.location.get_location, WorkShop.objects.get(number=4))
 
-    def test_create_transaction_to_group_cell(self):
-        nomad_group1 = piglets_testing.create_nomad_group_from_three_new_born()
-        nomad_group2 = piglets_testing.create_nomad_group_from_three_new_born()
-        nomad_group3 = piglets_testing.create_nomad_group_from_three_new_born()
+    # def test_create_transactions_with_nomad_merge(self):
+    #     nomad_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+    #     nomad_group2 = piglets_testing.create_nomad_group_from_three_new_born()
+
+    #     cell = PigletsGroupCell.objects.first()
+    #     self.assertEqual(cell.workshop.number, 4) 
+
+    #     nomad_group1_location = Location.objects.create_location(cell)
+    #     nomad_group1.location = nomad_group1_location
+    #     nomad_group1.save()
+
+    #     to_location = Location.objects.create_location(cell)
+
+    #     transaction = PigletsTransaction.objects.create_transactions_with_nomad_merge(
+    #         to_location=to_location,
+    #         piglets_group=nomad_group2
+    #         )
+        
+    #     print(transaction)
 
 
 

@@ -73,23 +73,49 @@ class WorkShopFourPigletsViewSet(WorkShopNomadPigletsViewSet):
 
     @action(methods=['post'], detail=True)
     def move_one_group_to_cell(self, request, pk=None):        
-        serializer = piglets_events_serializers.WeighingPigletsCreateSerializer(data=request.data)
+        serializer = workshops_serializers.PigletsGroupCellPkSerializer(data=request.data)
         if serializer.is_valid():
             piglets_group = self.get_object()
-            weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
-                piglets_group=piglets_group,
-                total_weight=serializer.validated_data['total_weight'],
-                place=serializer.validated_data['place'],
-                initiator=None
-                )
+            cell = serializer.validated_data['cell']
+            to_location = transactions_models.Location.objects.create_location(cell)
 
-            return Response(
-                {
-                 "piglets_group": piglets_serializers.NomadPigletsGroupSerializer(piglets_group).data,
-                 "weighing_record": piglets_events_serializers.WeighingPigletsSerializer(weighing_record).data,
-                 "message": 'Взвешивание прошло успешно.',
-                 },
-                status=status.HTTP_200_OK)
+            if cell.is_empty:
+                transaction = transactions_models.PigletsTransaction \
+                    .objects.create_transaction_without_merge(
+                        to_location=to_location, piglets_group=piglets_group, initiator=None)
+                piglets_group.change_status_to('Кормятся')
+            
+                return Response(
+                    {
+                     "piglets_group": piglets_serializers.NomadPigletsGroupSerializer(piglets_group).data,
+                     "cell": workshops_serializers.PigletsGroupCellSerializer(cell).data,
+                     "transaction": transactions_serializers \
+                        .NomadPigletsTransactionSerializer(transaction).data,
+                     "message": 'Клетка была пустая.',
+                     },
+                    status=status.HTTP_200_OK)
+            else:
+                transaction = transactions_models.PigletsTransaction \
+                    .objects.create_transaction_without_merge(
+                        to_location=to_location, piglets_group=piglets_group, initiator=None)
+
+                new_to_location = transactions_models.Location.objects.duplicate_location(to_location)
+                merged_group = piglets_events_models.NomadPigletsGroupMerger.objects \
+                    .create_merger_and_return_nomad_piglets_group(
+                        nomad_groups=cell.get_list_of_residents(),
+                        new_location=new_to_location,
+                        initiator=None
+                        )
+
+                return Response(
+                    {                     
+                     "merged_group": piglets_serializers.NomadPigletsGroupSerializer(merged_group).data,
+                     "transaction": transactions_serializers.NomadPigletsTransactionSerializer(transaction).data,
+                     "cell": workshops_serializers.PigletsGroupCellSerializer(cell).data,
+
+                     "message": 'Клетка была не пустая.',
+                     },
+                    status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

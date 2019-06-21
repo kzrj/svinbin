@@ -18,7 +18,7 @@ def create_piglets_statuses():
             PigletsStatus(title='Готовы ко взвешиванию'),
             PigletsStatus(title='Взвешены, готовы к заселению'),
             PigletsStatus(title='Кормятся'),
-            # PigletsStatus(title='Родились, кормятся'),
+            PigletsStatus(title='Объединены с другой группой'),
             ])
 
 

@@ -15,6 +15,7 @@ class PigletsStatus(CoreModel):
 class PigletsGroupManager(CoreModelManager):
     def reset_quantity_and_deactivate(self):
         self.update(quantity=0, active=False)
+        # return self.update(quantity=0, active=False)
 
     def piglets_in_workshop_not_in_cells(self):
         return self.filter(~Q(location__workshop=None))
@@ -92,8 +93,12 @@ class NewBornPigletsGroup(PigletsGroup):
 
 
 class NomadPigletsQuerySet(models.QuerySet):
+
     # def piglets_in_workshop_not_in_cells(self):
     #     return self.filter(~Q(location__workshop=None))
+
+    def reset_quantity_and_deactivate(self):
+        return self.update(quantity=0, active=False)
 
     def piglets_in_workshop_not_in_cells(self, workshop):
         return self.filter(location__workshop=workshop)
@@ -111,13 +116,13 @@ class NomadPigletsQuerySet(models.QuerySet):
     def piglets_without_weighing_record(self, place):
         return self.filter(~Q(weighing_records__place=place))
 
-    # def s_test(self):
-
-
 
 class NomadPigletsGroupManager(PigletsGroupManager):
     def get_queryset(self):
         return NomadPigletsQuerySet(self.model, using=self._db)
+
+    def reset_quantity_and_deactivate(self):
+        return self.get_queryset().reset_quantity_and_deactivate()
 
     def move_to(self, piglets_group_pk, pre_location, initiator=None):
         location = Location.objects.create_location(pre_location)
@@ -162,4 +167,3 @@ class NomadPigletsGroup(PigletsGroup):
         self.quantity = 0
         self.active = False
         self.save()
-

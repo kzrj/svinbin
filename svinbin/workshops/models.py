@@ -2,9 +2,11 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-# from transactions.models import Location
 from core.models import CoreModel, CoreModelManager
-import transactions
+# from piglets_events.models import NomadGroupPigletsMerger
+# from django.apps import apps
+
+# NomadGroupPigletsMerger = apps.get_model('piglets_events', 'NomadGroupPigletsMerger')
 
 
 class WorkShop(CoreModel):
@@ -68,12 +70,35 @@ class PigletsGroupCell(Cell):
     def get_all_locations(self):
         return self.locations.all()
 
-    def get_residents(self):
+    def get_locations_with_residents(self):
         return self.locations.get_with_active_nomad_group()
 
+    def get_list_of_residents(self):
+        residents = list()
+        for location in self.locations.get_with_active_nomad_group():
+            residents.append(location.nomadpigletsgroup)
+
+        return residents
+
+    # def get_first_of_resident(self):
+        
+
+    # def merge_residents(self, piglets_group):
+    #     NomadGroupPigletsMerger = apps.get_model(app_label='piglets_events', model_name='NomadGroupPigletsMerger')
+    #     nomad_group_in_cell = self.get_list_of_residents()[0]
+    #     new_location = nomad_group_in_cell.location.duplicate_location_from_model()
+    #     new_created_group = NomadGroupPigletsMerger.create_merger_and_return_nomad_piglets_group(
+    #         nomad_groups=[piglets_group, nomad_group_in_cell],
+    #         new_location=new_location,
+    #         initiator=initiator
+    #         )
+    #     return new_created_group
+
+
+
     @property
-    def is_empty():
-        if self.get_residents().first() == None:
+    def is_empty(self):
+        if self.get_locations_with_residents().first() == None:
             return True
         return False
 

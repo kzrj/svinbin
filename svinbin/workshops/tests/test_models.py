@@ -73,7 +73,7 @@ class PigletsGroupCelltest(TestCase):
         self.assertEqual(piglet_group_cell1.get_all_locations()[0],
          Location.objects.filter(pk=location1.pk)[0])
 
-    def test_get_residents(self):
+    def test_get_list_of_residents(self):
         nomad_group1 = piglets_testing.create_nomad_group_from_three_new_born()
         nomad_group2 = piglets_testing.create_nomad_group_from_three_new_born()
 
@@ -81,17 +81,27 @@ class PigletsGroupCelltest(TestCase):
         piglet_group_cell = PigletsGroupCell.objects.get(section=section, number=1)
 
         to_location1 = Location.objects.create_location(piglet_group_cell)
-        transaction1 = PigletsTransaction.objects.create_transaction_without_merge(to_location1,
-            nomad_group1)
+        nomad_group1.location = to_location1
+        nomad_group1.save()
 
         to_location2 = Location.objects.create_location(piglet_group_cell)
-        transaction2 = PigletsTransaction.objects.create_transaction_without_merge(to_location2,
-            nomad_group2)
+        nomad_group2.location = to_location2
+        nomad_group2.save()
 
-        print(nomad_group1.location)
-        print(piglet_group_cell.locations.filter(nomadpigletsgroup=nomad_group1).first().nomadpigletsgroup)
-        print(piglet_group_cell.get_residents())
+        list_of_residents = piglet_group_cell.get_list_of_residents()
+        self.assertEqual(list_of_residents, [nomad_group1, nomad_group2])
+    
+    # def test_merge_residents(self):
+    #     nomad_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+    #     nomad_group2 = piglets_testing.create_nomad_group_from_three_new_born()
 
-        # nomad_group.active = False
-        # nomad_group.save()
-        # print(piglet_group_cell.get_residents())
+    #     section = Section.objects.get(workshop__number=4, number=1)
+    #     piglet_group_cell = PigletsGroupCell.objects.get(section=section, number=1)
+
+    #     to_location1 = Location.objects.create_location(piglet_group_cell)
+    #     nomad_group1.location = to_location1
+    #     nomad_group1.save()
+    #     self.assertNotEqual(nomad_group2.location.get_location, piglet_group_cell)
+
+    #     merged_group = piglet_group_cell.merge_residents(nomad_group2)
+    #     print(merged_group)
