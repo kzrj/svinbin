@@ -157,7 +157,8 @@ class SplitNomadPigletsGroupManager(CoreModelManager):
         return NomadPigletsGroup.objects.create(location=location,
             start_quantity=quantity,
             quantity=quantity,
-            split_record=split_event
+            split_record=split_event,
+            status=parent_nomad_group.status
             )
 
     def split_group(self, parent_nomad_group, new_group_piglets_amount, initiator=None):
@@ -175,7 +176,8 @@ class SplitNomadPigletsGroupManager(CoreModelManager):
        
 
 class SplitNomadPigletsGroup(SplitPigletsGroup):
-    parent_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True)
+    parent_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
+        related_name='split_event')
 
     objects = SplitNomadPigletsGroupManager()
 

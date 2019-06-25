@@ -3,7 +3,7 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from workshopthree import serializers
+from workshopfour import serializers
 import sows.serializers as sows_serializers
 import sows_events.serializers as sows_events_serializers
 import piglets.serializers as piglets_serializers
@@ -113,6 +113,66 @@ class WorkShopFourPigletsViewSet(WorkShopNomadPigletsViewSet):
                      "transaction": transactions_serializers.NomadPigletsTransactionSerializer(transaction).data,
                      "cell": workshops_serializers.PigletsGroupCellSerializer(cell).data,
 
+                     "message": 'Клетка была не пустая.',
+                     },
+                    status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['post'], detail=False)
+    def move_group_from_cell_to_cell(self, request):        
+        serializer = serializers.MoveFromCellToCellSerializer(data=request.data)
+        if serializer.is_valid():
+            from_cell = serializer.validated_data['from_cell']
+            moving_group = from_cell.get_list_of_residents()[0]
+            quantity = serializer.validated_data['quantity']
+            
+            if quantity < moving_group.quantity:
+                other_group, moving_group = piglets_events_models.SplitNomadPigletsGroup.objects.split_group(
+                    parent_nomad_group=moving_group,
+                    new_group_piglets_amount=quantity,
+                    initiator=None
+                    )
+
+            to_cell = serializer.validated_data['to_cell']
+            to_location = transactions_models.Location.objects.create_location(to_cell)
+
+            if to_cell.is_empty:
+                transaction = transactions_models.PigletsTransaction \
+                    .objects.create_transaction_without_merge(
+                        to_location=to_location, piglets_group=moving_group, initiator=None)
+            
+                return Response(
+                    {
+                     "moving_group": piglets_serializers.NomadPigletsGroupSerializer(moving_group).data,
+                     "from_cell": workshops_serializers.PigletsGroupCellSerializer(from_cell).data,
+                     "to_cell": workshops_serializers.PigletsGroupCellSerializer(to_cell).data,
+                     "transaction": transactions_serializers \
+                        .NomadPigletsTransactionSerializer(transaction).data,
+                     "message": 'Клетка была пустая.',
+                     },
+                    status=status.HTTP_200_OK)
+            else:
+                transaction = transactions_models.PigletsTransaction \
+                    .objects.create_transaction_without_merge(
+                        to_location=to_location, piglets_group=moving_group, initiator=None)
+
+                new_to_location = transactions_models.Location.objects.duplicate_location(to_location)
+                merged_group = piglets_events_models.NomadPigletsGroupMerger.objects \
+                    .create_merger_and_return_nomad_piglets_group(
+                        nomad_groups=to_cell.get_list_of_residents(),
+                        new_location=new_to_location,
+                        initiator=None
+                        )
+
+                return Response(
+                    {           
+                     "moving_group": piglets_serializers.NomadPigletsGroupSerializer(moving_group).data,          
+                     "merged_group": piglets_serializers.NomadPigletsGroupSerializer(merged_group).data,
+                     "from_cell": workshops_serializers.PigletsGroupCellSerializer(from_cell).data,
+                     "to_cell": workshops_serializers.PigletsGroupCellSerializer(to_cell).data,
+                     "transaction": transactions_serializers.NomadPigletsTransactionSerializer(transaction).data,
                      "message": 'Клетка была не пустая.',
                      },
                     status=status.HTTP_200_OK)

@@ -8,7 +8,6 @@ from workshops.models import PigletsGroupCell, SowAndPigletsCell
 
 class PigletsGroupCellSerializer(serializers.ModelSerializer):
     section = serializers.StringRelatedField()
-    # locations = serializers.StringRelatedField(many=True)
     locations = transactions_serializers.NomadGroupsListingFromLocationsField(many=True, read_only=True)
     
     class Meta:

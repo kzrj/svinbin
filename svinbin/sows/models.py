@@ -95,8 +95,15 @@ class Sow(Pig):
         self.save()
 
 
+class GiltManager(CoreModelManager):
+    def create_gilt(self, birth_id, sow):
+        return self.create(birth_id=birth_id, sow=sow,
+         location=Location.objects.duplicate_location(sow.location))
+
+
 class Gilt(Pig):
-    status = models.ForeignKey(SowStatus, on_delete=models.SET_NULL, null=True)
+    sow = models.ForeignKey(Sow)
+    status = models.ForeignKey(GiltStatus, on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return 'Gilt #%s' % self.birth_id

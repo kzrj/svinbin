@@ -65,3 +65,30 @@ class NomadPigletsGroupMergerTest(TestCase):
         self.assertEqual(piglets_group1.quantity, 0)
         self.assertEqual(piglets_group2.quantity, 0)
         
+
+class SplitNomadPigletsGroupTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+
+    def test_split_group(self):
+        parent_piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
+        self.assertEqual(parent_piglets_group.location.get_location.number, 3)
+        self.assertEqual(parent_piglets_group.quantity, 37)
+
+        first_group, second_group = piglets_events_models.SplitNomadPigletsGroup \
+            .objects.split_group(parent_piglets_group, 10)
+
+        self.assertEqual(first_group.quantity, 27)
+        self.assertEqual(second_group.quantity, 10)
+        self.assertEqual(first_group.location.get_location.number, 3)
+        self.assertEqual(second_group.location.get_location.number, 3)
+        self.assertEqual(first_group.status, parent_piglets_group.status)
+        self.assertEqual(second_group.status, parent_piglets_group.status)
+        self.assertEqual(first_group.active, True)
+        self.assertEqual(second_group.active, True)
+        self.assertEqual(parent_piglets_group.quantity, 0)
+        self.assertEqual(parent_piglets_group.active, False)
+        self.assertEqual(first_group.split_record, parent_piglets_group.split_event)
+        

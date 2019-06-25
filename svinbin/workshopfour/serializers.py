@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-# import transactions.serializers as transactions_serializers
-# import sows.serializers as sows_serializers
+from workshops.models import PigletsGroupCell
 
 
+class MoveFromCellToCellSerializer(serializers.Serializer):
+	from_cell = serializers.PrimaryKeyRelatedField(queryset=PigletsGroupCell.objects.all())
+	to_cell = serializers.PrimaryKeyRelatedField(queryset=PigletsGroupCell.objects.all())
+	quantity = serializers.IntegerField()

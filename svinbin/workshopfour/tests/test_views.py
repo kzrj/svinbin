@@ -91,11 +91,98 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         # not empty cell
         response = self.client.post('/api/workshopfour/piglets/%s/move_one_group_to_cell/' %
           nomad_piglets_group2.pk, {'cell': cell.pk })
-        print(response.data)
         self.assertEqual(response.data['merged_group']['quantity'],
          nomad_piglets_group1.start_quantity + nomad_piglets_group2.start_quantity)
 
         nomad_piglets_group2.refresh_from_db()
-        print(nomad_piglets_group2.active)
-        print(nomad_piglets_group2.status)
-        print(nomad_piglets_group2.location)
+        nomad_piglets_group1.refresh_from_db()
+        self.assertEqual(nomad_piglets_group2.active, False)
+        self.assertEqual(nomad_piglets_group2.status.title, 'Объединены с другой группой')
+        self.assertEqual(nomad_piglets_group1.active, False)
+        self.assertEqual(nomad_piglets_group1.status.title, 'Объединены с другой группой')
+        
+    def test_move_one_group_to_cell_moving_without_split_to_empty_cell(self):
+        nomad_piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+        nomad_piglets_group1.location = Location.objects.create_location(WorkShop.objects.get(number=4))
+        nomad_piglets_group1.save()
+
+        from_cell = PigletsGroupCell.objects.all().first()
+        self.assertEqual(from_cell.workshop.number, 4)
+
+        to_cell = PigletsGroupCell.objects.all()[1]
+        self.assertEqual(to_cell.workshop.number, 4)
+
+        response = self.client.post('/api/workshopfour/piglets/%s/move_one_group_to_cell/' %
+          nomad_piglets_group1.pk, {'cell': from_cell.pk })
+
+        response = self.client.post('/api/workshopfour/piglets/move_group_from_cell_to_cell/', 
+          {'from_cell': from_cell.pk, 'to_cell': to_cell.pk, 'quantity': nomad_piglets_group1.quantity })
+        self.assertEqual(response.data['moving_group']['id'], nomad_piglets_group1.pk)
+        self.assertEqual(response.data['transaction']['piglets_group'], nomad_piglets_group1.pk)
+        self.assertEqual(response.data['from_cell']['locations'], ['No group'])
+        self.assertEqual(response.data['to_cell']['locations'][0]['id'], nomad_piglets_group1.pk)
+
+    def test_move_one_group_to_cell_moving_without_split_to_not_empty_cell(self):
+        from_cell = PigletsGroupCell.objects.all().first()
+        nomad_piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+        nomad_piglets_group1.location = Location.objects.create_location(from_cell)
+        nomad_piglets_group1.save()
+
+        to_cell = PigletsGroupCell.objects.all()[1]
+        nomad_piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
+        nomad_piglets_group2.location = Location.objects.create_location(to_cell)
+        nomad_piglets_group2.save()
+
+        response = self.client.post('/api/workshopfour/piglets/move_group_from_cell_to_cell/', 
+          {'from_cell': from_cell.pk, 'to_cell': to_cell.pk, 'quantity': nomad_piglets_group1.quantity })
+
+        self.assertEqual(response.data['moving_group']['id'], nomad_piglets_group1.pk)
+        self.assertEqual(response.data['merged_group']['quantity'],
+         nomad_piglets_group1.quantity + nomad_piglets_group2.quantity)
+
+        nomad_piglets_group1.refresh_from_db()
+        nomad_piglets_group2.refresh_from_db()
+        self.assertEqual(nomad_piglets_group1.active, False)
+        self.assertEqual(nomad_piglets_group2.active, False)
+        self.assertEqual(nomad_piglets_group2.quantity, 0)
+        self.assertEqual(nomad_piglets_group1.status.title, 'Объединены с другой группой')
+        
+    def test_move_one_group_to_cell_moving_with_split_to_empty_cell(self):
+        from_cell = PigletsGroupCell.objects.all().first()
+        nomad_piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+        nomad_piglets_group1.location = Location.objects.create_location(from_cell)
+        nomad_piglets_group1.save()
+
+        to_cell = PigletsGroupCell.objects.all()[1]
+
+        response = self.client.post('/api/workshopfour/piglets/move_group_from_cell_to_cell/', 
+          {'from_cell': from_cell.pk, 'to_cell': to_cell.pk, 'quantity': 10 })
+
+        self.assertEqual(response.data['moving_group']['quantity'], 10)
+
+        from_cell.refresh_from_db()
+        from_cell_group = from_cell.get_list_of_residents()[0]
+        self.assertEqual(from_cell_group.quantity, 27)
+
+        to_cell.refresh_from_db()
+        to_cell_group = to_cell.get_list_of_residents()[0]
+        self.assertEqual(response.data['moving_group']['id'], to_cell_group.pk)
+
+    def test_move_one_group_to_cell_moving_with_split_to_not_empty_cell(self):
+        from_cell = PigletsGroupCell.objects.all().first()
+        nomad_piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+        nomad_piglets_group1.location = Location.objects.create_location(from_cell)
+        nomad_piglets_group1.save()
+
+        to_cell = PigletsGroupCell.objects.all()[1]
+        nomad_piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
+        nomad_piglets_group2.location = Location.objects.create_location(to_cell)
+        nomad_piglets_group2.save()
+
+        response = self.client.post('/api/workshopfour/piglets/move_group_from_cell_to_cell/', 
+          {'from_cell': from_cell.pk, 'to_cell': to_cell.pk, 'quantity': 10 })
+
+        print(response.data)
+
+
+
