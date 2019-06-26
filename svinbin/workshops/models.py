@@ -38,16 +38,10 @@ class Cell(CoreModel):
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
     section = models.ForeignKey(Section, on_delete=models.CASCADE)
     number = models.CharField(max_length=4)
-    # pigletsQuantity = models.IntegerField(default=0)
-    # sow = models.OneToOneField(Sow, null=True)
     
     class Meta:
         abstract = True
 
-    # @property
-    # def is_empty(self):
-    #     if self.sowlocation:
-    #         return True
 
 # Here I can create just one cell class for all types instead separation.
 
@@ -58,6 +52,18 @@ class SowSingleCell(Cell):
 class SowGroupCell(Cell):
     sows = models.ManyToManyField('sows.Sow', related_name='sows_in_cell')
     sows_quantity = models.IntegerField(default=0)
+
+    def get_locations_with_residents(self):
+        return self.locations.get_with_active_new_born_group()
+
+    def get_list_of_residents(self):
+        residents = list()
+        for location in self.locations.get_with_active_nomad_group():
+            residents.append(location.newbornpigletsgroup)
+        return residents
+
+    def get_first_piglets_group(self):
+        return self.get_locations_with_residents().first().newbornpigletsgroup
 
 
 class PigletsGroupCell(Cell):
@@ -80,22 +86,6 @@ class PigletsGroupCell(Cell):
 
         return residents
 
-    # def get_first_of_resident(self):
-        
-
-    # def merge_residents(self, piglets_group):
-    #     NomadGroupPigletsMerger = apps.get_model(app_label='piglets_events', model_name='NomadGroupPigletsMerger')
-    #     nomad_group_in_cell = self.get_list_of_residents()[0]
-    #     new_location = nomad_group_in_cell.location.duplicate_location_from_model()
-    #     new_created_group = NomadGroupPigletsMerger.create_merger_and_return_nomad_piglets_group(
-    #         nomad_groups=[piglets_group, nomad_group_in_cell],
-    #         new_location=new_location,
-    #         initiator=initiator
-    #         )
-    #     return new_created_group
-
-
-
     @property
     def is_empty(self):
         if self.get_locations_with_residents().first() == None:
@@ -106,6 +96,18 @@ class PigletsGroupCell(Cell):
 class SowAndPigletsCell(Cell):
     sow = models.OneToOneField('sows.Sow', on_delete=models.SET_NULL, null=True)
     # piglets_groups = models.ManyToManyField('sows.NewBornPigletsGroup', related_name='piglets_groups_in_sow_cell')
+
+    def get_locations_with_residents(self):
+        return self.locations.get_with_active_new_born_group()
+
+    def get_list_of_residents(self):
+        residents = list()
+        for location in self.locations.get_with_active_new_born_group():
+            residents.append(location.newbornpigletsgroup)
+        return residents
+
+    def get_first_piglets_group(self):
+        return self.get_locations_with_residents().first().newbornpigletsgroup
 
 
 # class WeighingCell(Cell):

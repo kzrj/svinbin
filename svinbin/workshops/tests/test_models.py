@@ -91,17 +91,19 @@ class PigletsGroupCelltest(TestCase):
         list_of_residents = piglet_group_cell.get_list_of_residents()
         self.assertEqual(list_of_residents, [nomad_group1, nomad_group2])
     
-    # def test_merge_residents(self):
-    #     nomad_group1 = piglets_testing.create_nomad_group_from_three_new_born()
-    #     nomad_group2 = piglets_testing.create_nomad_group_from_three_new_born()
 
-    #     section = Section.objects.get(workshop__number=4, number=1)
-    #     piglet_group_cell = PigletsGroupCell.objects.get(section=section, number=1)
+class SowAndPigletsCellTest(TestCase):
+    def setUp(self):
+        workshops_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
-    #     to_location1 = Location.objects.create_location(piglet_group_cell)
-    #     nomad_group1.location = to_location1
-    #     nomad_group1.save()
-    #     self.assertNotEqual(nomad_group2.location.get_location, piglet_group_cell)
+    def test_get_all_locations(self):
+        new_born_piglets = piglets_testing.create_new_born_group(
+            section_number=1, cell_number=4, week_number=2)
+        cell = new_born_piglets.location.get_location
 
-    #     merged_group = piglet_group_cell.merge_residents(nomad_group2)
-    #     print(merged_group)
+        self.assertEqual(cell.get_locations_with_residents().count(), 1)
+        self.assertEqual(cell.get_locations_with_residents().first(), new_born_piglets.location)
+        self.assertEqual(cell.get_list_of_residents(), [new_born_piglets])
+        self.assertEqual(cell.get_first_piglets_group(), new_born_piglets)

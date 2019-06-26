@@ -28,7 +28,6 @@ class SeminationModelManagerTest(TestCase):
         self.assertEqual(sow.tour.week_number, 1)
 
 
-
 class UltrasoundModelManagerTest(TestCase):
     def setUp(self):
         workshop_testing.create_workshops_sections_and_cells()
@@ -96,5 +95,5 @@ class SowFarrowModelManagerTest(TestCase):
         self.assertEqual(piglets_group2.quantity, 17)
         self.assertEqual(piglets_group2.start_quantity, 10)
 
-        print(SowFarrow.objects.all())
-
+        self.assertEqual(SowFarrow.objects.all().count(), 2)
+        self.assertEqual(farrow1.new_born_piglets_group, farrow2.new_born_piglets_group)

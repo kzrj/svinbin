@@ -95,21 +95,26 @@ class Sow(Pig):
         self.save()
 
     def get_last_farrow(self):
-        return self.farrow_set.all().order_by('created')
+        # print(self._meta.get_fields())
+        return self.sowfarrow_set.all().order_by('-created_at')
 
 
 class GiltManager(CoreModelManager):
-    def create_gilt(self, birth_id, sow):
-        gilt = self.create(birth_id=birth_id, sow=sow,
-         location=Location.objects.duplicate_location(sow.location))
-
+    def create_gilt(self, birth_id, mother_sow, cell=None):
+        cell = mother_sow.location.get_location
+        new_born_group = cell.get_first_piglets_group()
+        gilt = self.create(birth_id=birth_id, mother_sow=sow,
+         location=Location.objects.duplicate_location(mother_sow.location),
+         newborngroup=new_born_group
+         )
 
         return gilt
 
 
 class Gilt(Pig):
-    sow = models.ForeignKey(Sow, on_delete=models.SET_NULL, null=True)
+    mother_sow = models.ForeignKey(Sow, on_delete=models.SET_NULL, null=True)
     status = models.ForeignKey(GiltStatus, on_delete=models.SET_NULL, null=True)
+    newborngroup = models.ForeignKey('piglets.NewBornPigletsGroup', on_delete=models.SET_NULL, null=True)
 
     def __str__(self):
         return 'Gilt #%s' % self.birth_id
