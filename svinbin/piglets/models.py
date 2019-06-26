@@ -31,7 +31,7 @@ class PigletsGroup(CoreModel):
 
     status = models.ForeignKey(PigletsStatus, on_delete=models.SET_NULL, null=True)
 
-    gilts_count = models.IntegerField(default=0)
+    gilts_quantity = models.IntegerField(default=0)
 
     class Meta:
         abstract = True
@@ -68,16 +68,17 @@ class PigletsGroup(CoreModel):
         self.save()
 
     def add_gilts(self, quantity):
-        self.gilts_count += quantity
+        self.gilts_quantity += quantity
         self.save()
 
     def remove_gilts(self, quantity):
-        self.gilts_count -= quantity
+        self.gilts_quantity -= quantity
         self.save()
 
 
 class NewBornPigletsGroupManager(PigletsGroupManager):
-    pass
+    def groups_with_gilts(self):
+        return self.get_queryset().filter(gilts_quantity__gt=0)
 
 
 class NewBornPigletsGroup(PigletsGroup):

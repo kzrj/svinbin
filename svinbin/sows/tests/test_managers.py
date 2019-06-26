@@ -93,9 +93,7 @@ class GiltModelManagerTest(TestCase):
         gilt = Gilt.objects.create_gilt(birth_id=1, mother_sow=sow)
 
         new_born_group.refresh_from_db()
-        self.assertEqual(new_born_group.gilts_count, 1)
+        self.assertEqual(new_born_group.gilts_quantity, 1)
         self.assertEqual(gilt.new_born_group, new_born_group)
         self.assertEqual(gilt.mother_sow, sow)
         self.assertEqual(gilt.location.get_location, sow.location.get_location)
-
-
