@@ -4,12 +4,15 @@ from django.conf import settings
 
 
 class CoreModelManager(models.Manager):
-	pass
+    pass
 
 
 class CoreModel(models.Model):
-	class Meta:
-		abstract = True
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        abstract = True
 
 
 class Event(CoreModel):

@@ -100,6 +100,7 @@ class LocationModelManagerTest(TestCase):
 class LocationModelTest(TestCase):
     def setUp(self):
         workshops_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
 
     def test_get_location(self):
         workshop = WorkShop.objects.get(number=1)
@@ -151,6 +152,13 @@ class LocationModelTest(TestCase):
         location = Location.objects.create_location(cell)
         self.assertEqual(location.get_workshop, cell.section.workshop)
 
+    def test_get_with_active_new_born_group(self):
+        new_born_group = piglets_testing.create_new_born_group()
+
+        location = new_born_group.location
+        
+
+    
 
 class PigletsTransactionManagerTest(TestCase):
     def setUp(self):

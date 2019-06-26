@@ -21,6 +21,10 @@ class SowEvent(Event):
 class SeminationManager(CoreModelManager):
     def create_semination(self, sow_farm_id, week, initiator=None, semination_employee=None):
         sow = Sow.objects.get_by_farm_id(sow_farm_id)
+        return self.create_semination_object(sow=sow, week=week, initiator=initiator,
+            semination_employee=semination_employee)
+
+    def create_semination_object(self, sow, week, initiator=None, semination_employee=None):
         tour = Tour.objects.get_or_create_by_week_in_current_year(week)
         semination = self.create(sow=sow, tour=tour, initiator=initiator,
          semination_employee=semination_employee, date=timezone.now())
@@ -63,9 +67,10 @@ class SowFarrowManager(CoreModelManager):
         tour = Tour.objects.get_tour_by_week_in_current_year(week)
 
         # check is it first sow_farrow in current tour
-        farrow = SowFarrow.objects.filter(sow=sow, tour=tour).first()
-        if farrow:
-            farrow.new_born_piglets_group.add_piglets(alive_quantity)
+        previous_farrow_in_tour = SowFarrow.objects.filter(sow=sow, tour=tour).first()
+        if previous_farrow_in_tour:
+            new_born_piglets_group = previous_farrow_in_tour.new_born_piglets_group
+            new_born_piglets_group.add_piglets(alive_quantity)
         else:
             location = Location.objects.create_location(sow.location.get_location)
             new_born_piglets_group = NewBornPigletsGroup.objects.create(
@@ -74,12 +79,13 @@ class SowFarrowManager(CoreModelManager):
                 quantity=alive_quantity,
                 tour=tour
                 )
-            farrow = self.create(sow=sow, tour=tour, initiator=initiator,
+
+        farrow = self.create(sow=sow, tour=tour, initiator=initiator,
                 date=timezone.now(), alive_quantity=alive_quantity,
                 dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
                 new_born_piglets_group=new_born_piglets_group
                 )
-
+        
         return farrow
 
     def create_sow_farrow(self, sow_farm_id, week, initiator=None,

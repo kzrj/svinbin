@@ -7,12 +7,14 @@ import sows.testing_utils as sows_testings
 from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
 SowAndPigletsCell
 from sows.models import Sow
+from sows_events.models import SowFarrow
 from transactions.models import Location
 
 
 class SowModelManagerTest(TestCase):
     def setUp(self):
         workshop_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
 
     # def test_create_new_from_gilt_and_put_in_workshop_one(self):
     #     # add test
@@ -66,5 +68,19 @@ class SowModelManagerTest(TestCase):
         self.assertEqual(sow2.location.get_location, WorkShop.objects.get(number=2))
         self.assertEqual(sow3.location.get_location, WorkShop.objects.get(number=2))
 
+    def test_get_last_farrow(self):
+        location = Location.objects.create_workshop_location(workshop_number=3)
+        sow = sows_testings.create_sow_with_semination(location)
+        farrow1 = SowFarrow.objects.create_sow_farrow_by_sow_object(sow=sow, week=1,
+            alive_quantity=10, dead_quantity=1, mummy_quantity=1)
+        farrow2 = SowFarrow.objects.create_sow_farrow_by_sow_object(sow=sow, week=1,
+            alive_quantity=3, dead_quantity=1, mummy_quantity=1)
+        farrow3 = SowFarrow.objects.create_sow_farrow_by_sow_object(sow=sow, week=1,
+            alive_quantity=20, dead_quantity=1, mummy_quantity=5)
+        sow.get_last_farrow()
 
 
+
+# class SowModelManagerTest(TestCase):
+#     def setUp(self):
+#         workshop_testing.create_workshops_sections_and_cells()

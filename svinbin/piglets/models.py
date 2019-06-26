@@ -31,6 +31,8 @@ class PigletsGroup(CoreModel):
 
     status = models.ForeignKey(PigletsStatus, on_delete=models.SET_NULL, null=True)
 
+    gilts_count = models.IntegerField(default=0)
+
     class Meta:
         abstract = True
 

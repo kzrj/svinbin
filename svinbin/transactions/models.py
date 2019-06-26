@@ -29,6 +29,9 @@ class LocationManager(CoreModelManager):
     def get_with_active_nomad_group(self):
         return self.filter(nomadpigletsgroup__active=True).select_related('nomadpigletsgroup')
 
+    def get_with_active_new_born_group(self):
+        return self.filter(newbornpigletsgroup__active=True).select_related('newbornpigletsgroup')
+
     def create_workshop_location(self, workshop_number):
         return self.create_location(WorkShop.objects.get(number=workshop_number))
 
