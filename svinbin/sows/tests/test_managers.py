@@ -4,9 +4,11 @@ from django.test import TestCase
 
 import workshops.testing_utils as workshop_testing
 import sows.testing_utils as sows_testings
+import piglets.testing_utils as piglets_testing
+
 from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
 SowAndPigletsCell
-from sows.models import Sow
+from sows.models import Sow, Gilt
 from sows_events.models import SowFarrow
 from transactions.models import Location
 
@@ -80,7 +82,20 @@ class SowModelManagerTest(TestCase):
     #     print(sow.get_last_farrow())
 
 
+class GiltModelManagerTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
 
-# class SowModelManagerTest(TestCase):
-#     def setUp(self):
-#         workshop_testing.create_workshops_sections_and_cells()
+    def test_create_gilt(self):
+        new_born_group = piglets_testing.create_new_born_group()
+        sow = new_born_group.farrows.all().first().sow
+        gilt = Gilt.objects.create_gilt(birth_id=1, mother_sow=sow)
+
+        new_born_group.refresh_from_db()
+        self.assertEqual(new_born_group.gilts_count, 1)
+        self.assertEqual(gilt.new_born_group, new_born_group)
+        self.assertEqual(gilt.mother_sow, sow)
+        self.assertEqual(gilt.location.get_location, sow.location.get_location)
+
+

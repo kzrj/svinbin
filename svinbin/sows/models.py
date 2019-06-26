@@ -103,10 +103,11 @@ class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow, cell=None):
         cell = mother_sow.location.get_location
         new_born_group = cell.get_first_piglets_group()
-        gilt = self.create(birth_id=birth_id, mother_sow=sow,
+        gilt = self.create(birth_id=birth_id, mother_sow=mother_sow,
          location=Location.objects.duplicate_location(mother_sow.location),
-         newborngroup=new_born_group
+         new_born_group=new_born_group
          )
+        new_born_group.add_gilts(1)
 
         return gilt
 
@@ -114,7 +115,10 @@ class GiltManager(CoreModelManager):
 class Gilt(Pig):
     mother_sow = models.ForeignKey(Sow, on_delete=models.SET_NULL, null=True)
     status = models.ForeignKey(GiltStatus, on_delete=models.SET_NULL, null=True)
-    newborngroup = models.ForeignKey('piglets.NewBornPigletsGroup', on_delete=models.SET_NULL, null=True)
+    new_born_group = models.ForeignKey('piglets.NewBornPigletsGroup', on_delete=models.SET_NULL,
+     null=True, related_name='gilts')
+
+    objects = GiltManager()
 
     def __str__(self):
         return 'Gilt #%s' % self.birth_id

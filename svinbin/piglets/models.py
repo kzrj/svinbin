@@ -67,6 +67,14 @@ class PigletsGroup(CoreModel):
         self.status = None
         self.save()
 
+    def add_gilts(self, quantity):
+        self.gilts_count += quantity
+        self.save()
+
+    def remove_gilts(self, quantity):
+        self.gilts_count -= quantity
+        self.save()
+
 
 class NewBornPigletsGroupManager(PigletsGroupManager):
     pass

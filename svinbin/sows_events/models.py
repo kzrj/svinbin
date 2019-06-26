@@ -96,7 +96,8 @@ class SowFarrowManager(CoreModelManager):
 
 
 class SowFarrow(SowEvent):
-    new_born_piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.SET_NULL, null=True)
+    new_born_piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.SET_NULL,
+     null=True, related_name='farrows')
     alive_quantity = models.IntegerField(default=0)
     dead_quantity = models.IntegerField(default=0)
     mummy_quantity = models.IntegerField(default=0)
