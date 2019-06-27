@@ -6,6 +6,7 @@ from django.test import TestCase
 import piglets_events.models as piglets_events_models
 import piglets.models as piglets_models
 import sows.models as sows_models
+import sows_events.models as sows_events_models
 import tours.models as tour_models
 import transactions.models as transactions_models
 import workshops.models as workshops_models
@@ -96,39 +97,40 @@ class SplitNomadPigletsGroupTest(TestCase):
 class NewBornMergerModelTest(TestCase):
     def setUp(self):
         workshop_testing.create_workshops_sections_and_cells()
-        pigs_testing.create_statuses()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
     def test_get_first_tour(self):
-        sow1 = pigs_testing.create_sow_and_put_in_workshop_three(1, 1)
-        Semination.objects.create_semination(sow_farm_id=sow1.farm_id, week=1,
+        sow1 = sows_testing.create_sow_and_put_in_workshop_three(1, 1)
+        sows_events_models.Semination.objects.create_semination(sow_farm_id=sow1.farm_id, week=1,
          initiator=None, semination_employee=None)
 
-        farrow1 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow1.farm_id, week=1,
+        farrow1 = sows_events_models.SowFarrow.objects.create_sow_farrow(sow_farm_id=sow1.farm_id, week=1,
          alive_quantity=10)
 
-        sow2 = pigs_testing.create_sow_and_put_in_workshop_three(1, 2)
-        Semination.objects.create_semination(sow_farm_id=sow2.farm_id, week=1,
+        sow2 = sows_testing.create_sow_and_put_in_workshop_three(1, 2)
+        sows_events_models.Semination.objects.create_semination(sow_farm_id=sow2.farm_id, week=1,
          initiator=None, semination_employee=None)
-        farrow2 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow2.farm_id, week=1,
+        farrow2 = sows_events_models.SowFarrow.objects.create_sow_farrow(sow_farm_id=sow2.farm_id, week=1,
             alive_quantity=12)
 
-        sow3 = pigs_testing.create_sow_and_put_in_workshop_three(1, 3)
-        Semination.objects.create_semination(sow_farm_id=sow3.farm_id, week=2,
+        sow3 = sows_testing.create_sow_and_put_in_workshop_three(1, 3)
+        sows_events_models.Semination.objects.create_semination(sow_farm_id=sow3.farm_id, week=2,
          initiator=None, semination_employee=None)
-        farrow3 = SowFarrow.objects.create_sow_farrow(sow_farm_id=sow3.farm_id, week=2,
+        farrow3 = sows_events_models.SowFarrow.objects.create_sow_farrow(sow_farm_id=sow3.farm_id, week=2,
             alive_quantity=15)
 
         piglets_group1 = farrow1.new_born_piglets_group
         piglets_group2 = farrow2.new_born_piglets_group
         piglets_group3 = farrow3.new_born_piglets_group
 
-        piglets_groups_same_tour = NewBornPigletsGroup.objects.filter(pk__in=
+        piglets_groups_same_tour = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
             [piglets_group1.pk, piglets_group2.pk])
-        piglets_groups_two_tours = NewBornPigletsGroup.objects.filter(pk__in=
+        piglets_groups_two_tours = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
             [piglets_group1.pk, piglets_group2.pk, piglets_group3.pk])
 
-        new_born_merger_same_tour = NewBornPigletsMerger.objects.create_merger(piglets_groups_same_tour)
-        new_born_merger_two_tours = NewBornPigletsMerger.objects.create_merger(piglets_groups_two_tours)
+        new_born_merger_same_tour = piglets_events_models.NewBornPigletsMerger.objects.create_merger(piglets_groups_same_tour)
+        new_born_merger_two_tours = piglets_events_models.NewBornPigletsMerger.objects.create_merger(piglets_groups_two_tours)
 
 
         tour1 = new_born_merger_two_tours.get_first_tour()
@@ -175,15 +177,23 @@ class NewBornMergerModelTest(TestCase):
 class SplitNomadPigletsGroupManagerTest(TestCase):
     def setUp(self):
         workshop_testing.create_workshops_sections_and_cells()
-        pigs_testing.create_statuses()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
     def test_split_group(self):
         # quantity 37
-        nomad_group = pigs_testing.create_nomad_group_from_three_new_born()
+        nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
+        nomad_group.gilts_quantity = 10
+        nomad_group.save()
 
-        first_group, second_group = SplitNomadPigletsGroup.objects.split_group(nomad_group, 5)
+        first_group, second_group = piglets_events_models.SplitNomadPigletsGroup \
+            .objects.split_group(parent_nomad_group=nomad_group, new_group_piglets_amount=5,
+            initiator=None, new_group_gilts_quantity=1)
         self.assertEqual(first_group.quantity, 32)
         self.assertEqual(second_group.quantity, 5)
+
+        self.assertEqual(first_group.gilts_quantity, 9)
+        self.assertEqual(second_group.gilts_quantity, 1)
 
         self.assertEqual(first_group.location.get_location, nomad_group.location.get_location)
         self.assertEqual(second_group.location.get_location, nomad_group.location.get_location)
@@ -195,27 +205,30 @@ class SplitNomadPigletsGroupManagerTest(TestCase):
 class NomadPigletsGroupMergerManagerTest(TestCase):
     def setUp(self):
         workshop_testing.create_workshops_sections_and_cells()
-        pigs_testing.create_statuses()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
-    def test_split_group(self):
+    def test_create_nomad_merger(self):
         # quantity 37
-        nomad_group1 = pigs_testing.create_nomad_group_from_three_new_born()
-        first_group, second_group = SplitNomadPigletsGroup.objects.split_group(nomad_group1, 5)
+        nomad_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+        first_group, second_group = piglets_events_models.SplitNomadPigletsGroup.objects.split_group(nomad_group1, 5)
 
         # quantity 30
-        nomad_group2 = pigs_testing.create_nomad_group_from_three_new_born2()
-        third_group, fourth_group = SplitNomadPigletsGroup.objects.split_group(nomad_group2, 7)
+        nomad_group2 = piglets_testing.create_nomad_group_from_three_new_born2()
+        third_group, fourth_group = piglets_events_models.SplitNomadPigletsGroup.objects.split_group(nomad_group2, 7)
         self.assertEqual(third_group.quantity, 23)
 
-        merge_groups = NomadPigletsGroup.objects.filter(pk__in=[first_group.pk, fourth_group.pk])
-        nomad_merger = NomadPigletsGroupMerger.objects.create_nomad_merger(merge_groups, first_group)
+        merge_groups = piglets_models.NomadPigletsGroup.objects.filter(pk__in=[first_group.pk, fourth_group.pk])
+        new_location = first_group.location.duplicate_location_from_model()
+        nomad_merger = piglets_events_models.NomadPigletsGroupMerger.objects.create_nomad_merger(merge_groups,
+         new_location)
 
         first_group.refresh_from_db()
         fourth_group.refresh_from_db()
         self.assertEqual(first_group.groups_merger, nomad_merger)
         self.assertEqual(fourth_group.groups_merger, nomad_merger)
 
-        merge_records = NomadMergerRecord.objects.create_records(nomad_merger)
+        merge_records = piglets_events_models.NomadMergerRecord.objects.create_records(nomad_merger)
         print(merge_records)
         self.assertEqual(merge_records.first().quantity, 32)
         self.assertEqual(merge_records.first().nomad_group, first_group)
@@ -247,20 +260,21 @@ class NomadPigletsGroupMergerManagerTest(TestCase):
 class RecountManagerTest(TestCase):
     def setUp(self):
         workshop_testing.create_workshops_sections_and_cells()
-        pigs_testing.create_statuses()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
     def test_create_recount_nomad_group(self):
         # quantity 37
-        nomad_group = pigs_testing.create_nomad_group_from_three_new_born()
-        recount = NomadPigletsGroupRecount.objects.create_recount(nomad_group, 35)
+        nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
+        recount = piglets_events_models.NomadPigletsGroupRecount.objects.create_recount(nomad_group, 35)
         self.assertEqual(recount.quantity_before, 37)
         self.assertEqual(recount.quantity_after, 35)
         self.assertEqual(recount.balance, -2)
 
     def test_create_recount_new_born_group(self):
         # quantity 10
-        new_born_group = pigs_testing.create_new_born_group()
-        recount = NewBornPigletsGroupRecount.objects.create_recount(new_born_group, 8)
+        new_born_group = piglets_testing.create_new_born_group()
+        recount = piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(new_born_group, 8)
         self.assertEqual(recount.quantity_before, 10)
         self.assertEqual(recount.quantity_after, 8)
         self.assertEqual(recount.balance, -2)

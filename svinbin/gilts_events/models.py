@@ -45,4 +45,3 @@ class GiltMerger(CoreModel):
         self.nomad_group = nomad_group
         self.save()
         return nomad_group
-
