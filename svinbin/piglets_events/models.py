@@ -293,6 +293,12 @@ class CullingPigletsManager(CoreModelManager):
         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
             date=timezone.now(), initiator=initiator, quantity=1)
         piglets_group.remove_piglets(quantity)
+        return culling
+
+    def create_culling_gilt(self, piglets_group, culling_type, quantity=1, reason=None, initiator=None):
+        culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
+            date=timezone.now(), initiator=initiator, quantity=1, is_it_gilt=True)
+        piglets_group.remove_gilts(quantity)
         return culling      
 
 
@@ -301,6 +307,8 @@ class CullingPiglets(PigletsEvent):
     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
     quantity = models.IntegerField(default=1)
     reason = models.CharField(max_length=200, null=True)
+
+    is_it_gilt = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
