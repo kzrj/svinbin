@@ -106,15 +106,20 @@ class GiltManager(CoreModelManager):
         new_born_group = cell.get_first_piglets_group()
         gilt = self.create(birth_id=birth_id, mother_sow=mother_sow,
          location=Location.objects.duplicate_location(mother_sow.location),
-         new_born_group=new_born_group
+         new_born_group=new_born_group, tour=mother_sow.tour
          )
         new_born_group.add_gilts(1)
 
         return gilt
 
+    def from_list_to_queryset(self, gilts_list): # test + in gilt merger
+        pks = [gilt.pk for gilt in gilts_list]
+        return self.get_queryset().filter(pk__in=pks)
+
 
 class Gilt(Pig):
     mother_sow = models.ForeignKey(Sow, on_delete=models.SET_NULL, null=True)
+    tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
     status = models.ForeignKey(GiltStatus, on_delete=models.SET_NULL, null=True)
     new_born_group = models.ForeignKey('piglets.NewBornPigletsGroup', on_delete=models.SET_NULL,
      null=True, related_name='gilts')

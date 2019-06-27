@@ -72,13 +72,34 @@ class PigletsGroup(CoreModel):
         self.save()
 
     def remove_gilts(self, quantity):
+        self.quantity -= quantity
         self.gilts_quantity -= quantity
         self.save()
 
 
+class NewBornPigletsQuerySet(models.QuerySet):
+    def remove_gilts_and_update_quantity(self): # test+ in gilt merger
+        return self.update(quantity=(models.F('quantity') - models.F('gilts_quantity')),
+         gilts_quantity=0) 
+
+
 class NewBornPigletsGroupManager(PigletsGroupManager):
+    def get_queryset(self):
+        return NewBornPigletsQuerySet(self.model, using=self._db)
+
     def groups_with_gilts(self):
-        return self.get_queryset().filter(gilts_quantity__gt=0)
+        return self.get_queryset().filter(active=True, gilts_quantity__gt=0)
+
+    def groups_with_gilts_by_gilts_queryset(self, gilts):
+        new_born_group_pk_queryset = gilts.values_list('new_born_group', flat=True)
+        return self.get_queryset().filter(pk__in=new_born_group_pk_queryset)
+
+    def from_list_to_queryset(self, groups_list):
+        pks = [group.pk for group in groups_list]
+        return self.get_queryset().filter(pk__in=pks)
+
+    def remove_gilts_and_update_quantity(self):
+        return self.get_queryset().remove_gilts_and_update_quantity()
 
 
 class NewBornPigletsGroup(PigletsGroup):
