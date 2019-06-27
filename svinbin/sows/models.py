@@ -125,6 +125,8 @@ class Gilt(Pig):
      null=True, related_name='gilts')
     merger = models.ForeignKey('gilts_events.GiltMerger', on_delete=models.SET_NULL, null=True,
         related_name='gilts')
+    casting_list_to_seven_five = models.ForeignKey('gilts_events.CastingListToSevenFiveEvent',
+     on_delete=models.SET_NULL, null=True, related_name='gilts')
 
     objects = GiltManager()
 

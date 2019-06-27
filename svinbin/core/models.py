@@ -16,7 +16,7 @@ class CoreModel(models.Model):
 
 
 class Event(CoreModel):
-    date = models.DateTimeField(null=True)
+    date = models.DateTimeField(auto_now_add=True)
     initiator = models.ForeignKey(settings.AUTH_USER_MODEL,
      on_delete=models.SET_NULL, null=True)
     
