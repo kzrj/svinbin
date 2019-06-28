@@ -98,8 +98,6 @@ class NewBornPigletsMerger(PigletsMerger):
         return NewBornMergerRecord.objects.create_records(self)
 
     def create_nomad_group(self):
-        # location = self.piglets_group.all().select_related('location').first().location.
-
         location = Location.objects.get(workshop__number=3)
         self.create_records()
         nomad_group = NomadPigletsGroup.objects.create(location=location,
@@ -190,11 +188,14 @@ class NomadPigletsGroupMergerManager(PigletsMergerManager):
     def create_nomad_merger(self, nomad_groups, new_location, initiator=None):
         nomad_groups_merger = self.create(date=timezone.now(), new_location=new_location,
          initiator=initiator)
+
         if isinstance(nomad_groups, list):
             pks = [group.pk for group in nomad_groups]
             nomad_groups = NomadPigletsGroup.objects.filter(pk__in=pks)
+
         nomad_groups.update(groups_merger=nomad_groups_merger,
             status=PigletsStatus.objects.get(title='Объединены с другой группой'))
+        
         return nomad_groups_merger
 
     def create_merger_and_return_nomad_piglets_group(self, nomad_groups, new_location, initiator=None):
@@ -207,9 +208,7 @@ class NomadPigletsGroupMergerManager(PigletsMergerManager):
 class NomadPigletsGroupMerger(PigletsMerger):
     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
      related_name='creating_nomad_merger')
-    # nomad_group_join_to = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
-    #  related_name='nomad_group_join_to')
-    new_location = models.OneToOneField('transactions.Location', on_delete=models.SET_NULL, null=True,
+    new_location = models.ForeignKey('transactions.Location', on_delete=models.SET_NULL, null=True,
      related_name='creating_nomad_merger')
 
     objects =  NomadPigletsGroupMergerManager()

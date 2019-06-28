@@ -119,7 +119,6 @@ class LocationModelManagerTest(TestCase):
 #         location = new_born_group.location
         
 
-
 class PigletsTransactionManagerTest(TestCase):
     def setUp(self):
         workshops_testing.create_workshops_sections_and_cells()

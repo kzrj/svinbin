@@ -22,57 +22,68 @@ class NewBornMergerModelTest(TestCase):
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
-    def test_get_first_tour(self):
-        piglets_group1 = piglets_testing.create_new_born_group(1, 1, 1, 10)
-        piglets_group2 = piglets_testing.create_new_born_group(1, 2, 1, 12)
-        piglets_group3 = piglets_testing.create_new_born_group(1, 3, 2, 15)
+        self.piglets_group1 = piglets_testing.create_new_born_group(1, 1, 1, 10)
+        self.piglets_group2 = piglets_testing.create_new_born_group(1, 2, 1, 12)
+        self.piglets_group3 = piglets_testing.create_new_born_group(1, 3, 2, 15)
 
         piglets_groups_same_tour = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
-            [piglets_group1.pk, piglets_group2.pk])
+            [self.piglets_group1.pk, self.piglets_group2.pk])
         piglets_groups_two_tours = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
-            [piglets_group1.pk, piglets_group2.pk, piglets_group3.pk])
+            [self.piglets_group1.pk, self.piglets_group2.pk, self.piglets_group3.pk])
 
-        new_born_merger_same_tour = piglets_events_models.NewBornPigletsMerger.objects \
+        self.new_born_merger_same_tour = piglets_events_models.NewBornPigletsMerger.objects \
             .create_merger(piglets_groups_same_tour)
-        new_born_merger_two_tours = piglets_events_models.NewBornPigletsMerger.objects \
+        self.new_born_merger_two_tours = piglets_events_models.NewBornPigletsMerger.objects \
             .create_merger(piglets_groups_two_tours)
 
-        tour1 = new_born_merger_two_tours.get_first_tour()
-        self.assertEqual(tour1.week_number, 1)
-        next_tour = new_born_merger_two_tours.get_next_tour([tour1])
+        self.tour1 = self.new_born_merger_two_tours.get_first_tour()
+
+    def test_get_first_tour(self):
+        self.assertEqual(self.tour1.week_number, 1)
+
+    def test_get_next_tour(self):
+        next_tour = self.new_born_merger_two_tours.get_next_tour([self.tour1])
         self.assertEqual(next_tour.week_number, 2)
 
-        tour1_piglets = new_born_merger_two_tours.get_piglets_groups_by_tour(tour1)
-        
-        quantity_piglets_by_tour = new_born_merger_two_tours.count_quantity_by_tour(tour1)
+    def test_get_piglets_groups_by_tour(self):
+        tour1_piglets = self.new_born_merger_two_tours.get_piglets_groups_by_tour(self.tour1)
+        quantity_piglets_by_tour = self.new_born_merger_two_tours.count_quantity_by_tour(self.tour1)
         self.assertEqual(quantity_piglets_by_tour, 22)
 
-        quantity_all_piglets = new_born_merger_two_tours.count_all_piglets()
-        print(quantity_all_piglets)
+    def test_count_all_piglets(self):
+        quantity_all_piglets = self.new_born_merger_two_tours.count_all_piglets()
+        self.assertEqual(quantity_all_piglets, 37)
 
-        print(new_born_merger_two_tours.get_percentage_by_tour(tour1))
+    def test_get_percentage_by_tour(self):
+        model_percentage = self.new_born_merger_two_tours.get_percentage_by_tour(self.tour1)
+        percentage = (self.new_born_merger_two_tours.count_quantity_by_tour(self.tour1) * 100) \
+         / self.new_born_merger_two_tours.count_all_piglets()
+        self.assertEqual(model_percentage, percentage)
 
-        print(new_born_merger_two_tours.count_quantity_and_percentage_by_tours())
+    def test_count_quantity_and_percentage_by_tours(self):
+        print(self.new_born_merger_two_tours.count_quantity_and_percentage_by_tours())
+        # to write
 
-        print(new_born_merger_two_tours.create_records())
-        self.assertEqual(new_born_merger_two_tours.create_records().first().tour.week_number, 1)
-        self.assertEqual(new_born_merger_two_tours.create_records().first().quantity, 22)
-        self.assertEqual(new_born_merger_two_tours.records.all().count(), 2)
+    def test_create_records(self):
+        self.new_born_merger_two_tours.create_records()
+        self.assertEqual(self.new_born_merger_two_tours.create_records().first().tour.week_number, 1)
+        self.assertEqual(self.new_born_merger_two_tours.create_records().first().quantity, 22)
+        self.assertEqual(self.new_born_merger_two_tours.records.all().count(), 2)
 
-        nomad_group = new_born_merger_two_tours.create_nomad_group()
-        self.assertEqual(nomad_group.quantity, 37)
+    def tes_deactivate_groups(self):    
+        self.piglets_group1.refresh_from_db()
+        self.assertEqual(self.piglets_group1.quantity, 0)
+        self.assertEqual(self.piglets_group1.active, False)
 
-        piglets_group1.refresh_from_db()
-        self.assertEqual(piglets_group1.quantity, 0)
-        self.assertEqual(piglets_group1.active, False)
+        self.piglets_group2.refresh_from_db()
+        self.assertEqual(self.piglets_group2.quantity, 0)
+        self.assertEqual(self.piglets_group2.active, False)
 
-        piglets_group2.refresh_from_db()
-        self.assertEqual(piglets_group2.quantity, 0)
-        self.assertEqual(piglets_group2.active, False)
+        self.piglets_group3.refresh_from_db()
+        self.assertEqual(self.piglets_group3.quantity, 0)
+        self.assertEqual(self.piglets_group3.active, False)
 
-        piglets_group3.refresh_from_db()
-        self.assertEqual(piglets_group3.quantity, 0)
-        self.assertEqual(piglets_group3.active, False)
+#to do MergerRecordsTest
 
 
 # class WeighingPigletsTest(TestCase):
@@ -93,37 +104,37 @@ class NewBornMergerModelTest(TestCase):
 #         self.assertEqual(weighing_record.place, '3/4')
 
 
-# class NomadPigletsGroupMergerTest(TestCase):
-#     def setUp(self):
-#         workshop_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
+class NomadPigletsGroupMergerTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
-#     def test_create_merger_and_return_nomad_piglets_group(self):
-#         piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
-#         piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
+    def test_create_merger_and_return_nomad_piglets_group(self):
+        piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+        piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
 
-#         cell = workshops_models.PigletsGroupCell.objects.get(workshop__number=4,
-#              section__number=1, number=1)
-#         new_location = transactions_models.Location.objects.create_location(cell)
+        cell = workshops_models.PigletsGroupCell.objects.get(workshop__number=4,
+             section__number=1, number=1)
+        new_location = transactions_models.Location.objects.create_location(cell)
 
-#         merged_group = piglets_events_models.NomadPigletsGroupMerger.objects \
-#             .create_merger_and_return_nomad_piglets_group(
-#                 nomad_groups=[piglets_group1, piglets_group2],
-#                 new_location=new_location
-#                 )
+        merged_group = piglets_events_models.NomadPigletsGroupMerger.objects \
+            .create_merger_and_return_nomad_piglets_group(
+                nomad_groups=[piglets_group1, piglets_group2],
+                new_location=new_location
+                )
 
-#         self.assertEqual(merged_group.location, new_location)
-#         self.assertEqual(merged_group.location.get_location, cell)
-#         self.assertEqual(merged_group.quantity, piglets_group1.start_quantity 
-#             + piglets_group2.start_quantity)
+        self.assertEqual(merged_group.location, new_location)
+        self.assertEqual(merged_group.location.get_location, cell)
+        self.assertEqual(merged_group.quantity, piglets_group1.start_quantity 
+            + piglets_group2.start_quantity)
         
-#         piglets_group1.refresh_from_db()
-#         piglets_group2.refresh_from_db()
-#         self.assertEqual(piglets_group1.active, False)
-#         self.assertEqual(piglets_group2.active, False)
-#         self.assertEqual(piglets_group1.quantity, 0)
-#         self.assertEqual(piglets_group2.quantity, 0)
+        piglets_group1.refresh_from_db()
+        piglets_group2.refresh_from_db()
+        self.assertEqual(piglets_group1.active, False)
+        self.assertEqual(piglets_group2.active, False)
+        self.assertEqual(piglets_group1.quantity, 0)
+        self.assertEqual(piglets_group2.quantity, 0)
         
 
 # class SplitNomadPigletsGroupTest(TestCase):
