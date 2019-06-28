@@ -3,11 +3,9 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 
-from core.models import CoreModel, CoreModelManager
+from core.models import CoreModel, CoreModelManager, Event
 from workshops.models import WorkShopEmployee, WorkShop, SowSingleCell, Section, \
     PigletsGroupCell, SowAndPigletsCell, SowGroupCell
-    # WeighingCell
-# import piglets_events.models
 
 
 class LocationManager(CoreModelManager):
@@ -26,17 +24,22 @@ class LocationManager(CoreModelManager):
             location = self.create(sowAndPigletsCell=pre_location)
         return location
 
-    def get_with_active_nomad_group(self):
-        return self.filter(nomadpigletsgroup__active=True).select_related('nomadpigletsgroup')
+    # def get_workshop_location(self, number):
+    #     return self.get_queryset().get(workshop__number=1)
 
-    def get_with_active_new_born_group(self):
-        return self.filter(newbornpigletsgroup__active=True).select_related('newbornpigletsgroup')
+    # #___________________________________________
 
-    def create_workshop_location(self, workshop_number):
-        return self.create_location(WorkShop.objects.get(number=workshop_number))
+    # def get_with_active_nomad_group(self):
+    #     return self.filter(nomadpigletsgroup__active=True).select_related('nomadpigletsgroup')
 
-    def duplicate_location(self, location):
-        return self.create_location(location.get_location)
+    # def get_with_active_new_born_group(self):
+    #     return self.filter(newbornpigletsgroup__active=True).select_related('newbornpigletsgroup')
+
+    # def create_workshop_location(self, workshop_number):
+    #     return self.create_location(WorkShop.objects.get(number=workshop_number))
+
+    # def duplicate_location(self, location):
+    #     return self.create_location(location.get_location)
 
 
 class Location(CoreModel):
@@ -98,20 +101,14 @@ class Location(CoreModel):
         if self.sowGroupCell:
             return self.sowGroupCell.section.workshop
 
-    def duplicate_location_from_model(self):
-        return Location.objects.create_location(self.get_location)
+    # def duplicate_location_from_model(self):
+    #     return Location.objects.create_location(self.get_location)
 
     def __str__(self):
         return str(self.get_location)
 
 
-class Transaction(CoreModel):
-    date = models.DateTimeField(auto_now_add=True)
-    initiator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True)
-    finished = models.BooleanField(default=False)
-    returned = models.BooleanField(default=False)
-    # reason = models.CharField(max_lenght=)
-
+class Transaction(Event):
     class Meta:
         abstract = True
 
