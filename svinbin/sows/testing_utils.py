@@ -12,10 +12,10 @@ from piglets_events.models import NewBornPigletsMerger
 def create_statuses():
     if SowStatus.objects.all().count() < 1:
         SowStatus.objects.bulk_create([
-            SowStatus(title='just seminated'),
-            SowStatus(title='waiting ultrasound'),
-            SowStatus(title='pregnant in workshop one'),
-            SowStatus(title='proholost'),
+            SowStatus(title='Осеменена'),
+            SowStatus(title='Ожидает УЗИ'),
+            SowStatus(title='Беременна'),
+            SowStatus(title='Прохолост'),
             SowStatus(title='pregnant in workshop two'),
             SowStatus(title='has slaughtered special'),
             SowStatus(title='waiting delivery in workshop three'),

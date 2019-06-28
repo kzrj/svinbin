@@ -22,7 +22,7 @@ class PigletsGroupManager(CoreModelManager):
 
 
 class PigletsGroup(CoreModel):
-    location = models.OneToOneField('transactions.Location', on_delete=models.SET_NULL,
+    location = models.ForeignKey('transactions.Location', on_delete=models.SET_NULL,
      null=True)
     start_quantity = models.IntegerField()
     quantity = models.IntegerField()

@@ -29,7 +29,7 @@ class SeminationManager(CoreModelManager):
         semination = self.create(sow=sow, tour=tour, initiator=initiator,
          semination_employee=semination_employee, date=timezone.now())
         sow.tour = tour
-        sow.change_status_to('just seminated')
+        sow.change_status_to('Осеменена')
         return semination
 
 
@@ -48,9 +48,9 @@ class UltrasoundManager(CoreModelManager):
         ultrasound = self.create(sow=sow, tour=tour, initiator=initiator,
          date=timezone.now(), result=result)
         if result:
-            sow.change_status_to('pregnant in workshop one')
+            sow.change_status_to('Беременна')
         else:
-            sow.change_status_to('proholost')
+            sow.change_status_to('Прохолост')
         return ultrasound
 
 
@@ -61,10 +61,11 @@ class Ultrasound(SowEvent):
 
 
 class SowFarrowManager(CoreModelManager):
-    def create_sow_farrow_by_sow_object(self, sow, week, initiator=None,
+    def create_sow_farrow(self, sow, week, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
-        sow.change_status_to('Опоросилась, кормит')
         tour = Tour.objects.get_tour_by_week_in_current_year(week)
+        sow.tour = tour
+        sow.change_status_to('Опоросилась, кормит')
 
         # check is it first sow_farrow in current tour
         previous_farrow_in_tour = SowFarrow.objects.filter(sow=sow, tour=tour).first()
@@ -72,9 +73,8 @@ class SowFarrowManager(CoreModelManager):
             new_born_piglets_group = previous_farrow_in_tour.new_born_piglets_group
             new_born_piglets_group.add_piglets(alive_quantity)
         else:
-            location = Location.objects.create_location(sow.location.get_location)
             new_born_piglets_group = NewBornPigletsGroup.objects.create(
-                location=location,
+                location=sow.location,
                 start_quantity=alive_quantity,
                 quantity=alive_quantity,
                 tour=tour
@@ -87,12 +87,6 @@ class SowFarrowManager(CoreModelManager):
                 )
         
         return farrow
-
-    def create_sow_farrow(self, sow_farm_id, week, initiator=None,
-        alive_quantity=0, dead_quantity=0, mummy_quantity=0):
-        sow = Sow.objects.get_by_farm_id(sow_farm_id)
-        return self.create_sow_farrow_by_sow_object(sow, week, initiator, \
-            alive_quantity, dead_quantity, mummy_quantity)
 
 
 class SowFarrow(SowEvent):

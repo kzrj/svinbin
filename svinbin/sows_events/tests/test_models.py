@@ -1,6 +1,4 @@
-from mixer.backend.django import mixer
-# from freezegun import freeze_time
-
+# -*- coding: utf-8 -*-
 from django.test import TestCase
 
 from sows_events.models import Semination, Ultrasound, SowFarrow
@@ -26,6 +24,7 @@ class SeminationModelManagerTest(TestCase):
         self.assertEqual(semination.tour.week_number, 1)
         sow.refresh_from_db()
         self.assertEqual(sow.tour.week_number, 1)
+        self.assertEqual(sow.status.title, 'Осеменена')
 
 
 class UltrasoundModelManagerTest(TestCase):
@@ -44,12 +43,12 @@ class UltrasoundModelManagerTest(TestCase):
         self.assertEqual(Ultrasound.objects.all().count(), 1)
         self.assertEqual(ultrasound.tour.week_number, 1)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'proholost')
+        self.assertEqual(sow.status.title, 'Прохолост')
 
         Ultrasound.objects.create_ultrasound(sow_farm_id=1, week=1,
          initiator=None, result=True)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'pregnant in workshop one')
+        self.assertEqual(sow.status.title, 'Беременна')
 
 
 class SowFarrowModelManagerTest(TestCase):
@@ -64,7 +63,7 @@ class SowFarrowModelManagerTest(TestCase):
 
         # first sow farrow in tour
         farrow1 = SowFarrow.objects.create_sow_farrow(
-            sow_farm_id=sow.farm_id,
+            sow=sow,
             week=1,
             alive_quantity=10,
             dead_quantity=1
@@ -73,16 +72,17 @@ class SowFarrowModelManagerTest(TestCase):
         self.assertEqual(NewBornPigletsGroup.objects.all().count(), 1)
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Опоросилась, кормит')
+        self.assertEqual(sow.tour.week_number, 1)
 
         piglets_group1 = farrow1.new_born_piglets_group
         self.assertEqual(sow.tour, piglets_group1.tour)
-        self.assertEqual(sow.location.get_location, piglets_group1.location.get_location)
+        self.assertEqual(sow.location, piglets_group1.location)
         self.assertEqual(piglets_group1.quantity, farrow1.alive_quantity)
         self.assertEqual(piglets_group1.start_quantity, farrow1.alive_quantity)
 
         # second sow farrow in tour
         farrow2 = SowFarrow.objects.create_sow_farrow(
-            sow_farm_id=sow.farm_id,
+            sow=sow,
             week=1,
             alive_quantity=7,
             mummy_quantity=1
