@@ -71,6 +71,11 @@ class PigletsGroup(CoreModel):
         self.gilts_quantity += quantity
         self.save()
 
+    def add_gilts_increase_quantity(self, quantity):
+        self.quantity += quantity
+        self.gilts_quantity += quantity
+        self.save()
+
     def remove_gilts(self, quantity):
         self.quantity -= quantity
         self.gilts_quantity -= quantity

@@ -276,42 +276,78 @@ class NomadPigletsGroupMergerManagerTest(TestCase):
         self.assertEqual(nomad_group.creating_nomad_merger, nomad_merger)
 
 
-# class RecountManagerTest(TestCase):
-#     def setUp(self):
-#         workshop_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
+class RecountManagerTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
-#     def test_create_recount_nomad_group(self):
-#         # quantity 37
-#         nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
-#         recount = piglets_events_models.NomadPigletsGroupRecount.objects.create_recount(nomad_group, 35)
-#         self.assertEqual(recount.quantity_before, 37)
-#         self.assertEqual(recount.quantity_after, 35)
-#         self.assertEqual(recount.balance, -2)
+    def test_create_recount_nomad_group(self):
+        # quantity 37
+        nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
+        recount = piglets_events_models.NomadPigletsGroupRecount.objects.create_recount(nomad_group, 35)
+        self.assertEqual(recount.quantity_before, 37)
+        self.assertEqual(recount.quantity_after, 35)
+        self.assertEqual(recount.balance, -2)
 
-#     def test_create_recount_new_born_group(self):
-#         # quantity 10
-#         new_born_group = piglets_testing.create_new_born_group()
-#         recount = piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(new_born_group, 8)
-#         self.assertEqual(recount.quantity_before, 10)
-#         self.assertEqual(recount.quantity_after, 8)
-#         self.assertEqual(recount.balance, -2)
+    def test_create_recount_new_born_group(self):
+        # quantity 10
+        new_born_group = piglets_testing.create_new_born_group()
+        recount = piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(new_born_group, 8)
+        self.assertEqual(recount.quantity_before, 10)
+        self.assertEqual(recount.quantity_after, 8)
+        self.assertEqual(recount.balance, -2)
 
 
-# class WeighingPigletsTest(TestCase):
-#     def setUp(self):
-#         workshop_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
+class WeighingPigletsTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
-#     def test_create_weighing(self):
-#         piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
-#         weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
-#             piglets_group=piglets_group, total_weight=670, place='3/4'
-#             )
-#         self.assertEqual(weighing_record.piglets_group, piglets_group)
-#         self.assertEqual(weighing_record.total_weight, 670)
-#         self.assertEqual(weighing_record.average_weight, 670/piglets_group.quantity)
-#         self.assertEqual(weighing_record.piglets_quantity, piglets_group.quantity)
-#         self.assertEqual(weighing_record.place, '3/4')
+    def test_create_weighing(self):
+        piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
+        weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
+            piglets_group=piglets_group, total_weight=670, place='3/4'
+            )
+        self.assertEqual(weighing_record.piglets_group, piglets_group)
+        self.assertEqual(weighing_record.total_weight, 670)
+        self.assertEqual(weighing_record.average_weight, 670/piglets_group.quantity)
+        self.assertEqual(weighing_record.piglets_quantity, piglets_group.quantity)
+        self.assertEqual(weighing_record.place, '3/4')
+
+
+class CullingPigletsTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+
+    def test_create_culling_piglets(self):
+        new_born_group = piglets_testing.create_new_born_group()
+        self.assertEqual(new_born_group.quantity, 10)
+        culling_new_born = piglets_events_models.CullingNewBornPiglets.objects.create_culling_piglets(
+            piglets_group=new_born_group, culling_type='padej', reason='xz'
+            )
+        new_born_group.refresh_from_db()
+        self.assertEqual(new_born_group.quantity, 9)
+        self.assertEqual(culling_new_born.quantity, 1)
+        self.assertEqual(culling_new_born.is_it_gilt, False)
+        self.assertEqual(culling_new_born.culling_type, 'padej')
+        self.assertEqual(culling_new_born.reason, 'xz')
+
+        piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
+        piglets_group.add_gilts_increase_quantity(1)
+        self.assertEqual(piglets_group.quantity, 38)
+        culling_nomad = piglets_events_models.CullingNomadPiglets.objects.create_culling_gilt(
+            piglets_group=piglets_group, culling_type='padej', reason='xz'
+            )
+        piglets_group.refresh_from_db()
+        self.assertEqual(piglets_group.quantity, 37)
+        self.assertEqual(culling_nomad.quantity, 1)
+        self.assertEqual(piglets_group.gilts_quantity, 0)
+        self.assertEqual(culling_nomad.is_it_gilt, True)
+        self.assertEqual(culling_nomad.culling_type, 'padej')
+        self.assertEqual(culling_nomad.reason, 'xz')
+
+
