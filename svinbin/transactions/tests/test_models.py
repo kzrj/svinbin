@@ -43,27 +43,20 @@ class SowTransactionManagerTest(TestCase):
         self.assertEqual(transactions, [1,2])
 
 
-# class LocationModelManagerTest(TestCase):
-#     def setUp(self):
-#         workshops_testing.create_workshops_sections_and_cells()
+class LocationModelManagerTest(TestCase):
+    def test_create_location(self):
+        workshop = WorkShop.objects.create(number=1)
+        location = Location.objects.create_location(workshop)
+        self.assertEqual(location.workshop.number, 1)
 
-#     def test_create_location(self):
-#         location = Location.objects.create_location(WorkShop.objects.get(number=1))
-#         self.assertEqual(location.workshop.number, 1)
-
-#         location = Location.objects.create_location(Section.objects.get(workshop__number=1, \
-#             number=1))
-#         self.assertEqual(location.section.number, 1)
+        section = Section.objects.create(workshop=workshop, number=1)
+        location = Location.objects.create_location(section)
+        self.assertEqual(location.section.number, 1)
         
-#         location = Location.objects.create_location(SowSingleCell.objects.get(number='1'))
-#         self.assertEqual(location.sowSingleCell.number, '1')
-
-#         location = Location.objects.create_location(SowGroupCell.objects.first())
-#         self.assertNotEqual(location.sowGroupCell, None)
-
-#         location = Location.objects.create_location(SowAndPigletsCell.objects.first())
-#         self.assertNotEqual(location.sowAndPigletsCell, None)
-        
+        location = Location.objects.create_location(
+            SowSingleCell.objects.create(workshop=workshop, section=section, number='1'))
+        self.assertEqual(location.sowSingleCell.number, '1')
+       
 
 # class LocationModelTest(TestCase):
 #     def setUp(self):
