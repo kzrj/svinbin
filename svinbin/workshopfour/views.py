@@ -9,14 +9,14 @@ import sows_events.serializers as sows_events_serializers
 import piglets.serializers as piglets_serializers
 import piglets_events.serializers as piglets_events_serializers
 import transactions.serializers as transactions_serializers
-import workshops.serializers as workshops_serializers
+import locations.serializers as workshops_serializers
 
 import sows.models as sows_models
 import sows_events.models as sows_events_models
 import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
-import workshops.models as workshops_models
+import locations.models as locations_models
 
 from piglets.views import WorkShopNomadPigletsViewSet
 
@@ -24,7 +24,7 @@ from piglets.views import WorkShopNomadPigletsViewSet
 class WorkShopFourPigletsViewSet(WorkShopNomadPigletsViewSet):
     @action(methods=['get'], detail=False)
     def waiting_for_weighing_piglets_outside_cells(self, request):
-        workshop = workshops_models.WorkShop.objects.get(number=4)        
+        workshop = locations_models.WorkShop.objects.get(number=4)        
         piglets = piglets_models.NomadPigletsGroup.objects \
                     .piglets_in_workshop_not_in_cells(workshop) \
                     .filter(status__title='Готовы ко взвешиванию')
@@ -60,7 +60,7 @@ class WorkShopFourPigletsViewSet(WorkShopNomadPigletsViewSet):
 
     @action(methods=['get'], detail=False)
     def get_weighted_piglets_outside_cells(self, request):
-        workshop = workshops_models.WorkShop.objects.get(number=4)        
+        workshop = locations_models.WorkShop.objects.get(number=4)        
         piglets = piglets_models.NomadPigletsGroup.objects \
                     .piglets_in_workshop_not_in_cells(workshop) \
                     .filter(status__title='Взвешены, готовы к заселению')
@@ -77,7 +77,7 @@ class WorkShopFourPigletsViewSet(WorkShopNomadPigletsViewSet):
         if serializer.is_valid():
             piglets_group = self.get_object()
             cell = serializer.validated_data['cell']
-            to_location = transactions_models.Location.objects.create_location(cell)
+            to_location = locations_models.Location.objects.create_location(cell)
 
             if cell.is_empty:
                 transaction = transactions_models.PigletsTransaction \
@@ -99,7 +99,7 @@ class WorkShopFourPigletsViewSet(WorkShopNomadPigletsViewSet):
                     .objects.create_transaction_without_merge(
                         to_location=to_location, piglets_group=piglets_group, initiator=None)
 
-                new_to_location = transactions_models.Location.objects.duplicate_location(to_location)
+                new_to_location = locations_models.Location.objects.duplicate_location(to_location)
                 merged_group = piglets_events_models.NomadPigletsGroupMerger.objects \
                     .create_merger_and_return_nomad_piglets_group(
                         nomad_groups=cell.get_list_of_residents(),
@@ -136,7 +136,7 @@ class WorkShopFourPigletsViewSet(WorkShopNomadPigletsViewSet):
                     )
 
             to_cell = serializer.validated_data['to_cell']
-            to_location = transactions_models.Location.objects.create_location(to_cell)
+            to_location = locations_models.Location.objects.create_location(to_cell)
 
             if to_cell.is_empty:
                 transaction = transactions_models.PigletsTransaction \
@@ -158,7 +158,7 @@ class WorkShopFourPigletsViewSet(WorkShopNomadPigletsViewSet):
                     .objects.create_transaction_without_merge(
                         to_location=to_location, piglets_group=moving_group, initiator=None)
 
-                new_to_location = transactions_models.Location.objects.duplicate_location(to_location)
+                new_to_location = locations_models.Location.objects.duplicate_location(to_location)
                 merged_group = piglets_events_models.NomadPigletsGroupMerger.objects \
                     .create_merger_and_return_nomad_piglets_group(
                         nomad_groups=to_cell.get_list_of_residents(),
@@ -230,8 +230,8 @@ class WorkShopFourPigletsViewSet(WorkShopNomadPigletsViewSet):
     #         nomad_group = piglets_events_models.NewBornPigletsMerger.objects.create_merger_and_return_nomad_piglets_group(
     #         new_born_piglets_groups=groups_to_merge, initiator=None)     
 
-    #         to_location = transactions_models.Location.objects.create_location(
-    #             workshops_models.WorkShop.objects.get(number=11))
+    #         to_location = locations_models.Location.objects.create_location(
+    #             locations_models.WorkShop.objects.get(number=11))
     #         transaction = transactions_models.PigletsTransaction.objects.create_transaction_without_merge(
     #             to_location, nomad_group, None)
 

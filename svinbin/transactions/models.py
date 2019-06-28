@@ -4,108 +4,6 @@ from django.utils import timezone
 from django.conf import settings
 
 from core.models import CoreModel, CoreModelManager, Event
-from workshops.models import WorkShopEmployee, WorkShop, SowSingleCell, Section, \
-    PigletsGroupCell, SowAndPigletsCell, SowGroupCell
-
-
-class LocationManager(CoreModelManager):
-    def create_location(self, pre_location):
-        if isinstance(pre_location, WorkShop):
-            location = self.create(workshop=pre_location)
-        elif isinstance(pre_location, Section):
-            location = self.create(section=pre_location)
-        elif isinstance(pre_location, SowSingleCell):
-            location = self.create(sowSingleCell=pre_location)
-        elif isinstance(pre_location, SowGroupCell):
-            location = self.create(sowGroupCell=pre_location)
-        elif isinstance(pre_location, PigletsGroupCell):
-            location = self.create(pigletsGroupCell=pre_location)
-        elif isinstance(pre_location, SowAndPigletsCell):
-            location = self.create(sowAndPigletsCell=pre_location)
-        return location
-
-    # def get_workshop_location(self, number):
-    #     return self.get_queryset().get(workshop__number=1)
-
-    # #___________________________________________
-
-    # def get_with_active_nomad_group(self):
-    #     return self.filter(nomadpigletsgroup__active=True).select_related('nomadpigletsgroup')
-
-    # def get_with_active_new_born_group(self):
-    #     return self.filter(newbornpigletsgroup__active=True).select_related('newbornpigletsgroup')
-
-    # def create_workshop_location(self, workshop_number):
-    #     return self.create_location(WorkShop.objects.get(number=workshop_number))
-
-    # def duplicate_location(self, location):
-    #     return self.create_location(location.get_location)
-
-
-class Location(CoreModel):
-    workshop = models.OneToOneField(WorkShop, null=True, on_delete=models.SET_NULL,
-     related_name='location')
-    section = models.OneToOneField(Section, null=True, on_delete=models.SET_NULL,
-     related_name='location')
-    sowSingleCell = models.OneToOneField(SowSingleCell, null=True, on_delete=models.SET_NULL,
-     related_name='location')
-    pigletsGroupCell = models.OneToOneField(PigletsGroupCell, null=True, on_delete=models.SET_NULL,
-     related_name='location')
-    sowAndPigletsCell = models.OneToOneField(SowAndPigletsCell, null=True, on_delete=models.SET_NULL,
-     related_name='location')
-    sowGroupCell = models.OneToOneField(SowGroupCell, null=True, on_delete=models.SET_NULL,
-     related_name='location')
-
-    objects = LocationManager()
-
-    @property
-    def get_location(self):
-        if self.workshop:
-            return self.workshop
-
-        if self.section:
-            return self.section
-
-        if self.sowSingleCell:
-            return self.sowSingleCell
-
-        if self.pigletsGroupCell:
-            return self.pigletsGroupCell
-
-        if self.sowAndPigletsCell:
-            return self.sowAndPigletsCell
-
-        if self.sowGroupCell:
-            return self.sowGroupCell
-
-        if self.weighingCell:
-            return self.weighingCell
-
-    @property
-    def get_workshop(self):
-        if self.workshop:
-            return self.workshop
-
-        if self.section:
-            return self.section.workshop
-
-        if self.sowSingleCell:
-            return self.sowSingleCell.section.workshop
-
-        if self.pigletsGroupCell:
-            return self.pigletsGroupCell.section.workshop
-
-        if self.sowAndPigletsCell:
-            return self.sowAndPigletsCell.section.workshop
-
-        if self.sowGroupCell:
-            return self.sowGroupCell.section.workshop
-
-    def __str__(self):
-        return str(self.get_location)
-
-    def get_located_active_new_born_groups(self):
-        return self.newbornpigletsgroup_set.all()
 
 
 class Transaction(Event):
@@ -137,8 +35,10 @@ class SowTransactionManager(CoreModelManager):
 
 
 class SowTransaction(Transaction):
-    from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_transactions_from")
-    to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_transactions_to")
+    from_location = models.ForeignKey('locations.Location', on_delete=models.CASCADE,
+     related_name="sow_transactions_from")
+    to_location = models.ForeignKey('locations.Location', on_delete=models.CASCADE,
+     related_name="sow_transactions_to")
     sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE, related_name='transactions')
 
     objects = SowTransactionManager()
@@ -160,9 +60,12 @@ class PigletsTransactionManager(CoreModelManager):
 
 
 class PigletsTransaction(Transaction):
-    from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_from_location")
-    to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_to_location")
-    piglets_group = models.ForeignKey('piglets.NomadPigletsGroup', on_delete=models.CASCADE, related_name="transactions")
+    from_location = models.ForeignKey('locations.Location', on_delete=models.CASCADE,
+     related_name="piglets_transaction_from")
+    to_location = models.ForeignKey('locations.Location', on_delete=models.CASCADE,
+     related_name="piglets_transaction_to")
+    piglets_group = models.ForeignKey('piglets.NomadPigletsGroup',
+     on_delete=models.CASCADE, related_name="transactions")
 
     objects = PigletsTransactionManager()
 

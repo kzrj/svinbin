@@ -9,8 +9,9 @@ from rest_framework.decorators import action
 
 from sows.models import Sow
 from piglets.models import NomadPigletsGroup
-from workshops.models import WorkShop, Section, SowSingleCell, SowGroupCell, SowAndPigletsCell
-from transactions.models import SowTransaction, Location, PigletsTransaction
+from locations.models import WorkShop, Section, SowSingleCell, SowGroupCell, SowAndPigletsCell, \
+    Location
+from transactions.models import SowTransaction, PigletsTransaction
 from transactions import serializers
 from sows import serializers as sows_serializers
 from piglets import serializers as piglets_serializers

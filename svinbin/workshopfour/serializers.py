@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from workshops.models import PigletsGroupCell
+from locations.models import PigletsGroupCell
 
 
 class MoveFromCellToCellSerializer(serializers.Serializer):

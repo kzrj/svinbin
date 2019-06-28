@@ -2,18 +2,18 @@
 from django.test import TestCase
 from django.db import models
 
-import workshops.testing_utils as workshops_testing
+import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
-from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
+from locations.models import Location, WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
 SowAndPigletsCell
-from transactions.models import Location, PigletsTransaction
+from transactions.models import PigletsTransaction
 
 
 class TestingUtilsTest(TestCase):
     def setUp(self):
-        workshops_testing.create_workshops()
+        locations_testing.create_workshops()
 
     def test_create_workshops(self):
         self.assertEqual(WorkShop.objects.all().count(), 10)
@@ -22,7 +22,7 @@ class TestingUtilsTest(TestCase):
         self.assertEqual(Location.objects.filter(workshop=WorkShop.objects.get(number=1)).count(), 1)
 
     def test_create_workshop_one(self):
-        workshops_testing.create_sections_and_cell_for_workshop_one()
+        locations_testing.create_sections_and_cell_for_workshop_one()
         workshop = WorkShop.objects.get(number=1)
 
         self.assertEqual(Section.objects.filter(workshop=workshop).count(), 3)
@@ -33,7 +33,7 @@ class TestingUtilsTest(TestCase):
         self.assertEqual(Location.objects.filter(~(models.Q(sowSingleCell=None))).count(), 480)
 
     def test_create_workshop_two(self):
-        workshops_testing.create_sections_and_cell_for_workshop_two()
+        locations_testing.create_sections_and_cell_for_workshop_two()
         workshop = WorkShop.objects.get(number=2)
 
         self.assertEqual(Section.objects.filter(workshop=workshop).count(), 2)
@@ -42,7 +42,7 @@ class TestingUtilsTest(TestCase):
         self.assertEqual(SowGroupCell.objects.filter(section=section1).count(), 6)
 
     def test_create_workshop_three(self):
-        workshops_testing.create_sections_and_cell_for_workshop_three()
+        locations_testing.create_sections_and_cell_for_workshop_three()
         workshop = WorkShop.objects.get(number=3)
 
         self.assertEqual(Section.objects.filter(workshop=workshop).count(), 2)
@@ -51,7 +51,7 @@ class TestingUtilsTest(TestCase):
         self.assertEqual(SowAndPigletsCell.objects.filter(section=section1).count(), 6)
 
     def test_create_sections_and_cell_for_workshop_with_group_cells(self):
-        workshops_testing.create_sections_and_cell_for_workshop_with_group_cells(4)
+        locations_testing.create_sections_and_cell_for_workshop_with_group_cells(4)
         workshop = WorkShop.objects.get(number=4)
 
         self.assertEqual(Section.objects.filter(workshop=workshop).count(), 5)
@@ -62,7 +62,7 @@ class TestingUtilsTest(TestCase):
 
 class SowAndPigletsCellTest(TestCase):
     def setUp(self):
-        workshops_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
@@ -84,7 +84,7 @@ class SowAndPigletsCellTest(TestCase):
 
 # class PigletsGroupCelltest(TestCase):
 #     def setUp(self):
-#         workshops_testing.create_workshops_sections_and_cells()
+#         locations_testing.create_workshops_sections_and_cells()
 #         sows_testing.create_statuses()
 #         piglets_testing.create_piglets_statuses()
 

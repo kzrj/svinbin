@@ -13,7 +13,7 @@ from rest_framework_swagger.views import get_swagger_view
 from transactions import views as transaction_views
 from sows import views as sows_views
 from sows_events import views as sows_events_views
-from workshops import views as workshops_views
+from locations import views as locations_views
 from workshopthree import views as workshopthree_views
 from workshopfour import views as workshopfour_views
 
@@ -34,7 +34,7 @@ router.register(r'sows_events/ultrasounds', sows_events_views.UltrasoundViewSet,
 router.register(r'sows_events/spec_uboi', sows_events_views.CullingSowViewSet, basename='spec_uboi')
 
 # cells
-router.register(r'pigletsgroupcells', workshops_views.PigletsGroupCellViewSet, basename='pigletsgroupcell')
+router.register(r'pigletsgroupcells', locations_views.PigletsGroupCellViewSet, basename='pigletsgroupcell')
 
 # by workshops
 # workshop three
@@ -53,6 +53,6 @@ schema_view = get_swagger_view(title='API Docs')
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(router.urls)),
-    url(r'^api/init_data/', workshops_views.CreateWorkshopsView.as_view()),
+    url(r'^api/init_data/', locations_views.CreateWorkshopsView.as_view()),
     url(r'^api/docs/$', schema_view)
     ]

@@ -3,7 +3,8 @@ from django.db.models import FieldDoesNotExist
 
 from rest_framework import serializers, status
 
-from transactions.models import SowTransaction, Location, PigletsTransaction
+from transactions.models import SowTransaction, PigletsTransaction
+from locations.models import Location
 from sows.models import Sow
 from piglets.models import NomadPigletsGroup
 

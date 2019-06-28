@@ -13,14 +13,14 @@ from sows_events import serializers as sows_events_serializers
 from piglets import serializers as piglets_serializers
 from piglets_events import serializers as piglets_events_serializers
 from transactions import serializers as transactions_serializers
-from workshops import serializers as workshops_serializers
+from locations import serializers as locations_serializers
 
 from sows.models import Sow
 from sows_events import models as sows_events_models
 from piglets.models import NomadPigletsGroup, NewBornPigletsGroup
 from piglets_events import models as piglets_events_models
 from transactions import models as transactions_models
-from workshops import models as workshops_models
+from locations import models as locations_models
 
 from sows.views import WorkShopSowViewSet
 
@@ -85,8 +85,8 @@ class WorkShopThreePigletsViewSet(viewsets.GenericViewSet):
             merger, nomad_group = piglets_events_models.NewBornPigletsMerger.objects.create_merger_and_return_nomad_piglets_group(
             new_born_piglets_groups=groups_to_merge, initiator=None)     
 
-            to_location = transactions_models.Location.objects.create_location(
-                workshops_models.WorkShop.objects.get(number=4))
+            to_location = locations_models.Location.objects.create_location(
+                locations_models.WorkShop.objects.get(number=4))
             transaction = transactions_models.PigletsTransaction.objects.create_transaction_without_merge(
                 to_location, nomad_group, None)
             # nomad_group.change_status_to('Готовы ко взвешиванию')
@@ -127,11 +127,11 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
 
     @action(methods=['post'], detail=True)
     def occupy_sow_to_cell(self, request, pk=None):
-        serializer = workshops_serializers.SowAndPigletsCellIdSerializer(data=request.data)
+        serializer = locations_serializers.SowAndPigletsCellIdSerializer(data=request.data)
         if serializer.is_valid():
             sow = self.get_object()
-            to_location = transactions_models.Location.objects.create_location(
-                workshops_models.SowAndPigletsCell.objects.get(pk=serializer.validated_data['cell_number'])
+            to_location = locations_models.Location.objects.create_location(
+                locations_models.SowAndPigletsCell.objects.get(pk=serializer.validated_data['cell_number'])
                 )
             transaction = transactions_models.SowTransaction.objects.create_transaction(
                 sow=sow, to_location=to_location, initiator=None)
@@ -148,7 +148,7 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
     @action(methods=['post'], detail=True)
     def move_sow_to_workshop_one(self, request, pk=None):
         sow = self.get_object()
-        to_location = transactions_models.Location.objects.create_workshop_location(1)
+        to_location = locations_models.Location.objects.create_workshop_location(1)
         transaction = transactions_models.SowTransaction.objects.create_transaction(
                 sow=sow, to_location=to_location, initiator=None)
 
@@ -163,7 +163,7 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
     def move_many_sows_to_workshop_one(self, request):
         serializer = serializers.SowsIdsSerializer(data=request.data)
         if serializer.is_valid():
-            to_location = transactions_models.Location.objects.create_workshop_location(1)
+            to_location = locations_models.Location.objects.create_workshop_location(1)
             transactions_ids = transactions_models.SowTransaction.objects.create_many_transactions(
                 sows=serializer.validated_data['sows'],
                 to_location=to_location,

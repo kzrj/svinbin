@@ -2,8 +2,7 @@
 from django.db import models
 
 from core.models import CoreModel, CoreModelManager
-from transactions.models import Location, SowTransaction
-from workshops.models import Section, SowGroupCell, WorkShop
+from locations.models import Location
 
 
 class SowStatus(CoreModel):
@@ -22,7 +21,7 @@ class GiltStatus(CoreModel):
 
 class Pig(CoreModel):
     birth_id = models.CharField(max_length=10, unique=True, null=True)
-    location = models.ForeignKey("transactions.Location", on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey("locations.Location", on_delete=models.SET_NULL, null=True)
 
     class Meta:
         abstract = True

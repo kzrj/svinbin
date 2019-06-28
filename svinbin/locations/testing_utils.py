@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from workshops.models import WorkShop, WorkShopEmployee, Section, SowSingleCell, \
-    PigletsGroupCell, SowAndPigletsCell, SowGroupCell
-
-from transactions.models import Location
+from locations.models import WorkShop, WorkShopEmployee, Section, SowSingleCell, \
+    PigletsGroupCell, SowAndPigletsCell, SowGroupCell, Location
 
 
 def create_workshops():

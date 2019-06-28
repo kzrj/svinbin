@@ -1,18 +1,18 @@
-from mixer.backend.django import mixer
-# from freezegun import freeze_time
+# -*- coding: utf-8 -*-
 
 from django.test import TestCase
 
-import workshops.testing_utils as workshop_testing
-import pigs.testing_utils as pigs_testings
 from tours.models import Tour
 from pigs.models import Sow
 from events.models import Semination, Ultrasound
 
+import locations.testing_utils as locations_testing
+import pigs.testing_utils as pigs_testings
+
 
 class TourModelManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         pigs_testings.create_statuses()
 
     def test_get_or_create_by_week_in_current_year(self):
@@ -32,7 +32,7 @@ class TourModelManagerTest(TestCase):
     
 class TourModelTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         pigs_testings.create_statuses()
 
     def test_get_inseminated_sows(self):

@@ -6,8 +6,7 @@ from core.models import Event, CoreModel, CoreModelManager
 from sows.models import Sow
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
 from tours.models import Tour
-from workshops.models import WorkShop
-from transactions.models import Location
+from locations.models import WorkShop, Location
 
 
 class SowEvent(Event):
@@ -29,7 +28,7 @@ class SeminationManager(CoreModelManager):
 
 
 class Semination(SowEvent):
-    semination_employee = models.ForeignKey('workshops.WorkShopEmployee',
+    semination_employee = models.ForeignKey('locations.WorkShopEmployee',
      on_delete=models.SET_NULL, null=True, related_name="semination_employee")
     # boar 
 

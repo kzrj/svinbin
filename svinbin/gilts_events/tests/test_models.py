@@ -1,24 +1,18 @@
-from mixer.backend.django import mixer
-# from freezegun import freeze_time
-
+# -*- coding: utf-8 -*-
 from django.test import TestCase
 
-import piglets_events.models as piglets_events_models
 import gilts_events.models as gilts_events_models
-import piglets.models as piglets_models
 import sows.models as sows_models
-import tours.models as tour_models
-import transactions.models as transactions_models
-import workshops.models as workshops_models
+import locations.models as locations_models
 
-import workshops.testing_utils as workshop_testing
+import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
 
 class GiltMergerManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
 
     def test__get_gilts_from_group_update_group(self):
@@ -72,7 +66,7 @@ class GiltMergerManagerTest(TestCase):
         self.assertEqual(nomad_group.gilts_quantity, 3)
         self.assertEqual(nomad_group.creating_gilt_merger, merger)
         self.assertEqual(nomad_group.location.get_location,
-            workshops_models.WorkShop.objects.get(number=3))
+            locations_models.WorkShop.objects.get(number=3))
 
 
 class CastingListToSevenFiveEventManagerTest(TestCase):
@@ -123,7 +117,3 @@ class CastingListToSevenFiveEventManagerTest(TestCase):
 
         self.assertEqual(list(casting_event.gilts.all().values_list('id', flat=True)),
             [gilt1.pk, gilt2.pk, gilt6.pk])
-
-        
-
-

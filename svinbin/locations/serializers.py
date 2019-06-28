@@ -3,7 +3,7 @@ from rest_framework import serializers, status
 
 from core.utils import CustomValidation
 import transactions.serializers as transactions_serializers
-from workshops.models import PigletsGroupCell, SowAndPigletsCell
+from locations.models import PigletsGroupCell, SowAndPigletsCell
 
 
 class PigletsGroupCellSerializer(serializers.ModelSerializer):

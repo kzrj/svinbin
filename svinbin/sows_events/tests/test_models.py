@@ -4,15 +4,14 @@ from django.test import TestCase
 from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow
 from sows.models import Sow
 from piglets.models import NewBornPigletsGroup
-from tours.models import Tour
 
-import workshops.testing_utils as workshop_testing
+import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 
 
 class SeminationModelManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
 
     def test_create_semination(self):
@@ -29,7 +28,7 @@ class SeminationModelManagerTest(TestCase):
 
 class UltrasoundModelManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
 
     def test_create_ultrasound(self):

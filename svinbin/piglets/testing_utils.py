@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 import random
 
-from workshops.models import SowSingleCell, SowGroupCell, Section, WorkShop, SowAndPigletsCell, PigletsGroupCell
-from transactions.models import Location, PigletsTransaction
-from sows.models import Sow, SowStatus
+from locations.models import Location, SowSingleCell, SowGroupCell, Section, WorkShop, \
+    SowAndPigletsCell, PigletsGroupCell
+from transactions.models import PigletsTransaction
+
 from piglets.models import NewBornPigletsGroup, PigletsStatus
 from sows_events.models import Semination, SowFarrow
 from piglets_events.models import NewBornPigletsMerger

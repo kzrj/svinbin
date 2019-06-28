@@ -7,20 +7,20 @@ from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
-import workshops.testing_utils as workshops_testing
+import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
 from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger, CullingNewBornPiglets
-from workshops.models import WorkShop, SowAndPigletsCell
-from transactions.models import PigletsTransaction, Location, SowTransaction
+from locations.models import WorkShop, SowAndPigletsCell, Location
+from transactions.models import PigletsTransaction, SowTransaction
 
 
 class WorkshopThreePigletsViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        workshops_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
@@ -87,7 +87,7 @@ class WorkshopThreePigletsViewSetTest(APITestCase):
 class WorkshopThreeSowsViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
-        workshops_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
 
     def test_sow_farrow(self):

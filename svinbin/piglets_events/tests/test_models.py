@@ -1,24 +1,18 @@
-from mixer.backend.django import mixer
-# from freezegun import freeze_time
-
+# -*- coding: utf-8 -*-
 from django.test import TestCase
 
 import piglets_events.models as piglets_events_models
 import piglets.models as piglets_models
-import sows.models as sows_models
-import sows_events.models as sows_events_models
-import tours.models as tour_models
-import transactions.models as transactions_models
-import workshops.models as workshops_models
+import locations.models as locations_models
 
-import workshops.testing_utils as workshop_testing
+import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
 
 class NewBornMergerModelTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
@@ -88,16 +82,16 @@ class NewBornMergerModelTest(TestCase):
 
 class NomadPigletsGroupMergerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
         self.piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
         self.piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
 
-        self.cell = workshops_models.PigletsGroupCell.objects.get(workshop__number=4,
+        self.cell = locations_models.PigletsGroupCell.objects.get(workshop__number=4,
              section__number=1, number=1)
-        self.new_location = transactions_models.Location.objects.get(pigletsGroupCell=self.cell)
+        self.new_location = locations_models.Location.objects.get(pigletsGroupCell=self.cell)
 
         self.merger = piglets_events_models.NomadPigletsGroupMerger.objects \
             .create_nomad_merger(
@@ -141,16 +135,16 @@ class NomadPigletsGroupMergerTest(TestCase):
 
 class NomadMergerRecordManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
         self.piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
         self.piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
 
-        self.cell = workshops_models.PigletsGroupCell.objects.get(workshop__number=4,
+        self.cell = locations_models.PigletsGroupCell.objects.get(workshop__number=4,
              section__number=1, number=1)
-        self.new_location = transactions_models.Location.objects.get(pigletsGroupCell=self.cell)
+        self.new_location = locations_models.Location.objects.get(pigletsGroupCell=self.cell)
 
         self.merger = piglets_events_models.NomadPigletsGroupMerger.objects \
             .create_nomad_merger(
@@ -170,7 +164,7 @@ class NomadMergerRecordManagerTest(TestCase):
 
 class SplitNomadPigletsGroupTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
@@ -197,7 +191,7 @@ class SplitNomadPigletsGroupTest(TestCase):
 
 class SplitNomadPigletsGroupManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
@@ -225,7 +219,7 @@ class SplitNomadPigletsGroupManagerTest(TestCase):
 
 class NomadPigletsGroupMergerManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
@@ -278,7 +272,7 @@ class NomadPigletsGroupMergerManagerTest(TestCase):
 
 class RecountManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
@@ -301,7 +295,7 @@ class RecountManagerTest(TestCase):
 
 class WeighingPigletsTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
@@ -319,7 +313,7 @@ class WeighingPigletsTest(TestCase):
 
 class CullingPigletsTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 

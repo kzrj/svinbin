@@ -1,21 +1,20 @@
+# -*- coding: utf-8 -*-
 from mixer.backend.django import mixer
 
 from django.test import TestCase
 
-import workshops.testing_utils as workshop_testing
+import locations.testing_utils as locaions_testing
 import sows.testing_utils as sows_testings
 import piglets.testing_utils as piglets_testing
 
-from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
-SowAndPigletsCell
+from locations.models import Location
 from sows.models import Sow, Gilt
 from sows_events.models import SowFarrow
-from transactions.models import Location
 
 
 class SowModelManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locaions_testing.create_workshops_sections_and_cells()
         sows_testings.create_statuses()
 
     def test_get_or_create_by_farm_id(self):
@@ -44,7 +43,7 @@ class SowModelManagerTest(TestCase):
 
 class GiltModelManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locaions_testing.create_workshops_sections_and_cells()
         sows_testings.create_statuses()
 
     def test_create_gilt(self):

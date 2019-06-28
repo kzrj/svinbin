@@ -1,20 +1,20 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-import datetime
-import random
+# # -*- coding: utf-8 -*-
+# from __future__ import unicode_literals
+# import datetime
+# import random
 
-from django.contrib.auth.models import User
+# from django.contrib.auth.models import User
 
-from rest_framework.test import APIClient
-from rest_framework.test import APITestCase
+# from rest_framework.test import APIClient
+# from rest_framework.test import APITestCase
 
-import workshops.testing_utils as workshops_testing
-import pigs.testing_utils as sows_testing
-from transactions.views import WorkShopSowTransactionViewSet
-from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
-SowAndPigletsCell
-from pigs.models import Sow
-from transactions.models import Location, SowTransaction
+# import workshops.testing_utils as workshops_testing
+# import pigs.testing_utils as sows_testing
+# from transactions.views import WorkShopSowTransactionViewSet
+# from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
+# SowAndPigletsCell
+# from pigs.models import Sow
+# from transactions.models import Location, SowTransaction
 
 
 # class WorkShopSowTransactionViewSet(APITestCase):

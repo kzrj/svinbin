@@ -22,7 +22,7 @@ class PigletsGroupManager(CoreModelManager):
 
 
 class PigletsGroup(CoreModel):
-    location = models.ForeignKey('transactions.Location', on_delete=models.SET_NULL,
+    location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL,
      null=True)
     start_quantity = models.IntegerField()
     quantity = models.IntegerField()
@@ -191,9 +191,10 @@ class NomadPigletsGroupManager(PigletsGroupManager):
 
 
 class NomadPigletsGroup(PigletsGroup):
-    split_record = models.ForeignKey('piglets_events.SplitNomadPigletsGroup', on_delete=models.SET_NULL, null=True)
-    groups_merger = models.ForeignKey('piglets_events.NomadPigletsGroupMerger', on_delete=models.SET_NULL, null=True,
-        related_name="groups_merger")
+    split_record = models.ForeignKey('piglets_events.SplitNomadPigletsGroup',
+         on_delete=models.SET_NULL, null=True)
+    groups_merger = models.ForeignKey('piglets_events.NomadPigletsGroupMerger',
+         on_delete=models.SET_NULL, null=True, related_name="groups_merger")
 
     objects = NomadPigletsGroupManager()
 

@@ -41,7 +41,7 @@ DJANGO_APPS = [
 
 
 OWN_APPS = [
-    'workshops.apps.WorkshopsConfig',
+    'locations.apps.LocationsConfig',
     'sows.apps.SowsConfig',
     'piglets.apps.PigletsConfig',
     'sows_events.apps.SowsEventsConfig',

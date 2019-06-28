@@ -3,20 +3,20 @@ from mixer.backend.django import mixer
 from django.test import TestCase
 from django.utils import timezone
 
-import workshops.testing_utils as workshops_testing
+import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
-from workshops.models import WorkShop, Section, SowSingleCell, PigletsGroupCell, SowGroupCell, \
-SowAndPigletsCell
+from locations.models import Location, WorkShop, Section, SowSingleCell, PigletsGroupCell, \
+ SowGroupCell, SowAndPigletsCell
 from sows.models import Sow
 from piglets.models import NomadPigletsGroup
-from transactions.models import Location, SowTransaction, PigletsTransaction
+from transactions.models import SowTransaction, PigletsTransaction
 
 
 class SowTransactionManagerTest(TestCase):
     def setUp(self):
-        workshops_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
 
     def test_create_transaction(self):
         sow = sows_testing.create_sow_and_put_in_workshop_one(1, '100')
@@ -60,7 +60,7 @@ class LocationModelManagerTest(TestCase):
 
 class LocationModelTest(TestCase):
     def setUp(self):
-        workshops_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
 
     def test_get_location(self):
@@ -121,7 +121,7 @@ class LocationModelTest(TestCase):
 
 class PigletsTransactionManagerTest(TestCase):
     def setUp(self):
-        workshops_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 

@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from core.models import Event, CoreModel, CoreModelManager
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup, PigletsStatus
-from transactions.models import Location
+from locations.models import Location
 
 
 class PigletsEvent(Event):
@@ -209,7 +209,7 @@ class NomadPigletsGroupMergerManager(PigletsMergerManager):
 class NomadPigletsGroupMerger(PigletsMerger):
     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
      related_name='creating_nomad_merger')
-    new_location = models.ForeignKey('transactions.Location', on_delete=models.SET_NULL, null=True,
+    new_location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL, null=True,
      related_name='creating_nomad_merger')
 
     objects =  NomadPigletsGroupMergerManager()
