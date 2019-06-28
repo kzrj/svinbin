@@ -155,13 +155,6 @@ class PigletsTransactionManager(CoreModelManager):
 
         return transaction
 
-    # def create_transaction_to_group_cell(self, to_location, piglets_group, initiator=None):
-    #     cell = to_location.get_location
-    #     if cell.is_empty:
-    #         return self.create_transaction_without_merge(to_location, piglets_group, initiator)
-    #     else:
-    #         return self.create_transactions_with_nomad_merge(to_location, piglets_group, initiator)
-
 
 class PigletsTransaction(Transaction):
     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="piglets_from_location")
