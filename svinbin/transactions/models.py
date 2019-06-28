@@ -104,6 +104,9 @@ class Location(CoreModel):
     def __str__(self):
         return str(self.get_location)
 
+    def get_located_active_new_born_groups(self):
+        return self.newbornpigletsgroup_set.all()
+
 
 class Transaction(Event):
     class Meta:
@@ -164,7 +167,7 @@ class PigletsTransaction(Transaction):
     objects = PigletsTransactionManager()
 
     
-class GiltTransaction(Transaction):
-    from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_from_location")
-    to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_to_location")
-    gilt = models.ForeignKey('sows.Gilt', on_delete=models.CASCADE)
+# class GiltTransaction(Transaction):
+#     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_from_location")
+#     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_to_location")
+#     gilt = models.ForeignKey('sows.Gilt', on_delete=models.CASCADE)

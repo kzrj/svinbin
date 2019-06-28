@@ -60,6 +60,28 @@ class TestingUtilsTest(TestCase):
         self.assertEqual(PigletsGroupCell.objects.filter(section=section1).count(), 6)
 
 
+class SowAndPigletsCellTest(TestCase):
+    def setUp(self):
+        workshops_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+
+    def test_get_newborn_groups(self):
+        new_born_piglets = piglets_testing.create_new_born_group(
+            section_number=1, cell_number=4, week=2)
+        cell = new_born_piglets.location.get_location
+        cell.get_newborn_groups()
+
+
+
+
+
+        # self.assertEqual(cell.get_locations_with_residents().count(), 1)
+        # self.assertEqual(cell.get_locations_with_residents().first(), new_born_piglets.location)
+        # self.assertEqual(cell.get_list_of_residents(), [new_born_piglets])
+        # self.assertEqual(cell.get_first_piglets_group(), new_born_piglets)
+
+
 # class PigletsGroupCelltest(TestCase):
 #     def setUp(self):
 #         workshops_testing.create_workshops_sections_and_cells()
@@ -95,20 +117,3 @@ class TestingUtilsTest(TestCase):
 
 #         list_of_residents = piglet_group_cell.get_list_of_residents()
 #         self.assertEqual(list_of_residents, [nomad_group1, nomad_group2])
-    
-
-# class SowAndPigletsCellTest(TestCase):
-#     def setUp(self):
-#         workshops_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
-
-#     def test_get_all_locations(self):
-#         new_born_piglets = piglets_testing.create_new_born_group(
-#             section_number=1, cell_number=4, week_number=2)
-#         cell = new_born_piglets.location.get_location
-
-#         self.assertEqual(cell.get_locations_with_residents().count(), 1)
-#         self.assertEqual(cell.get_locations_with_residents().first(), new_born_piglets.location)
-#         self.assertEqual(cell.get_list_of_residents(), [new_born_piglets])
-#         self.assertEqual(cell.get_first_piglets_group(), new_born_piglets)

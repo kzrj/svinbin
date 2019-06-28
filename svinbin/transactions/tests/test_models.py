@@ -58,66 +58,66 @@ class LocationModelManagerTest(TestCase):
         self.assertEqual(location.sowSingleCell.number, '1')
        
 
-# class LocationModelTest(TestCase):
-#     def setUp(self):
-#         workshops_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
+class LocationModelTest(TestCase):
+    def setUp(self):
+        workshops_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
 
-#     def test_get_location(self):
-#         workshop = WorkShop.objects.get(number=1)
-#         location = Location.objects.create_location(workshop)
-#         self.assertEqual(location.get_location, workshop)
+    def test_get_location(self):
+        workshop = WorkShop.objects.get(number=1)
+        location = Location.objects.get(workshop=workshop)
+        self.assertEqual(location.get_location, workshop)
 
-#         section = Section.objects.get(workshop__number=1, number=1)
-#         location = Location.objects.create_location(section)
-#         self.assertEqual(location.get_location, section)
+        section = Section.objects.get(workshop__number=1, number=1)
+        location = Location.objects.get(section=section)
+        self.assertEqual(location.get_location, section)
         
-#         cell = SowSingleCell.objects.get(number='1')
-#         location = Location.objects.create_location(cell)
-#         self.assertEqual(location.get_location, cell)
+        cell = SowSingleCell.objects.get(number='1')
+        location = Location.objects.get(sowSingleCell=cell)
+        self.assertEqual(location.get_location, cell)
 
-#         cell = SowGroupCell.objects.first()
-#         location = Location.objects.create_location(cell)
-#         self.assertEqual(location.get_location, cell)
+        cell = SowGroupCell.objects.first()
+        location = Location.objects.get(sowGroupCell=cell)
+        self.assertEqual(location.get_location, cell)
 
-#         cell = PigletsGroupCell.objects.first()
-#         location = Location.objects.create_location(cell)
-#         self.assertEqual(location.get_location, cell)
+        cell = PigletsGroupCell.objects.first()
+        location = Location.objects.get(pigletsGroupCell=cell)
+        self.assertEqual(location.get_location, cell)
 
-#         cell = SowAndPigletsCell.objects.first()
-#         location = Location.objects.create_location(cell)
-#         self.assertEqual(location.get_location, cell)
+        cell = SowAndPigletsCell.objects.first()
+        location = Location.objects.get(sowAndPigletsCell=cell)
+        self.assertEqual(location.get_location, cell)
 
-#     def test_get_workshop(self):
-#         workshop = WorkShop.objects.get(number=1)
-#         location = Location.objects.create_location(workshop)
-#         self.assertEqual(location.get_workshop, workshop)
+    def test_get_workshop(self):
+        workshop = WorkShop.objects.get(number=1)
+        location = Location.objects.get(workshop=workshop)
+        self.assertEqual(location.get_workshop, workshop)
 
-#         section = Section.objects.get(workshop__number=1, number=1)
-#         location = Location.objects.create_location(section)
-#         self.assertEqual(location.get_workshop, workshop)
+        section = Section.objects.get(workshop__number=1, number=1)
+        location = Location.objects.get(section=section)
+        self.assertEqual(location.get_workshop, workshop)
         
-#         cell = SowSingleCell.objects.get(number='1')
-#         location = Location.objects.create_location(cell)
-#         self.assertEqual(location.get_workshop, workshop)
+        cell = SowSingleCell.objects.get(number='1')
+        location = Location.objects.get(sowSingleCell=cell)
+        self.assertEqual(location.get_workshop, workshop)
 
-#         cell = SowGroupCell.objects.first()
-#         location = Location.objects.create_location(cell)
-#         self.assertEqual(location.get_workshop, cell.section.workshop)
+        cell = SowGroupCell.objects.first()
+        location = Location.objects.get(sowGroupCell=cell)
+        self.assertEqual(location.get_workshop, cell.section.workshop)
 
-#         cell = PigletsGroupCell.objects.first()
-#         location = Location.objects.create_location(cell)
-#         self.assertEqual(location.get_workshop, cell.section.workshop)
+        cell = PigletsGroupCell.objects.first()
+        location = Location.objects.get(pigletsGroupCell=cell)
+        self.assertEqual(location.get_workshop, cell.section.workshop)
 
-#         cell = SowAndPigletsCell.objects.first()
-#         location = Location.objects.create_location(cell)
-#         self.assertEqual(location.get_workshop, cell.section.workshop)
+        cell = SowAndPigletsCell.objects.first()
+        location = Location.objects.get(sowAndPigletsCell=cell)
+        self.assertEqual(location.get_workshop, cell.section.workshop)
 
-#     def test_get_with_active_new_born_group(self):
-#         new_born_group = piglets_testing.create_new_born_group()
-
-#         location = new_born_group.location
-        
+    def test_get_located_active_new_born_groups(self):
+        new_born_group = piglets_testing.create_new_born_group()
+        location = new_born_group.location
+        print(location.get_located_active_new_born_groups())
+       
 
 class PigletsTransactionManagerTest(TestCase):
     def setUp(self):

@@ -2,7 +2,7 @@
 from django.db import models
 
 from core.models import CoreModel, CoreModelManager
-from transactions.models import Location, SowTransaction, GiltTransaction
+from transactions.models import Location, SowTransaction
 from workshops.models import Section, SowGroupCell, WorkShop
 
 
@@ -47,29 +47,6 @@ class SowManager(CoreModelManager):
         #     raise error
         return sow
 
-    # def move_to(self, sow, pre_location, initiator=None):
-    #     location = Location.objects.create_location(pre_location)
-    #     transaction = SowTransaction.objects.create_transaction(                
-    #             initiator=initiator,
-    #             to_location=location,
-    #             sow=sow
-    #             )
-    #     return transaction
-
-    # def create_and_move_to_by_farm_id(self, farm_id, pre_location, initiator=None):
-    #     sow = self.get_or_create_by_farm_id(farm_id)
-    #     transaction = self.move_to(sow, pre_location, initiator)
-    #     return sow, transaction
-
-    # def move_to_by_farm_id(self, farm_id, pre_location, initiator=None):
-    #     sow = self.get_by_farm_id(farm_id)
-    #     transaction = self.move_to(sow, pre_location, initiator)
-    #     return sow, transaction
-
-    # def move_many(self, sows, pre_location, initiator=None):
-    #     for sow in sows.all():
-    #         self.move_to(sow, pre_location, initiator)
-
 
 class Sow(Pig):
     farm_id = models.IntegerField(null=True, unique=True)
@@ -102,7 +79,7 @@ class GiltManager(CoreModelManager):
         # carefully, here I get FIRST group.
         new_born_group = cell.get_first_piglets_group()
         gilt = self.create(birth_id=birth_id, mother_sow=mother_sow,
-         location=Location.objects.duplicate_location(mother_sow.location),
+         location=mother_sow.location,
          new_born_group=new_born_group, tour=mother_sow.tour
          )
         new_born_group.add_gilts(1)

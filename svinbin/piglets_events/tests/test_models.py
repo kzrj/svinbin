@@ -349,5 +349,3 @@ class CullingPigletsTest(TestCase):
         self.assertEqual(culling_nomad.is_it_gilt, True)
         self.assertEqual(culling_nomad.culling_type, 'padej')
         self.assertEqual(culling_nomad.reason, 'xz')
-
-
