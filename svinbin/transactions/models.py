@@ -114,7 +114,7 @@ class Transaction(Event):
 
 
 class SowTransactionManager(CoreModelManager):
-    def create_transaction(self, to_location, sow, initiator):
+    def create_transaction(self, to_location, sow, initiator=None):
         # need to refractor to atomic transactions.
         transaction = SowTransaction.objects.create(
                 date=timezone.now(),
@@ -124,54 +124,24 @@ class SowTransactionManager(CoreModelManager):
                 sow=sow
                 )
 
-        transaction.to_empty_from_location
-        transaction.to_fill_to_location
-
         sow.change_sow_current_location(to_location)
 
         return transaction
 
-    def create_many_transactions(self, sows, to_location, initiator):
+    def create_many_transactions(self, sows, to_location, initiator=None):
         transactions_ids = list()
         for sow in sows:
-            location = Location.objects.duplicate_location(to_location)
-            transaction = self.create_transaction(location, sow, initiator)
+            transaction = self.create_transaction(to_location, sow, initiator)
             transactions_ids.append(transaction.pk)
         return transactions_ids
 
 
 class SowTransaction(Transaction):
-    from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_from_location")
-    to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_to_location")
-    sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE)
+    from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_transactions_from")
+    to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="sow_transactions_to")
+    sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE, related_name='transactions')
 
     objects = SowTransactionManager()
-
-    @property
-    def to_empty_from_location(self):
-        if self.from_location.sowSingleCell:
-            self.from_location.sowSingleCell.sow = None
-            self.from_location.sowSingleCell.save()
-
-        if self.from_location.sowGroupCell:
-            self.from_location.sowGroupCell.sows.remove(self.sow)
-
-        if self.from_location.sowAndPigletsCell:
-            self.from_location.sowAndPigletsCell.sow = None
-            self.from_location.sowAndPigletsCell.save()
-
-    @property
-    def to_fill_to_location(self):
-        if self.to_location.sowSingleCell:
-            self.to_location.sowSingleCell.sow = self.sow
-            self.to_location.sowSingleCell.save()
-
-        if self.to_location.sowGroupCell:
-            self.to_location.sowGroupCell.sows.add(self.sow)
-
-        if self.to_location.sowAndPigletsCell:
-            self.to_location.sowAndPigletsCell.sow = self.sow
-            self.to_location.sowAndPigletsCell.save()
 
 
 class PigletsTransactionManager(CoreModelManager):

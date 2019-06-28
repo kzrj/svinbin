@@ -46,8 +46,8 @@ class Cell(CoreModel):
 # Here I can create just one cell class for all types instead separation.
 
 class SowSingleCell(Cell):
-    sow = models.OneToOneField('sows.Sow', on_delete=models.SET_NULL, null=True)
-
+    pass
+    
 
 class SowGroupCell(Cell):
     sows = models.ManyToManyField('sows.Sow', related_name='sows_in_cell')
