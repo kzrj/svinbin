@@ -40,12 +40,18 @@ class LocationManager(CoreModelManager):
 
 
 class Location(CoreModel):
-    workshop = models.ForeignKey(WorkShop, null=True, on_delete=models.SET_NULL, related_name='locations')
-    section = models.ForeignKey(Section, null=True, on_delete=models.SET_NULL, related_name='locations')
-    sowSingleCell = models.ForeignKey(SowSingleCell, null=True, on_delete=models.SET_NULL, related_name='locations')
-    pigletsGroupCell = models.ForeignKey(PigletsGroupCell, null=True, on_delete=models.SET_NULL, related_name='locations')
-    sowAndPigletsCell = models.ForeignKey(SowAndPigletsCell, null=True, on_delete=models.SET_NULL, related_name='locations')
-    sowGroupCell = models.ForeignKey(SowGroupCell, null=True, on_delete=models.SET_NULL, related_name='locations')
+    workshop = models.OneToOneField(WorkShop, null=True, on_delete=models.SET_NULL,
+     related_name='location')
+    section = models.OneToOneField(Section, null=True, on_delete=models.SET_NULL,
+     related_name='location')
+    sowSingleCell = models.OneToOneField(SowSingleCell, null=True, on_delete=models.SET_NULL,
+     related_name='location')
+    pigletsGroupCell = models.OneToOneField(PigletsGroupCell, null=True, on_delete=models.SET_NULL,
+     related_name='location')
+    sowAndPigletsCell = models.OneToOneField(SowAndPigletsCell, null=True, on_delete=models.SET_NULL,
+     related_name='location')
+    sowGroupCell = models.OneToOneField(SowGroupCell, null=True, on_delete=models.SET_NULL,
+     related_name='location')
 
     objects = LocationManager()
 
@@ -184,22 +190,6 @@ class PigletsTransactionManager(CoreModelManager):
         piglets_group.change_current_location(to_location)
 
         return transaction
-
-    # def create_transactions_with_nomad_merge(self, to_location, piglets_group, initiator=None):
-    #     transaction = self.create_transaction_without_merge(to_location, piglets_group, initiator)
-        
-    #     cell = to_location.get_location
-    #     # nomad_group_in_cell = cell.get_residents().first()
-    #     nomad_group_in_cell = cell.get_list_of_residents()[0]
-    #     new_location = Location.objects.duplicate_location(to_location)
-        
-    #     new_created_group = piglets_events.models.NomadGroupPigletsMerger.create_merger_and_return_nomad_piglets_group(
-    #         nomad_groups=[piglets_group, nomad_group_in_cell],
-    #         new_location=new_location,
-    #         initiator=initiator
-    #         )
-
-    #     return transaction
 
     def create_transaction_to_group_cell(self, to_location, piglets_group, initiator=None):
         cell = to_location.get_location

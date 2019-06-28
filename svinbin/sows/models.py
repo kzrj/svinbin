@@ -22,7 +22,7 @@ class GiltStatus(CoreModel):
 
 class Pig(CoreModel):
     birth_id = models.CharField(max_length=10, unique=True, null=True)
-    location = models.OneToOneField("transactions.Location", on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey("transactions.Location", on_delete=models.SET_NULL, null=True)
 
     class Meta:
         abstract = True
