@@ -100,7 +100,7 @@ class NewBornPigletsMerger(PigletsMerger):
     def create_nomad_group(self):
         # location = self.piglets_group.all().select_related('location').first().location.
 
-        location = Location.objects.create_workshop_location(workshop_number=3)
+        location = Location.objects.get(workshop__number=3)
         self.create_records()
         nomad_group = NomadPigletsGroup.objects.create(location=location,
          start_quantity=self.count_all_piglets(), quantity=self.count_all_piglets(),
