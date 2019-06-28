@@ -120,22 +120,22 @@ class LocationModelManagerTest(TestCase):
         
 
 
-# class PigletsTransactionManagerTest(TestCase):
-#     def setUp(self):
-#         workshops_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
+class PigletsTransactionManagerTest(TestCase):
+    def setUp(self):
+        workshops_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
-#     def test_create_transaction_without_merge(self):
-#         nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
-#         self.assertEqual(nomad_group.location.get_location, WorkShop.objects.get(number=3))
+    def test_create_transaction(self):
+        nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
+        self.assertEqual(nomad_group.location.workshop.number, 3)
 
-#         to_location = Location.objects.create_location(WorkShop.objects.get(number=4))
-#         transaction = PigletsTransaction.objects.create_transaction_without_merge(to_location, nomad_group)
+        to_location = Location.objects.get(workshop__number=4)
+        transaction = PigletsTransaction.objects.create_transaction(to_location, nomad_group)
 
-#         self.assertEqual(transaction.from_location.get_location, WorkShop.objects.get(number=3))
-#         self.assertEqual(transaction.to_location.get_location, WorkShop.objects.get(number=4))
-#         self.assertEqual(transaction.piglets_group, nomad_group)
+        self.assertEqual(transaction.from_location.workshop.number, 3)
+        self.assertEqual(transaction.to_location.workshop.number, 4)
+        self.assertEqual(transaction.piglets_group, nomad_group)
 
-#         nomad_group.refresh_from_db()
-#         self.assertEqual(nomad_group.location.get_location, WorkShop.objects.get(number=4))
+        nomad_group.refresh_from_db()
+        self.assertEqual(nomad_group.location.workshop.number, 4)

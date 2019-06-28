@@ -101,9 +101,6 @@ class Location(CoreModel):
         if self.sowGroupCell:
             return self.sowGroupCell.section.workshop
 
-    # def duplicate_location_from_model(self):
-    #     return Location.objects.create_location(self.get_location)
-
     def __str__(self):
         return str(self.get_location)
 
@@ -145,7 +142,7 @@ class SowTransaction(Transaction):
 
 
 class PigletsTransactionManager(CoreModelManager):
-    def create_transaction_without_merge(self, to_location, piglets_group, initiator=None):
+    def create_transaction(self, to_location, piglets_group, initiator=None):
         transaction = PigletsTransaction.objects.create(
                 date=timezone.now(),
                 initiator=initiator,
@@ -158,12 +155,12 @@ class PigletsTransactionManager(CoreModelManager):
 
         return transaction
 
-    def create_transaction_to_group_cell(self, to_location, piglets_group, initiator=None):
-        cell = to_location.get_location
-        if cell.is_empty:
-            return self.create_transaction_without_merge(to_location, piglets_group, initiator)
-        else:
-            return self.create_transactions_with_nomad_merge(to_location, piglets_group, initiator)
+    # def create_transaction_to_group_cell(self, to_location, piglets_group, initiator=None):
+    #     cell = to_location.get_location
+    #     if cell.is_empty:
+    #         return self.create_transaction_without_merge(to_location, piglets_group, initiator)
+    #     else:
+    #         return self.create_transactions_with_nomad_merge(to_location, piglets_group, initiator)
 
 
 class PigletsTransaction(Transaction):
