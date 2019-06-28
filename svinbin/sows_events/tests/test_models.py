@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
 
-from sows_events.models import Semination, Ultrasound, SowFarrow
+from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow
 from sows.models import Sow
 from piglets.models import NewBornPigletsGroup
 from tours.models import Tour
@@ -97,3 +97,18 @@ class SowFarrowModelManagerTest(TestCase):
 
         self.assertEqual(SowFarrow.objects.all().count(), 2)
         self.assertEqual(farrow1.new_born_piglets_group, farrow2.new_born_piglets_group)
+
+
+class CullingSowManagerTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+
+    def test_create_farrow(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_three(1, 1)
+        culling = CullingSow.objects.create_culling(sow, 'spec', 'prichina')
+        sow.refresh_from_db()
+        self.assertEqual(sow.alive, False)
+        self.assertEqual(culling.sow, sow)
+        self.assertEqual(culling.culling_type, 'spec')
+        self.assertEqual(culling.reason, 'prichina')
