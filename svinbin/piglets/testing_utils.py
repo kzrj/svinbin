@@ -56,7 +56,7 @@ def create_nomad_group_from_three_new_born_two_tours():
     piglets_groups_two_tours = NewBornPigletsGroup.objects.filter(pk__in=
         [piglets_group1.pk, piglets_group2.pk, piglets_group3.pk])
 
-    nomad_group = create_nomad_group_from_new_born_groups()
+    nomad_group = create_nomad_group_from_new_born_groups(piglets_groups_two_tours)
 
     return nomad_group
 

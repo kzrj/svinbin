@@ -151,8 +151,7 @@ class SplitPigletsGroup(PigletsEvent):
 class SplitNomadPigletsGroupManager(CoreModelManager):
     def _create_split_group(self, split_event, quantity, initiator=None, gilts_quantity=0):
         parent_nomad_group = split_event.parent_group
-        location = Location.objects.create_location(parent_nomad_group.location.get_location)
-        return NomadPigletsGroup.objects.create(location=location,
+        return NomadPigletsGroup.objects.create(location=parent_nomad_group.location,
             start_quantity=quantity,
             quantity=quantity,
             split_record=split_event,
