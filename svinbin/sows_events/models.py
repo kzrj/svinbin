@@ -19,12 +19,7 @@ class SowEvent(Event):
 
     
 class SeminationManager(CoreModelManager):
-    def create_semination(self, sow_farm_id, week, initiator=None, semination_employee=None):
-        sow = Sow.objects.get_by_farm_id(sow_farm_id)
-        return self.create_semination_object(sow=sow, week=week, initiator=initiator,
-            semination_employee=semination_employee)
-
-    def create_semination_object(self, sow, week, initiator=None, semination_employee=None):
+    def create_semination(self, sow, week, initiator=None, semination_employee=None):
         tour = Tour.objects.get_or_create_by_week_in_current_year(week)
         semination = self.create(sow=sow, tour=tour, initiator=initiator,
          semination_employee=semination_employee, date=timezone.now())
@@ -42,8 +37,7 @@ class Semination(SowEvent):
 
 
 class UltrasoundManager(CoreModelManager):
-    def create_ultrasound(self, sow_farm_id, week, initiator=None, result=False):
-        sow = Sow.objects.get_by_farm_id(sow_farm_id)
+    def create_ultrasound(self, sow, week, initiator=None, result=False):
         tour = Tour.objects.get_tour_by_week_in_current_year(week)
         ultrasound = self.create(sow=sow, tour=tour, initiator=initiator,
          date=timezone.now(), result=result)

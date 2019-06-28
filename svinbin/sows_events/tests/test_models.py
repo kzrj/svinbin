@@ -17,7 +17,7 @@ class SeminationModelManagerTest(TestCase):
 
     def test_create_semination(self):
         sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
-        semination = Semination.objects.create_semination(sow_farm_id=1, week=1,
+        semination = Semination.objects.create_semination(sow=sow, week=1,
          initiator=None, semination_employee=None)
 
         self.assertEqual(Semination.objects.all().count(), 1)
@@ -34,10 +34,10 @@ class UltrasoundModelManagerTest(TestCase):
 
     def test_create_ultrasound(self):
         sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
-        semination = Semination.objects.create_semination(sow_farm_id=1, week=1,
+        semination = Semination.objects.create_semination(sow=sow, week=1,
          initiator=None, semination_employee=None)
 
-        ultrasound = Ultrasound.objects.create_ultrasound(sow_farm_id=1, week=1,
+        ultrasound = Ultrasound.objects.create_ultrasound(sow=sow, week=1,
          initiator=None, result=False)
 
         self.assertEqual(Ultrasound.objects.all().count(), 1)
@@ -45,7 +45,7 @@ class UltrasoundModelManagerTest(TestCase):
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Прохолост')
 
-        Ultrasound.objects.create_ultrasound(sow_farm_id=1, week=1,
+        Ultrasound.objects.create_ultrasound(sow=sow, week=1,
          initiator=None, result=True)
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Беременна')
@@ -58,7 +58,7 @@ class SowFarrowModelManagerTest(TestCase):
 
     def test_create_farrow(self):
         sow = sows_testing.create_sow_and_put_in_workshop_three(1, 1)
-        Semination.objects.create_semination(sow_farm_id=sow.farm_id, week=1,
+        Semination.objects.create_semination(sow=sow, week=1,
          initiator=None, semination_employee=None)
 
         # first sow farrow in tour
