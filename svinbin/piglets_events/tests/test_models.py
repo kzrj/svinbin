@@ -83,6 +83,7 @@ class NewBornMergerModelTest(TestCase):
         self.assertEqual(self.piglets_group3.quantity, 0)
         self.assertEqual(self.piglets_group3.active, False)
 
+
 #to do MergerRecordsTest
 
 
@@ -110,32 +111,81 @@ class NomadPigletsGroupMergerTest(TestCase):
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
-    def test_create_merger_and_return_nomad_piglets_group(self):
-        piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
-        piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
+        self.piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+        self.piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
 
-        cell = workshops_models.PigletsGroupCell.objects.get(workshop__number=4,
+        self.cell = workshops_models.PigletsGroupCell.objects.get(workshop__number=4,
              section__number=1, number=1)
-        new_location = transactions_models.Location.objects.create_location(cell)
+        self.new_location = transactions_models.Location.objects.get(pigletsGroupCell=self.cell)
 
-        merged_group = piglets_events_models.NomadPigletsGroupMerger.objects \
-            .create_merger_and_return_nomad_piglets_group(
-                nomad_groups=[piglets_group1, piglets_group2],
-                new_location=new_location
+        self.merger = piglets_events_models.NomadPigletsGroupMerger.objects \
+            .create_nomad_merger(
+                nomad_groups=[self.piglets_group1, self.piglets_group2],
+                new_location=self.new_location
                 )
 
-        self.assertEqual(merged_group.location, new_location)
-        self.assertEqual(merged_group.location.get_location, cell)
-        self.assertEqual(merged_group.quantity, piglets_group1.start_quantity 
-            + piglets_group2.start_quantity)
+    def test_create_merger_and_return_nomad_piglets_group(self):
+        merged_group = piglets_events_models.NomadPigletsGroupMerger.objects \
+            .create_merger_and_return_nomad_piglets_group(
+                nomad_groups=[self.piglets_group1, self.piglets_group2],
+                new_location=self.new_location
+                )
+        self.assertEqual(merged_group.location, self.new_location)
+        self.assertEqual(merged_group.location.pigletsGroupCell, self.cell)
+        self.assertEqual(merged_group.quantity, self.piglets_group1.start_quantity 
+            + self.piglets_group2.start_quantity)
         
-        piglets_group1.refresh_from_db()
-        piglets_group2.refresh_from_db()
-        self.assertEqual(piglets_group1.active, False)
-        self.assertEqual(piglets_group2.active, False)
-        self.assertEqual(piglets_group1.quantity, 0)
-        self.assertEqual(piglets_group2.quantity, 0)
-        
+        self.piglets_group1.refresh_from_db()
+        self.piglets_group2.refresh_from_db()
+        self.assertEqual(self.piglets_group1.active, False)
+        self.assertEqual(self.piglets_group2.active, False)
+        self.assertEqual(self.piglets_group1.quantity, 0)
+        self.assertEqual(self.piglets_group2.quantity, 0)
+    
+    def test_count_all_piglets(self):
+        count_all = self.merger.count_all_piglets()
+        self.assertEqual(count_all, 74)
+
+    def test_count_all_gilts(self):
+        count_all = self.merger.count_all_gilts()
+        self.assertEqual(count_all, 0)
+
+    def test_create_nomad_group(self):
+        nomad_group = self.merger.create_nomad_group()
+        self.assertEqual(nomad_group.location, self.new_location)
+        self.assertEqual(nomad_group.location.pigletsGroupCell, self.cell)
+        self.assertEqual(nomad_group.quantity, self.piglets_group1.start_quantity 
+            + self.piglets_group2.start_quantity)
+
+
+class NomadMergerRecordManagerTest(TestCase):
+    def setUp(self):
+        workshop_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+
+        self.piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+        self.piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
+
+        self.cell = workshops_models.PigletsGroupCell.objects.get(workshop__number=4,
+             section__number=1, number=1)
+        self.new_location = transactions_models.Location.objects.get(pigletsGroupCell=self.cell)
+
+        self.merger = piglets_events_models.NomadPigletsGroupMerger.objects \
+            .create_nomad_merger(
+                nomad_groups=[self.piglets_group1, self.piglets_group2],
+                new_location=self.new_location
+                )
+
+    def test_create_records(self):
+        records = piglets_events_models.NomadMergerRecord.objects.create_records(self.merger)
+        self.assertEqual(records.count(), 2)
+        self.assertEqual(records.first().merger, self.merger)
+        self.assertEqual(records.first().nomad_group, self.piglets_group1)
+        self.assertEqual(records.first().nomad_group.quantity, self.piglets_group1.quantity)
+        self.assertEqual(records.first().percentage, self.piglets_group1.quantity *100 / \
+            self.merger.count_all_piglets())
+
 
 # class SplitNomadPigletsGroupTest(TestCase):
 #     def setUp(self):

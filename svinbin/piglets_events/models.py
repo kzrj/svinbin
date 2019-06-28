@@ -195,14 +195,16 @@ class NomadPigletsGroupMergerManager(PigletsMergerManager):
 
         nomad_groups.update(groups_merger=nomad_groups_merger,
             status=PigletsStatus.objects.get(title='Объединены с другой группой'))
-        
+
         return nomad_groups_merger
 
     def create_merger_and_return_nomad_piglets_group(self, nomad_groups, new_location, initiator=None):
         nomad_merger = self.create_nomad_merger(nomad_groups=nomad_groups, new_location=new_location,
          initiator=initiator)
         nomad_merger.create_records()
-        return nomad_merger.create_nomad_group()    
+        return nomad_merger.create_nomad_group()
+
+    # def create_nomda_group_from_merger(self, merger)
 
 
 class NomadPigletsGroupMerger(PigletsMerger):
