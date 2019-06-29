@@ -130,25 +130,11 @@ class NewBornPigletsGroup(PigletsGroup):
 
 
 class NomadPigletsQuerySet(models.QuerySet):
-
-    # def piglets_in_workshop_not_in_cells(self):
-    #     return self.filter(~Q(location__workshop=None))
-
     def reset_quantity_and_deactivate(self):
         return self.update(quantity=0, active=False)
 
-    def piglets_in_workshop_not_in_cells(self, workshop):
-        return self.filter(location__workshop=workshop)
-
     def piglets_with_weighing_record(self, place):
         return self.filter(weighing_records__place=place)
-
-    def piglets_with_new_born_merger(self):
-        return self.filter(~Q(creating_new_born_merger=None))
-        # return self.filter(creating_new_born_merger__nomad_group__isnull=False)
-
-    # def piglets_without_new_born_merger(self):
-    #     return self.filter(~Q(creating_new_born_merger=None))
 
     def piglets_without_weighing_record(self, place):
         return self.filter(~Q(weighing_records__place=place))
@@ -161,33 +147,11 @@ class NomadPigletsGroupManager(PigletsGroupManager):
     def reset_quantity_and_deactivate(self):
         return self.get_queryset().reset_quantity_and_deactivate()
 
-    def move_to(self, piglets_group_pk, pre_location, initiator=None):
-        location = Location.objects.create_location(pre_location)
-        piglets_group = self.get(pk=piglets_group_pk)
-        transaction = PigletsTransactionManager.objects.create_transaction(                
-                initiator=initiator,
-                to_location=location,
-                piglets_group=piglets_group
-                )
-        return piglets_group, transaction
-
-    def piglets_to_weighing_v1(self, from_workshop):
-        return self.get_queryset().filter(transactions__from_location__workshop=from_workshop  
-            )
-    
-    def piglets_in_workshop_not_in_cells(self, workshop):
-        return self.get_queryset().piglets_in_workshop_not_in_cells(workshop)
-
     def piglets_with_weighing_record(self, place):
         return self.get_queryset().piglets_with_weighing_record(place)
 
     def piglets_without_weighing_record(self, place):
         return self.get_queryset().piglets_without_weighing_record(place)
-
-    def piglets_with_new_born_merger(self):
-        return self.get_queryset().piglets_with_new_born_merger()
-
-    # def piglets_weighted_in_workshop_4(self)
 
 
 class NomadPigletsGroup(PigletsGroup):

@@ -40,7 +40,7 @@ class GiltMerger(Event):
 
     def create_nomad_group(self): # test +
         gilts_count = self.gilts.all().count()
-        location = Location.objects.create_workshop_location(workshop_number=3)
+        location = Location.objects.get(workshop__number=3)
         nomad_group = NomadPigletsGroup.objects.create(start_quantity=gilts_count, quantity=gilts_count,
             gilts_quantity=gilts_count, location=location)
         self.nomad_group = nomad_group

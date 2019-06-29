@@ -74,9 +74,9 @@ class Sow(Pig):
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow, cell=None):
-        cell = mother_sow.location.get_location
         # carefully, here I get FIRST group.
-        new_born_group = cell.get_first_piglets_group()
+        new_born_group = mother_sow.location.get_located_active_new_born_groups().first()
+
         gilt = self.create(birth_id=birth_id, mother_sow=mother_sow,
          location=mother_sow.location,
          new_born_group=new_born_group, tour=mother_sow.tour

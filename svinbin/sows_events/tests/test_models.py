@@ -52,7 +52,7 @@ class UltrasoundModelManagerTest(TestCase):
 
 class SowFarrowModelManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
 
     def test_create_farrow(self):
@@ -100,7 +100,7 @@ class SowFarrowModelManagerTest(TestCase):
 
 class CullingSowManagerTest(TestCase):
     def setUp(self):
-        workshop_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
 
     def test_create_farrow(self):

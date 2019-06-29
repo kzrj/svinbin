@@ -3,11 +3,11 @@
 from django.test import TestCase
 
 from tours.models import Tour
-from pigs.models import Sow
-from events.models import Semination, Ultrasound
+from sows.models import Sow
+from sows_events.models import Semination, Ultrasound
 
 import locations.testing_utils as locations_testing
-import pigs.testing_utils as pigs_testings
+import sows.testing_utils as pigs_testings
 
 
 class TourModelManagerTest(TestCase):
@@ -25,10 +25,6 @@ class TourModelManagerTest(TestCase):
         self.assertEqual(Tour.objects.all().count(), 1)
         self.assertEqual(tour.week_number, 1)
 
-        # add @freeze_time('2032-11-01') test year
-
-    # def test_get_tour_by_week_in_current_year(self):
-        # pass
     
 class TourModelTest(TestCase):
     def setUp(self):
@@ -39,8 +35,8 @@ class TourModelTest(TestCase):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         sow1 = Sow.objects.get_or_create_by_farm_id(101)
         sow2 = Sow.objects.get_or_create_by_farm_id(102)
-        semination101 = Semination.objects.create_semination(101, 1)
-        semination102 = Semination.objects.create_semination(102, 1)
+        semination101 = Semination.objects.create_semination(sow1, 1)
+        semination102 = Semination.objects.create_semination(sow2, 1)
 
         inseminated_sows_in_tour = tour.get_inseminated_sows
         self.assertEqual(inseminated_sows_in_tour[0], sow1)
@@ -50,8 +46,8 @@ class TourModelTest(TestCase):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         sow1 = Sow.objects.get_or_create_by_farm_id(201)
         sow2 = Sow.objects.get_or_create_by_farm_id(202)
-        ultrasound201 = Ultrasound.objects.create_ultrasound(201, 1, None, False)
-        ultrasound201 = Ultrasound.objects.create_ultrasound(202, 1, None, True)
+        ultrasound201 = Ultrasound.objects.create_ultrasound(sow1, 1, None, False)
+        ultrasound201 = Ultrasound.objects.create_ultrasound(sow2, 1, None, True)
 
         ultrasounded_sows_in_tour = tour.get_ultrasounded_sows
         self.assertEqual(ultrasounded_sows_in_tour[0], sow1)
