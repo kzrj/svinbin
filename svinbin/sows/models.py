@@ -71,6 +71,10 @@ class Sow(Pig):
         # print(self._meta.get_fields())
         return self.sowfarrow_set.all().order_by('-created_at')
 
+    def assing_farm_id(self, farm_id):
+        self.farm_id = farm_id
+        self.save()
+
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow, cell=None):

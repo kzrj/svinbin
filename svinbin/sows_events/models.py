@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
+from django.conf import settings
 
 from core.models import Event, CoreModel, CoreModelManager
 from sows.models import Sow
@@ -28,7 +29,7 @@ class SeminationManager(CoreModelManager):
 
 
 class Semination(SowEvent):
-    semination_employee = models.ForeignKey('locations.WorkShopEmployee',
+    semination_employee = models.ForeignKey(settings.AUTH_USER_MODEL,
      on_delete=models.SET_NULL, null=True, related_name="semination_employee")
     # boar 
 

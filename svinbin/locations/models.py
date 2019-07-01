@@ -13,14 +13,6 @@ class WorkShop(CoreModel):
         return self.title
 
 
-class WorkShopEmployee(CoreModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
-
-    def __str__(self):
-        return 'Employee {} at workshop {}'.format(self.user.username, self.workshop.title)
-
-
 class Section(CoreModel):
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
     name = models.CharField(max_length=20)

@@ -20,9 +20,18 @@ class SeminationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CreateSeminationSerializer(serializers.Serializer):
+# class CreateSeminationSerializer(serializers.Serializer):
+#     week = serializers.IntegerField()
+#     farm_id = serializers.IntegerField()
+
+
+class CreateSeminationSerializer(serializers.ModelSerializer):
     week = serializers.IntegerField()
-    farm_id = serializers.IntegerField()
+
+    class Meta:
+        model = Semination
+        fields = ['week', 'semination_employee']
+    
 
 
 class UltrasoundSerializer(serializers.ModelSerializer):
@@ -34,7 +43,12 @@ class UltrasoundSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CreateUltrasoundSerializer(CreateSeminationSerializer):
+# class CreateUltrasoundSerializer(CreateSeminationSerializer):
+#     result = serializers.BooleanField()
+
+
+class CreateUltrasoundSerializer(serializers.Serializer):
+    week = serializers.IntegerField()
     result = serializers.BooleanField()
 
 

@@ -3,7 +3,11 @@ from rest_framework import serializers, status
 
 from core.utils import CustomValidation
 import transactions.serializers as transactions_serializers
-from locations.models import PigletsGroupCell, SowAndPigletsCell
+from locations.models import PigletsGroupCell, SowAndPigletsCell, Location
+
+
+class LocationPKSerializer(serializers.Serializer):
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
 
 
 class PigletsGroupCellSerializer(serializers.ModelSerializer):

@@ -14,6 +14,7 @@ from transactions import views as transaction_views
 from sows import views as sows_views
 from sows_events import views as sows_events_views
 from locations import views as locations_views
+from workshoponetwo import views as workshoponetwo_views
 from workshopthree import views as workshopthree_views
 from workshopfour import views as workshopfour_views
 
@@ -37,6 +38,10 @@ router.register(r'sows_events/spec_uboi', sows_events_views.CullingSowViewSet, b
 router.register(r'pigletsgroupcells', locations_views.PigletsGroupCellViewSet, basename='pigletsgroupcell')
 
 # by workshops
+# workshop one two
+router.register(r'workshoponetwo/sows', workshoponetwo_views.WorkShopOneTwoSowViewSet, \
+ basename='workshoponetwo-sows')
+
 # workshop three
 router.register(r'workshopthree/piglets', workshopthree_views.WorkShopThreePigletsViewSet, \
  basename='workshopthree-piglets')

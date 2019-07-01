@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from locations.models import WorkShop, WorkShopEmployee, Section, SowSingleCell, \
+from locations.models import WorkShop, Section, SowSingleCell, \
     PigletsGroupCell, SowAndPigletsCell, SowGroupCell, Location
 
 

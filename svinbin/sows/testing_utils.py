@@ -76,3 +76,8 @@ def create_gilt(birth_id):
     SowFarrow.objects.create_sow_farrow_by_sow_object(sow=sow, week=1, alive_quantity=10)
     gilt = Gilt.objects.create_gilt(birth_id, sow)
     return gilt
+
+def create_sow_without_farm_id_with_birth_id(birth_id):
+    sow = Sow.objects.create(birth_id=birth_id,
+        location=Location.objects.get(section=Section.objects.get(workshop__number=1, number=3)))
+    return sow

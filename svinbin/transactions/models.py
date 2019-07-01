@@ -12,7 +12,7 @@ class Transaction(Event):
 
 
 class SowTransactionManager(CoreModelManager):
-    def create_transaction(self, to_location, sow, initiator=None):
+    def create_transaction(self, sow, to_location,  initiator=None):
         # need to refractor to atomic transactions.
         transaction = SowTransaction.objects.create(
                 date=timezone.now(),

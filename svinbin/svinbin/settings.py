@@ -49,6 +49,7 @@ OWN_APPS = [
     'gilts_events.apps.GiltsEventsConfig',
     'transactions.apps.TransactionsConfig',
     'tours.apps.ToursConfig',
+    'staff.apps.StaffConfig',
     'workshoponetwo.apps.WorkshoponetwoConfig',
     'workshopthree.apps.WorkshopthreeConfig',
     'workshopfour.apps.WorkshopfourConfig',
