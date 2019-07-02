@@ -18,43 +18,7 @@ import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
 
-
-class WorkShopSowViewSet(viewsets.GenericViewSet):
-    queryset = sows_models.Sow.objects.all()
-    serializer_class = sows_serializers.SowSerializer
-
-    @action(methods=['post'], detail=True)
-    def move_to(self, request, pk=None):
-        sow = self.get_object()        
-        serializer = locations_serializers.LocationPKSerializer(data=request.data)
-        if serializer.is_valid():
-            transaction = transactions_models.SowTransaction.objects.create_transaction(
-                sow, serializer.validated_data['location'], request.user)
-            return Response(
-                {
-                    "transaction": transactions_serializers.SowTransactionSerializer(transaction).data,
-                    "sow": sows_serializers.SowSerializer(sow).data, 
-                },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['post'], detail=True)
-    def culling(self, request, pk=None):
-        sow = self.get_object()        
-        serializer = sows_events_serializers.CreateCullingSowPkSerializer(data=request.data)
-        if serializer.is_valid():
-            culling = sows_events_models.CullingSow.objects.create_culling(
-                sow, serializer.validated_data['culling_type'],
-                serializer.validated_data['reason'], request.user)
-            return Response(
-                {
-                    "culling": sows_events_serializers.CullingSowSerializer(culling).data,
-                    "sow": sows_serializers.SowSerializer(sow).data, 
-                },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+from sows.views import WorkShopSowViewSet
     
 
 class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):

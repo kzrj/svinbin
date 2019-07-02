@@ -26,7 +26,7 @@ class WorkshopThreePigletsViewSetTest(APITestCase):
 
     def test_mark_to_transfer_mark_size_and_recount_without_recount(self):
         newBornPigletsGroup = piglets_testing.create_new_born_group()
-        self.assertEqual(newBornPigletsGroup.location.sowAndPigletsCell.number, '4')
+        self.assertEqual(newBornPigletsGroup.location.sowAndPigletsCell.number, '1')
 
         response = self.client.post('/api/workshopthree/piglets/%s/mark_to_transfer_mark_size_and_recount/' %
           newBornPigletsGroup.pk, {'size_label': 'l'})
@@ -37,7 +37,7 @@ class WorkshopThreePigletsViewSetTest(APITestCase):
 
     def test_mark_to_transfer_mark_size_and_recount(self):
         newBornPigletsGroup = piglets_testing.create_new_born_group()
-        self.assertEqual(newBornPigletsGroup.location.sowAndPigletsCell.number, '4')
+        self.assertEqual(newBornPigletsGroup.location.sowAndPigletsCell.number, '1')
 
         response = self.client.post('/api/workshopthree/piglets/%s/mark_to_transfer_mark_size_and_recount/' %
           newBornPigletsGroup.pk, {'size_label': 'l', 'new_amount': 7})
@@ -63,15 +63,11 @@ class WorkshopThreePigletsViewSetTest(APITestCase):
 
         new_born_merger = NewBornPigletsMerger.objects.filter(nomad_group=nomad_group).first()
         self.assertNotEqual(new_born_merger, None)
-        # self.assertEqual(new_born_merger.piglets_groups.all()[0], newBornPigletsGroup1)
-        # self.assertEqual(new_born_merger.piglets_groups.all()[1], newBornPigletsGroup2)
-        # print(new_born_merger.piglets_groups.all())
 
         transaction = nomad_group.transactions.all().first()
         self.assertNotEqual(transaction, None)
         self.assertEqual(transaction.from_location.get_location, WorkShop.objects.get(number=3))
         self.assertEqual(transaction.to_location.get_location, WorkShop.objects.get(number=4))
-
 
     def test_culling_piglets(self):
         newBornPigletsGroup = piglets_testing.create_new_born_group()
@@ -103,50 +99,3 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         self.assertEqual(response.data['farrow']['alive_quantity'], 10)
         self.assertEqual(response.data['farrow']['dead_quantity'], 1)
         self.assertEqual(response.data['farrow']['mummy_quantity'], 2)
-
-    def test_occupy_sow_to_cell(self):
-        sow = sows_testing.create_sow_with_location(Location.objects.create_workshop_location(3))
-        self.assertEqual(sow.location.get_location, WorkShop.objects.get(number=3))
-
-        cell = SowAndPigletsCell.objects.all().first()
-        response = self.client.post('/api/workshopthree/sows/%s/occupy_sow_to_cell/' %
-          sow.pk, {'cell_number': cell.pk })
-
-        self.assertEqual(response.data['sow']['id'], sow.pk)
-        
-        transaction = SowTransaction.objects.get(pk=response.data['transaction']['id'])
-        self.assertEqual(transaction.sow, sow)
-        self.assertEqual(transaction.to_location.get_location, cell)
-
-    def test_move_sow_to_workshop_one(self):
-        sow = sows_testing.create_sow_and_put_in_workshop_three()
-        response = self.client.post('/api/workshopthree/sows/%s/move_sow_to_workshop_one/' %
-          sow.pk)
-
-        self.assertEqual(response.data['sow']['id'], sow.pk)
-
-        transaction = SowTransaction.objects.get(pk=response.data['transaction']['id'])
-        self.assertEqual(transaction.sow, sow)
-        self.assertEqual(transaction.to_location.get_location, WorkShop.objects.get(number=1))
-
-    def test_move_many_sows_to_workshop_one(self):
-        sow1 = sows_testing.create_sow_and_put_in_workshop_three(1, 1)
-        sow2 = sows_testing.create_sow_and_put_in_workshop_three(1, 2)
-        sow3 = sows_testing.create_sow_and_put_in_workshop_three(1, 3)
-
-        self.assertEqual(SowTransaction.objects.all().count(), 0)
-        response = self.client.post('/api/workshopthree/sows/move_many_sows_to_workshop_one/',
-            {'sows': [sow1.pk, sow2.pk, sow3.pk]})
-        
-        self.assertEqual(SowTransaction.objects.all().count(), 3)
-
-    def test_culling_sow(self):
-        sow = sows_testing.create_sow_and_put_in_workshop_three(1, 1)
-        response = self.client.post('/api/workshopthree/sows/%s/culling_sow/' %
-          sow.pk, {'culling_type': 'padej', 'reason': 'xz'})
-
-        self.assertEqual(response.data['sow']['id'], sow.pk)
-        self.assertEqual(response.data['sow']['alive'], False)
-        self.assertEqual(response.data['culling']['id'], 1)
-        self.assertEqual(response.data['culling']['culling_type'], 'padej')
-        self.assertEqual(response.data['culling']['reason'], 'xz')

@@ -58,7 +58,7 @@ def create_sow_and_put_in_workshop_three(section_number=1, cell_number=1):
 
 def create_sow_with_semination_and_put_in_workshop_three(week=1, section_number=1, cell_number=1):
     sow = create_sow_and_put_in_workshop_three(section_number, cell_number)
-    Semination.objects.create_semination(sow_farm_id=sow.farm_id, week=week,
+    Semination.objects.create_semination(sow=sow, week=week,
      initiator=None, semination_employee=None)
     return sow
     

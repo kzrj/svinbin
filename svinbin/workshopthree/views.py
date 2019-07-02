@@ -85,11 +85,9 @@ class WorkShopThreePigletsViewSet(viewsets.GenericViewSet):
             merger, nomad_group = piglets_events_models.NewBornPigletsMerger.objects.create_merger_and_return_nomad_piglets_group(
             new_born_piglets_groups=groups_to_merge, initiator=None)     
 
-            to_location = locations_models.Location.objects.create_location(
-                locations_models.WorkShop.objects.get(number=4))
-            transaction = transactions_models.PigletsTransaction.objects.create_transaction_without_merge(
+            to_location = locations_models.Location.objects.get(workshop__number=4)
+            transaction = transactions_models.PigletsTransaction.objects.create_transaction(
                 to_location, nomad_group, None)
-            # nomad_group.change_status_to('Готовы ко взвешиванию')
 
             return Response(
                 {
@@ -108,7 +106,7 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
         serializer = sows_events_serializers.CreateSowFarrowSerializer(data=request.data)
         if serializer.is_valid():
             sow = self.get_object()
-            farrow = sows_events_models.SowFarrow.objects.create_sow_farrow_by_sow_object(
+            farrow = sows_events_models.SowFarrow.objects.create_sow_farrow(
                 sow=sow,
                 week=serializer.validated_data['week'],
                 alive_quantity=serializer.validated_data['alive_quantity'],
@@ -121,80 +119,6 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
                 {"sow": sows_serializers.SowSerializer(sow).data,
                  "message": 'Свинья успешно опоросилась.',
                  "farrow": sows_events_serializers.SowFarrowSerializer(farrow).data},
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['post'], detail=True)
-    def occupy_sow_to_cell(self, request, pk=None):
-        serializer = locations_serializers.SowAndPigletsCellIdSerializer(data=request.data)
-        if serializer.is_valid():
-            sow = self.get_object()
-            to_location = locations_models.Location.objects.create_location(
-                locations_models.SowAndPigletsCell.objects.get(pk=serializer.validated_data['cell_number'])
-                )
-            transaction = transactions_models.SowTransaction.objects.create_transaction(
-                sow=sow, to_location=to_location, initiator=None)
-            
-            return Response(
-                {"sow": sows_serializers.SowSerializer(sow).data,
-                 "message": 'Свинья заселена в клетку',
-                 "transaction": transactions_serializers.SowTransactionSerializer(transaction).data
-                 },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['post'], detail=True)
-    def move_sow_to_workshop_one(self, request, pk=None):
-        sow = self.get_object()
-        to_location = locations_models.Location.objects.create_workshop_location(1)
-        transaction = transactions_models.SowTransaction.objects.create_transaction(
-                sow=sow, to_location=to_location, initiator=None)
-
-        return Response(
-                {"sow": sows_serializers.SowSerializer(sow).data,
-                 "message": 'Свинья перемещена в цех 1',
-                 "transaction": transactions_serializers.SowTransactionSerializer(transaction).data
-                 },
-                status=status.HTTP_200_OK)
-
-    @action(methods=['post'], detail=False)
-    def move_many_sows_to_workshop_one(self, request):
-        serializer = serializers.SowsIdsSerializer(data=request.data)
-        if serializer.is_valid():
-            to_location = locations_models.Location.objects.create_workshop_location(1)
-            transactions_ids = transactions_models.SowTransaction.objects.create_many_transactions(
-                sows=serializer.validated_data['sows'],
-                to_location=to_location,
-                initiator=None
-                )
-            return Response(
-                {
-                 "sows": sows_serializers.SowSerializer(serializer.validated_data['sows'], many=True).data,
-                 "message": 'Свиньи перемещены',
-                 "transaction_ids": transactions_ids
-                 },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['post'], detail=True)
-    def culling_sow(self, request, pk=None):        
-        serializer = sows_events_serializers.CreateCullingSowPkSerializer(data=request.data)
-        if serializer.is_valid():
-            sow = self.get_object()
-            culling = sows_events_models.CullingSow.objects.create_culling(
-                sow=sow,
-                culling_type=serializer.validated_data['culling_type'],
-                reason=serializer.validated_data['reason'],
-                initiator=None
-                )
-
-            return Response(
-                {"sow": sows_serializers.SowSerializer(sow).data,
-                 "message": '%s sow ' % serializer.validated_data['culling_type'],
-                 "culling": sows_events_serializers.CullingSowSerializer(culling).data},
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
