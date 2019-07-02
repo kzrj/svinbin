@@ -77,22 +77,8 @@ class PigletsGroupCell(Cell):
 
 
 class SowAndPigletsCell(Cell):
-    def get_newborn_groups(self):
-        print(self.location)
-
-
-    # def get_locations_with_residents(self):
-    #     return self.location.get_with_active_new_born_group()
-
-    # def get_list_of_residents(self):
-    #     residents = list()
-    #     for location in self.locations.get_with_active_new_born_group():
-    #         residents.append(location.newbornpigletsgroup)
-    #     return residents
-
-    # def get_first_piglets_group(self):
-    #     return self.get_locations_with_residents().first().newbornpigletsgroup
-
+    pass
+    
 
 class LocationManager(CoreModelManager):
     def create_location(self, pre_location):
@@ -175,3 +161,11 @@ class Location(CoreModel):
 
     def get_located_active_new_born_groups(self):
         return self.newbornpigletsgroup_set.all()
+
+    def get_located_active_nomad_groups(self):
+        return self.nomadpigletsgroup_set.all()
+
+    def is_nomad_piglet_group_cell_empty(self):
+        if self.get_located_active_nomad_groups():
+            return False
+        return True

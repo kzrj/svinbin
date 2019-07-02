@@ -28,6 +28,12 @@ class CullingNewBornPigletsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class CullingNomadPigletsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.CullingNomadPiglets
+        fields = '__all__'
+
+
 class NewBornPigletsGroupRecountSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.NewBornPigletsGroupRecount
@@ -44,3 +50,9 @@ class WeighingPigletsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.WeighingPiglets
         fields = '__all__'
+
+
+class SplitPigletsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.SplitNomadPigletsGroup
+        fields = '__all__'        

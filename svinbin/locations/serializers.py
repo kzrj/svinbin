@@ -10,6 +10,19 @@ class LocationPKSerializer(serializers.Serializer):
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
 
 
+class LocationsFromToSerializer(serializers.Serializer):
+    from_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+
+
+class LocationPigletsGrouspCellSerializer(serializers.ModelSerializer):
+    pigletsGroupCell = serializers.StringRelatedField()
+
+    class Meta:
+        model = Location
+        fields = ['id', 'pigletsGroupCell']
+
+
 class PigletsGroupCellSerializer(serializers.ModelSerializer):
     section = serializers.StringRelatedField()
     locations = transactions_serializers.NomadGroupsListingFromLocationsField(many=True, read_only=True)
