@@ -32,14 +32,14 @@ def create_sections_and_cell_for_workshop_one():
         [Location(section=section) for section in Section.objects.filter(workshop=workshop_one)]
         )
 
-    workshop_one_section_1 = Section.objects.get(name='Змейка')
-    SowSingleCell.objects.bulk_create([
-        SowSingleCell(workshop=workshop_one, section=workshop_one_section_1, number=cellNumber) for cellNumber in range(1, 481)
-        ])
-    Location.objects.bulk_create(
-        [Location(sowSingleCell=cell) for cell in SowSingleCell.objects.filter(workshop=workshop_one,
-            section=workshop_one_section_1)]
-        )
+    # workshop_one_section_1 = Section.objects.get(name='Змейка')
+    # SowSingleCell.objects.bulk_create([
+    #     SowSingleCell(workshop=workshop_one, section=workshop_one_section_1, number=cellNumber) for cellNumber in range(1, 481)
+    #     ])
+    # Location.objects.bulk_create(
+    #     [Location(sowSingleCell=cell) for cell in SowSingleCell.objects.filter(workshop=workshop_one,
+    #         section=workshop_one_section_1)]
+    #     )
 
 def create_sections_and_cell_for_workshop_two():
     workshop_two = WorkShop.objects.get(number=2)

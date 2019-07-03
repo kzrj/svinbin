@@ -13,3 +13,12 @@ class SowSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sow
         fields = '__all__'
+
+
+class SowSimpleSerializer(serializers.ModelSerializer):
+    status = serializers.StringRelatedField()
+    tour = serializers.StringRelatedField()
+
+    class Meta:
+        model = Sow
+        fields = ['status', 'tour', 'farm_id', 'birth_id', 'id']

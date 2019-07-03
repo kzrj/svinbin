@@ -169,3 +169,12 @@ class Location(CoreModel):
         if self.get_located_active_nomad_groups():
             return False
         return True
+
+    @property
+    def is_empty(self):
+        if not self.get_located_active_nomad_groups() and \
+            not self.get_located_active_new_born_groups() and \
+            not self.sow_set.all() and \
+            not self.gilt_set.all():
+            return True
+        return False

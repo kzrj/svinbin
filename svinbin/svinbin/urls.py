@@ -52,6 +52,10 @@ router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsView
 router.register(r'workshopfour/piglets', workshopfour_views.WorkShopFourPigletsViewSet, \
  basename='workshopfour-piglets')
 
+# location
+router.register(r'locations', locations_views.LocationViewSet, \
+ basename='locations')
+
 
 schema_view = get_swagger_view(title='API Docs')
 

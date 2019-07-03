@@ -2,8 +2,46 @@
 from rest_framework import serializers, status
 
 from core.utils import CustomValidation
+
 import transactions.serializers as transactions_serializers
-from locations.models import PigletsGroupCell, SowAndPigletsCell, Location
+import sows.serializers as sows_serializers
+import piglets.serializers as piglets_serializers
+
+from locations.models import PigletsGroupCell, SowAndPigletsCell, Location, WorkShop, Section
+
+
+class WokrshopSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WorkShop
+        exclude = ['created_at', 'modified_at' ]
+
+
+class SectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Section
+        exclude = ['created_at', 'modified_at' ]
+
+
+class SowAndPigletsCellSerializer(serializers.ModelSerializer):
+    workshop = serializers.StringRelatedField()
+    section = serializers.StringRelatedField()
+
+    class Meta:
+        model = SowAndPigletsCell
+        exclude = ['created_at', 'modified_at' ]
+
+
+class PigletsGroupCellSerializer(serializers.ModelSerializer):
+    workshop = serializers.StringRelatedField()
+    section = serializers.StringRelatedField()
+
+    class Meta:
+        model = PigletsGroupCell
+        exclude = ['created_at', 'modified_at' ]
+
+
+class PigletsGroupCellPkSerializer(serializers.Serializer):
+    cell = serializers.PrimaryKeyRelatedField(queryset=PigletsGroupCell.objects.all())
 
 
 class LocationPKSerializer(serializers.Serializer):
@@ -23,30 +61,26 @@ class LocationPigletsGrouspCellSerializer(serializers.ModelSerializer):
         fields = ['id', 'pigletsGroupCell']
 
 
-class PigletsGroupCellSerializer(serializers.ModelSerializer):
+class LocationSerializer(serializers.ModelSerializer):
+    workshop = serializers.StringRelatedField()
     section = serializers.StringRelatedField()
-    locations = transactions_serializers.NomadGroupsListingFromLocationsField(many=True, read_only=True)
-    
+    sowAndPigletsCell = SowAndPigletsCellSerializer(read_only=True)
+    pigletsGroupCell = PigletsGroupCellSerializer(read_only=True)
+
+    sow_set = sows_serializers.SowSimpleSerializer(many=True, read_only=True)
+    newbornpigletsgroup_set = piglets_serializers.NewBornPigletsGroupSerializer(many=True,
+        read_only=True)
+    nomadpigletsgroup_set = piglets_serializers.NomadPigletsGroupSerializer(many=True,
+        read_only=True)
+
+    is_empty = serializers.SerializerMethodField()
+
     class Meta:
-        model = PigletsGroupCell
-        fields = ['id', 'section', 'number', 'locations']
+        model = Location
+        exclude = ['created_at', 'modified_at' ]
 
+    def get_is_empty(self, obj):
+        return obj.is_empty
 
-class PigletsGroupCellPkSerializer(serializers.Serializer):
-    cell = serializers.PrimaryKeyRelatedField(queryset=PigletsGroupCell.objects.all())
-
-
-class SowAndPigletsCellSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SowAndPigletsCell
-        fields = '__all__'
-
-
-class SowAndPigletsCellIdSerializer(serializers.Serializer):
-    cell_number = serializers.IntegerField()
-
-    def validate_cell_number(self, value):
-        if not SowAndPigletsCell.objects.filter(pk=value).first():
-            raise CustomValidation('There is no cell with this number.', 
-                'cell_number', status_code=status.HTTP_400_BAD_REQUEST) 
-        return value
+    def get_test_cell(self, obj):
+        obj.sowAndPigletsCell

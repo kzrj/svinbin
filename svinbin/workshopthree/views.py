@@ -44,7 +44,7 @@ class WorkShopThreePigletsViewSet(viewsets.GenericViewSet):
                 culling_type=serializer.validated_data['culling_type'],
                 quantity=1,
                 reason=serializer.validated_data['reason'],
-                initiator=None
+                initiator=request.usesr
                 )
             # piglets_group.change_status_to()
 
@@ -87,7 +87,7 @@ class WorkShopThreePigletsViewSet(viewsets.GenericViewSet):
 
             to_location = locations_models.Location.objects.get(workshop__number=4)
             transaction = transactions_models.PigletsTransaction.objects.create_transaction(
-                to_location, nomad_group, None)
+                to_location, nomad_group, request.user)
 
             return Response(
                 {
@@ -112,7 +112,7 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
                 alive_quantity=serializer.validated_data['alive_quantity'],
                 dead_quantity=serializer.validated_data['dead_quantity'],
                 mummy_quantity=serializer.validated_data['mummy_quantity'],
-                initiator=None
+                initiator=request.user
                 )
             
             return Response(

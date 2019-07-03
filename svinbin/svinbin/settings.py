@@ -58,7 +58,8 @@ OWN_APPS = [
 
 WEB_APPS = [
     'rest_framework',
-    'rest_framework_swagger'
+    'rest_framework_swagger',
+    'django_filters'
 ]
 
 
@@ -111,7 +112,7 @@ DATABASES = {
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
-        # 'django_filters.rest_framework.DjangoFilterBackend',
+        'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter'
     ),
@@ -124,7 +125,7 @@ REST_FRAMEWORK = {
     #     'rest_framework.authentication.BasicAuthentication',
     # ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-    'PAGE_SIZE': 20,
+    'PAGE_SIZE': 50,
     'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler'
 }
 
