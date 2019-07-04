@@ -2,17 +2,16 @@ version: '3'
 
 services:
     
-  # nginx:
-  #   image: nginx:latest
-  #   ports:
-  #     - "80:8080"
-  #     - "443:443"
-  #     # - "5000"
-  #   volumes:
-  #     - .:/code
-  #     - ./nginx:/etc/nginx/conf.d
-  #   depends_on:
-  #     - backend
+  nginx:
+    image: nginx:latest
+    ports:
+      - "80:8080"
+      # - "443:443"
+    volumes:
+      - .:/code
+      - ./nginx:/etc/nginx/conf.d
+    depends_on:
+      - backend
       
   db:
     image: postgres:10.1-alpine
@@ -39,12 +38,13 @@ services:
                       python manage.py makemigrations --no-input &&
                       python manage.py migrate &&
                       python manage.py collectstatic --no-input &&
-                      python manage.py runserver 0.0.0.0:8000"
+                      gunicorn svinbin.wsgi -b 0.0.0.0:8000"
+                      # python manage.py runserver 0.0.0.0:8000"
    
     volumes:
       - .:/code
     ports:
-      - "8000:8000"
+      - "8000"
 
   # viber:
   #   build: ./viberapi

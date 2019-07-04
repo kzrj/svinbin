@@ -21,10 +21,13 @@ import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
 
+from sows.filters import SowFilter
+
 
 class SowViewSet(viewsets.ModelViewSet):
     queryset = sows_models.Sow.objects.all()
     serializer_class = sows_serializers.SowSerializer
+    filter_class = SowFilter
 
 
 class WorkShopSowViewSet(viewsets.GenericViewSet):
