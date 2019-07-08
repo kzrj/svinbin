@@ -8,3 +8,4 @@ pytest-cov
 djangorestframework
 django-rest-swagger
 django-filter
+django-cors-headers

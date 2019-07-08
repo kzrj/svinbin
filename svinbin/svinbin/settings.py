@@ -59,7 +59,8 @@ OWN_APPS = [
 WEB_APPS = [
     'rest_framework',
     'rest_framework_swagger',
-    'django_filters'
+    'django_filters',
+    'corsheaders',
 ]
 
 
@@ -68,11 +69,13 @@ INSTALLED_APPS = DJANGO_APPS + OWN_APPS + WEB_APPS
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'core.middleware.XFrameOptionsHeaderMiddleware',
 ]
 
 ROOT_URLCONF = 'svinbin.urls'
@@ -171,3 +174,30 @@ STATIC_ROOT = os.path.join(BASE_DIR, "static/")
 
 MEDIA_ROOT = os.path.join(BASE_DIR, '../media')
 MEDIA_URL = '/media/'
+
+# CORS
+CORS_ORIGIN_ALLOW_ALL =True
+
+# CORS_ALLOW_METHODS = (
+#     'DELETE',
+#     'GET',
+#     'OPTIONS',
+#     'PATCH',
+#     'POST',
+#     'PUT',
+# )
+# CORS_ALLOW_HEADERS = (
+#     'accept',
+#     'accept-encoding',
+#     'authorization',
+#     'content-type',
+#     'dnt',
+#     'origin',
+#     'user-agent',
+#     'x-csrftoken',
+#     'x-requested-with',
+#     'Access-Control-Allow-Origin',
+#     'X-Total-Count',
+#     'Access-Control-Expose-Headers',
+#     'x-frame-options',
+# )
