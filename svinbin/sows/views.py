@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 
 from rest_framework.views import APIView
-from rest_framework import viewsets, status, generics
+from rest_framework import viewsets, status, generics, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
@@ -30,7 +30,7 @@ class SowViewSet(viewsets.ModelViewSet):
     filter_class = SowFilter
 
 
-class WorkShopSowViewSet(viewsets.GenericViewSet):
+class WorkShopSowViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = sows_models.Sow.objects.all()
     serializer_class = sows_serializers.SowSerializer
 
