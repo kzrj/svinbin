@@ -12,6 +12,9 @@ class SowFilter(filters.FilterSet):
     by_workshop_number = filters.NumberFilter(field_name='location',
      method='filter_by_workshop_number')
 
+    # farm_id startswith
+    # birth_id startswith
+
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
 

@@ -10,6 +10,9 @@ class SowSerializer(serializers.ModelSerializer):
     tour = serializers.StringRelatedField()
     status = serializers.StringRelatedField()
 
+    # seminations in current tour
+    # ultrasounds in current tour
+
     class Meta:
         model = Sow
         fields = '__all__'

@@ -58,6 +58,7 @@ OWN_APPS = [
 
 WEB_APPS = [
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_swagger',
     'django_filters',
     'corsheaders',
@@ -75,7 +76,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    # 'core.middleware.XFrameOptionsHeaderMiddleware',
 ]
 
 ROOT_URLCONF = 'svinbin.urls'
@@ -122,14 +122,20 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.AllowAny',
     ),
-    # 'DEFAULT_AUTHENTICATION_CLASSES': ( 
-    #     'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
-    #     'rest_framework.authentication.SessionAuthentication', 
-    #     'rest_framework.authentication.BasicAuthentication',
-    # ),
+    'DEFAULT_AUTHENTICATION_CLASSES': ( 
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication', 
+        'rest_framework.authentication.BasicAuthentication',
+    ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 50,
     'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler'
+}
+
+# JWT
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=365),
+    # 'JWT_RESPONSE_PAYLOAD_HANDLER': 'users.utils.jwt_response_payload_handler'
 }
 
 # Password validation
@@ -156,7 +162,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Irkutsk'
 
 USE_I18N = True
 
@@ -177,27 +183,3 @@ MEDIA_URL = '/media/'
 
 # CORS
 CORS_ORIGIN_ALLOW_ALL =True
-
-# CORS_ALLOW_METHODS = (
-#     'DELETE',
-#     'GET',
-#     'OPTIONS',
-#     'PATCH',
-#     'POST',
-#     'PUT',
-# )
-# CORS_ALLOW_HEADERS = (
-#     'accept',
-#     'accept-encoding',
-#     'authorization',
-#     'content-type',
-#     'dnt',
-#     'origin',
-#     'user-agent',
-#     'x-csrftoken',
-#     'x-requested-with',
-#     'Access-Control-Allow-Origin',
-#     'X-Total-Count',
-#     'Access-Control-Expose-Headers',
-#     'x-frame-options',
-# )

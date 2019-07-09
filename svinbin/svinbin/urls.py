@@ -10,6 +10,8 @@ from django.conf import settings
 from rest_framework import routers
 from rest_framework_swagger.views import get_swagger_view
 
+from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
+
 from transactions import views as transaction_views
 from sows import views as sows_views
 from sows_events import views as sows_events_views
@@ -62,6 +64,9 @@ schema_view = get_swagger_view(title='API Docs')
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^api/', include(router.urls)),
+    url(r'^api/jwt/api-token-auth/', obtain_jwt_token),
+    url(r'^api/jwt/api-token-refresh/', refresh_jwt_token),
+    url(r'^api/jwt/api-token-verify/', verify_jwt_token)
     url(r'^api/init_data/', locations_views.CreateWorkshopsView.as_view()),
     url(r'^api/docs/$', schema_view)
     ]

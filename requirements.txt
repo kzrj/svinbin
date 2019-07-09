@@ -9,3 +9,5 @@ djangorestframework
 django-rest-swagger
 django-filter
 django-cors-headers
+djangorestframework-jwt
+PyJWT

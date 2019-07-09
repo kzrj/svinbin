@@ -6,6 +6,7 @@ from rest_framework import viewsets, status
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
+import staff.testing_utils as staff_testing
 
 from locations.models import PigletsGroupCell, Location
 from locations import serializers
@@ -22,6 +23,8 @@ class CreateWorkshopsView(APIView):
         piglets_testing.create_piglets_statuses()
         sows_testing.create_sow_and_put_in_workshop_three()
         piglets_testing.create_nomad_group_from_three_new_born()
+        staff_testing.create_seminator()
+
         return Response({'msg': 'success'})
 
 

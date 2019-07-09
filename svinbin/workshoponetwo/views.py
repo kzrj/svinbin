@@ -56,6 +56,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         sow = self.get_object() 
         serializer = sows_events_serializers.CreateSeminationSerializer(data=request.data)
         if serializer.is_valid():
+            # semination employee is request user. TODO: need to choose semination employee
             semination = sows_events_models.Semination.objects.create_semination(
                 sow, serializer.validated_data['week'], request.user, request.user)
             return Response(
