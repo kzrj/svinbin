@@ -12,7 +12,7 @@ def create_employee():
     return user
 
 
-def create_seminator()
+def create_seminator():
     user = mixer.blend('auth.user', username='test_seminator', password=123)
     WorkShopEmployee.objects.create(user=user, is_seminator=True)
     return user
