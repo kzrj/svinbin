@@ -23,7 +23,7 @@ class CreateWorkshopsView(APIView):
         piglets_testing.create_piglets_statuses()
         sows_testing.create_sow_and_put_in_workshop_three()
         piglets_testing.create_nomad_group_from_three_new_born()
-        staff_testing.create_seminator()
+        staff_testing.create_test_users()
 
         return Response({'msg': 'success'})
 

@@ -7,12 +7,14 @@ from staff.models import WorkShopEmployee
 
 
 def create_employee():
-    user = mixer.blend('auth.user', username='test_user', password=123)
+    user = mixer.blend('auth.user', username='test_user')
     WorkShopEmployee.objects.create(user=user)
     return user
 
 
-def create_seminator():
-    user = mixer.blend('auth.user', username='test_seminator', password=123)
+def create_test_users():
+    user = User.objects.create_user('test_seminator', 't@t.ru', 'qwerty123')
     WorkShopEmployee.objects.create(user=user, is_seminator=True)
+
+    
     return user
