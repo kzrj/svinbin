@@ -249,7 +249,7 @@ class WorkShopNomadPigletsViewSet(viewsets.ModelViewSet):
 
 
 class NewBornPigletsViewSet(viewsets.ModelViewSet):
-    queryset = NewBornPigletsGroup.objects.all()
+    queryset = piglets_models.NewBornPigletsGroup.objects.all()
     serializer_class = piglets_serializers.NewBornPigletsGroupSerializer
 
     # def get_serializer_class(self):
