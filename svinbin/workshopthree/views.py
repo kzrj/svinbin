@@ -23,11 +23,12 @@ from transactions import models as transactions_models
 from locations import models as locations_models
 
 from sows.views import WorkShopSowViewSet
+from piglets.views import NewBornPigletsViewSet
 
 
-class WorkShopThreePigletsViewSet(viewsets.GenericViewSet):
-    queryset = NewBornPigletsGroup.objects.all()
-    serializer_class = piglets_serializers.NewBornPigletsGroupSerializer
+class WorkShopThreePigletsViewSet(NewBornPigletsViewSet):
+    # queryset = NewBornPigletsGroup.objects.all()
+    # serializer_class = piglets_serializers.NewBornPigletsGroupSerializer
 
     # def get_serializer_class(self):
     #     if self.action == 'mark_to_transfer_and_mark_size':
