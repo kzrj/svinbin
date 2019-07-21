@@ -74,3 +74,11 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.assertEqual(response.data['culling']['id'], 1)
         self.assertEqual(response.data['culling']['reason'], 'test reason')
         self.assertEqual(response.data['sow']['status'], 'Брак')
+
+    def test_get_one(self):
+        self.client.force_authenticate(user=self.user)
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        response = self.client.get('/api/workshoponetwo/sows/%s/' % sow.pk)
+
+        self.assertEqual(response.data['id'], sow.pk)
+

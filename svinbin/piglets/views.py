@@ -47,7 +47,7 @@ class WorkShopNomadPigletsViewSet(viewsets.ModelViewSet):
                 piglets_group=piglets_group,
                 total_weight=serializer.validated_data['total_weight'],
                 place=serializer.validated_data['place'],
-                initiator=None
+                initiator=request.user
                 )
 
             return Response(
@@ -128,11 +128,13 @@ class WorkShopNomadPigletsViewSet(viewsets.ModelViewSet):
             from_location = serializer.validated_data['from_location']
             moving_group = from_location.get_located_active_nomad_groups()[0]
             quantity = serializer.validated_data['quantity']
+            gilt_quantity = serializer.validated_data['gilt_quantity']
             
             if quantity < moving_group.quantity:
                 other_group, moving_group = piglets_events_models.SplitNomadPigletsGroup.objects.split_group(
                     parent_nomad_group=moving_group,
                     new_group_piglets_amount=quantity,
+                    gilt_quantity=gilt_quantity,
                     initiator=request.user
                     )
 
@@ -223,11 +225,13 @@ class WorkShopNomadPigletsViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             moving_group = self.get_object()
             quantity = serializer.validated_data['quantity']
+            gilt_quantity = serializer.validated_data['gilt_quantity']
 
             if quantity < moving_group.quantity:
                 other_group, moving_group = piglets_events_models.SplitNomadPigletsGroup.objects.split_group(
                     parent_nomad_group=moving_group,
                     new_group_piglets_amount=quantity,
+                    gilt_quantity=gilt_quantity,
                     initiator=request.user
                     )
 

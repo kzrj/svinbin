@@ -30,10 +30,10 @@ class SowViewSet(viewsets.ModelViewSet):
     filter_class = SowFilter
 
 
-class WorkShopSowViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = sows_models.Sow.objects.all()
-    serializer_class = sows_serializers.SowSerializer
-    filter_class = SowFilter
+class WorkShopSowViewSet(SowViewSet):
+    # queryset = sows_models.Sow.objects.all()
+    # serializer_class = sows_serializers.SowSerializer
+    # filter_class = SowFilter
 
     @action(methods=['post'], detail=False)
     def move_many_by_queryset(self, request):

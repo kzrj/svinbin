@@ -18,7 +18,8 @@ class NomadPigletsGroupSerializer(serializers.ModelSerializer):
         model = NomadPigletsGroup
         
         fields = ['id', 'start_quantity', 'quantity', 'active', 'location',
-         'split_record', 'groups_merger', 'creating_new_born_merger', 'status' ,'creating_nomad_merger']
+         'split_record', 'groups_merger', 'creating_new_born_merger', 'status' ,'creating_nomad_merger',
+         'gilt_quantity']
 
 
 class NewBornPigletsGroupSerializer(serializers.ModelSerializer):
