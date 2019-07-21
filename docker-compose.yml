@@ -15,6 +15,7 @@ services:
       - backend
       
   db:
+    restart: unless-stopped
     image: postgres:10.1-alpine
     # volumes:
     #   - ./postgres_data:/var/lib/postgresql/data
@@ -40,7 +41,7 @@ services:
                       python manage.py migrate &&
                       python manage.py collectstatic --no-input &&
                       gunicorn svinbin.wsgi -b 0.0.0.0:8000"
-                      python manage.py runserver 0.0.0.0:8000"
+                      # python manage.py runserver 0.0.0.0:8000"
    
     volumes:
       - .:/code
