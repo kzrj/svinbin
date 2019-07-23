@@ -91,7 +91,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['get'], detail=False)
-    def sow_by_tours(self, request):
+    def sows_by_tours(self, request):
         data = list()
         workshop = locations_models.WorkShop.objects.get(number=1)
         tours = tours_models.Tour.objects.get_tours_in_workshop_by_sows(workshop)
