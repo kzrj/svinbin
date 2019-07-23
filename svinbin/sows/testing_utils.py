@@ -81,3 +81,9 @@ def create_sow_without_farm_id_with_birth_id(birth_id):
     sow = Sow.objects.create(birth_id=birth_id,
         location=Location.objects.get(section=Section.objects.get(workshop__number=1, number=3)))
     return sow
+
+def create_some_sows_with_tours_put_in_ws_one():
+    location = Location.objects.get(workshop__number=1)
+    for tour_number in range(1, 4):
+        for i in range(1, 4):
+            create_sow_with_semination(location, tour_number)
