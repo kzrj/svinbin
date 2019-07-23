@@ -16,6 +16,7 @@ from transactions import views as transaction_views
 from sows import views as sows_views
 from sows_events import views as sows_events_views
 from locations import views as locations_views
+from tours import views as tours_views
 from workshoponetwo import views as workshoponetwo_views
 from workshopthree import views as workshopthree_views
 from workshopfour import views as workshopfour_views
@@ -58,6 +59,9 @@ router.register(r'workshopfour/piglets', workshopfour_views.WorkShopFourPigletsV
 router.register(r'locations', locations_views.LocationViewSet, \
  basename='locations')
 
+# tours
+router.register(r'tours', tours_views.TourViewSet, \
+ basename='tours')
 
 schema_view = get_swagger_view(title='API Docs')
 

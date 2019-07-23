@@ -68,7 +68,7 @@ def create_sow_with_location(location):
 
 def create_sow_with_semination(location, week=1):
     sow = create_sow_with_location(location)
-    Semination.objects.create_semination_object(sow=sow, week=week)
+    Semination.objects.create_semination(sow=sow, week=week)
     return sow
 
 def create_gilt(birth_id):

@@ -10,6 +10,7 @@ import piglets.serializers as piglets_serializers
 import piglets_events.serializers as piglets_events_serializers
 import transactions.serializers as transactions_serializers
 import locations.serializers as locations_serializers
+import tours.serializers as tours_serializers
 
 import sows.models as sows_models
 import sows_events.models as sows_events_models
@@ -17,6 +18,8 @@ import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
+import tours.models as tours_models
+
 
 from sows.views import WorkShopSowViewSet
     
@@ -86,3 +89,21 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['get'], detail=False)
+    def sow_by_tours(self, request):
+        data = list()
+        workshop = locations_models.WorkShop.objects.get(number=1)
+        tours = tours_models.Tour.objects.get_tours_in_workshop_by_sows(workshop)
+        for tour in tours:
+            data.append(
+                {   
+                    'tour': tours_serializers.TourSerializer(tour).data,
+                    'sows': sows_serializers.SowSerializer(
+                        tour.sows.filter(status__title='Осеменена', location=workshop.location),
+                        many=True).data,
+                    'count': tour.sows.filter(status__title='Осеменена', location=workshop.location).count()
+                }
+            )
+
+        return Response(data, status=status.HTTP_200_OK)

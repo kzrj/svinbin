@@ -5,6 +5,8 @@ from django.test import TestCase
 from tours.models import Tour
 from sows.models import Sow
 from sows_events.models import Semination, Ultrasound
+from locations.models import Location
+
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as pigs_testings
@@ -24,6 +26,21 @@ class TourModelManagerTest(TestCase):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         self.assertEqual(Tour.objects.all().count(), 1)
         self.assertEqual(tour.week_number, 1)
+
+    def test_get_tours_in_workshop_by_sows(self):
+        sow1 = pigs_testings.create_sow_and_put_in_workshop_one()
+        sow2 = pigs_testings.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = pigs_testings.create_sow_with_semination(sow1.location)
+
+        location2 = Location.objects.get(workshop__number=2)
+        seminated_sow2 = pigs_testings.create_sow_with_semination(location2)
+        seminated_sow3 = pigs_testings.create_sow_with_semination(location2, 2)
+        seminated_sow3 = pigs_testings.create_sow_with_semination(location2, 2)
+        sow3 = pigs_testings.create_sow_and_put_in_workshop_one()
+        sow3.location = location2
+        sow3.save()
+
+        self.assertEqual(Tour.objects.get_tours_in_workshop_by_sows(location2.workshop).count(), 2)
 
     
 class TourModelTest(TestCase):

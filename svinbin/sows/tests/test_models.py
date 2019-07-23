@@ -2,6 +2,7 @@
 from mixer.backend.django import mixer
 
 from django.test import TestCase
+from django.db import models
 
 import locations.testing_utils as locaions_testing
 import sows.testing_utils as sows_testings
@@ -39,6 +40,25 @@ class SowModelManagerTest(TestCase):
     #     farrow3 = SowFarrow.objects.create_sow_farrow_by_sow_object(sow=sow, week=1,
     #         alive_quantity=20, dead_quantity=1, mummy_quantity=5)
     #     print(sow.get_last_farrow())
+
+    def test_get_all_sows_in_workshop(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
+
+        location2 = Location.objects.get(workshop__number=2)
+        seminated_sow2 = sows_testings.create_sow_with_semination(location2)
+        seminated_sow3 = sows_testings.create_sow_with_semination(location2, 2)
+
+        self.assertEqual(Sow.objects.all().count(), 5)
+        self.assertEqual(Sow.objects.get_all_sows_in_workshop(sow1.location.workshop).count(), 3)
+
+        self.assertEqual(Sow.objects.get_all_sows_in_workshop(sow1.location.workshop)
+            .filter(tour=seminated_sow1.tour).get().pk, seminated_sow1.pk)
+
+        # print(Sow.objects.all().values_list('tour', flat=True))
+        # print(type(Sow.objects.all().values_list('tour', flat=True)))
+        # print(list(Sow.objects.all().values_list('tour', flat=True)))
 
 
 class GiltModelManagerTest(TestCase):

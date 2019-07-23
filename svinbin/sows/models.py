@@ -46,11 +46,23 @@ class SowManager(CoreModelManager):
         #     raise error
         return sow
 
+    def get_all_sows_in_workshop(self, workshop):
+        return self.get_queryset().filter(
+            models.Q(
+                models.Q(location__workshop=workshop) |
+                models.Q(location__section__workshop=workshop) |
+                models.Q(location__sowGroupCell__workshop=workshop) |
+                models.Q(location__sowSingleCell__workshop=workshop) |
+                models.Q(location__sowAndPigletsCell__workshop=workshop)
+                )
+            )
+
 
 class Sow(Pig):
     farm_id = models.IntegerField(null=True, unique=True)
     status = models.ForeignKey(SowStatus, on_delete=models.SET_NULL, null=True)
-    tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
+    tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, 
+        related_name='sows')
     alive = models.BooleanField(default=True)
 
     objects = SowManager()
