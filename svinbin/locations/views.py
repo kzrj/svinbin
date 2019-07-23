@@ -38,5 +38,3 @@ class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = serializers.LocationSerializer
     filter_class = LocationFilter
-
-    # def create()
