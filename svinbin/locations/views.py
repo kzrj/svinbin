@@ -10,7 +10,7 @@ import staff.testing_utils as staff_testing
 
 from locations.models import PigletsGroupCell, Location, Section
 from locations import serializers
-from locations.filters import LocationFilter
+from locations.filters import LocationFilter, SectionFilter
 
 
 class CreateWorkshopsView(APIView):
