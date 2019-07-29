@@ -8,7 +8,7 @@ import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 import staff.testing_utils as staff_testing
 
-from locations.models import PigletsGroupCell, Location
+from locations.models import PigletsGroupCell, Location, Section
 from locations import serializers
 from locations.filters import LocationFilter
 
@@ -38,3 +38,9 @@ class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = serializers.LocationSerializer
     filter_class = LocationFilter
+
+
+class SectionViewSet(viewsets.ModelViewSet):
+    queryset = Section.objects.all()
+    serializer_class = serializers.SectionSerializer
+    filter_class = SectionFilter

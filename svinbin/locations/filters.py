@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django_filters import rest_framework as filters
 
-from locations.models import Location
+from locations.models import Location, Section
 
 
 class LocationFilter(filters.FilterSet):
@@ -35,4 +35,10 @@ class LocationFilter(filters.FilterSet):
 
     class Meta:
         model = Location
+        fields = '__all__'
+
+
+class SectionFilter(filters.FilterSet):
+    class Meta:
+        model = Section
         fields = '__all__'

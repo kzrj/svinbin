@@ -58,6 +58,8 @@ router.register(r'workshopfour/piglets', workshopfour_views.WorkShopFourPigletsV
 # location
 router.register(r'locations', locations_views.LocationViewSet, \
  basename='locations')
+router.register(r'sections', locations_views.SectionViewSet, \
+ basename='sections')
 
 # tours
 router.register(r'tours', tours_views.TourViewSet, \
