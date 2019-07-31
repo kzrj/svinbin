@@ -13,8 +13,9 @@ def create_employee():
 
 
 def create_test_users():
-    user = User.objects.create_user('test_seminator', 't@t.ru', 'qwerty123')
-    WorkShopEmployee.objects.create(user=user, is_seminator=True)
-
-    
-    return user
+    try:
+        user = User.objects.create_user('test_seminator', 't@t.ru', 'qwerty123')
+        WorkShopEmployee.objects.create(user=user, is_seminator=True)
+        return user
+    except:
+        pass
