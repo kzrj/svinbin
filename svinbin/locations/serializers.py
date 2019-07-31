@@ -6,6 +6,7 @@ from core.utils import CustomValidation
 import transactions.serializers as transactions_serializers
 import sows.serializers as sows_serializers
 import piglets.serializers as piglets_serializers
+import piglets_events.serializers as piglets_events_serializers
 
 from locations.models import PigletsGroupCell, SowAndPigletsCell, Location, WorkShop, Section
 
@@ -72,6 +73,8 @@ class LocationSerializer(serializers.ModelSerializer):
         read_only=True)
     nomadpigletsgroup_set = piglets_serializers.NomadPigletsGroupSerializer(many=True,
         read_only=True)
+
+    creating_new_born_merger = piglets_events_serializers.NewBornPigletsGroupMergerSerializer(read_only=True)
 
     is_empty = serializers.SerializerMethodField()
 
