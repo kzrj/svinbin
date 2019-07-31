@@ -74,7 +74,7 @@ class LocationSerializer(serializers.ModelSerializer):
     nomadpigletsgroup_set = piglets_serializers.NomadPigletsGroupSerializer(many=True,
         read_only=True)
 
-    creating_new_born_merger = piglets_events_serializers.NewBornPigletsGroupMergerSerializer(read_only=True)
+    # creating_new_born_merger = piglets_events_serializers.NewBornPigletsGroupMergerSerializer(read_only=True)
 
     is_empty = serializers.SerializerMethodField()
 

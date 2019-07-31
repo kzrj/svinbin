@@ -18,10 +18,13 @@ import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
 
+from piglets.filters import NomadPigletsGroupFilter
+
 
 class WorkShopNomadPigletsViewSet(viewsets.ModelViewSet):
     queryset = piglets_models.NomadPigletsGroup.objects.all()
     serializer_class = piglets_serializers.NomadPigletsGroupSerializer
+    filter_class = NomadPigletsGroupFilter
 
     @action(methods=['get'], detail=False)
     # to filters
