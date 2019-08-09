@@ -21,6 +21,7 @@ def create_statuses():
             SowStatus(title='Брак'),
             SowStatus(title='waiting delivery in workshop three'),
             SowStatus(title='Опоросилась, кормит'),
+            SowStatus(title='Ожидает осеменения'),
             ])
 
 

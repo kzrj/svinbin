@@ -85,6 +85,7 @@ class Sow(Pig):
 
     def assing_farm_id(self, farm_id):
         self.farm_id = farm_id
+        self.status = SowStatus.objects.get(title='Ожидает осеменения')
         self.save()
 
 

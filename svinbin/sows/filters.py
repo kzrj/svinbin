@@ -12,8 +12,9 @@ class SowFilter(filters.FilterSet):
     by_workshop_number = filters.NumberFilter(field_name='location',
      method='filter_by_workshop_number')
 
-    # farm_id startswith
-    # birth_id startswith
+    farm_id_starts = filters.NumberFilter(field_name='farm_id', lookup_expr='startswith')
+    status_title = filters.CharFilter(field_name='status__title', lookup_expr='exact')
+    not_in_tour = filters.BooleanFilter(field_name='tour', lookup_expr='isnull')
 
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
