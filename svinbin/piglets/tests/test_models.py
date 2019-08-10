@@ -30,10 +30,10 @@ class NewBornModelManagerTest(TestCase):
         self.assertEqual(piglets_models.NewBornPigletsGroup.objects.all().count(), 3)
 
 
-class NomadPigletsModelManagerTest(TestCase):
-    def setUp(self):
-        locations_testing.create_workshops_sections_and_cells()
-        piglets_testing.create_statuses()
+# class NomadPigletsModelManagerTest(TestCase):
+#     def setUp(self):
+#         locations_testing.create_workshops_sections_and_cells()
+#         piglets_testing.create_statuses()
 
-    def test_groups_with_gilts(self):
-        new_born_group1 = piglets_testing.create_new_born_group(cell_number=5)
+#     def test_groups_with_gilts(self):
+#         new_born_group1 = piglets_testing.create_new_born_group(cell_number=5)
