@@ -17,11 +17,17 @@ class NomadPigletsGroupFilter(filters.FilterSet):
     by_weighing_place = filters.CharFilter(field_name='weighing_records',
         method='filter_by_weighing_place')
 
+    by_weighing_place_reverse = filters.CharFilter(field_name='weighing_records',
+        method='filter_by_weighing_place_reverse')
+
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
 
     def filter_by_weighing_place(self, queryset, name, value):
         return queryset.filter(weighing_records__place=value).distinct()
+
+    def filter_by_weighing_place_reverse(self, queryset, name, value):
+        return queryset.filter(~Q(weighing_records__place=value)).distinct()
 
     class Meta:
         model = NomadPigletsGroup
