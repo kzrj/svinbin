@@ -13,13 +13,11 @@ class NomadPigletsGroupPkSerializer(serializers.ModelSerializer):
 class NomadPigletsGroupSerializer(serializers.ModelSerializer):
     creating_new_born_merger = serializers.StringRelatedField()
     status = serializers.StringRelatedField()
+    weighing_records = serializers.StringRelatedField(many=True)
 
     class Meta:
-        model = NomadPigletsGroup
-        
-        fields = ['id', 'start_quantity', 'quantity', 'active', 'location',
-         'split_record', 'groups_merger', 'creating_new_born_merger', 'status' ,'creating_nomad_merger',
-         'gilts_quantity']
+        model = NomadPigletsGroup        
+        fields = '__all__'
 
 
 class NewBornPigletsGroupSerializer(serializers.ModelSerializer):
