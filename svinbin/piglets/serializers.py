@@ -2,6 +2,7 @@
 from rest_framework import serializers, status
 
 from piglets.models import NomadPigletsGroup, NewBornPigletsGroup
+from piglets_events.serializers import WeighingPigletsSerializer
 
 
 class NomadPigletsGroupPkSerializer(serializers.ModelSerializer):
@@ -13,7 +14,7 @@ class NomadPigletsGroupPkSerializer(serializers.ModelSerializer):
 class NomadPigletsGroupSerializer(serializers.ModelSerializer):
     creating_new_born_merger = serializers.StringRelatedField()
     status = serializers.StringRelatedField()
-    weighing_records = serializers.StringRelatedField(many=True)
+    weighing_records = WeighingPigletsSerializer(many=True)
 
     class Meta:
         model = NomadPigletsGroup        
