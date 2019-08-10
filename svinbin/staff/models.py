@@ -6,7 +6,7 @@ from core.models import CoreModel, CoreModelManager
 
 
 class WorkShopEmployee(CoreModel):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="employee")
     workshop = models.ForeignKey('locations.WorkShop', on_delete=models.CASCADE, null=True)
 
     is_officer = models.BooleanField(default=False)
