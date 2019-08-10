@@ -21,7 +21,7 @@ class NomadPigletsGroupFilter(filters.FilterSet):
         return queryset.filter(location__workshop__number=value)
 
     def filter_by_weighing_place(self, queryset, name, value):
-        return queryset.filter(weighing_records__place=value)
+        return queryset.filter(weighing_records__place=value).distinct()
 
     class Meta:
         model = NomadPigletsGroup
