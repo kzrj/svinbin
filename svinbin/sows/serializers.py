@@ -2,6 +2,7 @@
 from rest_framework import serializers, status
 
 from sows.models import Sow
+from locations.models import Location
 
 
 class SowSerializer(serializers.ModelSerializer):
@@ -25,3 +26,9 @@ class SowSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sow
         fields = ['status', 'tour', 'farm_id', 'birth_id', 'id']
+
+
+class SowsToMoveSerializer(serializers.Serializer):
+    # mb alive
+    sows = serializers.PrimaryKeyRelatedField(queryset=Sow.objects.all(), many=True)
+    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())

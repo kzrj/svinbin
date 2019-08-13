@@ -29,7 +29,7 @@ class SowTransactionManager(CoreModelManager):
     def create_many_transactions(self, sows, to_location, initiator=None):
         transactions_ids = list()
         for sow in sows:
-            transaction = self.create_transaction(to_location, sow, initiator)
+            transaction = self.create_transaction(sow, to_location, initiator)
             transactions_ids.append(transaction.pk)
         return transactions_ids
 

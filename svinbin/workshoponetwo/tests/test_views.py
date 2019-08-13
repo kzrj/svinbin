@@ -100,3 +100,15 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         response = self.client.get('/api/workshoponetwo/sows/sows_by_tours/')
         self.assertEqual(response.data[0]['tour']['id'], 2)
         self.assertEqual(response.data[0]['sows'][0]['id'], seminated_sow1.pk)
+
+    def test_sows_move_many(self):
+        self.client.force_authenticate(user=self.user)
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+        location2 = Location.objects.get(workshop__number=2)
+
+        response = self.client.post('/api/workshoponetwo/sows/move_many/', 
+            {'sows': [sow1.pk, sow2.pk, seminated_sow1.pk], 'to_location': location2.pk})
+        self.assertEqual(type(response.data['transaction_ids']), list)
+        self.assertEqual(len(response.data['transaction_ids']), 3)

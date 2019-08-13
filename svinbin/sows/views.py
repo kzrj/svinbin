@@ -86,3 +86,26 @@ class WorkShopSowViewSet(SowViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False)
+    def move_many(self, request):
+        serializer = sows_serializers.SowsToMoveSerializer(data=request.data)
+        if serializer.is_valid():
+
+            transaction_ids = transactions_models.SowTransaction.objects.create_many_transactions(
+                serializer.validated_data['sows'],
+                serializer.validated_data['to_location'],
+                request.user
+                )
+
+            return Response(
+                {
+                    # "transaction_ids": transactions_serializers.SowTransactionSerializer(transaction).data,
+                    # "sows": sows_serializers.SowSerializer(sows, many=True).data, 
+                    "transaction_ids": transaction_ids,
+                    "message": "ok"
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
