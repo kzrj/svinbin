@@ -37,13 +37,14 @@ class Semination(SowEvent):
 
 
 class UltrasoundManager(CoreModelManager):
-    def create_ultrasound(self, sow, week, initiator=None, result=False):
-        tour = Tour.objects.get_tour_by_week_in_current_year(week)
-        ultrasound = self.create(sow=sow, tour=tour, initiator=initiator,
+    def create_ultrasound(self, sow, week=None, initiator=None, result=False):
+        # tour = Tour.objects.get_tour_by_week_in_current_year(week)
+        ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
          date=timezone.now(), result=result)
         if result:
             sow.change_status_to('Беременна')
         else:
+            sow.tour = None
             sow.change_status_to('Прохолост')
         return ultrasound
 

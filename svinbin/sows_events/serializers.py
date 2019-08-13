@@ -48,7 +48,7 @@ class UltrasoundSerializer(serializers.ModelSerializer):
 
 
 class CreateUltrasoundSerializer(serializers.Serializer):
-    week = serializers.IntegerField()
+    # week = serializers.IntegerField()
     result = serializers.BooleanField()
 
 
