@@ -54,6 +54,24 @@ class Ultrasound(SowEvent):
     objects = UltrasoundManager()
 
 
+class UltrasoundV2Manager(CoreModelManager):
+    def create_ultrasoundV2(self, sow, initiator=None, result=False):
+        ultrasoundV2 = self.create(sow=sow, tour=sow.tour, initiator=initiator,
+         date=timezone.now(), result=result)
+        if result:
+            sow.change_status_to('Беременна')
+        else:
+            sow.tour = None
+            sow.change_status_to('Прохолост')
+        return ultrasoundV2
+
+
+class UltrasoundV2(SowEvent):
+    result = models.BooleanField()
+
+    objects = UltrasoundV2Manager()
+
+
 class SowFarrowManager(CoreModelManager):
     def create_sow_farrow(self, sow, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):

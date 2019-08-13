@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
 
-from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow
+from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, UltrasoundV2
 from sows.models import Sow
 from piglets.models import NewBornPigletsGroup
 
@@ -36,7 +36,7 @@ class UltrasoundModelManagerTest(TestCase):
         semination = Semination.objects.create_semination(sow=sow, week=1,
          initiator=None, semination_employee=None)
 
-        ultrasound = Ultrasound.objects.create_ultrasound(sow=sow, week=1,
+        ultrasound = Ultrasound.objects.create_ultrasound(sow=sow,
          initiator=None, result=False)
 
         self.assertEqual(Ultrasound.objects.all().count(), 1)
@@ -44,7 +44,25 @@ class UltrasoundModelManagerTest(TestCase):
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Прохолост')
 
-        Ultrasound.objects.create_ultrasound(sow=sow, week=1,
+        Ultrasound.objects.create_ultrasound(sow=sow, 
+         initiator=None, result=True)
+        sow.refresh_from_db()
+        self.assertEqual(sow.status.title, 'Беременна')
+
+    def test_create_ultrasoundV2(self):
+        sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
+        semination = Semination.objects.create_semination(sow=sow, week=1,
+         initiator=None, semination_employee=None)
+
+        ultrasound = UltrasoundV2.objects.create_ultrasoundV2(sow=sow, 
+         initiator=None, result=False)
+
+        self.assertEqual(UltrasoundV2.objects.all().count(), 1)
+        self.assertEqual(ultrasound.tour.week_number, 1)
+        sow.refresh_from_db()
+        self.assertEqual(sow.status.title, 'Прохолост')
+
+        UltrasoundV2.objects.create_ultrasoundV2(sow=sow,
          initiator=None, result=True)
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Беременна')
@@ -63,7 +81,6 @@ class SowFarrowModelManagerTest(TestCase):
         # first sow farrow in tour
         farrow1 = SowFarrow.objects.create_sow_farrow(
             sow=sow,
-            week=1,
             alive_quantity=10,
             dead_quantity=1
             )
@@ -82,7 +99,6 @@ class SowFarrowModelManagerTest(TestCase):
         # second sow farrow in tour
         farrow2 = SowFarrow.objects.create_sow_farrow(
             sow=sow,
-            week=1,
             alive_quantity=7,
             mummy_quantity=1
             )

@@ -108,3 +108,22 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             )
 
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=True)
+    def ultrasoundv2(self, request, pk=None):
+        sow = self.get_object() 
+        serializer = sows_events_serializers.CreateUltrasoundSerializer(data=request.data)
+        if serializer.is_valid():
+            ultrasound = sows_events_models.UltrasoundV2.objects.create_ultrasoundV2(
+                 sow,
+                 request.user,
+                 serializer.validated_data['result'])
+            return Response(
+                {
+                    "ultrasoundv2": sows_events_serializers.UltrasoundV2Serializer(ultrasound).data,
+                    "sow": sows_serializers.SowSerializer(sow).data, 
+                    "message": "ok"
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
