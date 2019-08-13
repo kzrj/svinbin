@@ -37,8 +37,7 @@ class Semination(SowEvent):
 
 
 class UltrasoundManager(CoreModelManager):
-    def create_ultrasound(self, sow, week=None, initiator=None, result=False):
-        # tour = Tour.objects.get_tour_by_week_in_current_year(week)
+    def create_ultrasound(self, sow, initiator=None, result=False):
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
          date=timezone.now(), result=result)
         if result:
@@ -56,10 +55,10 @@ class Ultrasound(SowEvent):
 
 
 class SowFarrowManager(CoreModelManager):
-    def create_sow_farrow(self, sow, week, initiator=None,
+    def create_sow_farrow(self, sow, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
-        tour = Tour.objects.get_tour_by_week_in_current_year(week)
-        sow.tour = tour
+        # tour = Tour.objects.get_tour_by_week_in_current_year(week)
+        tour = sow.tour
         sow.change_status_to('Опоросилась, кормит')
 
         # check is it first sow_farrow in current tour

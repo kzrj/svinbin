@@ -79,7 +79,6 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         if serializer.is_valid():
             ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
                  sow,
-                 # serializer.validated_data['week'],
                  request.user,
                  serializer.validated_data['result'])
             return Response(

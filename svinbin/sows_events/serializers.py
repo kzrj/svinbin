@@ -76,15 +76,15 @@ class CreateCullingSowPkSerializer(serializers.ModelSerializer):
  
 
 class CreateSowFarrowSerializer(serializers.ModelSerializer):
-    week = serializers.IntegerField()
+    # week = serializers.IntegerField()
 
-    def validate_week(self, value):
-        # get tour with week in current year
-        if Tour.objects.filter(week_number=value).first():
-            return value
-        else:
-            raise CustomValidation('There is no tour with this week number.', 
-                'week', status_code=status.HTTP_400_BAD_REQUEST)
+    # def validate_week(self, value):
+    #     # get tour with week in current year
+    #     if Tour.objects.filter(week_number=value).first():
+    #         return value
+    #     else:
+    #         raise CustomValidation('There is no tour with this week number.', 
+    #             'week', status_code=status.HTTP_400_BAD_REQUEST)
 
     class Meta:
         model = SowFarrow

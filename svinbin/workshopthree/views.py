@@ -109,7 +109,6 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
             sow = self.get_object()
             farrow = sows_events_models.SowFarrow.objects.create_sow_farrow(
                 sow=sow,
-                week=serializer.validated_data['week'],
                 alive_quantity=serializer.validated_data['alive_quantity'],
                 dead_quantity=serializer.validated_data['dead_quantity'],
                 mummy_quantity=serializer.validated_data['mummy_quantity'],
