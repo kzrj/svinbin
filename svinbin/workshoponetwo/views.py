@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from django.db import models
+
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -97,15 +99,39 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         workshop = locations_models.WorkShop.objects.get(number=1)
         tours = tours_models.Tour.objects.get_tours_in_workshop_by_sows(workshop)
         for tour in tours:
-            data.append(
-                {   
-                    'tour': tours_serializers.TourSerializer(tour).data,
-                    'sows': sows_serializers.SowSerializer(
-                        tour.sows.filter(status__title='Осеменена', location=workshop.location),
-                        many=True).data,
-                    'count': tour.sows.filter(status__title='Осеменена', location=workshop.location).count()
-                }
-            )
+            qs = tour.sows.get_suporos_in_workshop(workshop)
+            if qs.count() > 0:
+                data.append(
+                    {   
+                        'tour': tours_serializers.TourSerializer(tour).data,
+                        'sows': sows_serializers.SowSerializer(qs, many=True).data,
+                        'count': qs.count()
+                    }
+                )
+
+        return Response(data, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=False)
+    def sows_by_tours_ws2(self, request):
+        data = list()
+        workshop = locations_models.WorkShop.objects.get(number=2)
+        tours = tours_models.Tour.objects.get_tours_in_workshop_by_sows(workshop)
+        for tour in tours:
+            qs = tour.sows.get_suporos_in_workshop(workshop)
+            if qs.count() > 0:
+                data.append(
+                    {   
+                        'tour': tours_serializers.TourSerializer(tour).data,
+                        'sows': sows_serializers.SowSerializer(qs, many=True).data,
+                        'count': qs.count()
+                    }
+                )
+        data.append({
+                'tour': {'id': 'Не супорос'},
+                'sows': sows_serializers.SowSerializer(
+                    sows_models.Sow.objects.get_not_suporos_in_workshop(workshop), many=True).data,
+                'count': sows_models.Sow.objects.get_not_suporos_in_workshop(workshop).count()
+                })
 
         return Response(data, status=status.HTTP_200_OK)
 

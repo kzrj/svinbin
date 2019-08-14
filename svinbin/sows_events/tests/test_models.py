@@ -42,12 +42,12 @@ class UltrasoundModelManagerTest(TestCase):
         self.assertEqual(Ultrasound.objects.all().count(), 1)
         self.assertEqual(ultrasound.tour.week_number, 1)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Прохолост')
+        self.assertEqual(sow.status.title, 'Прошла УЗИ1, прохолост')
 
         Ultrasound.objects.create_ultrasound(sow=sow, 
          initiator=None, result=True)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Беременна')
+        self.assertEqual(sow.status.title, 'Прошла УЗИ1, супорос')
 
     def test_create_ultrasoundV2(self):
         sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
@@ -60,12 +60,12 @@ class UltrasoundModelManagerTest(TestCase):
         self.assertEqual(UltrasoundV2.objects.all().count(), 1)
         self.assertEqual(ultrasound.tour.week_number, 1)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Прохолост')
+        self.assertEqual(sow.status.title, 'Прошла УЗИ2, прохолост')
 
         UltrasoundV2.objects.create_ultrasoundV2(sow=sow,
          initiator=None, result=True)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Беременна')
+        self.assertEqual(sow.status.title, 'Прошла УЗИ2, супорос')
 
 
 class SowFarrowModelManagerTest(TestCase):

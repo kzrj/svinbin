@@ -15,6 +15,7 @@ import staff.testing_utils as staff_testing
 
 from locations.models import Location
 from transactions.models import SowTransaction
+from sows_events.models import Ultrasound, UltrasoundV2
 
 
 class WorkshopOneTwoSowViewSetTest(APITestCase):
@@ -58,10 +59,10 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         semination_employee = staff_testing.create_employee()
 
         response = self.client.post('/api/workshoponetwo/sows/%s/ultrasound/' %
-          sow.pk, {'week': 7, 'result': True})
+          sow.pk, {'result': True})
 
-        self.assertEqual(response.data['ultrasound']['id'], 1)
-        self.assertEqual(response.data['sow']['status'], 'Беременна')
+        # self.assertEqual(response.data['ultrasound']['id'], 2)
+        self.assertEqual(response.data['sow']['status'], 'Прошла УЗИ1, супорос')
 
     def test_culling(self):
         self.client.force_authenticate(user=self.user)
@@ -87,6 +88,8 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         sow2 = sows_testing.create_sow_and_put_in_workshop_one()
         seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True)
 
         location2 = Location.objects.get(workshop__number=2)
         seminated_sow2 = sows_testing.create_sow_with_semination(location2)
@@ -100,6 +103,30 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         response = self.client.get('/api/workshoponetwo/sows/sows_by_tours/')
         self.assertEqual(response.data[0]['tour']['id'], 2)
         self.assertEqual(response.data[0]['sows'][0]['id'], seminated_sow1.pk)
+
+    def test_sows_by_tours_ws2(self):
+        self.client.force_authenticate(user=self.user)
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True)
+
+        location2 = Location.objects.get(workshop__number=2)
+        seminated_sow2 = sows_testing.create_sow_with_semination(location2)
+        seminated_sow3 = sows_testing.create_sow_with_semination(location2, 2)
+        seminated_sow3 = sows_testing.create_sow_with_semination(location2, 2)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
+         initiator=None, result=True)
+        sow3 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow3.location = location2
+        sow3.save()
+        seminated_sow4 = sows_testing.create_sow_with_semination(location2, 3)
+
+        response = self.client.get('/api/workshoponetwo/sows/sows_by_tours_ws2/')
+        self.assertEqual(response.data[0]['count'], 1)
+        self.assertEqual(response.data[1]['tour']['id'], "Не супорос")
+        self.assertEqual(response.data[1]['count'], 4)
 
     def test_sows_move_many(self):
         self.client.force_authenticate(user=self.user)

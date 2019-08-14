@@ -41,10 +41,10 @@ class UltrasoundManager(CoreModelManager):
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
          date=timezone.now(), result=result)
         if result:
-            sow.change_status_to('Беременна')
+            sow.change_status_to('Прошла УЗИ1, супорос')
         else:
             sow.tour = None
-            sow.change_status_to('Прохолост')
+            sow.change_status_to('Прошла УЗИ1, прохолост')
         return ultrasound
 
 

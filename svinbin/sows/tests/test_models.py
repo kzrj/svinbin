@@ -3,6 +3,7 @@ from mixer.backend.django import mixer
 
 from django.test import TestCase
 from django.db import models
+from django.db.models import Q
 
 import locations.testing_utils as locaions_testing
 import sows.testing_utils as sows_testings
@@ -10,7 +11,7 @@ import piglets.testing_utils as piglets_testing
 
 from locations.models import Location
 from sows.models import Sow, Gilt
-from sows_events.models import SowFarrow
+from sows_events.models import SowFarrow, Ultrasound, UltrasoundV2
 
 
 class SowModelManagerTest(TestCase):
@@ -59,6 +60,40 @@ class SowModelManagerTest(TestCase):
         # print(Sow.objects.all().values_list('tour', flat=True))
         # print(type(Sow.objects.all().values_list('tour', flat=True)))
         # print(list(Sow.objects.all().values_list('tour', flat=True)))
+
+    def test_get_suporos_in_workshop(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
+
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True)
+        UltrasoundV2.objects.create_ultrasoundV2(sow=seminated_sow2,
+         initiator=None, result=True)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
+         initiator=None, result=False)
+
+        qs = Sow.objects.get_suporos_in_workshop(workshop=sow1.location.workshop)
+        self.assertEqual(qs[0].pk, seminated_sow1.pk)
+        self.assertEqual(qs[1].pk, seminated_sow2.pk)
+
+    def test_get_not_suporos_in_workshop(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
+
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True)
+        UltrasoundV2.objects.create_ultrasoundV2(sow=seminated_sow2,
+         initiator=None, result=True)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
+         initiator=None, result=False)
+        qs = Sow.objects.get_not_suporos_in_workshop(workshop=sow1.location.workshop)        
+        self.assertEqual(list(qs.values_list(flat=True)), [seminated_sow3.pk, sow2.pk, sow1.pk])
 
 
 class GiltModelManagerTest(TestCase):

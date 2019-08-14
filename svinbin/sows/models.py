@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.db.models import Q
 
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location
@@ -55,6 +56,24 @@ class SowManager(CoreModelManager):
                 models.Q(location__sowSingleCell__workshop=workshop) |
                 models.Q(location__sowAndPigletsCell__workshop=workshop)
                 )
+            )
+
+    def get_not_suporos_in_workshop(self, workshop):
+        return self.get_queryset().filter(
+            Q(
+                ~Q(status__title='Прошла УЗИ2, супорос'), 
+                ~Q(status__title='Прошла УЗИ1, супорос'),
+            ),
+            location=workshop.location
+            )
+
+    def get_suporos_in_workshop(self, workshop):
+        return self.get_queryset().filter(
+            Q(
+                Q(status__title='Прошла УЗИ2, супорос') | 
+                Q(status__title='Прошла УЗИ1, супорос')
+                ),
+            location=workshop.location
             )
 
 
