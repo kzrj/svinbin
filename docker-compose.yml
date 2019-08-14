@@ -27,7 +27,7 @@ services:
     volumes:
       - .:/code
     depends_on:
-    #   - db
+      - db
     # command: bash -c "cd svinbin && 
     #                   python manage.py makemigrations --no-input &&
     #                   python manage.py migrate &&

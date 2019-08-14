@@ -18,6 +18,8 @@ def create_statuses():
             SowStatus(title='Ожидает УЗИ'),
             SowStatus(title='Беременна'),
             SowStatus(title='Прохолост'),
+            SowStatus(title='Прошла УЗИ2, супорос'),
+            SowStatus(title='Прошла УЗИ2, прохолост'),
             SowStatus(title='pregnant in workshop two'),
             SowStatus(title='Брак'),
             SowStatus(title='waiting delivery in workshop three'),
