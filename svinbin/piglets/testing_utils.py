@@ -26,8 +26,7 @@ def create_new_born_group(section_number=1, cell_number=1, week=1, quantity=10):
     sow = sows_testing_utils.create_sow_and_put_in_workshop_three(section_number, cell_number)
     Semination.objects.create_semination(sow=sow, week=week,
      initiator=None, semination_employee=None)
-    farrow = SowFarrow.objects.create_sow_farrow(sow=sow, week=week,
-     alive_quantity=quantity)
+    farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=quantity)
     return farrow.new_born_piglets_group
 
 
