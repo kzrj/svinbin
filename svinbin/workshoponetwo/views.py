@@ -126,12 +126,13 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                         'count': qs.count()
                     }
                 )
-        data.append({
-                'tour': {'id': 'Не супорос'},
-                'sows': sows_serializers.SowSerializer(
-                    sows_models.Sow.objects.get_not_suporos_in_workshop(workshop), many=True).data,
-                'count': sows_models.Sow.objects.get_not_suporos_in_workshop(workshop).count()
-                })
+        qs = sows_models.Sow.objects.get_not_suporos_in_workshop(workshop)
+        if qs.count() > 0:
+            data.append({
+                    'tour': {'id': 'Не супорос'},
+                    'sows': sows_serializers.SowSerializer(qs, many=True).data,
+                    'count': qs.count()
+                    })
 
         return Response(data, status=status.HTTP_200_OK)
 
