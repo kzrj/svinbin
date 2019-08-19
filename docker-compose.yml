@@ -11,6 +11,7 @@ services:
     volumes:
       - .:/code
       - ./nginx:/etc/nginx/conf.d
+      - ./frontend:/var/www/frontend
     depends_on:
       - backend
       
