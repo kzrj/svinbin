@@ -42,7 +42,6 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     @action(methods=['post'], detail=True)
     def assing_farm_id(self, request, pk=None):
         sow = self.get_object()

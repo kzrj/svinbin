@@ -1,0 +1,92 @@
+.workshop-header-2{
+	background-color: gray;
+}
+
+.sow-active{
+	background: #1CD623 !important;
+}
+
+.tab-active{
+	border-top: 2px solid blue;
+	font-weight: bold;
+	background-color: white !important;
+}
+
+.cell{
+	border: 2px solid gray;
+	max-width: 65px !important;
+}
+.cell-active{
+	background-color: green;
+}
+
+.section-button{
+	border: 2px solid blue;
+}
+
+.section-active{
+	background-color: green;
+}
+
+.piglets{
+	border: 2px solid gray;
+}
+
+.piglets-active{
+	background-color: green;
+}
+
+.workshop{
+	background-color: #E0E0E0;
+	min-height: 768px;
+}
+
+.workshop-header{
+	margin-left: -15px;
+	margin-right: -15px;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	background-color: #747474;
+	min-height: 24px;
+}
+
+.workshop-tab{
+	background-color: #ECEFF1;
+	border-right: 2px solid #747474 !important;
+	min-height: 62px !important;
+	text-align: center !important;
+}
+
+.workshop-menu{
+	background-color: #EEEEEE;
+}
+
+.workshop-header-2{
+	color: white;
+	min-height: 50px;
+	background-color: #616161;
+}
+
+.workshop-left-column{
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	border-right: 3px solid #747474;
+	min-height: 500px !important;
+	
+}
+
+.workshop-right-column{
+	padding-left: 0px !important;
+	padding-right: 0px !important;
+	min-height: 500px ;
+}
+
+.search-input{
+	width: 130px;
+}
+
+.sow-li{
+	border-bottom: 2px solid #747474 !important;
+	background: #E0E0E0;
+	min-height: 50px;
+}
