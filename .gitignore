@@ -3,3 +3,4 @@
 **/migrations/*.py
 !**/migrations/__init__.py
 **/static
+!**/frontend/static
