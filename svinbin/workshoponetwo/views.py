@@ -27,6 +27,22 @@ from sows.views import WorkShopSowViewSet
     
 
 class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
+    @action(methods=['post'], detail=False)
+    def create_new(self, request):
+        serializer = serializers.CreateFarmIdSerializer(data=request.data)
+        if serializer.is_valid():
+            sow = sows_models.Sow.objects.create_new_and_put_in_workshop_one(
+                serializer.validated_data['farm_id'])
+            return Response(
+                {
+                    "sow": sows_serializers.SowSerializer(sow).data,
+                    "message": 'ok',
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
     @action(methods=['post'], detail=True)
     def assing_farm_id(self, request, pk=None):
         sow = self.get_object()

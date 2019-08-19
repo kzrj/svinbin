@@ -29,6 +29,10 @@ class Pig(CoreModel):
 
 
 class SowManager(CoreModelManager):
+    def create_new_and_put_in_workshop_one(self, farm_id):
+        return self.create(farm_id=farm_id,
+            location=Location.objects.get(workshop__number=1))
+
     def create_new_from_gilt_and_put_in_workshop_one(self, farm_id):
         # DECREASE GILT QUANTITY!!!
         

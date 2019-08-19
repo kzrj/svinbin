@@ -139,3 +139,13 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
             {'sows': [sow1.pk, sow2.pk, seminated_sow1.pk], 'to_location': location2.pk})
         self.assertEqual(type(response.data['transaction_ids']), list)
         self.assertEqual(len(response.data['transaction_ids']), 3)
+
+    def test_create_new(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/api/workshoponetwo/sows/create_new/', 
+            {'farm_id': 99999})
+        self.assertEqual(response.data['sow']['farm_id'], 99999)
+
+        response = self.client.post('/api/workshoponetwo/sows/create_new/', 
+            {'farm_id': 99999})
+        self.assertEqual(response.status_code, 400)
