@@ -160,7 +160,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         qs = sows_models.Sow.objects.get_without_farm_id_in_workshop(workshop)
         if qs.count() > 0:
             data.append({
-                    'title': 'Ремонтные'
+                    'title': 'Ремонтные',
                     'tour': {'id': 'Нет Id'},
                     'sows': sows_serializers.SowSerializer(qs, many=True).data,
                     'count': qs.count()
