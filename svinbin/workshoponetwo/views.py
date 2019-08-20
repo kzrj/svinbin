@@ -142,6 +142,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             if qs.count() > 0:
                 data.append(
                     {   
+                        'title': str(tour),
                         'tour': tours_serializers.TourSerializer(tour).data,
                         'sows': sows_serializers.SowSerializer(qs, many=True).data,
                         'count': qs.count()
@@ -150,6 +151,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         qs = sows_models.Sow.objects.get_not_seminated_not_suporos_in_workshop(workshop)
         if qs.count() > 0:
             data.append({
+                    'title': 'Не супорос, не осеменена, есть Id',
                     'tour': {'id': 'Не супорос, не осеменена, есть Id'},
                     'sows': sows_serializers.SowSerializer(qs, many=True).data,
                     'count': qs.count()
@@ -158,6 +160,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         qs = sows_models.Sow.objects.get_without_farm_id_in_workshop(workshop)
         if qs.count() > 0:
             data.append({
+                    'title': 'Ремонтные'
                     'tour': {'id': 'Нет Id'},
                     'sows': sows_serializers.SowSerializer(qs, many=True).data,
                     'count': qs.count()
@@ -175,6 +178,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             if qs.count() > 0:
                 data.append(
                     {   
+                        'title': str(tour),
                         'tour': tours_serializers.TourSerializer(tour).data,
                         'sows': sows_serializers.SowSerializer(qs, many=True).data,
                         'count': qs.count()
@@ -183,6 +187,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         qs = sows_models.Sow.objects.get_not_suporos_in_workshop(workshop)
         if qs.count() > 0:
             data.append({
+                    'title': 'Не супорос',
                     'tour': {'id': 'Не супорос'},
                     'sows': sows_serializers.SowSerializer(qs, many=True).data,
                     'count': qs.count()
