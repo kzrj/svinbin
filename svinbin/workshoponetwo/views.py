@@ -29,16 +29,27 @@ from sows.views import WorkShopSowViewSet
 class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
     @action(methods=['post'], detail=False)
     def create_new(self, request):
+        workshop = locations_models.WorkShop.objects.get(number=1)
         serializer = serializers.CreateFarmIdSerializer(data=request.data)
         if serializer.is_valid():
-            sow = sows_models.Sow.objects.create_new_and_put_in_workshop_one(
-                serializer.validated_data['farm_id'])
-            return Response(
-                {
-                    "sow": sows_serializers.SowSerializer(sow).data,
-                    "message": 'ok',
-                },
-                status=status.HTTP_200_OK)
+            sow = sows_models.Sow.objects.create_new_from_noname(
+                serializer.validated_data['farm_id'],
+                workshop
+                )
+            if sow:
+                return Response(
+                    {
+                        "sow": sows_serializers.SowSerializer(sow).data,
+                        "message": 'ok',
+                    },
+                    status=status.HTTP_200_OK)
+            else:
+                return Response(
+                    {
+                        "sow": None,
+                        "message": 'Net remontok',
+                    },
+                    status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

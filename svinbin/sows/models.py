@@ -29,11 +29,14 @@ class Pig(CoreModel):
 
 
 class SowManager(CoreModelManager):
-    # def create_new_from_noname(self):
+    def create_new_from_noname(self, farm_id, workshop):
+        noname_sow = self.get_without_farm_id_in_workshop(workshop).first()
+        if noname_sow:
+            noname_sow.assing_farm_id(farm_id)
+        return noname_sow
 
     def create_new_from_gilt_without_farm_id(self):
-        # DECREASE GILT QUANTITY!!!
-        
+        # For init
         return self.create(location=Location.objects.get(workshop__number=1))
 
     def create_new_and_put_in_workshop_one(self, farm_id):

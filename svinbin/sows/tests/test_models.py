@@ -134,6 +134,16 @@ class SowModelManagerTest(TestCase):
         qs = Sow.objects.get_without_farm_id_in_workshop(workshop=sow1.location.workshop)        
         self.assertEqual(list(qs.values_list(flat=True)), [sow_noname.pk])
 
+    def test_create_new_from_noname(self):
+        noname_sow1 = Sow.objects.create_new_from_gilt_without_farm_id()
+
+        named_sow1 = Sow.objects.create_new_from_noname(900, noname_sow1.location.workshop)
+        self.assertEqual(named_sow1.farm_id, 900)
+        self.assertEqual(named_sow1.location.workshop.number, 1)
+
+        named_sow2 = Sow.objects.create_new_from_noname(901, named_sow1.location.workshop)
+        self.assertEqual(named_sow2, None)
+
 
 class GiltModelManagerTest(TestCase):
     def setUp(self):
