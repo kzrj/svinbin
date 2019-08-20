@@ -140,16 +140,6 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.assertEqual(type(response.data['transaction_ids']), list)
         self.assertEqual(len(response.data['transaction_ids']), 3)
 
-    def test_create_new(self):
-        self.client.force_authenticate(user=self.user)
-        response = self.client.post('/api/workshoponetwo/sows/create_new/', 
-            {'farm_id': 99999})
-        self.assertEqual(response.data['sow']['farm_id'], 99999)
-
-        response = self.client.post('/api/workshoponetwo/sows/create_new/', 
-            {'farm_id': 99999})
-        self.assertEqual(response.status_code, 400)
-
     def test_create_new_without_farm_id(self):
         self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/workshoponetwo/sows/create_new_without_farm_id/')
@@ -158,3 +148,17 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
 
         response = self.client.post('/api/workshoponetwo/sows/create_new_without_farm_id/')
         self.assertEqual(response.data['noname_sows_count'], 2)
+
+    def test_create_new(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/api/workshoponetwo/sows/create_new_without_farm_id/')
+
+        response = self.client.post('/api/workshoponetwo/sows/create_new/', 
+            {'farm_id': 99999})
+        self.assertEqual(response.data['sow']['farm_id'], 99999)
+
+        response = self.client.post('/api/workshoponetwo/sows/create_new/', 
+            {'farm_id': 99998})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data['message'], 'Net remontok')
+

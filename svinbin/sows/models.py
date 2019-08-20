@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.db.models import Q
+from django.core import exceptions
 
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location
