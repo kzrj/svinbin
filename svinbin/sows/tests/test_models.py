@@ -95,6 +95,45 @@ class SowModelManagerTest(TestCase):
         qs = Sow.objects.get_not_suporos_in_workshop(workshop=sow1.location.workshop)        
         self.assertEqual(list(qs.values_list(flat=True)), [seminated_sow3.pk, sow2.pk, sow1.pk])
 
+    def test_get_not_seminated_not_suporos_in_workshop(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow4 = sows_testings.create_sow_with_semination(sow1.location)
+
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True)
+        UltrasoundV2.objects.create_ultrasoundV2(sow=seminated_sow2,
+         initiator=None, result=True)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
+         initiator=None, result=False)
+        qs = Sow.objects.get_not_seminated_not_suporos_in_workshop(workshop=sow1.location.workshop)        
+        self.assertEqual(list(qs.values_list(flat=True)), [seminated_sow3.pk, sow2.pk, sow1.pk])
+
+    def test_create_new_from_gilt_without_farm_id(self):
+        sow_noname = Sow.objects.create_new_from_gilt_without_farm_id()
+        self.assertEqual(sow_noname.farm_id, None)
+
+    def test_get_without_farm_id_in_workshop(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow4 = sows_testings.create_sow_with_semination(sow1.location)
+        sow_noname = Sow.objects.create_new_from_gilt_without_farm_id()
+
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True)
+        UltrasoundV2.objects.create_ultrasoundV2(sow=seminated_sow2,
+         initiator=None, result=True)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
+         initiator=None, result=False)
+        qs = Sow.objects.get_without_farm_id_in_workshop(workshop=sow1.location.workshop)        
+        self.assertEqual(list(qs.values_list(flat=True)), [sow_noname.pk])
+
 
 class GiltModelManagerTest(TestCase):
     def setUp(self):

@@ -29,6 +29,11 @@ class Pig(CoreModel):
 
 
 class SowManager(CoreModelManager):
+    def create_new_from_gilt_without_farm_id(self):
+        # DECREASE GILT QUANTITY!!!
+        
+        return self.create(location=Location.objects.get(workshop__number=1))
+
     def create_new_and_put_in_workshop_one(self, farm_id):
         return self.create(farm_id=farm_id,
             location=Location.objects.get(workshop__number=1))
@@ -77,6 +82,23 @@ class SowManager(CoreModelManager):
                 Q(status__title='Прошла УЗИ2, супорос') | 
                 Q(status__title='Прошла УЗИ1, супорос')
                 ),
+            location=workshop.location
+            )
+
+    def get_not_seminated_not_suporos_in_workshop(self, workshop):
+        return self.get_queryset().filter(
+            Q(
+                ~Q(status__title='Прошла УЗИ2, супорос'), 
+                ~Q(status__title='Прошла УЗИ1, супорос'),
+                ~Q(status__title='Осеменена'),
+                Q(farm_id__isnull=False),
+                ),
+            location=workshop.location
+            )
+
+    def get_without_farm_id_in_workshop(self, workshop):
+        return self.get_queryset().filter(
+            farm_id__isnull=True,            
             location=workshop.location
             )
 

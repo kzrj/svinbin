@@ -42,6 +42,17 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['post'], detail=False)
+    def create_new_without_farm_id(self, request):    
+        sow = sows_models.Sow.objects.create_new_from_gilt_without_farm_id()
+        return Response(
+            {
+                "sow": sows_serializers.SowSerializer(sow).data,
+                "message": 'ok',
+            },
+            status=status.HTTP_200_OK)
+        
+
     @action(methods=['post'], detail=True)
     def assing_farm_id(self, request, pk=None):
         sow = self.get_object()
@@ -123,6 +134,21 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                         'count': qs.count()
                     }
                 )
+        qs = sows_models.Sow.objects.get_not_seminated_not_suporos_in_workshop(workshop)
+        if qs.count() > 0:
+            data.append({
+                    'tour': {'id': 'Не супорос, не осеменена, есть Id'},
+                    'sows': sows_serializers.SowSerializer(qs, many=True).data,
+                    'count': qs.count()
+                    })
+
+        qs = sows_models.Sow.objects.get_without_farm_id_in_workshop(workshop)
+        if qs.count() > 0:
+            data.append({
+                    'tour': {'id': 'Нет Id'},
+                    'sows': sows_serializers.SowSerializer(qs, many=True).data,
+                    'count': qs.count()
+                    })
 
         return Response(data, status=status.HTTP_200_OK)
 
