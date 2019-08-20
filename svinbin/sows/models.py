@@ -29,6 +29,8 @@ class Pig(CoreModel):
 
 
 class SowManager(CoreModelManager):
+    # def create_new_from_noname(self):
+
     def create_new_from_gilt_without_farm_id(self):
         # DECREASE GILT QUANTITY!!!
         

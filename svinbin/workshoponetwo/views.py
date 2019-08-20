@@ -43,15 +43,17 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=False)
-    def create_new_without_farm_id(self, request):    
+    def create_new_without_farm_id(self, request):
+        workshop = locations_models.WorkShop.objects.get(number=1)    
         sow = sows_models.Sow.objects.create_new_from_gilt_without_farm_id()
+        noname_sows = sows_models.Sow.objects.get_without_farm_id_in_workshop(workshop)
         return Response(
             {
                 "sow": sows_serializers.SowSerializer(sow).data,
+                "noname_sows_count": noname_sows.count(), 
                 "message": 'ok',
             },
             status=status.HTTP_200_OK)
-        
 
     @action(methods=['post'], detail=True)
     def assing_farm_id(self, request, pk=None):

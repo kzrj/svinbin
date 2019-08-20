@@ -154,3 +154,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.post('/api/workshoponetwo/sows/create_new_without_farm_id/')
         self.assertEqual(response.data['sow']['farm_id'], None)
+        self.assertEqual(response.data['noname_sows_count'], 1)
+
+        response = self.client.post('/api/workshoponetwo/sows/create_new_without_farm_id/')
+        self.assertEqual(response.data['noname_sows_count'], 2)
