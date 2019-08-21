@@ -21,9 +21,9 @@ class CreateWorkshopsView(APIView):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
-        sows_testing.create_sow_and_put_in_workshop_three()
-        sows_testing.create_some_sows_with_tours_put_in_ws_one()
-        piglets_testing.create_nomad_group_from_three_new_born()
+        # sows_testing.create_sow_and_put_in_workshop_three()
+        # sows_testing.create_some_sows_with_tours_put_in_ws_one()
+        # piglets_testing.create_nomad_group_from_three_new_born()
         staff_testing.create_test_users()
 
         return Response({'msg': 'success'})

@@ -75,6 +75,10 @@ router.register(r'users', staff_views.UsersViewSet, \
 router.register(r'piglets', piglets_views.WorkShopNomadPigletsViewSet, \
  basename='piglets')
 
+# inits
+router.register(r'inits', piglets_views.WorkShopNomadPigletsViewSet, \
+ basename='piglets')
+
 schema_view = get_swagger_view(title='API Docs')
 
 urlpatterns = [
