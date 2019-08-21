@@ -178,3 +178,9 @@ class Location(CoreModel):
             not self.gilt_set.all():
             return True
         return False
+
+    @property
+    def is_sow_empty(self):
+        if not self.sow_set.all():
+            return True
+        return False
