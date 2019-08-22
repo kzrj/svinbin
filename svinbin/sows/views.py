@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.db import connection
 
 from rest_framework.views import APIView
 from rest_framework import viewsets, status, generics, mixins
@@ -28,6 +29,11 @@ class SowViewSet(viewsets.ModelViewSet):
     queryset = sows_models.Sow.objects.all()
     serializer_class = sows_serializers.SowSerializer
     filter_class = SowFilter
+
+    def retrieve(self, request, pk=None):
+        sow = self.get_object()
+        sow.
+        return Response(sows_serializers.SowSerializer(sow).data , status=status.HTTP_200_OK)
 
 
 class WorkShopSowViewSet(SowViewSet):

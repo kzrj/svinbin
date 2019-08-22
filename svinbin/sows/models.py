@@ -139,6 +139,21 @@ class Sow(Pig):
         self.status = SowStatus.objects.get(title='Ожидает осеменения')
         self.save()
 
+    def get_seminations_by_tour(self, tour):
+        return self.semination_set.filter(tour=tour)      
+
+    def get_ultrasounds1_by_tour(self, tour):
+        return self.ultrasound_set.filter(tour=tour)
+
+    def get_ultrasoundsv2_by_tour(self, tour):
+        return self.ultrasoundv2_set.filter(tour=tour)
+
+    def get_farrows_by_tour(self, tour):
+        return self.sowfarrow_set.filter(tour=tour)
+
+    def get_tours_pk(self):
+        return self.semination_set.all().values_list('tour', flat=True).distinct()
+
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow, cell=None):

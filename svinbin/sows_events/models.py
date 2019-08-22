@@ -4,7 +4,6 @@ from django.utils import timezone
 from django.conf import settings
 
 from core.models import Event, CoreModel, CoreModelManager
-from sows.models import Sow
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
 from tours.models import Tour
 from locations.models import WorkShop, Location

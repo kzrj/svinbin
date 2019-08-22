@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers, status
 
+# from sows_events.serializers import SeminationSerializer
+# import sows_events.serializers as sows_events_serializers
 from sows.models import Sow
+from sows_events.models import Semination
 from locations.models import Location
 
 
@@ -14,9 +17,22 @@ class SowSerializer(serializers.ModelSerializer):
     # seminations in current tour
     # ultrasounds in current tour
 
+    seminations = serializers.SerializerMethodField()
+
     class Meta:
         model = Sow
         fields = '__all__'
+
+    def get_seminations(self, obj):
+        seminations_qs = obj.semination_set.all()
+        return SowSeminationSerializer(seminations_qs, many=True).data
+
+
+class SowSeminationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Semination
+        # fields = '__all__'
+        exclude = ['created_at', 'modified_at', 'sow', 'id']
 
 
 class SowSimpleSerializer(serializers.ModelSerializer):

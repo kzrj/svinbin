@@ -8,7 +8,7 @@ from staff.models import WorkShopEmployee
 
 def create_employee():
     user = mixer.blend('auth.user')
-    WorkShopEmployee.objects.create(user=user)
+    WorkShopEmployee.objects.create(user=user, is_seminator=True)
     return user
 
 

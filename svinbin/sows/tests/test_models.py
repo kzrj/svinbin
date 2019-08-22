@@ -11,7 +11,8 @@ import piglets.testing_utils as piglets_testing
 
 from locations.models import Location
 from sows.models import Sow, Gilt
-from sows_events.models import SowFarrow, Ultrasound, UltrasoundV2
+from sows_events.models import SowFarrow, Ultrasound, UltrasoundV2, Semination
+from tours.models import Tour
 
 
 class SowModelManagerTest(TestCase):
@@ -143,6 +144,50 @@ class SowModelManagerTest(TestCase):
 
         named_sow2 = Sow.objects.create_new_from_noname(901, named_sow1.location.workshop)
         self.assertEqual(named_sow2, None)
+
+    def test_get_by_tour(self):
+        sow = sows_testings.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        tour = Tour.objects.filter(week_number=1).first()
+        self.assertEqual(sow.get_seminations_by_tour(tour).count(), 2)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+        self.assertEqual(sow.get_ultrasounds1_by_tour(tour).count(), 1)
+        UltrasoundV2.objects.create_ultrasoundV2(sow, None, True)
+        self.assertEqual(sow.get_ultrasoundsv2_by_tour(tour).count(), 1)
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
+        self.assertEqual(sow.get_farrows_by_tour(tour).count(), 1)
+
+    def test_get_tours_pk(self):
+        sow = sows_testings.create_sow_and_put_in_workshop_one()
+
+        # tour 1
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+        UltrasoundV2.objects.create_ultrasoundV2(sow, None, True)
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
+
+        # tour 2
+        Semination.objects.create_semination(sow=sow, week=2, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=2, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+        UltrasoundV2.objects.create_ultrasoundV2(sow, None, True)
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
+
+        # tour 3
+        Semination.objects.create_semination(sow=sow, week=3, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, False)
+
+        self.assertEqual(sow.get_tours_pk().first(), 
+            Tour.objects.filter(week_number=1).first().pk)
 
 
 class GiltModelManagerTest(TestCase):
