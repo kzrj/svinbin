@@ -23,7 +23,7 @@ class SeminationSerializer(serializers.ModelSerializer):
 class SimpleSeminationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Semination
-        fields = ['date', 'semination_employee']
+        fields = ['date', 'semination_employee', 'boar']
 
 
 class CreateSeminationSerializer(serializers.ModelSerializer):
@@ -31,7 +31,7 @@ class CreateSeminationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Semination
-        fields = ['week', 'semination_employee']
+        fields = ['week', 'semination_employee', 'boar']
 
 
 class UltrasoundSerializer(serializers.ModelSerializer):

@@ -33,6 +33,7 @@ router.register(r'sowtransactions/transactions', transaction_views.SowTransactio
 
 # pigs
 router.register(r'sows', sows_views.SowViewSet, basename='sows')
+router.register(r'boars', sows_views.BoarViewSet, basename='boars')
 
 # events
 router.register(r'sows_events/seminations', sows_events_views.SeminationViewSet, basename='seminations')

@@ -16,9 +16,10 @@ import staff.testing_utils as staff_testing
 from locations.models import Location
 from transactions.models import SowTransaction
 from sows_events.models import Ultrasound, UltrasoundV2, Semination, SowFarrow
+from sows.models import Boar
 
 
-class WorkshopOneTwoSowViewSetTest(APITestCase):
+class SowViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
         locations_testing.create_workshops_sections_and_cells()
@@ -28,17 +29,18 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
     def test_get_sow(self):
         self.client.force_authenticate(user=self.user)
         sow = sows_testing.create_sow_and_put_in_workshop_one()
+        boar = Boar.objects.all().first()
 
         response = self.client.get('/api/sows/%s/' % sow.pk)
 
         Semination.objects.create_semination(sow=sow, week=1,
-         initiator=self.user, semination_employee=self.user)
+         initiator=self.user, semination_employee=self.user, boar=boar)
         response = self.client.get('/api/sows/%s/' % sow.pk)
         self.assertEqual(response.data['tours_info'][0]['seminations'][0]['semination_employee'],
             self.user.pk)
 
         Semination.objects.create_semination(sow=sow, week=1,
-         initiator=self.user, semination_employee=self.user)
+         initiator=self.user, semination_employee=self.user, boar=boar)
         response = self.client.get('/api/sows/%s/' % sow.pk)
         self.assertEqual(len(response.data['tours_info'][0]['seminations']), 2)
 
@@ -59,7 +61,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.assertEqual(response.data['tours_info'][0]['farrows'][1]['alive_quantity'], 10)
         
         Semination.objects.create_semination(sow=sow, week=2,
-         initiator=self.user, semination_employee=self.user)
+         initiator=self.user, semination_employee=self.user, boar=boar)
         response = self.client.get('/api/sows/%s/' % sow.pk)
         self.assertEqual(response.data['tours_info'][1]['seminations'][0]['semination_employee'],
             self.user.pk)
@@ -67,3 +69,17 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         Ultrasound.objects.create_ultrasound(sow, self.user, False)
         response = self.client.get('/api/sows/%s/' % sow.pk)
         self.assertEqual(response.data['tours_info'][1]['ultrasounds'][0]['result'], False)
+
+
+class BoarViewSetTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_testing.create_boars()
+        self.user = staff_testing.create_employee()
+        
+    def test_get_boars(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.get('/api/boars/')
+        self.assertEqual(response.data['count'], 2)

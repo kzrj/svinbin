@@ -58,6 +58,11 @@ class SowViewSet(viewsets.ModelViewSet):
         )
 
 
+class BoarViewSet(viewsets.ModelViewSet):
+    queryset = sows_models.Boar.objects.all()
+    serializer_class = sows_serializers.BoarSerializer
+
+
 class WorkShopSowViewSet(SowViewSet):
     # queryset = sows_models.Sow.objects.all()
     # serializer_class = sows_serializers.SowSerializer
