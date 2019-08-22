@@ -15,7 +15,7 @@ import staff.testing_utils as staff_testing
 
 from locations.models import Location
 from transactions.models import SowTransaction
-from sows_events.models import Ultrasound, UltrasoundV2, Semination
+from sows_events.models import Ultrasound, UltrasoundV2, Semination, SowFarrow
 
 
 class WorkshopOneTwoSowViewSetTest(APITestCase):
@@ -29,13 +29,41 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.client.force_authenticate(user=self.user)
         sow = sows_testing.create_sow_and_put_in_workshop_one()
 
-        print(len(connection.queries))
         response = self.client.get('/api/sows/%s/' % sow.pk)
-        print(response.data)
-        print(len(connection.queries))
 
         Semination.objects.create_semination(sow=sow, week=1,
          initiator=self.user, semination_employee=self.user)
         response = self.client.get('/api/sows/%s/' % sow.pk)
-        print(response.data)
+        self.assertEqual(response.data['tours_info'][0]['seminations'][0]['semination_employee'],
+            self.user.pk)
+
+        Semination.objects.create_semination(sow=sow, week=1,
+         initiator=self.user, semination_employee=self.user)
+        response = self.client.get('/api/sows/%s/' % sow.pk)
+        self.assertEqual(len(response.data['tours_info'][0]['seminations']), 2)
+
+        Ultrasound.objects.create_ultrasound(sow, self.user, True)
+        response = self.client.get('/api/sows/%s/' % sow.pk)
+        self.assertEqual(response.data['tours_info'][0]['ultrasounds'][0]['result'], True)
+
+        UltrasoundV2.objects.create_ultrasoundV2(sow, self.user, True)
+        response = self.client.get('/api/sows/%s/' % sow.pk)
+        self.assertEqual(response.data['tours_info'][0]['ultrasoundsV2'][0]['result'], True)
+
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
+        response = self.client.get('/api/sows/%s/' % sow.pk)
+        self.assertEqual(response.data['tours_info'][0]['farrows'][0]['alive_quantity'], 7)
+
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10, mummy_quantity=1)
+        response = self.client.get('/api/sows/%s/' % sow.pk)
+        self.assertEqual(response.data['tours_info'][0]['farrows'][1]['alive_quantity'], 10)
         
+        Semination.objects.create_semination(sow=sow, week=2,
+         initiator=self.user, semination_employee=self.user)
+        response = self.client.get('/api/sows/%s/' % sow.pk)
+        self.assertEqual(response.data['tours_info'][1]['seminations'][0]['semination_employee'],
+            self.user.pk)
+
+        Ultrasound.objects.create_ultrasound(sow, self.user, False)
+        response = self.client.get('/api/sows/%s/' % sow.pk)
+        self.assertEqual(response.data['tours_info'][1]['ultrasounds'][0]['result'], False)

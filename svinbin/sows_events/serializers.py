@@ -20,9 +20,10 @@ class SeminationSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-# class CreateSeminationSerializer(serializers.Serializer):
-#     week = serializers.IntegerField()
-#     farm_id = serializers.IntegerField()
+class SimpleSeminationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Semination
+        fields = ['date', 'semination_employee']
 
 
 class CreateSeminationSerializer(serializers.ModelSerializer):
@@ -31,7 +32,6 @@ class CreateSeminationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Semination
         fields = ['week', 'semination_employee']
-    
 
 
 class UltrasoundSerializer(serializers.ModelSerializer):
@@ -43,6 +43,12 @@ class UltrasoundSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class SimpleUltrasoundSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Ultrasound
+        fields = ['date', 'result']
+
+
 class UltrasoundV2Serializer(serializers.ModelSerializer):
     sow = SowSerializer()
     tour = serializers.StringRelatedField()
@@ -50,6 +56,12 @@ class UltrasoundV2Serializer(serializers.ModelSerializer):
     class Meta:
         model = UltrasoundV2
         fields = "__all__"
+
+
+class SimpleUltrasoundV2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = UltrasoundV2
+        fields = ['date', 'result']
 
 
 class CreateUltrasoundSerializer(serializers.Serializer):
@@ -89,3 +101,9 @@ class SowFarrowSerializer(serializers.ModelSerializer):
     class Meta:
         model = SowFarrow
         fields = '__all__'
+
+
+class SimpleSowFarrowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SowFarrow
+        fields = ['date', 'alive_quantity', 'dead_quantity', 'mummy_quantity']

@@ -17,15 +17,15 @@ class SowSerializer(serializers.ModelSerializer):
     # seminations in current tour
     # ultrasounds in current tour
 
-    seminations = serializers.SerializerMethodField()
+    # seminations = serializers.SerializerMethodField()
 
     class Meta:
         model = Sow
         fields = '__all__'
 
-    def get_seminations(self, obj):
-        seminations_qs = obj.semination_set.all()
-        return SowSeminationSerializer(seminations_qs, many=True).data
+    # def get_seminations(self, obj):
+    #     seminations_qs = obj.semination_set.all()
+    #     return SowSeminationSerializer(seminations_qs, many=True).data
 
 
 class SowSeminationSerializer(serializers.ModelSerializer):

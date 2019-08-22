@@ -21,6 +21,7 @@ import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
+import tours.models as tours_models
 
 from sows.filters import SowFilter
 
@@ -32,8 +33,29 @@ class SowViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None):
         sow = self.get_object()
-        sow.
-        return Response(sows_serializers.SowSerializer(sow).data , status=status.HTTP_200_OK)
+        tours_info = list()
+        for tour in tours_models.Tour.objects.filter(pk__in=sow.get_tours_pk()):
+            tours_info.append(
+                {
+                    'tour_title': str(tour),
+                    'seminations': sows_events_serializers.SimpleSeminationSerializer(
+                        sow.get_seminations_by_tour(tour), many=True).data,
+                    'ultrasounds': sows_events_serializers.SimpleUltrasoundSerializer(
+                        sow.get_ultrasounds1_by_tour(tour), many=True).data,
+                    'ultrasoundsV2': sows_events_serializers.SimpleUltrasoundV2Serializer(
+                        sow.get_ultrasoundsv2_by_tour(tour), many=True).data,
+                    'farrows': sows_events_serializers.SimpleSowFarrowSerializer(
+                        sow.get_farrows_by_tour(tour), many=True).data,
+                }
+            )
+
+        return Response(
+            { 
+                'sow': sows_serializers.SowSerializer(sow).data,
+                'tours_info': tours_info
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 class WorkShopSowViewSet(SowViewSet):
