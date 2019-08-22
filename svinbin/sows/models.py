@@ -188,3 +188,11 @@ class Gilt(Pig):
 
     def __str__(self):
         return 'Gilt #%s' % self.birth_id
+
+
+class BoarManager(CoreModelManager):
+    def create_boar(self, birth_id):
+        return self.create(birth_id=birth_id, location=Location.objects.get(workshop__number=1))
+
+class Boar(Pig):
+    objects = BoarManager()

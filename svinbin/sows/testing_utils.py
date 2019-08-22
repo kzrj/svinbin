@@ -4,7 +4,7 @@ import random
 from locations.models import Location, SowSingleCell, SowGroupCell, Section, WorkShop, \
     SowAndPigletsCell, PigletsGroupCell
 from transactions.models import PigletsTransaction
-from sows.models import Sow, SowStatus, Gilt
+from sows.models import Sow, SowStatus, Gilt, Boar
 from piglets.models import NewBornPigletsGroup
 from sows_events.models import Semination, SowFarrow
 from piglets_events.models import NewBornPigletsMerger
@@ -89,3 +89,9 @@ def create_some_sows_with_tours_put_in_ws_one():
     for tour_number in range(1, 4):
         for i in range(1, 4):
             create_sow_with_semination(location, tour_number)
+
+
+def create_boars():
+    if Boar.objects.all().count() < 1:
+        Boar.objects.create_boar(1)
+        Boar.objects.create_boar(2)

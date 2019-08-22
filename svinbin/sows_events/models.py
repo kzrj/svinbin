@@ -18,10 +18,10 @@ class SowEvent(Event):
 
     
 class SeminationManager(CoreModelManager):
-    def create_semination(self, sow, week, initiator=None, semination_employee=None):
+    def create_semination(self, sow, week, initiator=None, semination_employee=None, boar=None):
         tour = Tour.objects.get_or_create_by_week_in_current_year(week)
         semination = self.create(sow=sow, tour=tour, initiator=initiator,
-         semination_employee=semination_employee, date=timezone.now())
+         semination_employee=semination_employee, date=timezone.now(), boar=boar)
         sow.tour = tour
         sow.change_status_to('Осеменена')
         return semination
@@ -30,7 +30,7 @@ class SeminationManager(CoreModelManager):
 class Semination(SowEvent):
     semination_employee = models.ForeignKey(settings.AUTH_USER_MODEL,
      on_delete=models.SET_NULL, null=True, related_name="semination_employee")
-    # boar 
+    boar = models.ForeignKey('sows.Boar', on_delete=models.SET_NULL, null=True)
 
     objects = SeminationManager()
 

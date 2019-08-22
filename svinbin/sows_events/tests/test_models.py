@@ -2,7 +2,7 @@
 from django.test import TestCase
 
 from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, UltrasoundV2
-from sows.models import Sow
+from sows.models import Sow, Boar
 from piglets.models import NewBornPigletsGroup
 
 import locations.testing_utils as locations_testing
@@ -13,11 +13,13 @@ class SeminationModelManagerTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
+        sows_testing.create_boars()
 
     def test_create_semination(self):
         sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
+        boar = Boar.objects.all().first()
         semination = Semination.objects.create_semination(sow=sow, week=1,
-         initiator=None, semination_employee=None)
+         initiator=None, semination_employee=None, boar=boar)
 
         self.assertEqual(Semination.objects.all().count(), 1)
         self.assertEqual(semination.tour.week_number, 1)
