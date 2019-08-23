@@ -108,6 +108,13 @@ class SowManager(CoreModelManager):
             location=workshop.location
             )
 
+    # def get_sows_for_semination(self):
+    #     return self.get_queryset().filter(
+    #         location=Location.objects.get(workshop__number=1),
+    #         farm_id__isnull=false,
+            
+    #         )
+
 
 class Sow(Pig):
     farm_id = models.IntegerField(null=True, unique=True)
