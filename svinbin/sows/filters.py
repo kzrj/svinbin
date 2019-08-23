@@ -19,12 +19,17 @@ class SowFilter(filters.FilterSet):
     not_in_tour = filters.BooleanFilter(field_name='tour', lookup_expr='isnull')
     status_title_not = filters.CharFilter(field_name='status__title', 
         method='filter_status_title_not')
+    status_title_not_contains = filters.CharFilter(field_name='status__title', 
+        method='filter_status_title_not_contains')
 
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
 
     def filter_status_title_not(self, queryset, name, value):
         return queryset.filter(~Q(status__title=value))
+
+    def filter_status_title_not_contains(self, queryset, name, value):
+        return queryset.filter(~Q(status__title__contains=value))
 
     class Meta:
         model = Sow
