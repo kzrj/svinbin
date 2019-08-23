@@ -13,6 +13,7 @@ import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import staff.testing_utils as staff_testing
 
+from sows.models import Boar
 from locations.models import Location
 from transactions.models import SowTransaction
 from sows_events.models import Ultrasound, UltrasoundV2
@@ -23,6 +24,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.client = APIClient()
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
+        sows_testing.create_boars()
         self.user = staff_testing.create_employee()
         
     def test_assing_farm_id(self):
@@ -45,13 +47,15 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
     def test_semination(self):
         self.client.force_authenticate(user=self.user)
         sow = sows_testing.create_sow_and_put_in_workshop_one()
+        boar = Boar.objects.all().first()
         semination_employee = staff_testing.create_employee()
 
         response = self.client.post('/api/workshoponetwo/sows/%s/semination/' %
-          sow.pk, {'week': 7, 'semination_employee': semination_employee.pk})
+          sow.pk, {'week': 7, 'semination_employee': semination_employee.pk, 'boar': boar.pk})
 
         self.assertEqual(response.data['semination']['id'], 1)
         self.assertEqual(response.data['sow']['status'], 'Осеменена')
+        self.assertEqual(response.data['semination']['boar'], boar.pk)
 
     def test_ultrasound(self):
         self.client.force_authenticate(user=self.user)
@@ -81,7 +85,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         sow = sows_testing.create_sow_and_put_in_workshop_one()
         response = self.client.get('/api/workshoponetwo/sows/%s/' % sow.pk)
 
-        self.assertEqual(response.data['id'], sow.pk)
+        self.assertEqual(response.data['sow']['id'], sow.pk)
 
     def test_sows_by_tours(self):
         self.client.force_authenticate(user=self.user)
@@ -101,7 +105,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         seminated_sow4 = sows_testing.create_sow_with_semination(location2, 3)
 
         response = self.client.get('/api/workshoponetwo/sows/sows_by_tours/')
-        self.assertEqual(response.data[0]['tour']['id'], 2)
+        self.assertEqual(response.data[0]['tour']['id'], seminated_sow1.tour.pk)
         self.assertEqual(response.data[0]['sows'][0]['id'], seminated_sow1.pk)
 
     def test_sows_by_tours_ws2(self):
