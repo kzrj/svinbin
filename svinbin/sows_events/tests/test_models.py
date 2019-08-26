@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
 
-from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, UltrasoundV2
+from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, UltrasoundType
 from sows.models import Sow, Boar
 from piglets.models import NewBornPigletsGroup
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
+import sows_events.utils as sows_events_testing
 
 
 class SeminationModelManagerTest(TestCase):
@@ -14,6 +15,7 @@ class SeminationModelManagerTest(TestCase):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         sows_testing.create_boars()
+        sows_events_testing.create_types()
 
     def test_create_semination(self):
         sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
@@ -32,6 +34,7 @@ class UltrasoundModelManagerTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
+        sows_events_testing.create_types()
 
     def test_create_ultrasound(self):
         sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
@@ -44,30 +47,17 @@ class UltrasoundModelManagerTest(TestCase):
         self.assertEqual(Ultrasound.objects.all().count(), 1)
         self.assertEqual(ultrasound.tour.week_number, 1)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Прошла УЗИ1, прохолост')
+        self.assertEqual(sow.status.title, 'Прохолост')
 
         Ultrasound.objects.create_ultrasound(sow=sow, 
-         initiator=None, result=True)
+         initiator=None, result=True, u_type=UltrasoundType.objects.get(days=30))
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Прошла УЗИ1, супорос')
+        self.assertEqual(sow.status.title, 'Супорос')
 
-    def test_create_ultrasoundV2(self):
-        sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
-        semination = Semination.objects.create_semination(sow=sow, week=1,
-         initiator=None, semination_employee=None)
-
-        ultrasound = UltrasoundV2.objects.create_ultrasoundV2(sow=sow, 
-         initiator=None, result=False)
-
-        self.assertEqual(UltrasoundV2.objects.all().count(), 1)
-        self.assertEqual(ultrasound.tour.week_number, 1)
+        Ultrasound.objects.create_ultrasound(sow=sow, 
+         initiator=None, result=False, u_type=UltrasoundType.objects.get(days=60))
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Прошла УЗИ2, прохолост')
-
-        UltrasoundV2.objects.create_ultrasoundV2(sow=sow,
-         initiator=None, result=True)
-        sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Прошла УЗИ2, супорос')
+        self.assertEqual(sow.status.title, 'Прохолост')
 
 
 class SowFarrowModelManagerTest(TestCase):

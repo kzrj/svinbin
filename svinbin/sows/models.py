@@ -76,8 +76,7 @@ class SowManager(CoreModelManager):
     def get_not_suporos_in_workshop(self, workshop):
         return self.get_queryset().filter(
             Q(
-                ~Q(status__title='Прошла УЗИ2, супорос'), 
-                ~Q(status__title='Прошла УЗИ1, супорос'),
+                ~Q(status__title='Супорос'), 
             ),
             location=workshop.location
             )
@@ -85,8 +84,7 @@ class SowManager(CoreModelManager):
     def get_suporos_in_workshop(self, workshop):
         return self.get_queryset().filter(
             Q(
-                Q(status__title='Прошла УЗИ2, супорос') | 
-                Q(status__title='Прошла УЗИ1, супорос')
+                Q(status__title='Супорос') 
                 ),
             location=workshop.location
             )
@@ -94,8 +92,7 @@ class SowManager(CoreModelManager):
     def get_not_seminated_not_suporos_in_workshop(self, workshop):
         return self.get_queryset().filter(
             Q(
-                ~Q(status__title='Прошла УЗИ2, супорос'), 
-                ~Q(status__title='Прошла УЗИ1, супорос'),
+                ~Q(status__title='Супорос'), 
                 ~Q(status__title='Осеменена'),
                 Q(farm_id__isnull=False),
                 ),

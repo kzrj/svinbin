@@ -16,10 +16,8 @@ def create_statuses():
         SowStatus.objects.bulk_create([
             SowStatus(title='Осеменена'),
             SowStatus(title='Ожидает УЗИ'),
-            SowStatus(title='Прошла УЗИ1, супорос'),
-            SowStatus(title='Прошла УЗИ1, прохолост'),
-            SowStatus(title='Прошла УЗИ2, супорос'),
-            SowStatus(title='Прошла УЗИ2, прохолост'),
+            SowStatus(title='Супорос'),
+            SowStatus(title='Прохолост'),            
             SowStatus(title='Брак'),
             SowStatus(title='Опоросилась, кормит'),
             SowStatus(title='Ожидает осеменения'),

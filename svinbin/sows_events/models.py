@@ -35,40 +35,39 @@ class Semination(SowEvent):
     objects = SeminationManager()
 
 
+class UltrasoundType(CoreModel):
+    title = models.CharField(max_length=100, null=True)
+    days = models.IntegerField()
+    final = models.BooleanField(default=False)
+
+    def __str__(self):
+        return 'UZI %d' % self.days
+
+
 class UltrasoundManager(CoreModelManager):
-    def create_ultrasound(self, sow, initiator=None, result=False):
+    def create_ultrasound(self, sow, initiator=None, result=False, u_type=None):
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
-         date=timezone.now(), result=result)
+         date=timezone.now(), result=result, u_type=u_type)
         if result:
-            sow.change_status_to('Прошла УЗИ1, супорос')
+            # if ultrasound.u_type == 'УЗИ 3 недели':
+            #     # event
+            # if ultrasound.u_type == 'УЗИ промежуточный':
+            #     # event
+            # if ultrasound.u_type == 'УЗИ 6 недель':
+            #     # event
+            #     sow.change_status_to('Прошла УЗИ 6 недель, супорос')
+            sow.change_status_to('Супорос')
         else:
             sow.tour = None
-            sow.change_status_to('Прошла УЗИ1, прохолост')
+            sow.change_status_to('Прохолост')
         return ultrasound
 
 
 class Ultrasound(SowEvent):
     result = models.BooleanField()
+    u_type = models.ForeignKey(UltrasoundType, on_delete=models.SET_NULL, null=True)
 
     objects = UltrasoundManager()
-
-
-class UltrasoundV2Manager(CoreModelManager):
-    def create_ultrasoundV2(self, sow, initiator=None, result=False):
-        ultrasoundV2 = self.create(sow=sow, tour=sow.tour, initiator=initiator,
-         date=timezone.now(), result=result)
-        if result:
-            sow.change_status_to('Прошла УЗИ2, супорос')
-        else:
-            sow.tour = None
-            sow.change_status_to('Прошла УЗИ2, прохолост')
-        return ultrasoundV2
-
-
-class UltrasoundV2(SowEvent):
-    result = models.BooleanField()
-
-    objects = UltrasoundV2Manager()
 
 
 class SowFarrowManager(CoreModelManager):
