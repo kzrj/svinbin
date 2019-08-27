@@ -45,7 +45,9 @@ class UltrasoundType(CoreModel):
 
 
 class UltrasoundManager(CoreModelManager):
-    def create_ultrasound(self, sow, initiator=None, result=False, u_type=None):
+    def create_ultrasound(self, sow, initiator=None, result=False, days=None):
+        if days:
+            u_type = UltrasoundType.objects.get(days=days)
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
          date=timezone.now(), result=result, u_type=u_type)
         if result:

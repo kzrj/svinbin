@@ -102,12 +102,12 @@ class SowViewSet(viewsets.ModelViewSet):
                 boar=boar,
                 initiator=request.user
                 )
-            u_type = sows_events_models.UltrasoundType.objects.get(
-                days=serializer.validated_data['days'])
+            
             ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
                 sow=sow,
                 # result=serializer.validated_data['result'],
                 u_type=u_type,
+                days=serializer.validated_data['days'],
                 initiator=request.user,
                 result=True,
                 )
@@ -148,7 +148,7 @@ class SowViewSet(viewsets.ModelViewSet):
             ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
                 sow=sow,
                 result=True,
-                u_type=u_type,
+                days=60,
                 initiator=request.user
                 )
 
@@ -188,7 +188,7 @@ class SowViewSet(viewsets.ModelViewSet):
             ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
                 sow=sow,
                 result=True,
-                u_type=u_type,
+                days=60,
                 initiator=request.user
                 )
 
