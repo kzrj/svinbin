@@ -29,10 +29,6 @@ class SowSerializer(serializers.ModelSerializer):
         model = Sow
         fields = '__all__'
 
-    # def get_seminations(self, obj):
-    #     seminations_qs = obj.semination_set.all()
-    #     return SowSeminationSerializer(seminations_qs, many=True).data
-
 
 class SowSeminationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,3 +50,38 @@ class SowsToMoveSerializer(serializers.Serializer):
     # mb alive
     sows = serializers.PrimaryKeyRelatedField(queryset=Sow.objects.all(), many=True)
     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+
+
+# Init only
+class InitOnlyCreateSow(serializers.Serializer):
+    farm_id = serializers.IntegerField()
+    week = serializers.IntegerField()
+
+    def validate_farm_id(self, value):
+        if Sow.objects.filter(farm_id=value).first():
+            raise CustomValidation('Not unique farm_id', 
+                'farm_id', status_code=status.HTTP_400_BAD_REQUEST)
+        return value
+
+
+class InitOnlyCreateSeminatedSow(InitOnlyCreateSow):
+    boar = serializers.IntegerField(required=False)
+
+
+class InitOnlyCreateUltrasoundedSow(InitOnlyCreateSeminatedSow):    
+    result = serializers.BooleanField()
+    days = serializers.IntegerField()
+    workshop_number = serializers.IntegerField()
+
+
+class InitOnlyCreateSuporosWs3Sow(InitOnlyCreateSeminatedSow):
+    section = serializers.IntegerField()
+    cell = serializers.IntegerField()
+
+
+class InitOnlyCreateFarrowSow(InitOnlyCreateSeminatedSow):    
+    alive_quantity = serializers.IntegerField()
+    dead_quantity = serializers.IntegerField()
+    mummy_quantity = serializers.IntegerField()
+    section = serializers.IntegerField()
+    cell = serializers.IntegerField()

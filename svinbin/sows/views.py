@@ -42,8 +42,6 @@ class SowViewSet(viewsets.ModelViewSet):
                         sow.get_seminations_by_tour(tour), many=True).data,
                     'ultrasounds': sows_events_serializers.SimpleUltrasoundSerializer(
                         sow.get_ultrasounds1_by_tour(tour), many=True).data,
-                    'ultrasoundsV2': sows_events_serializers.SimpleUltrasoundV2Serializer(
-                        sow.get_ultrasoundsv2_by_tour(tour), many=True).data,
                     'farrows': sows_events_serializers.SimpleSowFarrowSerializer(
                         sow.get_farrows_by_tour(tour), many=True).data,
                 }
@@ -56,6 +54,161 @@ class SowViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_200_OK
         )
+
+    @action(methods=['post'], detail=False)
+    def add_new_seminated_to_ws1(self, request):
+        # for init
+        location = locations_models.Location.objects.get(workshop__number=1)
+        serializer = sows_serializers.InitOnlyCreateSeminatedSow(data=request.data)
+        if serializer.is_valid():
+            sow = sows_models.Sow.objects.init_only_create_new(
+                farm_id=serializer.validated_data['farm_id'],
+                location=location
+                )
+            boar, created = sows_models.Boar.objects.get_create_boar(serializer.validated_data['boar'])
+            semination = sows_events_models.Semination.objects.create_semination(
+                sow=sow, 
+                week=serializer.validated_data['week'],
+                semination_employee=request.user,
+                boar=boar,
+                initiator=request.user
+                )
+
+            return Response(
+                {
+                    "sow": sows_serializers.SowSerializer(sow).data,
+                    "semination": sows_events_serializers.SimpleSeminationSerializer(semination).data
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False)
+    def add_new_ultrasounded_to_ws12(self, request):
+        # for init
+        serializer = sows_serializers.InitOnlyCreateUltrasoundedSow(data=request.data)
+        if serializer.is_valid():
+            location = locations_models.Location.objects.get(
+                workshop__number=serializer.validated_data['workshop_number'])
+            sow = sows_models.Sow.objects.init_only_create_new(
+                farm_id=serializer.validated_data['farm_id'],
+                location=location
+                )
+            boar, created = sows_models.Boar.objects.get_create_boar(serializer.validated_data['boar'])
+            semination = sows_events_models.Semination.objects.create_semination(
+                sow=sow, 
+                week=serializer.validated_data['week'],
+                semination_employee=request.user,
+                boar=boar,
+                initiator=request.user
+                )
+            u_type = sows_events_models.UltrasoundType.objects.get(
+                days=serializer.validated_data['days'])
+            ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
+                sow=sow,
+                result=serializer.validated_data['result'],
+                u_type=u_type,
+                initiator=request.user
+                )
+
+            return Response(
+                {
+                    "sow": sows_serializers.SowSerializer(sow).data,
+                    "semination": sows_events_serializers.SimpleSeminationSerializer(semination).data,
+                    "ultrasound": sows_events_serializers.SimpleUltrasoundSerializer(ultrasound).data
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False)
+    def add_new_suporos_to_ws3(self, request):
+        serializer = sows_serializers.InitOnlyCreateSuporosWs3Sow(data=request.data)
+        if serializer.is_valid():
+            cell = locations_models.SowAndPigletsCell.objects.get(
+                section__number=serializer.validated_data['section'],
+                number=serializer.validated_data['cell'],
+                )
+            location = locations_models.Location.objects.get(sowAndPigletsCell=cell)
+            sow = sows_models.Sow.objects.init_only_create_new(
+                farm_id=serializer.validated_data['farm_id'],
+                location=location
+                )
+            boar, created = sows_models.Boar.objects.get_create_boar(serializer.validated_data['boar'])
+            semination = sows_events_models.Semination.objects.create_semination(
+                sow=sow, 
+                week=serializer.validated_data['week'],
+                semination_employee=request.user,
+                boar=boar,
+                initiator=request.user
+                )
+
+            u_type = sows_events_models.UltrasoundType.objects.get(days=60)
+            ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
+                sow=sow,
+                result=True,
+                u_type=u_type,
+                initiator=request.user
+                )
+
+            return Response(
+                {
+                    "sow": sows_serializers.SowSerializer(sow).data,
+                    "semination": sows_events_serializers.SimpleSeminationSerializer(semination).data,
+                    "ultrasound": sows_events_serializers.SimpleUltrasoundSerializer(ultrasound).data
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False)
+    def add_new_oporos_to_ws3(self, request):
+        serializer = sows_serializers.InitOnlyCreateFarrowSow(data=request.data)
+        if serializer.is_valid():
+            cell = locations_models.SowAndPigletsCell.objects.get(
+                section__number=serializer.validated_data['section'],
+                number=serializer.validated_data['cell'],
+                )
+            location = locations_models.Location.objects.get(sowAndPigletsCell=cell)
+            sow = sows_models.Sow.objects.init_only_create_new(
+                farm_id=serializer.validated_data['farm_id'],
+                location=location
+                )
+            boar, created = sows_models.Boar.objects.get_create_boar(serializer.validated_data['boar'])
+            semination = sows_events_models.Semination.objects.create_semination(
+                sow=sow, 
+                week=serializer.validated_data['week'],
+                semination_employee=request.user,
+                boar=boar,
+                initiator=request.user
+                )
+
+            u_type = sows_events_models.UltrasoundType.objects.get(days=60)
+            ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
+                sow=sow,
+                result=True,
+                u_type=u_type,
+                initiator=request.user
+                )
+
+            farrow = sows_events_models.SowFarrow.objects.create_sow_farrow(
+                sow=sow,
+                initiator=request.user,
+                alive_quantity=serializer.validated_data['alive_quantity'],
+                dead_quantity=serializer.validated_data['dead_quantity'],
+                mummy_quantity=serializer.validated_data['mummy_quantity'],
+                )
+
+            return Response(
+                {
+                    "sow": sows_serializers.SowSerializer(sow).data,
+                    "semination": sows_events_serializers.SimpleSeminationSerializer(semination).data,
+                    "ultrasound": sows_events_serializers.SimpleUltrasoundSerializer(ultrasound).data,
+                    "farrow": sows_events_serializers.SimpleSowFarrowSerializer(farrow).data
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class BoarViewSet(viewsets.ModelViewSet):

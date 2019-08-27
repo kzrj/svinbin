@@ -62,15 +62,21 @@ def create_sections_and_cell_for_workshop_two():
 def create_sections_and_cell_for_workshop_three():
     workshop_three = WorkShop.objects.get(number=3)
 
-    Section.objects.bulk_create([Section(workshop=workshop_three, name='Секция 3-1', number=1),
-     Section(workshop=workshop_three, name='Секция 3-2', number=2)])
+    Section.objects.bulk_create([
+        Section(workshop=workshop_three, name='Секция 3-1', number=1),
+        Section(workshop=workshop_three, name='Секция 3-2', number=2),
+        Section(workshop=workshop_three, name='Секция 3-3', number=3),
+        Section(workshop=workshop_three, name='Секция 3-4', number=4),
+        Section(workshop=workshop_three, name='Секция 3-5', number=5),
+        Section(workshop=workshop_three, name='Секция 3-6', number=6),
+        ])
     Location.objects.bulk_create(
         [Location(section=section) for section in Section.objects.filter(workshop=workshop_three)]
         )
 
     for section in Section.objects.filter(workshop=workshop_three):
         SowAndPigletsCell.objects.bulk_create([
-            SowAndPigletsCell(workshop=workshop_three, section=section, number=cellNumber) for cellNumber in range(1, 7)
+            SowAndPigletsCell(workshop=workshop_three, section=section, number=cellNumber) for cellNumber in range(1, 46)
             ])
         Location.objects.bulk_create(
             [Location(sowAndPigletsCell=cell) for cell in SowAndPigletsCell.objects.filter(workshop=workshop_three,

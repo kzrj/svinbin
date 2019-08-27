@@ -30,6 +30,10 @@ class Pig(CoreModel):
 
 
 class SowManager(CoreModelManager):
+    def init_only_create_new(self, farm_id, location):
+        # for init only
+        return self.create(farm_id=farm_id, location=location)
+
     def create_new_from_noname(self, farm_id, workshop):
         noname_sow = self.get_without_farm_id_in_workshop(workshop).first()
         if noname_sow:
@@ -197,6 +201,10 @@ class Gilt(Pig):
 class BoarManager(CoreModelManager):
     def create_boar(self, birth_id):
         return self.create(birth_id=birth_id, location=Location.objects.get(workshop__number=1))
+
+    def get_create_boar(self, birth_id):
+        return self.get_or_create(birth_id=birth_id, location=Location.objects.get(workshop__number=1))
+
 
 class Boar(Pig):
     objects = BoarManager()

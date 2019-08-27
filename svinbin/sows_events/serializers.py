@@ -46,7 +46,7 @@ class UltrasoundSerializer(serializers.ModelSerializer):
 class SimpleUltrasoundSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ultrasound
-        fields = ['date', 'result']
+        fields = ['date', 'result', 'u_type']
 
 
 class CreateUltrasoundSerializer(serializers.Serializer):
