@@ -3,6 +3,8 @@ from rest_framework import serializers, status
 
 # from sows_events.serializers import SeminationSerializer
 # import sows_events.serializers as sows_events_serializers
+
+from core.utils import CustomValidation
 from sows.models import Sow, Boar
 from sows_events.models import Semination
 from locations.models import Location
