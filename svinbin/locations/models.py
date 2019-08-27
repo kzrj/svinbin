@@ -77,7 +77,8 @@ class PigletsGroupCell(Cell):
 
 
 class SowAndPigletsCell(Cell):
-    pass
+    def __str__(self):
+        return 'section {}, cell {}'.format(str(self.section.number), self.number)
     
 
 class LocationManager(CoreModelManager):
