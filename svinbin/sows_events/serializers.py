@@ -21,7 +21,6 @@ class SeminationSerializer(serializers.ModelSerializer):
 
 
 class SimpleSeminationSerializer(serializers.ModelSerializer):
-    date = 
     class Meta:
         model = Semination
         fields = ['date', 'semination_employee', 'boar']
