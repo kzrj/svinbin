@@ -5,6 +5,7 @@ from rest_framework import viewsets, status
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
+import sows_events.utils as sows_events_testing
 import piglets.testing_utils as piglets_testing
 import staff.testing_utils as staff_testing
 
@@ -25,7 +26,8 @@ class CreateWorkshopsView(APIView):
         # sows_testing.create_some_sows_with_tours_put_in_ws_one()
         # piglets_testing.create_nomad_group_from_three_new_born()
         staff_testing.create_test_users()
-        sows_testing.create_boars()
+        # sows_testing.create_boars()
+        sows_events_testing.create_types()
 
         return Response({'msg': 'success'})
 
