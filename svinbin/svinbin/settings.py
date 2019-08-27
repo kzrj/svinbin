@@ -130,7 +130,8 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE': 100,
-    'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler'
+    'EXCEPTION_HANDLER': 'core.utils.custom_exception_handler',
+    'DATETIME_FORMAT': "%d-%m-%YT%H:%M",
 }
 
 # JWT
