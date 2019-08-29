@@ -29,7 +29,18 @@ class Pig(CoreModel):
         abstract = True
 
 
+class SowsQuerySet(models.QuerySet):
+    def update_status(self, title):
+        return self.update(status=SowStatus.objects.get(title=title))
+
+    def update_tour(self, title):
+        return self.update(status=SowStatus.objects.get(title=title))
+
+
 class SowManager(CoreModelManager):
+    def get_queryset(self):
+        return SowsQuerySet(self.model, using=self._db)
+
     def init_only_create_new(self, farm_id, location):
         # for init only
         return self.create(farm_id=farm_id, location=location)

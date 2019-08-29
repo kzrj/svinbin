@@ -8,6 +8,7 @@ from core.models import Event, CoreModel, CoreModelManager
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
 from tours.models import Tour
 from locations.models import WorkShop, Location
+# from sows.models import Sow
 
 
 class SowEvent(Event):
@@ -26,6 +27,18 @@ class SeminationManager(CoreModelManager):
         sow.tour = tour
         sow.change_status_to('Осеменена')
         return semination
+
+    def mass_semination(self, sows_qs, week, initiator=None, semination_employee=None,
+            boar=None):
+        # sows needs as qs
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week)
+        seminations = list()
+        for sow in sows_qs:
+            seminations.append(Semination(sow=sow, tour=tour, initiator=initiator,
+             semination_employee=semination_employee, boar=boar, date=timezone.now()))
+        Semination.objects.bulk_create(seminations)
+        sows_qs.update_status('Осеменена')
+        sows_qs.update(tour=tour)
 
 
 class Semination(SowEvent):
