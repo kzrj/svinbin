@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db.models import Q
+from django.db.models import Q, Prefetch, F
 from django.contrib.auth.models import User
 from django_filters import rest_framework as filters
 
 from sows.models import Sow
+from sows_events.models import Semination
 
 
 class SowFilter(filters.FilterSet):
@@ -23,6 +24,9 @@ class SowFilter(filters.FilterSet):
         method='filter_status_title_not_contains')
     suporos = filters.NumberFilter(field_name='suporos_30', 
         method='filter_suporos')
+
+    seminated = filters.NumberFilter(field_name='seminated', 
+        method='filter_seminated')
 
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
@@ -48,6 +52,44 @@ class SowFilter(filters.FilterSet):
                 tour__isnull=False,
                 ultrasound__u_type__days=60,
             )
+
+    def filter_seminated(self, queryset, name, value):
+        if value == 1:
+            sows = list()       
+            sows_init_qs = queryset.filter(
+                ultrasound__sow__farm_id__isnull=True,
+                sowfarrow__sow__farm_id__isnull=True,
+                tour__isnull=False,
+                ).prefetch_related(
+                    Prefetch(
+                         'semination_set',
+                          queryset=Semination.objects.filter(tour=F('tour')),
+                          to_attr="seminations_by_current_tour"
+                        )
+                )
+            for sow in sows_init_qs:
+                if len(sow.seminations_by_current_tour) == 1:
+                    sows.append(sow.pk)
+            return sows_init_qs.filter(pk__in=sows)
+            
+        if value == 2:
+            sows = list()       
+            sows_init_qs = queryset.filter(
+                ultrasound__sow__farm_id__isnull=True,
+                sowfarrow__sow__farm_id__isnull=True,
+                tour__isnull=False,
+                ).prefetch_related(
+                    Prefetch(
+                         'semination_set',
+                          queryset=Semination.objects.filter(tour=F('tour')),
+                          to_attr="seminations_by_current_tour"
+                        )
+                )
+            for sow in sows_init_qs:
+                if len(sow.seminations_by_current_tour) == 2:
+                    sows.append(sow.pk)
+            return sows_init_qs.filter(pk__in=sows)
+
 
     class Meta:
         model = Sow

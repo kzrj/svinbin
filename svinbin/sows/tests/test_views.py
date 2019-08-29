@@ -154,12 +154,39 @@ class SowViewSetTest(APITestCase):
          dead_quantity=1, mummy_quantity=2)
 
         response = self.client.get('/api/sows/?suporos=30')
-        print(response.data)
         self.assertEqual(response.data['results'][0]['id'], seminated_sow2.pk)
 
         response = self.client.get('/api/sows/?suporos=60')
-        print(response.data)
         self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
+
+    def test_filter_seminated(self):
+        self.client.force_authenticate(user=self.user)
+        
+        # not seminated sow
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+
+        # sow one time seminated
+        seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+        
+        # sow two times seminated. not in 1
+        seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
+        Semination.objects.create_semination(sow=seminated_sow3, week=1, initiator=None,
+         semination_employee=None)
+
+        # sow have usound
+        seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
+         initiator=None, result=True, days=30)
+
+        response = self.client.get('/api/sows/?seminated=1')
+        self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
+        self.assertEqual(response.data['count'], 1)
+
+        response = self.client.get('/api/sows/?seminated=2')
+        self.assertEqual(response.data['results'][0]['id'], seminated_sow3.pk)
+        self.assertEqual(response.data['count'], 1)
+
+
 
 
 class BoarViewSetTest(APITestCase):

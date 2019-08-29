@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Prefetch
 from django.core import exceptions
 
 from core.models import CoreModel, CoreModelManager
@@ -122,6 +122,21 @@ class SowManager(CoreModelManager):
                 tour__isnull=False,
                 ultrasound__u_type__days=60,
             )
+
+    def get_seminated(self):
+        # here cant use Prefetch with semination model because of circular import
+        # just return sow with tour(seminated), without usound and farrow
+        return self.get_queryset().filter(
+            ultrasound__sow__farm_id__isnull=True,
+            sowfarrow__sow__farm_id__isnull=True,
+            tour__isnull=False,
+            )
+            # ).prefetch_related(
+            #     Prefetch(
+            #         'semination_set',
+            #         queryset=
+            #     )
+            # )
 
 
 class Sow(Pig):

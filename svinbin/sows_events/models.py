@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.db import connection
 
 from core.models import Event, CoreModel, CoreModelManager
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
