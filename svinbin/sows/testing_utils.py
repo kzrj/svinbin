@@ -15,8 +15,9 @@ def create_statuses():
     if SowStatus.objects.all().count() < 1:
         SowStatus.objects.bulk_create([
             SowStatus(title='Осеменена'),
-            SowStatus(title='Ожидает УЗИ'),
             SowStatus(title='Супорос'),
+            # SowStatus(title='Супорос 30'),
+            # SowStatus(title='Супорос 60'),
             SowStatus(title='Прохолост'),            
             SowStatus(title='Брак'),
             SowStatus(title='Опоросилась, кормит'),

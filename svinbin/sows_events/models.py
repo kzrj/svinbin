@@ -46,18 +46,12 @@ class UltrasoundType(CoreModel):
 
 class UltrasoundManager(CoreModelManager):
     def create_ultrasound(self, sow, initiator=None, result=False, days=None):
+        u_type = None
         if days:
             u_type = UltrasoundType.objects.get(days=days)
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
          date=timezone.now(), result=result, u_type=u_type)
         if result:
-            # if ultrasound.u_type == 'УЗИ 3 недели':
-            #     # event
-            # if ultrasound.u_type == 'УЗИ промежуточный':
-            #     # event
-            # if ultrasound.u_type == 'УЗИ 6 недель':
-            #     # event
-            #     sow.change_status_to('Прошла УЗИ 6 недель, супорос')
             sow.change_status_to('Супорос')
         else:
             sow.tour = None
@@ -75,7 +69,6 @@ class Ultrasound(SowEvent):
 class SowFarrowManager(CoreModelManager):
     def create_sow_farrow(self, sow, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
-        # tour = Tour.objects.get_tour_by_week_in_current_year(week)
         tour = sow.tour
         sow.change_status_to('Опоросилась, кормит')
 

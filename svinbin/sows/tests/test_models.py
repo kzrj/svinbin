@@ -7,11 +7,12 @@ from django.db.models import Q
 
 import locations.testing_utils as locaions_testing
 import sows.testing_utils as sows_testings
+import sows_events.utils as sows_events_testings
 import piglets.testing_utils as piglets_testing
 
 from locations.models import Location
 from sows.models import Sow, Gilt
-from sows_events.models import SowFarrow, Ultrasound, UltrasoundV2, Semination
+from sows_events.models import SowFarrow, Ultrasound, Semination
 from tours.models import Tour
 
 
@@ -19,6 +20,7 @@ class SowModelManagerTest(TestCase):
     def setUp(self):
         locaions_testing.create_workshops_sections_and_cells()
         sows_testings.create_statuses()
+        sows_events_testings.create_types()
 
     def test_get_or_create_by_farm_id(self):
         location = Location.objects.get(workshop__number=1)
@@ -31,17 +33,6 @@ class SowModelManagerTest(TestCase):
         Sow.objects.get_or_create_by_farm_id(120)
         self.assertEqual(Sow.objects.all().count(), 100)        
         self.assertEqual(Sow.objects.filter(farm_id=120).count(), 1)
-
-    # def test_get_last_farrow(self):
-    #     location = Location.objects.create_workshop_location(workshop_number=3)
-    #     sow = sows_testings.create_sow_with_semination(location)
-    #     farrow1 = SowFarrow.objects.create_sow_farrow_by_sow_object(sow=sow, week=1,
-    #         alive_quantity=10, dead_quantity=1, mummy_quantity=1)
-    #     farrow2 = SowFarrow.objects.create_sow_farrow_by_sow_object(sow=sow, week=1,
-    #         alive_quantity=3, dead_quantity=1, mummy_quantity=1)
-    #     farrow3 = SowFarrow.objects.create_sow_farrow_by_sow_object(sow=sow, week=1,
-    #         alive_quantity=20, dead_quantity=1, mummy_quantity=5)
-    #     print(sow.get_last_farrow())
 
     def test_get_all_sows_in_workshop(self):
         sow1 = sows_testings.create_sow_and_put_in_workshop_one()
@@ -58,38 +49,26 @@ class SowModelManagerTest(TestCase):
         self.assertEqual(Sow.objects.get_all_sows_in_workshop(sow1.location.workshop)
             .filter(tour=seminated_sow1.tour).get().pk, seminated_sow1.pk)
 
-        # print(Sow.objects.all().values_list('tour', flat=True))
-        # print(type(Sow.objects.all().values_list('tour', flat=True)))
-        # print(list(Sow.objects.all().values_list('tour', flat=True)))
-
     def test_get_suporos_in_workshop(self):
         sow1 = sows_testings.create_sow_and_put_in_workshop_one()
-        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
         seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
-        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
         seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
 
         Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
-         initiator=None, result=True)
-        UltrasoundV2.objects.create_ultrasoundV2(sow=seminated_sow2,
          initiator=None, result=True)
         Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
          initiator=None, result=False)
 
         qs = Sow.objects.get_suporos_in_workshop(workshop=sow1.location.workshop)
         self.assertEqual(qs[0].pk, seminated_sow1.pk)
-        self.assertEqual(qs[1].pk, seminated_sow2.pk)
 
     def test_get_not_suporos_in_workshop(self):
         sow1 = sows_testings.create_sow_and_put_in_workshop_one()
         sow2 = sows_testings.create_sow_and_put_in_workshop_one()
         seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
-        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
         seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
 
         Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
-         initiator=None, result=True)
-        UltrasoundV2.objects.create_ultrasoundV2(sow=seminated_sow2,
          initiator=None, result=True)
         Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
          initiator=None, result=False)
@@ -98,20 +77,16 @@ class SowModelManagerTest(TestCase):
 
     def test_get_not_seminated_not_suporos_in_workshop(self):
         sow1 = sows_testings.create_sow_and_put_in_workshop_one()
-        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
         seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
-        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
         seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
-        seminated_sow4 = sows_testings.create_sow_with_semination(sow1.location)
 
         Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
          initiator=None, result=True)
-        UltrasoundV2.objects.create_ultrasoundV2(sow=seminated_sow2,
-         initiator=None, result=True)
+        
         Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
          initiator=None, result=False)
         qs = Sow.objects.get_not_seminated_not_suporos_in_workshop(workshop=sow1.location.workshop)        
-        self.assertEqual(list(qs.values_list(flat=True)), [seminated_sow3.pk, sow2.pk, sow1.pk])
+        self.assertEqual(list(qs.values_list(flat=True)), [seminated_sow3.pk, sow1.pk])
 
     def test_create_new_from_gilt_without_farm_id(self):
         sow_noname = Sow.objects.create_new_from_gilt_without_farm_id()
@@ -119,16 +94,11 @@ class SowModelManagerTest(TestCase):
 
     def test_get_without_farm_id_in_workshop(self):
         sow1 = sows_testings.create_sow_and_put_in_workshop_one()
-        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
         seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
-        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
         seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
-        seminated_sow4 = sows_testings.create_sow_with_semination(sow1.location)
         sow_noname = Sow.objects.create_new_from_gilt_without_farm_id()
 
         Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
-         initiator=None, result=True)
-        UltrasoundV2.objects.create_ultrasoundV2(sow=seminated_sow2,
          initiator=None, result=True)
         Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
          initiator=None, result=False)
@@ -155,8 +125,6 @@ class SowModelManagerTest(TestCase):
         self.assertEqual(sow.get_seminations_by_tour(tour).count(), 2)
         Ultrasound.objects.create_ultrasound(sow, None, True)
         self.assertEqual(sow.get_ultrasounds1_by_tour(tour).count(), 1)
-        UltrasoundV2.objects.create_ultrasoundV2(sow, None, True)
-        self.assertEqual(sow.get_ultrasoundsv2_by_tour(tour).count(), 1)
         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
         self.assertEqual(sow.get_farrows_by_tour(tour).count(), 1)
 
@@ -169,7 +137,6 @@ class SowModelManagerTest(TestCase):
         Semination.objects.create_semination(sow=sow, week=1, initiator=None,
          semination_employee=None)
         Ultrasound.objects.create_ultrasound(sow, None, True)
-        UltrasoundV2.objects.create_ultrasoundV2(sow, None, True)
         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
 
         # tour 2
@@ -178,7 +145,6 @@ class SowModelManagerTest(TestCase):
         Semination.objects.create_semination(sow=sow, week=2, initiator=None,
          semination_employee=None)
         Ultrasound.objects.create_ultrasound(sow, None, True)
-        UltrasoundV2.objects.create_ultrasoundV2(sow, None, True)
         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
 
         # tour 3
@@ -188,6 +154,72 @@ class SowModelManagerTest(TestCase):
 
         self.assertEqual(sow.get_tours_pk().first(), 
             Tour.objects.filter(week_number=1).first().pk)
+
+    def test_get_suporos_30(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
+
+        # in tour, without usound
+        seminated_sow4 = sows_testings.create_sow_with_semination(sow1.location)
+
+        # sow have usound 30 and 60, both true. In tour true
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True, days=60)
+
+        # have usound 30 false
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
+         initiator=None, result=False, days=30)
+
+        # have usound 30 True, In tour
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
+         initiator=None, result=True, days=30)
+
+        self.assertEqual(Sow.objects.get_suporos_30()[0], seminated_sow2)
+        self.assertEqual(Sow.objects.get_suporos_30().count(), 1)
+
+    def test_get_suporos_60(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow2 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow5 = sows_testings.create_sow_with_semination(sow1.location)
+        seminated_sow6 = sows_testings.create_sow_with_semination(sow1.location)
+
+        # in tour, without usound
+        seminated_sow4 = sows_testings.create_sow_with_semination(sow1.location)
+
+        # sow have usound 30 and 60, both true. In tour true. In qs
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True, days=60)
+
+        # sow have usound 30 and 60, both true. Not in tour true. Should not be in qs
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow6,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow6,
+         initiator=None, result=False, days=60)
+
+        # have usound 30 false. Should not be in qs
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
+         initiator=None, result=False, days=30)
+
+        # have usound 30 True, In tour. Should not be in qs
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
+         initiator=None, result=True, days=30)
+
+        # have u30, u60, tour and farrow. Should not be in qs
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
+         initiator=None, result=True, days=60)
+        SowFarrow.objects.create_sow_farrow(sow=seminated_sow5, alive_quantity=10,
+         dead_quantity=1, mummy_quantity=2)        
+        self.assertEqual(Sow.objects.get_suporos_60()[0], seminated_sow1)
 
 
 class GiltModelManagerTest(TestCase):

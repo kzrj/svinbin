@@ -109,12 +109,19 @@ class SowManager(CoreModelManager):
             location=workshop.location
             )
 
-    # def get_sows_for_semination(self):
-    #     return self.get_queryset().filter(
-    #         location=Location.objects.get(workshop__number=1),
-    #         farm_id__isnull=false,
-            
-    #         )
+    def get_suporos_30(self):
+        return self.get_queryset().filter(
+                ~Q(ultrasound__u_type__days=60),
+                tour__isnull=False,
+                ultrasound__u_type__days=30,
+            )
+
+    def get_suporos_60(self):
+        return self.get_queryset().filter(
+                sowfarrow__sow__farm_id__isnull=True,
+                tour__isnull=False,
+                ultrasound__u_type__days=60,
+            )
 
 
 class Sow(Pig):

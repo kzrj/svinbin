@@ -105,8 +105,6 @@ class SowViewSet(viewsets.ModelViewSet):
             
             ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
                 sow=sow,
-                # result=serializer.validated_data['result'],
-                u_type=u_type,
                 days=serializer.validated_data['days'],
                 initiator=request.user,
                 result=True,

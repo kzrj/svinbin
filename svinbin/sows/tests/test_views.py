@@ -113,6 +113,54 @@ class SowViewSetTest(APITestCase):
         self.assertEqual(sow.location.sowAndPigletsCell.section.number, 6)
         self.assertEqual(response.data['farrow']['alive_quantity'], 5)
 
+    def test_filter_suporos(self):
+        self.client.force_authenticate(user=self.user)
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+        seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
+        seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
+        seminated_sow5 = sows_testing.create_sow_with_semination(sow1.location)
+        seminated_sow6 = sows_testing.create_sow_with_semination(sow1.location)
+
+        # in tour, without usound
+        seminated_sow4 = sows_testing.create_sow_with_semination(sow1.location)
+
+        # sow have usound 30 and 60, both true. In tour true. In qs 60
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+         initiator=None, result=True, days=60)
+
+        # sow have usound 30 and 60, both true. Not in tour true. Should not be in qs
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow6,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow6,
+         initiator=None, result=False, days=60)
+
+        # have usound 30 false. Should not be in qs
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
+         initiator=None, result=False, days=30)
+
+        # have usound 30 True, In tour. Should not be in qs
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
+         initiator=None, result=True, days=30)
+
+        # have u30, u60, tour and farrow. Should not be in qs
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
+         initiator=None, result=True, days=60)
+        SowFarrow.objects.create_sow_farrow(sow=seminated_sow5, alive_quantity=10,
+         dead_quantity=1, mummy_quantity=2)
+
+        response = self.client.get('/api/sows/?suporos=30')
+        print(response.data)
+        self.assertEqual(response.data['results'][0]['id'], seminated_sow2.pk)
+
+        response = self.client.get('/api/sows/?suporos=60')
+        print(response.data)
+        self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
+
 
 class BoarViewSetTest(APITestCase):
     def setUp(self):

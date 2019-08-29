@@ -21,6 +21,8 @@ class SowFilter(filters.FilterSet):
         method='filter_status_title_not')
     status_title_not_contains = filters.CharFilter(field_name='status__title', 
         method='filter_status_title_not_contains')
+    suporos = filters.NumberFilter(field_name='suporos_30', 
+        method='filter_suporos')
 
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
@@ -30,6 +32,22 @@ class SowFilter(filters.FilterSet):
 
     def filter_status_title_not_contains(self, queryset, name, value):
         return queryset.filter(~Q(status__title__contains=value))
+
+    def filter_suporos(self, queryset, name, value):
+        if value == 30:
+            # tested in sow model manager         
+            return queryset.filter(
+                ~Q(ultrasound__u_type__days=60),
+                tour__isnull=False,
+                ultrasound__u_type__days=30,
+            )
+        if value == 60:
+            # tested in sow model manager         
+            return queryset.filter(
+                sowfarrow__sow__farm_id__isnull=True,
+                tour__isnull=False,
+                ultrasound__u_type__days=60,
+            )
 
     class Meta:
         model = Sow
