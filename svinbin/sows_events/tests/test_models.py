@@ -4,6 +4,7 @@ from django.test import TestCase
 from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, UltrasoundType
 from sows.models import Sow, Boar
 from piglets.models import NewBornPigletsGroup
+from locations.models import Location
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -73,6 +74,24 @@ class UltrasoundModelManagerTest(TestCase):
          initiator=None, result=False, days=60)
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Прохолост')
+
+    def test_mass_ultrasound(self):
+        location = Location.objects.get(workshop__number=1)
+        seminated_sow1 =  sows_testing.create_sow_with_semination(location, 1)
+        seminated_sow2 =  sows_testing.create_sow_with_semination(location, 1)
+        seminated_sow3 =  sows_testing.create_sow_with_semination(location, 1)
+
+        sows_qs = Sow.objects.filter(pk__in=[seminated_sow1.pk, seminated_sow2.pk, seminated_sow3.pk])
+        Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, initiator=None, result=True, days=30)
+
+        seminated_sow2.refresh_from_db()
+        self.assertEqual(seminated_sow2.status.title, 'Супорос')
+
+        Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, initiator=None, result=False, days=60)
+
+        seminated_sow3.refresh_from_db()
+        self.assertEqual(seminated_sow3.status.title, 'Прохолост')
+        self.assertEqual(seminated_sow3.tour, None)
 
 
 class SowFarrowModelManagerTest(TestCase):

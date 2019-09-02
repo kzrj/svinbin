@@ -167,6 +167,9 @@ class Sow(Pig):
         self.alive = alive
         self.save()
 
+    def change_status_without_save(self, status_title):
+        self.status = SowStatus.objects.get(title=status_title)
+
     def change_sow_current_location(self, to_location):
         self.location = to_location
         self.save()

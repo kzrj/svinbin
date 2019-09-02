@@ -11,12 +11,13 @@ from rest_framework.test import APITestCase
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
+import sows_events.utils as sows_events_testing
 import staff.testing_utils as staff_testing
 
 from sows.models import Boar
 from locations.models import Location
 from transactions.models import SowTransaction
-from sows_events.models import Ultrasound, UltrasoundV2
+from sows_events.models import Ultrasound, Semination
 
 
 class WorkshopOneTwoSowViewSetTest(APITestCase):
@@ -25,6 +26,8 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         sows_testing.create_boars()
+        sows_events_testing.create_types()
+        self.boar = Boar.objects.all().first()
         self.user = staff_testing.create_employee()
         
     def test_assing_farm_id(self):
@@ -53,7 +56,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         response = self.client.post('/api/workshoponetwo/sows/%s/semination/' %
           sow.pk, {'week': 7, 'semination_employee': semination_employee.pk, 'boar': boar.pk})
 
-        self.assertEqual(response.data['semination']['id'], 1)
+        self.assertNotEqual(response.data['semination']['id'], None)
         self.assertEqual(response.data['sow']['status'], 'Осеменена')
         self.assertEqual(response.data['semination']['boar'], boar.pk)
 
@@ -66,7 +69,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
           sow.pk, {'result': True})
 
         # self.assertEqual(response.data['ultrasound']['id'], 2)
-        self.assertEqual(response.data['sow']['status'], 'Прошла УЗИ1, супорос')
+        self.assertEqual(response.data['sow']['status'], 'Супорос')
 
     def test_culling(self):
         self.client.force_authenticate(user=self.user)
@@ -166,3 +169,51 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data['message'], 'Net remontok')
 
+    def test_mass_semination(self):
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testing.create_sow_and_put_in_workshop_one()
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/api/workshoponetwo/sows/mass_semination/',
+            { 'sows': [sow1.pk, sow2.pk, sow3.pk], 'week': 1, 
+              'semination_employee': self.user.pk, 'boar': self.boar.pk
+            })
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+        sow3.refresh_from_db()
+        self.assertEqual(sow1.tour.week_number, 1)
+        self.assertEqual(sow2.tour.week_number, 1)
+        self.assertEqual(sow3.tour.week_number, 1)
+
+        self.assertEqual(sow1.status.title, 'Осеменена')
+        self.assertEqual(sow2.status.title, 'Осеменена')
+        self.assertEqual(sow3.status.title, 'Осеменена')
+
+
+    def test_mass_semination(self):
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testing.create_sow_and_put_in_workshop_one()
+
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/api/workshoponetwo/sows/mass_semination/',
+            { 'sows': [sow1.pk, sow2.pk, sow3.pk], 'week': 1, 
+              'semination_employee': self.user.pk, 'boar': self.boar.pk
+            })
+
+        response = self.client.post('/api/workshoponetwo/sows/mass_ultrasound/',
+            { 'sows': [sow1.pk, sow2.pk, sow3.pk], 'days': 30, 
+              'result': True
+            })
+
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+        sow3.refresh_from_db()
+        self.assertEqual(sow1.tour.week_number, 1)
+        self.assertEqual(sow2.tour.week_number, 1)
+        self.assertEqual(sow3.tour.week_number, 1)
+
+        self.assertEqual(sow1.status.title, 'Супорос')
+        self.assertEqual(sow2.status.title, 'Супорос')
+        self.assertEqual(sow3.status.title, 'Супорос')

@@ -72,6 +72,19 @@ class UltrasoundManager(CoreModelManager):
             sow.change_status_to('Прохолост')
         return ultrasound
 
+    def mass_ultrasound(self, sows_qs, initiator=None, result=False, days=None):
+        u_type = UltrasoundType.objects.get(days=days)
+        ultrasounds = list()
+        for sow in sows_qs:
+            ultrasounds.append(Ultrasound(sow=sow, tour=sow.tour, initiator=initiator, date=timezone.now(),
+                result=result, u_type=u_type))
+        Ultrasound.objects.bulk_create(ultrasounds)
+        if result:
+            sows_qs.update_status('Супорос')
+        else:
+            sows_qs.update(tour=None)
+            sows_qs.update_status('Прохолост')
+
 
 class Ultrasound(SowEvent):
     result = models.BooleanField()

@@ -54,6 +54,21 @@ class SowsToMoveSerializer(serializers.Serializer):
     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
 
 
+class SowsMassSeminationSerializer(serializers.ModelSerializer):
+    sows = serializers.ListField(child=serializers.IntegerField())
+    week = serializers.IntegerField()
+
+    class Meta:
+        model = Semination
+        fields = ['sows', 'week', 'semination_employee', 'boar']
+
+
+class SowsMassUltrasoundSerializer(serializers.Serializer):
+    sows = serializers.ListField(child=serializers.IntegerField())
+    days = serializers.IntegerField()
+    result =serializers.BooleanField()  
+
+
 # Init only
 class InitOnlyCreateSow(serializers.Serializer):
     farm_id = serializers.IntegerField()

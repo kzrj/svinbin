@@ -195,3 +195,44 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                     })
 
         return Response(data, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False)
+    def mass_semination(self, request):
+        serializer = sows_serializers.SowsMassSeminationSerializer(data=request.data)
+        if serializer.is_valid():
+            sows_qs = sows_models.Sow.objects.filter(pk__in=serializer.validated_data['sows'])
+            sows_events_models.Semination.objects.mass_semination(
+                sows_qs=sows_qs,
+                week=serializer.validated_data['week'],
+                semination_employee=serializer.validated_data['semination_employee'],
+                boar=serializer.validated_data['boar'],
+                initiator=request.user
+                )
+
+            return Response(
+                {
+                    "message": "ok"
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False)
+    def mass_ultrasound(self, request):
+        serializer = sows_serializers.SowsMassUltrasoundSerializer(data=request.data)
+        if serializer.is_valid():
+            sows_qs = sows_models.Sow.objects.filter(pk__in=serializer.validated_data['sows'])
+            sows_events_models.Ultrasound.objects.mass_ultrasound(
+                sows_qs=sows_qs,
+                days=serializer.validated_data['days'],
+                result=serializer.validated_data['result'],
+                initiator=request.user
+                )
+
+            return Response(
+                {
+                    "message": "ok"
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
