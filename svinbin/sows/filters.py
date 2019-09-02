@@ -56,6 +56,16 @@ class SowFilter(filters.FilterSet):
             return queryset
 
     def filter_seminated(self, queryset, name, value):
+        if value == 0:
+            # sows = list()       
+            # sows_init_qs = queryset.filter(
+            #     tour__isnull=True,
+            #     )
+            # for sow in sows_init_qs:
+            #     if len(sow.seminations_by_current_tour) == 1:
+            #         sows.append(sow.pk)
+            return sows_init_qs.filter(tour__isnull=True,)
+
         if value == 1:
             sows = list()       
             sows_init_qs = queryset.filter(
@@ -91,7 +101,7 @@ class SowFilter(filters.FilterSet):
                 if len(sow.seminations_by_current_tour) == 2:
                     sows.append(sow.pk)
             return sows_init_qs.filter(pk__in=sows)
-            
+
         if not value:
             return queryset
 
