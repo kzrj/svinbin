@@ -52,6 +52,8 @@ class SowFilter(filters.FilterSet):
                 tour__isnull=False,
                 ultrasound__u_type__days=60,
             )
+        if not value:
+            return queryset
 
     def filter_seminated(self, queryset, name, value):
         if value == 1:
@@ -89,6 +91,9 @@ class SowFilter(filters.FilterSet):
                 if len(sow.seminations_by_current_tour) == 2:
                     sows.append(sow.pk)
             return sows_init_qs.filter(pk__in=sows)
+            
+        if not value:
+            return queryset
 
 
     class Meta:
