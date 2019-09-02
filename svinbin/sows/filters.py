@@ -57,13 +57,6 @@ class SowFilter(filters.FilterSet):
 
     def filter_seminated(self, queryset, name, value):
         if value == 0:
-            # sows = list()       
-            # sows_init_qs = queryset.filter(
-            #     tour__isnull=True,
-            #     )
-            # for sow in sows_init_qs:
-            #     if len(sow.seminations_by_current_tour) == 1:
-            #         sows.append(sow.pk)
             return queryset.filter(tour__isnull=True, farm_id__isnull=False)
 
         if value == 1:

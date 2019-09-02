@@ -25,11 +25,34 @@ class SowSerializer(serializers.ModelSerializer):
     # seminations in current tour
     # ultrasounds in current tour
 
-    # seminations = serializers.SerializerMethodField()
+    class Meta:
+        model = Sow
+        fields = '__all__'
+
+
+
+class SowManySerializer(serializers.ModelSerializer):
+    location = serializers.StringRelatedField()
+    status = serializers.StringRelatedField()
+    tour = serializers.StringRelatedField()
+    status = serializers.StringRelatedField()
+
+    seminations_current_tour = serializers.ReadOnlyField(
+        source='get_seminations_by_current_tour_values_list')
+
+    # ultrasounds in current tour
+
 
     class Meta:
         model = Sow
         fields = '__all__'
+
+
+class SowManySeminationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Semination
+        fields = ['date']
+        # exclude = ['created_at', 'modified_at', 'sow', 'id']
 
 
 class SowSeminationSerializer(serializers.ModelSerializer):

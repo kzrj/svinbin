@@ -2,11 +2,13 @@
 from django.contrib.auth.models import User
 from django.utils import timezone
 from django.db import connection
+from django.db.models import F, Prefetch
 
 from rest_framework.views import APIView
 from rest_framework import viewsets, status, generics, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.pagination import LimitOffsetPagination
 
 import sows.serializers as sows_serializers
 import sows_events.serializers as sows_events_serializers
@@ -30,6 +32,7 @@ class SowViewSet(viewsets.ModelViewSet):
     queryset = sows_models.Sow.objects.all()
     serializer_class = sows_serializers.SowSerializer
     filter_class = SowFilter
+    # pagination_class = LimitOffsetPagination
 
     def retrieve(self, request, pk=None):
         sow = self.get_object()
@@ -54,6 +57,25 @@ class SowViewSet(viewsets.ModelViewSet):
             },
             status=status.HTTP_200_OK
         )
+
+    def list(self, request):
+        # should be in model!
+        queryset = self.filter_queryset(
+            self.get_queryset().prefetch_related(
+                Prefetch(
+                    'semination_set',
+                    queryset=sows_events_models.Semination.objects.filter(tour=F('tour'))
+                )
+            ))
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = sows_serializers.SowManySerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = sows_serializers.SowManySerializer(queryset, many=True)
+        return Response(serializer.data)
+
 
     @action(methods=['post'], detail=False)
     def add_new_seminated_to_ws1(self, request):

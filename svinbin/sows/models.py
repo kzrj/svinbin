@@ -36,6 +36,15 @@ class SowsQuerySet(models.QuerySet):
     def update_tour(self, title):
         return self.update(status=SowStatus.objects.get(title=title))
 
+    # def get_with_seminations_in_current_tour(self):
+    #     self.prefetch_related(
+    #             Prefetch(
+    #                 'semination_set',
+    #                 queryset=
+    #             )
+    #         )
+        
+
 
 class SowManager(CoreModelManager):
     def get_queryset(self):
@@ -185,6 +194,13 @@ class Sow(Pig):
 
     def get_seminations_by_tour(self, tour):
         return self.semination_set.filter(tour=tour)      
+
+    def get_seminations_by_tour_values_list(self, tour):
+        return self.semination_set.filter(tour=tour).values_list('tour', flat=True)
+
+    @property
+    def get_seminations_by_current_tour_values_list(self):
+        return self.semination_set.filter(tour=self.tour).values_list('tour', flat=True)
 
     def get_ultrasounds1_by_tour(self, tour):
         return self.ultrasound_set.filter(tour=tour)

@@ -179,6 +179,9 @@ class SowViewSetTest(APITestCase):
          initiator=None, result=True, days=30)
 
         response = self.client.get('/api/sows/?seminated=1')
+        print(response.data)
+        print(response.data['results'][0]['seminations_current_tour'])
+        print(type(response.data['results'][0]['seminations_current_tour']))
         self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
         self.assertEqual(response.data['count'], 1)
 
