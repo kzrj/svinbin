@@ -64,7 +64,7 @@ class SowFilter(filters.FilterSet):
             # for sow in sows_init_qs:
             #     if len(sow.seminations_by_current_tour) == 1:
             #         sows.append(sow.pk)
-            return sows_init_qs.filter(tour__isnull=True,)
+            return queryset.filter(tour__isnull=True,)
 
         if value == 1:
             sows = list()       
