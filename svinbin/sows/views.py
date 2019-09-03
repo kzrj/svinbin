@@ -66,7 +66,13 @@ class SowViewSet(viewsets.ModelViewSet):
                     'semination_set',
                     queryset=sows_events_models.Semination.objects.filter(tour=F('tour'))
                 )
-            ))
+            ).prefetch_related(
+                Prefetch(
+                    'ultrasound_set',
+                    queryset=sows_events_models.Ultrasound.objects.filter(tour=F('tour'))
+                )
+            )
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:

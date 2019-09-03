@@ -179,9 +179,6 @@ class SowViewSetTest(APITestCase):
          initiator=None, result=True, days=30)
 
         response = self.client.get('/api/sows/?seminated=1')
-        print(response.data)
-        print(response.data['results'][0]['seminations_current_tour'])
-        print(type(response.data['results'][0]['seminations_current_tour']))
         self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
         self.assertEqual(response.data['count'], 1)
 
@@ -189,7 +186,46 @@ class SowViewSetTest(APITestCase):
         self.assertEqual(response.data['results'][0]['id'], seminated_sow3.pk)
         self.assertEqual(response.data['count'], 1)
 
+    def test_seminations_ultrasound_in_sows_list(self):
+        self.client.force_authenticate(user=self.user)
+        
+        # not seminated sow
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
 
+        # sow one time seminated
+        seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+        
+        # sow two times seminated. not in 1
+        seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
+        Semination.objects.create_semination(sow=seminated_sow3, week=1, initiator=None,
+         semination_employee=None)
+
+        # sow have usound
+        seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
+         initiator=None, result=True, days=30)
+
+        seminated_sow4 = sows_testing.create_sow_with_semination(sow1.location)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow4,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow4,
+         initiator=None, result=True, days=60)
+
+        # 1 semination
+        response = self.client.get('/api/sows/?seminated=1')
+        self.assertEqual(len(response.data['results'][0]['seminations_current_tour']), 1)
+
+        # 2 semination
+        response = self.client.get('/api/sows/?seminated=2')
+        self.assertEqual(len(response.data['results'][0]['seminations_current_tour']), 2)
+
+        # usound 30
+        response = self.client.get('/api/sows/?suporos=30')
+        self.assertEqual(len(response.data['results'][0]['ultrasound_30_current_tour']), 1)
+
+        # usound 60
+        response = self.client.get('/api/sows/?suporos=60')
+        self.assertEqual(len(response.data['results'][0]['ultrasound_60_current_tour']), 1)
 
 
 class BoarViewSetTest(APITestCase):
