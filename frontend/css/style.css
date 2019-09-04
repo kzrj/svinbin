@@ -13,9 +13,16 @@
 }
 
 .cell{
-	border: 2px solid gray;
-	max-width: 65px !important;
+	border: 1px solid gray;
+	/*max-width: 65px !important;*/
 }
+
+.cell-full{
+	border: 1px solid gray;
+	background-color: red !important;
+	/*max-width: 65px !important;*/
+}
+
 .cell-active{
 	background-color: green;
 }
@@ -89,4 +96,8 @@
 	border-bottom: 2px solid #747474 !important;
 	background: #E0E0E0;
 	min-height: 50px;
+}
+
+.sow-row-active {
+	background: green;
 }
