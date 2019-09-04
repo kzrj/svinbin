@@ -238,17 +238,28 @@ class SowModelManagerTest(TestCase):
         Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
          initiator=None, result=True, days=30)
 
-        # print(Sow.objects.get_with_one_semination())
-        # sows = list()
-        # qs = Sow.objects.get_with_one_semination()
-        # for sow in qs:
-        #     print(sow.semination_set.all())
-        #     if sow.semination_set.all().count() == 1:
-        #         sows.append(sow)
-        # print(sows)
         self.assertEqual(Sow.objects.get_seminated()[0], seminated_sow3)
         self.assertEqual(Sow.objects.get_seminated()[1], seminated_sow1)
         self.assertEqual(Sow.objects.get_seminated().count(), 2)
+
+    def test_is_farrow_in_current_tour(self):
+        sow = sows_testings.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
+        
+        self.assertEqual(sow.is_farrow_in_current_tour, True)
+
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow2, None, True)
+        self.assertEqual(sow2.is_farrow_in_current_tour, False)
 
 
 class GiltModelManagerTest(TestCase):

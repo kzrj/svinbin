@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
 
-from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, UltrasoundType
+from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, \
+    UltrasoundType, WeaningSow
 from sows.models import Sow, Boar
 from piglets.models import NewBornPigletsGroup
 from locations.models import Location
+from transactions.models import SowTransaction
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -153,3 +155,73 @@ class CullingSowManagerTest(TestCase):
         self.assertEqual(culling.sow, sow)
         self.assertEqual(culling.culling_type, 'spec')
         self.assertEqual(culling.reason, 'prichina')
+
+
+class WeaningSowTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+
+    def test_create_weaning(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
+        self.assertEqual(sow.tour.week_number, 1)
+        
+        to_location = Location.objects.get(workshop__number=3)
+        transaction1 = SowTransaction.objects.create_transaction(sow=sow, 
+            to_location=to_location)
+     
+        weaning1 = WeaningSow.objects.all().first()
+        self.assertNotEqual(weaning1, None)
+        self.assertEqual(weaning1.transaction, transaction1)
+        self.assertEqual(weaning1.sow, sow)
+
+        sow.refresh_from_db()
+        self.assertEqual(sow.tour, None)
+
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow2, None, True)
+
+        transaction2 = SowTransaction.objects.create_transaction(sow=sow, 
+            to_location=to_location)
+
+        weaning2 = WeaningSow.objects.filter(transaction=transaction2).first()
+        self.assertEqual(weaning2, None)
+        sow2.refresh_from_db()
+        self.assertEqual(sow2.tour.week_number, 1)
+
+    def test_create_weaning_many(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
+ 
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow2, None, True)
+        SowFarrow.objects.create_sow_farrow(sow=sow2, alive_quantity=7, mummy_quantity=1)
+
+        to_location = Location.objects.get(workshop__number=3)
+        transactions_ids = SowTransaction.objects.create_many_transactions(sows=[sow, sow2], 
+            to_location=to_location)
+
+        self.assertEqual(WeaningSow.objects.all().count(), 2)
+        sow.refresh_from_db()
+        sow2.refresh_from_db()
+        self.assertEqual(sow.tour, None)
+        self.assertEqual(sow2.tour, None)

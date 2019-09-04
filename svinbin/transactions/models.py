@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.conf import settings
 
 from core.models import CoreModel, CoreModelManager, Event
+from sows_events.models import WeaningSow
 
 
 class Transaction(Event):
@@ -21,6 +22,10 @@ class SowTransactionManager(CoreModelManager):
                 to_location=to_location,
                 sow=sow
                 )
+
+        if sow.is_farrow_in_current_tour:
+            WeaningSow.objects.create_weaning(sow=sow, transaction=transaction,
+                initiator=initiator)
 
         sow.change_sow_current_location(to_location)
 

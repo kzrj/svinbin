@@ -149,3 +149,18 @@ class CullingSow(SowEvent):
     reason = models.CharField(max_length=300, null=True)
 
     objects = CullingSowManager()
+
+
+class WeaningSowManager(CoreModelManager):
+    def create_weaning(self, sow, transaction, initiator=None):
+        weaning = self.create(sow=sow, tour=sow.tour, transaction=transaction,
+         initiator=initiator, date=timezone.now())
+        sow.tour = None
+        # sow.save()
+        return weaning
+
+
+class WeaningSow(SowEvent):
+    transaction = models.ForeignKey('transactions.SowTransaction', 
+        on_delete=models.SET_NULL, null=True)
+    objects = WeaningSowManager()

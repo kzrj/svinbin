@@ -187,6 +187,12 @@ class Sow(Pig):
         # print(self._meta.get_fields())
         return self.sowfarrow_set.all().order_by('-created_at')
 
+    @property
+    def is_farrow_in_current_tour(self):
+        if self.sowfarrow_set.filter(tour=self.tour).first():
+            return True
+        return False
+
     def assing_farm_id(self, farm_id):
         self.farm_id = farm_id
         self.status = SowStatus.objects.get(title='Ожидает осеменения')
