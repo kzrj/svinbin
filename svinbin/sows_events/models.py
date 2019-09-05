@@ -40,12 +40,11 @@ class SeminationManager(CoreModelManager):
         for sow in sows_qs:
             seminations.append(Semination(sow=sow, tour=tour, initiator=initiator,
              semination_employee=semination_employee, boar=boar, date=timezone.now()))    
-                     
-        Semination.objects.bulk_create(seminations)
+
+        self.bulk_create(seminations)
 
         sows_qs.update(tour=tour)
 
-        # to sow manager
         once_seminated_sows_qs, more_than_once_seminated_sows_qs = \
             sows_qs.get_list_of_qs_by_seminations_in_tour(tour)
 

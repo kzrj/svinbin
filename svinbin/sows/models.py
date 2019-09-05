@@ -40,7 +40,7 @@ class SowsQuerySet(models.QuerySet):
                 Prefetch(
                     'semination_set',
                     queryset=Semination.objects.filter(tour=tour),
-                    to_attr="seminations_by_current_tour"
+                    to_attr="seminations_by_tour"
                 )
             )
 
@@ -48,15 +48,14 @@ class SowsQuerySet(models.QuerySet):
         once_seminated_sows = list()
         more_than_once_seminated_sows = list()
         for sow in self.get_with_seminations_in_tour(tour):
-            if len(sow.seminations_by_current_tour) == 1:
+            if len(sow.seminations_by_tour) == 1:
                 once_seminated_sows.append(sow.pk)
 
-            if len(sow.seminations_by_current_tour) > 1:
+            if len(sow.seminations_by_tour) > 1:
                 more_than_once_seminated_sows.append(sow.pk)
 
         return self.filter(pk__in=once_seminated_sows), self.filter(pk__in=more_than_once_seminated_sows)
         
-
 
 class SowManager(CoreModelManager):
     def get_queryset(self):

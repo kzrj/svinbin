@@ -293,6 +293,70 @@ class SowModelManagerTest(TestCase):
          semination_employee=None)
         self.assertEqual(sow.does_once_seminate_in_tour, False)
 
+    def test_get_with_seminations_in_tour(self):
+        sow = sows_testings.create_sow_and_put_in_workshop_one()
+        
+        # 1 semination
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+
+        sows_qs = Sow.objects.all().get_with_seminations_in_tour(
+                tour=Tour.objects.get(week_number=1))
+        self.assertEqual(len(sows_qs.first().seminations_by_tour), 1)
+
+        # not seminated
+        sow.refresh_from_db()
+        tour = Tour.objects.get_or_create_by_week_in_current_year(2)
+        sows_qs = Sow.objects.all().get_with_seminations_in_tour(
+                tour=tour)
+        self.assertEqual(len(sows_qs.first().seminations_by_tour), 0)
+
+        # 2 semination in another tour
+        Semination.objects.create_semination(sow=sow, week=2, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=2, initiator=None,
+         semination_employee=None)
+
+        sows_qs = Sow.objects.all().get_with_seminations_in_tour(
+                tour=tour)
+        self.assertEqual(len(sows_qs.first().seminations_by_tour), 2)
+
+    def test_get_list_of_qs_by_seminations_in_tour(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        
+        # 1 semination sow1, 2 semination sow2
+        Semination.objects.create_semination(sow=sow1, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+
+        sows_once_seminated_qs, sows_two_seminated_qs = Sow.objects.all().get_list_of_qs_by_seminations_in_tour(
+                tour=Tour.objects.get(week_number=1))
+        self.assertEqual(sows_once_seminated_qs.count(), 1)
+        self.assertEqual(sows_once_seminated_qs.first(), sow1)
+        self.assertEqual(sows_two_seminated_qs.count(), 1)
+        self.assertEqual(sows_two_seminated_qs.first(), sow2)
+
+        # lets seminate sow1 by tour 2. sow1 have 2 seminations with different tours
+        Semination.objects.create_semination(sow=sow1, week=2, initiator=None,
+         semination_employee=None)
+        sows_once_seminated_qs, sows_two_seminated_qs = Sow.objects.all().get_list_of_qs_by_seminations_in_tour(
+                tour=Tour.objects.get(week_number=1))
+        self.assertEqual(sows_once_seminated_qs.count(), 1)
+        self.assertEqual(sows_once_seminated_qs.first(), sow1)
+        self.assertEqual(sows_two_seminated_qs.count(), 1)
+        self.assertEqual(sows_two_seminated_qs.first(), sow2)
+
+        sows_once_seminated_qs, sows_two_seminated_qs = Sow.objects.all().get_list_of_qs_by_seminations_in_tour(
+                tour=Tour.objects.get(week_number=2))
+        self.assertEqual(sows_once_seminated_qs.count(), 1)
+        self.assertEqual(sows_once_seminated_qs.first(), sow1)
+        self.assertEqual(sows_two_seminated_qs.count(), 0)
+        self.assertEqual(sows_two_seminated_qs.first(), None)
+
 
 class GiltModelManagerTest(TestCase):
     def setUp(self):
