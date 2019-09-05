@@ -113,3 +113,77 @@ class SowStatusesTest(TestCase):
         self.assertEqual(sow2.status.title, 'Осеменена 2')
         sow3.refresh_from_db()
         self.assertEqual(sow3.status.title, 'Осеменена 2')
+
+    def test_usound_statuses(self):
+        sow = sows_testings.create_sow_and_put_in_workshop_one()
+        
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+
+        Ultrasound.objects.create_ultrasound(sow=sow, result=True, days=30)
+        self.assertEqual(sow.status.title, 'Супорос 30')
+
+        Ultrasound.objects.create_ultrasound(sow=sow, result=True, days=60)
+        self.assertEqual(sow.status.title, 'Супорос 60')
+
+        Ultrasound.objects.create_ultrasound(sow=sow, result=False, days=30)
+        self.assertEqual(sow.status.title, 'Прохолост')
+
+
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow=sow, result=False, days=60)
+        self.assertEqual(sow.status.title, 'Прохолост')
+
+    def test_mass_usound_statuses(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testings.create_sow_and_put_in_workshop_one()
+        
+        Semination.objects.create_semination(sow=sow1, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow3, week=1, initiator=None,
+         semination_employee=None)
+
+        sows_qs = Sow.objects.filter(pk__in=[sow1.pk, sow2.pk, sow3.pk])
+        Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, result=True, days=30)
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+        sow3.refresh_from_db()
+        self.assertEqual(sow1.status.title, 'Супорос 30')
+        self.assertEqual(sow2.status.title, 'Супорос 30')
+        self.assertEqual(sow3.status.title, 'Супорос 30')
+
+        Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, result=True, days=60)
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+        sow3.refresh_from_db()
+        self.assertEqual(sow1.status.title, 'Супорос 60')
+        self.assertEqual(sow2.status.title, 'Супорос 60')
+        self.assertEqual(sow3.status.title, 'Супорос 60')
+
+        Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, result=False, days=30)
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+        sow3.refresh_from_db()
+        self.assertEqual(sow1.status.title, 'Прохолост')
+        self.assertEqual(sow2.status.title, 'Прохолост')
+        self.assertEqual(sow3.status.title, 'Прохолост')
+        
+        Semination.objects.create_semination(sow=sow1, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow2, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow3, week=1, initiator=None,
+         semination_employee=None)
+        sows_qs = Sow.objects.filter(pk__in=[sow1.pk, sow2.pk, sow3.pk])
+        Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, result=False, days=60)
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+        sow3.refresh_from_db()
+        self.assertEqual(sow1.status.title, 'Прохолост')
+        self.assertEqual(sow2.status.title, 'Прохолост')
+        self.assertEqual(sow3.status.title, 'Прохолост')
+  

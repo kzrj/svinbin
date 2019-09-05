@@ -77,7 +77,10 @@ class UltrasoundManager(CoreModelManager):
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
          date=timezone.now(), result=result, u_type=u_type)
         if result:
-            sow.change_status_to('Супорос')
+            if days == 30:
+                sow.change_status_to('Супорос 30')
+            if days == 60:
+                sow.change_status_to('Супорос 60')
         else:
             sow.tour = None
             sow.change_status_to('Прохолост')
@@ -87,11 +90,15 @@ class UltrasoundManager(CoreModelManager):
         u_type = UltrasoundType.objects.get(days=days)
         ultrasounds = list()
         for sow in sows_qs:
-            ultrasounds.append(Ultrasound(sow=sow, tour=sow.tour, initiator=initiator, date=timezone.now(),
-                result=result, u_type=u_type))
+            ultrasounds.append(Ultrasound(sow=sow, tour=sow.tour, initiator=initiator,
+             date=timezone.now(), result=result, u_type=u_type))
         Ultrasound.objects.bulk_create(ultrasounds)
+
         if result:
-            sows_qs.update_status('Супорос')
+            if days == 30:
+                sows_qs.update_status('Супорос 30')
+            if days == 60:
+                sows_qs.update_status('Супорос 60')
         else:
             sows_qs.update(tour=None)
             sows_qs.update_status('Прохолост')
