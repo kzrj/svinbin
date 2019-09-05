@@ -44,6 +44,8 @@ class SowFilter(filters.FilterSet):
                 ~Q(ultrasound__u_type__days=60),
                 tour__isnull=False,
                 ultrasound__u_type__days=30,
+                # ultrasound__tour=F('tour'),
+                # ultrasound__result=True,
             )
         if value == 60:
             # tested in sow model manager         

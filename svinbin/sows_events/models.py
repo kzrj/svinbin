@@ -24,8 +24,12 @@ class SeminationManager(CoreModelManager):
         tour = Tour.objects.get_or_create_by_week_in_current_year(week)
         semination = self.create(sow=sow, tour=tour, initiator=initiator,
          semination_employee=semination_employee, date=timezone.now(), boar=boar)
+
         sow.tour = tour
-        sow.change_status_to('Осеменена')
+        if len(sow.get_seminations_by_current_tour_values_list) == 1:
+            sow.change_status_to('Осеменена 1')
+        if len(sow.get_seminations_by_current_tour_values_list) > 1:
+            sow.change_status_to('Осеменена 2')
         return semination
 
     def mass_semination(self, sows_qs, week, initiator=None, semination_employee=None,
@@ -35,10 +39,18 @@ class SeminationManager(CoreModelManager):
         seminations = list()
         for sow in sows_qs:
             seminations.append(Semination(sow=sow, tour=tour, initiator=initiator,
-             semination_employee=semination_employee, boar=boar, date=timezone.now()))
+             semination_employee=semination_employee, boar=boar, date=timezone.now()))    
+                     
         Semination.objects.bulk_create(seminations)
-        sows_qs.update_status('Осеменена')
+
         sows_qs.update(tour=tour)
+
+        # to sow manager
+        once_seminated_sows_qs, more_than_once_seminated_sows_qs = \
+            sows_qs.get_list_of_qs_by_seminations_in_tour(tour)
+
+        once_seminated_sows_qs.update_status('Осеменена 1')
+        more_than_once_seminated_sows_qs.update_status('Осеменена 2')
 
 
 class Semination(SowEvent):

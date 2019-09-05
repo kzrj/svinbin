@@ -3,7 +3,6 @@ from django.utils import timezone
 from django.apps import apps
 
 from core.models import CoreModel, CoreModelManager
-from sows.models import Sow
 from sows_events import models as events_models
 
 

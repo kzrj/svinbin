@@ -6,6 +6,8 @@ from django.core import exceptions
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location
 
+from sows_events.models import Semination
+
 
 class SowStatus(CoreModel):
     title = models.CharField(max_length=100)
@@ -33,16 +35,26 @@ class SowsQuerySet(models.QuerySet):
     def update_status(self, title):
         return self.update(status=SowStatus.objects.get(title=title))
 
-    def update_tour(self, title):
-        return self.update(status=SowStatus.objects.get(title=title))
+    def get_with_seminations_in_tour(self, tour):
+        return self.prefetch_related(
+                Prefetch(
+                    'semination_set',
+                    queryset=Semination.objects.filter(tour=tour),
+                    to_attr="seminations_by_current_tour"
+                )
+            )
 
-    # def get_with_seminations_in_current_tour(self):
-    #     self.prefetch_related(
-    #             Prefetch(
-    #                 'semination_set',
-    #                 queryset=
-    #             )
-    #         )
+    def get_list_of_qs_by_seminations_in_tour(self, tour):
+        once_seminated_sows = list()
+        more_than_once_seminated_sows = list()
+        for sow in self.get_with_seminations_in_tour(tour):
+            if len(sow.seminations_by_current_tour) == 1:
+                once_seminated_sows.append(sow.pk)
+
+            if len(sow.seminations_by_current_tour) > 1:
+                more_than_once_seminated_sows.append(sow.pk)
+
+        return self.filter(pk__in=once_seminated_sows), self.filter(pk__in=more_than_once_seminated_sows)
         
 
 
@@ -203,6 +215,12 @@ class Sow(Pig):
 
     def get_seminations_by_tour_values_list(self, tour):
         return self.semination_set.filter(tour=tour).values_list('date', flat=True)
+
+    @property
+    def does_once_seminate_in_tour(self):
+        if len(self.get_seminations_by_current_tour_values_list) == 1:
+            return True
+        return False
 
     @property
     def get_seminations_by_current_tour_values_list(self):

@@ -261,6 +261,38 @@ class SowModelManagerTest(TestCase):
         Ultrasound.objects.create_ultrasound(sow2, None, True)
         self.assertEqual(sow2.is_farrow_in_current_tour, False)
 
+    def test_does_once_seminate_in_tour(self):
+        sow = sows_testings.create_sow_and_put_in_workshop_one()
+        
+        # 1 semination
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        self.assertEqual(sow.does_once_seminate_in_tour, True)
+
+        # 2 seminations
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        sow.refresh_from_db()
+        self.assertEqual(sow.does_once_seminate_in_tour, False)
+
+        Ultrasound.objects.create_ultrasound(sow=sow, result=False, days=30)
+        sow.refresh_from_db()
+        self.assertEqual(sow.tour, None)
+
+        # not seminated
+        sow.refresh_from_db()
+        self.assertEqual(sow.does_once_seminate_in_tour, False)
+
+        # 1 semination in another tour
+        Semination.objects.create_semination(sow=sow, week=2, initiator=None,
+         semination_employee=None)
+        self.assertEqual(sow.does_once_seminate_in_tour, True)
+
+        # 2 semination in anopther tour
+        Semination.objects.create_semination(sow=sow, week=2, initiator=None,
+         semination_employee=None)
+        self.assertEqual(sow.does_once_seminate_in_tour, False)
+
 
 class GiltModelManagerTest(TestCase):
     def setUp(self):

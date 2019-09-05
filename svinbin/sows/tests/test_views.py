@@ -25,8 +25,10 @@ class SowViewSetTest(APITestCase):
         self.client = APIClient()
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
+        sows_testing.create_boars()
         sows_events_testing.create_types()
         self.user = staff_testing.create_employee()
+        self.boar = Boar.objects.all().first()
         
     def test_get_sow(self):
         self.client.force_authenticate(user=self.user)
@@ -158,6 +160,97 @@ class SowViewSetTest(APITestCase):
 
         response = self.client.get('/api/sows/?suporos=60')
         self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
+
+
+    def test_filter_suporos2(self):
+        '''
+            sow seminated 2 times then usoudn 30 false
+        '''
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+
+        # seminate 2 times
+        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+            initiator=self.user, boar=self.boar, week=1)
+        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+            initiator=self.user, boar=self.boar, week=1)
+
+        # usound30 false, sow1 tour disabled
+        Ultrasound.objects.create_ultrasound(sow=sow1, result=False, days=30, initiator=self.user)
+
+        self.client.force_authenticate(user=self.user)
+
+        # seminated=0. Should be
+        response = self.client.get('/api/sows/?seminated=0')
+        self.assertEqual(response.data['results'][0]['id'], sow1.pk)
+
+        # seminated=1. Should not be
+        response = self.client.get('/api/sows/?seminated=1')
+        print(response.data)
+        self.assertEqual(response.data['count'], 0)
+
+        # seminated=2. Should not be
+        response = self.client.get('/api/sows/?seminated=2')
+        print(response.data)
+        self.assertEqual(response.data['count'], 0)
+
+        # suporos=30. Should not be
+        response = self.client.get('/api/sows/?suporos=30')
+        print(response.data)
+        self.assertEqual(response.data['count'], 0)
+
+        # suporos=60. Should not be
+        response = self.client.get('/api/sows/?suporos=60')
+        print(response.data)
+        self.assertEqual(response.data['count'], 0)
+
+    def test_filter_suporos3(self):
+        '''
+            sow seminated 2 times then usoudn 30 false, then seminated 1 time in next tour
+        '''
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+
+        # seminate 2 times tour 1
+        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+            initiator=self.user, boar=self.boar, week=1)
+        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+            initiator=self.user, boar=self.boar, week=1)
+
+        # usound30 false, sow1 tour disabled
+        Ultrasound.objects.create_ultrasound(sow=sow1, result=False, days=30, initiator=self.user)
+
+        # seminate 2 times tour 2
+        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+            initiator=self.user, boar=self.boar, week=2)
+
+        self.client.force_authenticate(user=self.user)
+
+        # seminated=0. Should be
+        response = self.client.get('/api/sows/?seminated=0')
+        # self.assertEqual(response.data['results'][0]['id'], sow1.pk)
+        self.assertEqual(response.data['count'], 0)
+
+        # seminated=1. Should not be
+        response = self.client.get('/api/sows/?seminated=1')
+        print(response.data)
+        # self.assertEqual(response.data['count'], 0)
+        # self.assertEqual(response.data['results'][0]['id'], sow1.pk)
+
+        # seminated=2. Should not be
+        response = self.client.get('/api/sows/?seminated=2')
+        print(response.data)
+        self.assertEqual(response.data['count'], 0)
+
+        # suporos=30. Should not be
+        response = self.client.get('/api/sows/?suporos=30')
+        print(response.data)
+        self.assertEqual(response.data['count'], 0)
+
+        # suporos=60. Should not be
+        response = self.client.get('/api/sows/?suporos=60')
+        print(response.data)
+        self.assertEqual(response.data['count'], 0)
+
+
 
     def test_filter_seminated(self):
         self.client.force_authenticate(user=self.user)
