@@ -18,9 +18,10 @@ def create_statuses():
             SowStatus(title='Осеменена 2'),
             SowStatus(title='Супорос 30'),
             SowStatus(title='Супорос 60'),
-            SowStatus(title='Прохолост'),            
+            SowStatus(title='Прохолост'),
+            SowStatus(title='Отъем'),            
             SowStatus(title='Брак'),
-            SowStatus(title='Опоросилась, кормит'),
+            SowStatus(title='Опоросилась'),
             SowStatus(title='Ожидает осеменения'),
             ])
 

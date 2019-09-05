@@ -115,7 +115,7 @@ class SowFarrowManager(CoreModelManager):
     def create_sow_farrow(self, sow, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
         tour = sow.tour
-        sow.change_status_to('Опоросилась, кормит')
+        sow.change_status_to('Опоросилась')
 
         # check is it first sow_farrow in current tour
         previous_farrow_in_tour = SowFarrow.objects.filter(sow=sow, tour=tour).first()
@@ -174,6 +174,7 @@ class WeaningSowManager(CoreModelManager):
         weaning = self.create(sow=sow, tour=sow.tour, transaction=transaction,
          initiator=initiator, date=timezone.now())
         sow.tour = None
+        sow.change_status_to(status_title='Отъем')
         # sow.save()
         return weaning
 
