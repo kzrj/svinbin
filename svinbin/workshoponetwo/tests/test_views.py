@@ -72,7 +72,6 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
           sow.pk, {'result': True, 'days': 30})
 
         # self.assertEqual(response.data['ultrasound']['id'], 2)
-        print(response.data)
         self.assertEqual(response.data['sow']['status'], 'Супорос 30')
 
     def test_culling(self):

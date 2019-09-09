@@ -115,89 +115,89 @@ class SowViewSetTest(APITestCase):
         self.assertEqual(sow.location.sowAndPigletsCell.section.number, 6)
         self.assertEqual(response.data['farrow']['alive_quantity'], 5)
 
-    def test_filter_suporos(self):
-        self.client.force_authenticate(user=self.user)
-        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
-        seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
-        seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
-        seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
-        seminated_sow5 = sows_testing.create_sow_with_semination(sow1.location)
-        seminated_sow6 = sows_testing.create_sow_with_semination(sow1.location)
+    # def test_filter_suporos(self):
+    #     self.client.force_authenticate(user=self.user)
+    #     sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+    #     seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+    #     seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
+    #     seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
+    #     seminated_sow5 = sows_testing.create_sow_with_semination(sow1.location)
+    #     seminated_sow6 = sows_testing.create_sow_with_semination(sow1.location)
 
-        # in tour, without usound
-        seminated_sow4 = sows_testing.create_sow_with_semination(sow1.location)
+    #     # in tour, without usound
+    #     seminated_sow4 = sows_testing.create_sow_with_semination(sow1.location)
 
-        # sow have usound 30 and 60, both true. In tour true. In qs 60
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
-         initiator=None, result=True, days=30)
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
-         initiator=None, result=True, days=60)
+    #     # sow have usound 30 and 60, both true. In tour true. In qs 60
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+    #      initiator=None, result=True, days=30)
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
+    #      initiator=None, result=True, days=60)
 
-        # sow have usound 30 and 60, both true. Not in tour true. Should not be in qs
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow6,
-         initiator=None, result=True, days=30)
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow6,
-         initiator=None, result=False, days=60)
+    #     # sow have usound 30 and 60, both true. Not in tour true. Should not be in qs
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow6,
+    #      initiator=None, result=True, days=30)
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow6,
+    #      initiator=None, result=False, days=60)
 
-        # have usound 30 false. Should not be in qs
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
-         initiator=None, result=False, days=30)
+    #     # have usound 30 false. Should not be in qs
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
+    #      initiator=None, result=False, days=30)
 
-        # have usound 30 True, In tour. Should not be in qs
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
-         initiator=None, result=True, days=30)
+    #     # have usound 30 True, In tour. Should not be in qs
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
+    #      initiator=None, result=True, days=30)
 
-        # have u30, u60, tour and farrow. Should not be in qs
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
-         initiator=None, result=True, days=30)
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
-         initiator=None, result=True, days=60)
-        SowFarrow.objects.create_sow_farrow(sow=seminated_sow5, alive_quantity=10,
-         dead_quantity=1, mummy_quantity=2)
+    #     # have u30, u60, tour and farrow. Should not be in qs
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
+    #      initiator=None, result=True, days=30)
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
+    #      initiator=None, result=True, days=60)
+    #     SowFarrow.objects.create_sow_farrow(sow=seminated_sow5, alive_quantity=10,
+    #      dead_quantity=1, mummy_quantity=2)
 
-        response = self.client.get('/api/sows/?suporos=30')
-        self.assertEqual(response.data['results'][0]['id'], seminated_sow2.pk)
+    #     response = self.client.get('/api/sows/?suporos=30')
+    #     self.assertEqual(response.data['results'][0]['id'], seminated_sow2.pk)
 
-        response = self.client.get('/api/sows/?suporos=60')
-        self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
+    #     response = self.client.get('/api/sows/?suporos=60')
+    #     self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
 
 
-    def test_filter_suporos2(self):
-        '''
-            sow seminated 2 times then usoudn 30 false
-        '''
-        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+    # def test_filter_suporos2(self):
+    #     '''
+    #         sow seminated 2 times then usoudn 30 false
+    #     '''
+    #     sow1 = sows_testing.create_sow_and_put_in_workshop_one()
 
-        # seminate 2 times
-        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
-            initiator=self.user, boar=self.boar, week=1)
-        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
-            initiator=self.user, boar=self.boar, week=1)
+    #     # seminate 2 times
+    #     Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+    #         initiator=self.user, boar=self.boar, week=1)
+    #     Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+    #         initiator=self.user, boar=self.boar, week=1)
 
-        # usound30 false, sow1 tour disabled
-        Ultrasound.objects.create_ultrasound(sow=sow1, result=False, days=30, initiator=self.user)
+    #     # usound30 false, sow1 tour disabled
+    #     Ultrasound.objects.create_ultrasound(sow=sow1, result=False, days=30, initiator=self.user)
 
-        self.client.force_authenticate(user=self.user)
+    #     self.client.force_authenticate(user=self.user)
 
-        # seminated=0. Should be
-        response = self.client.get('/api/sows/?seminated=0')
-        self.assertEqual(response.data['results'][0]['id'], sow1.pk)
+    #     # seminated=0. Should be
+    #     response = self.client.get('/api/sows/?seminated=0')
+    #     self.assertEqual(response.data['results'][0]['id'], sow1.pk)
 
-        # seminated=1. Should not be
-        response = self.client.get('/api/sows/?seminated=1')
-        self.assertEqual(response.data['count'], 0)
+    #     # seminated=1. Should not be
+    #     response = self.client.get('/api/sows/?seminated=1')
+    #     self.assertEqual(response.data['count'], 0)
 
-        # seminated=2. Should not be
-        response = self.client.get('/api/sows/?seminated=2')
-        self.assertEqual(response.data['count'], 0)
+    #     # seminated=2. Should not be
+    #     response = self.client.get('/api/sows/?seminated=2')
+    #     self.assertEqual(response.data['count'], 0)
 
-        # suporos=30. Should not be
-        response = self.client.get('/api/sows/?suporos=30')
-        self.assertEqual(response.data['count'], 0)
+    #     # suporos=30. Should not be
+    #     response = self.client.get('/api/sows/?suporos=30')
+    #     self.assertEqual(response.data['count'], 0)
 
-        # suporos=60. Should not be
-        response = self.client.get('/api/sows/?suporos=60')
-        self.assertEqual(response.data['count'], 0)
+    #     # suporos=60. Should not be
+    #     response = self.client.get('/api/sows/?suporos=60')
+    #     self.assertEqual(response.data['count'], 0)
 
     # def test_filter_suporos3(self):
     #     '''
@@ -248,76 +248,139 @@ class SowViewSetTest(APITestCase):
 
 
 
-    def test_filter_seminated(self):
-        self.client.force_authenticate(user=self.user)
+    # def test_filter_seminated(self):
+    #     self.client.force_authenticate(user=self.user)
         
+    #     # not seminated sow
+    #     sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+
+    #     # sow one time seminated
+    #     seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+        
+    #     # sow two times seminated. not in 1
+    #     seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
+    #     Semination.objects.create_semination(sow=seminated_sow3, week=1, initiator=None,
+    #      semination_employee=None)
+
+    #     # sow have usound
+    #     seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
+    #      initiator=None, result=True, days=30)
+
+    #     response = self.client.get('/api/sows/?seminated=1')
+    #     self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
+    #     self.assertEqual(response.data['count'], 1)
+
+    #     response = self.client.get('/api/sows/?seminated=2')
+    #     self.assertEqual(response.data['results'][0]['id'], seminated_sow3.pk)
+    #     self.assertEqual(response.data['count'], 1)
+
+    # def test_seminations_ultrasound_in_sows_list(self):
+    #     self.client.force_authenticate(user=self.user)
+        
+    #     # not seminated sow
+    #     sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+
+    #     # sow one time seminated
+    #     seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+        
+    #     # sow two times seminated. not in 1
+    #     seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
+    #     Semination.objects.create_semination(sow=seminated_sow3, week=1, initiator=None,
+    #      semination_employee=None)
+
+    #     # sow have usound
+    #     seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
+    #      initiator=None, result=True, days=30)
+
+    #     seminated_sow4 = sows_testing.create_sow_with_semination(sow1.location)
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow4,
+    #      initiator=None, result=True, days=30)
+    #     Ultrasound.objects.create_ultrasound(sow=seminated_sow4,
+    #      initiator=None, result=True, days=60)
+
+    #     # 1 semination
+    #     response = self.client.get('/api/sows/?seminated=1')
+    #     self.assertEqual(len(response.data['results'][0]['seminations_current_tour']), 1)
+
+    #     # 2 semination
+    #     response = self.client.get('/api/sows/?seminated=2')
+    #     self.assertEqual(len(response.data['results'][0]['seminations_current_tour']), 2)
+
+    #     # usound 30
+    #     response = self.client.get('/api/sows/?suporos=30')
+    #     self.assertEqual(len(response.data['results'][0]['ultrasound_30_current_tour']), 1)
+
+    #     # usound 60
+    #     response = self.client.get('/api/sows/?suporos=60')
+    #     self.assertEqual(len(response.data['results'][0]['ultrasound_60_current_tour']), 1)
+
+    def test_status_title_in_not_in(self):
+        self.client.force_authenticate(user=self.user)
+
         # not seminated sow
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
 
         # sow one time seminated
         seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
         
-        # sow two times seminated. not in 1
+        # sow two times seminated
         seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
         Semination.objects.create_semination(sow=seminated_sow3, week=1, initiator=None,
          semination_employee=None)
 
-        # sow have usound
+        # sow have usound 30
         seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
-         initiator=None, result=True, days=30)
-
-        response = self.client.get('/api/sows/?seminated=1')
-        self.assertEqual(response.data['results'][0]['id'], seminated_sow1.pk)
-        self.assertEqual(response.data['count'], 1)
-
-        response = self.client.get('/api/sows/?seminated=2')
-        self.assertEqual(response.data['results'][0]['id'], seminated_sow3.pk)
-        self.assertEqual(response.data['count'], 1)
-
-    def test_seminations_ultrasound_in_sows_list(self):
-        self.client.force_authenticate(user=self.user)
-        
-        # not seminated sow
-        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
-
-        # sow one time seminated
-        seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
-        
-        # sow two times seminated. not in 1
-        seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
-        Semination.objects.create_semination(sow=seminated_sow3, week=1, initiator=None,
+        Semination.objects.create_semination(sow=seminated_sow2, week=1, initiator=None,
          semination_employee=None)
-
-        # sow have usound
-        seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
         Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
          initiator=None, result=True, days=30)
 
+        # sow have usound 60
         seminated_sow4 = sows_testing.create_sow_with_semination(sow1.location)
+        Semination.objects.create_semination(sow=seminated_sow4, week=1, initiator=None,
+         semination_employee=None)
         Ultrasound.objects.create_ultrasound(sow=seminated_sow4,
          initiator=None, result=True, days=30)
         Ultrasound.objects.create_ultrasound(sow=seminated_sow4,
          initiator=None, result=True, days=60)
 
-        # 1 semination
-        response = self.client.get('/api/sows/?seminated=1')
-        self.assertEqual(len(response.data['results'][0]['seminations_current_tour']), 1)
+        # sow have usound 30
+        seminated_sow5 = sows_testing.create_sow_with_semination(sow1.location)
+        Semination.objects.create_semination(sow=seminated_sow5, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
+         initiator=None, result=False, days=30)
 
-        # 2 semination
-        response = self.client.get('/api/sows/?seminated=2')
-        self.assertEqual(len(response.data['results'][0]['seminations_current_tour']), 2)
+        response = self.client.get('/api/sows/?status_title_in=Осеменена 1&status_title_in=Осеменена 2&')
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['results'][0]['id'] in [seminated_sow1.pk, seminated_sow3.pk], True)
+        self.assertEqual(response.data['results'][1]['id'] in [seminated_sow1.pk, seminated_sow3.pk], True)
 
-        # usound 30
-        response = self.client.get('/api/sows/?suporos=30')
-        self.assertEqual(len(response.data['results'][0]['ultrasound_30_current_tour']), 1)
+        response = self.client.get('/api/sows/?status_title_in=Осеменена 1&status_title_in=Супорос 30')
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['results'][0]['id'] in [seminated_sow1.pk, seminated_sow2.pk], True)
+        self.assertEqual(response.data['results'][1]['id'] in [seminated_sow1.pk, seminated_sow2.pk], True)
 
-        # usound 60
-        response = self.client.get('/api/sows/?suporos=60')
-        self.assertEqual(len(response.data['results'][0]['ultrasound_60_current_tour']), 1)
+        response = self.client.get('/api/sows/?status_title_in=Супорос 30&status_title_in=Супорос 60')
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual(response.data['results'][0]['id'] in [seminated_sow2.pk, seminated_sow4.pk], True)
+        self.assertEqual(response.data['results'][1]['id'] in [seminated_sow2.pk, seminated_sow4.pk], True)
 
-    # def test_status_title_in(self):
-        # self.client.force_authenticate(user=self.user)
+        response = self.client.get('/api/sows/?status_title_not_in=Супорос 30&status_title_not_in=Супорос 60')
+        self.assertEqual(response.data['count'], 4)
+        for result_sow in response.data['results']:
+            self.assertEqual(
+                result_sow['id'] in [sow1.pk, seminated_sow1.pk, seminated_sow3.pk, seminated_sow5.pk],
+                True)
+
+        response = self.client.get('/api/sows/?status_title_not_in=Осеменена 1&status_title_not_in=Супорос 60')
+        self.assertEqual(response.data['count'], 4)
+        for result_sow in response.data['results']:
+            self.assertEqual(
+                result_sow['id'] in [sow1.pk, seminated_sow2.pk, seminated_sow3.pk, seminated_sow5.pk],
+                True)
 
 
 class BoarViewSetTest(APITestCase):
