@@ -185,70 +185,66 @@ class SowViewSetTest(APITestCase):
 
         # seminated=1. Should not be
         response = self.client.get('/api/sows/?seminated=1')
-        print(response.data)
         self.assertEqual(response.data['count'], 0)
 
         # seminated=2. Should not be
         response = self.client.get('/api/sows/?seminated=2')
-        print(response.data)
         self.assertEqual(response.data['count'], 0)
 
         # suporos=30. Should not be
         response = self.client.get('/api/sows/?suporos=30')
-        print(response.data)
         self.assertEqual(response.data['count'], 0)
 
         # suporos=60. Should not be
         response = self.client.get('/api/sows/?suporos=60')
-        print(response.data)
         self.assertEqual(response.data['count'], 0)
 
-    def test_filter_suporos3(self):
-        '''
-            sow seminated 2 times then usoudn 30 false, then seminated 1 time in next tour
-        '''
-        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+    # def test_filter_suporos3(self):
+    #     '''
+    #         sow seminated 2 times then usoudn 30 false, then seminated 1 time in next tour
+    #     '''
+    #     sow1 = sows_testing.create_sow_and_put_in_workshop_one()
 
-        # seminate 2 times tour 1
-        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
-            initiator=self.user, boar=self.boar, week=1)
-        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
-            initiator=self.user, boar=self.boar, week=1)
+    #     # seminate 2 times tour 1
+    #     Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+    #         initiator=self.user, boar=self.boar, week=1)
+    #     Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+    #         initiator=self.user, boar=self.boar, week=1)
 
-        # usound30 false, sow1 tour disabled
-        Ultrasound.objects.create_ultrasound(sow=sow1, result=False, days=30, initiator=self.user)
+    #     # usound30 false, sow1 tour disabled
+    #     Ultrasound.objects.create_ultrasound(sow=sow1, result=False, days=30, initiator=self.user)
 
-        # seminate 2 times tour 2
-        Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
-            initiator=self.user, boar=self.boar, week=2)
+    #     # seminate 2 times tour 2
+    #     Semination.objects.create_semination(sow=sow1, semination_employee=self.user, 
+    #         initiator=self.user, boar=self.boar, week=2)
 
-        self.client.force_authenticate(user=self.user)
+    #     self.client.force_authenticate(user=self.user)
 
-        # seminated=0. Should be
-        response = self.client.get('/api/sows/?seminated=0')
-        # self.assertEqual(response.data['results'][0]['id'], sow1.pk)
-        self.assertEqual(response.data['count'], 0)
+    #     # seminated=0. Should be
+    #     response = self.client.get('/api/sows/?seminated=0')
+    #     # self.assertEqual(response.data['results'][0]['id'], sow1.pk)
+    #     self.assertEqual(response.data['count'], 0)
 
-        # seminated=1. Should not be
-        response = self.client.get('/api/sows/?seminated=1')
-        print(response.data)
-        # self.assertEqual(response.data['count'], 0)
-        # self.assertEqual(response.data['results'][0]['id'], sow1.pk)
+    #     # seminated=1. Should not be
+    #     response = self.client.get('/api/sows/?seminated=1')
+    #     print(response.data)
+    #     # self.assertEqual(response.data['count'], 0)
+    #     # self.assertEqual(response.data['results'][0]['id'], sow1.pk)
 
-        # seminated=2. Should not be
-        response = self.client.get('/api/sows/?seminated=2')
-        print(response.data)
-        self.assertEqual(response.data['count'], 0)
+    #     # seminated=2. Should not be
+    #     response = self.client.get('/api/sows/?seminated=2')
+    #     print(response.data)
+    #     self.assertEqual(response.data['count'], 0)
 
-        # suporos=30. Should not be
-        response = self.client.get('/api/sows/?suporos=30')
-        print(response.data)
-        self.assertEqual(response.data['count'], 0)
+    #     # suporos=30. Should not be
+    #     response = self.client.get('/api/sows/?suporos=30')
+    #     print(response.data)
+    #     self.assertEqual(response.data['count'], 0)
 
-        # suporos=60. Should not be
-        response = self.client.get('/api/sows/?suporos=60')
-        print(response.data)
-        self.assertEqual(response.data['count'], 0)
+    #     # suporos=60. Should not be
+    #     response = self.client.get('/api/sows/?suporos=60')
+    #     print(response.data)
+    #     self.assertEqual(response.data['count'], 0)
 
 
 
@@ -319,6 +315,9 @@ class SowViewSetTest(APITestCase):
         # usound 60
         response = self.client.get('/api/sows/?suporos=60')
         self.assertEqual(len(response.data['results'][0]['ultrasound_60_current_tour']), 1)
+
+    # def test_status_title_in(self):
+        # self.client.force_authenticate(user=self.user)
 
 
 class BoarViewSetTest(APITestCase):

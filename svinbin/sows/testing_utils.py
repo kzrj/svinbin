@@ -19,6 +19,7 @@ def create_statuses():
             SowStatus(title='Супорос 30'),
             SowStatus(title='Супорос 60'),
             SowStatus(title='Прохолост'),
+            SowStatus(title='Аборт'),
             SowStatus(title='Отъем'),            
             SowStatus(title='Брак'),
             SowStatus(title='Опоросилась'),

@@ -183,3 +183,15 @@ class WeaningSow(SowEvent):
     transaction = models.ForeignKey('transactions.SowTransaction', 
         on_delete=models.SET_NULL, null=True)
     objects = WeaningSowManager()
+
+
+class AbortionSowManager(CoreModelManager):
+    def create_abortion(self, sow, initiator=None):
+        abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator)
+        sow.tour = None
+        sow.change_status_to(status_title='Аборт')
+        return abortion
+
+
+class AbortionSow(SowEvent):
+    objects = AbortionSowManager()

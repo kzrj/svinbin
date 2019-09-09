@@ -321,4 +321,16 @@ class WorkShopSowViewSet(SowViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
+
+
+    @action(methods=['post'], detail=True) # test +  in workshop onetwo
+    def abortion(self, request, pk=None):
+        sow = self.get_object()
+        abortion = sows_events_models.AbortionSow.objects.create_abortion(
+            sow=sow, initiator=request.user)
+        return Response(
+            {
+                "abortion": sows_events_serializers.AbortionSowSerializer(abortion).data,
+                "sow": sows_serializers.SowSerializer(sow).data, 
+            },
+            status=status.HTTP_200_OK)

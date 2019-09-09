@@ -4,6 +4,7 @@ from django.apps import apps
 
 from core.models import CoreModel, CoreModelManager
 from sows_events import models as events_models
+from sows import models as sows_models
 
 
 class TourManager(CoreModelManager):
@@ -17,7 +18,7 @@ class TourManager(CoreModelManager):
         return Tour.objects.filter(week_number=week_number, year=timezone.now().year).first()
 
     def get_tours_in_workshop_by_sows(self, workshop):
-        tours_list = list(Sow.objects.get_all_sows_in_workshop(workshop).values_list('tour', flat=True))
+        tours_list = list(sows_models.Sow.objects.get_all_sows_in_workshop(workshop).values_list('tour', flat=True))
         tours_list = list(set(tours_list))
         return self.get_queryset().filter(pk__in=tours_list).prefetch_related('sows')
 

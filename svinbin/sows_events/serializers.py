@@ -2,7 +2,7 @@
 from rest_framework import serializers, status
 
 from sows.models import Sow
-from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow
+from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow
 from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger
 from tours.models import Tour
 
@@ -51,6 +51,7 @@ class SimpleUltrasoundSerializer(serializers.ModelSerializer):
 
 class CreateUltrasoundSerializer(serializers.Serializer):
     result = serializers.BooleanField()
+    days = serializers.IntegerField()
 
 
 class CullingSowSerializer(serializers.ModelSerializer):
@@ -92,3 +93,9 @@ class SimpleSowFarrowSerializer(serializers.ModelSerializer):
     class Meta:
         model = SowFarrow
         fields = ['date', 'alive_quantity', 'dead_quantity', 'mummy_quantity']
+
+
+class AbortionSowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AbortionSow
+        fields = '__all__'

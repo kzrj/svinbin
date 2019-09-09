@@ -17,6 +17,8 @@ class SowFilter(filters.FilterSet):
     farm_id_contains = filters.NumberFilter(field_name='farm_id', lookup_expr='contains')
     farm_id_isnull = filters.BooleanFilter(field_name='farm_id', lookup_expr='isnull')
     status_title = filters.CharFilter(field_name='status__title', lookup_expr='exact')
+    status_title_in = filters.CharFilter(field_name='status__title', lookup_expr='in')
+
     not_in_tour = filters.BooleanFilter(field_name='tour', lookup_expr='isnull')
     status_title_not = filters.CharFilter(field_name='status__title', 
         method='filter_status_title_not')

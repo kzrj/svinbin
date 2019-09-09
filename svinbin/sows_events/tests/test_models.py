@@ -2,7 +2,7 @@
 from django.test import TestCase
 
 from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, \
-    UltrasoundType, WeaningSow
+    UltrasoundType, WeaningSow, AbortionSow
 from sows.models import Sow, Boar
 from piglets.models import NewBornPigletsGroup
 from locations.models import Location
@@ -31,7 +31,7 @@ class SeminationModelManagerTest(TestCase):
         self.assertEqual(semination.tour.week_number, 1)
         sow.refresh_from_db()
         self.assertEqual(sow.tour.week_number, 1)
-        self.assertEqual(sow.status.title, 'Осеменена')
+        self.assertEqual(sow.status.title, 'Осеменена 1')
 
     def test_mass_semination(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
@@ -45,8 +45,9 @@ class SeminationModelManagerTest(TestCase):
         self.assertEqual(Semination.objects.all().count(), 3)
 
         sow1.refresh_from_db()
-        self.assertEqual(sow1.status.title, 'Осеменена')
+        self.assertEqual(sow1.status.title, 'Осеменена 1')
         self.assertEqual(sow1.tour.week_number, 1)
+
 
 class UltrasoundModelManagerTest(TestCase):
     def setUp(self):
@@ -70,7 +71,7 @@ class UltrasoundModelManagerTest(TestCase):
         Ultrasound.objects.create_ultrasound(sow=sow, 
          initiator=None, result=True, days=30)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Супорос')
+        self.assertEqual(sow.status.title, 'Супорос 30')
 
         Ultrasound.objects.create_ultrasound(sow=sow, 
          initiator=None, result=False, days=60)
@@ -87,7 +88,7 @@ class UltrasoundModelManagerTest(TestCase):
         Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, initiator=None, result=True, days=30)
 
         seminated_sow2.refresh_from_db()
-        self.assertEqual(seminated_sow2.status.title, 'Супорос')
+        self.assertEqual(seminated_sow2.status.title, 'Супорос 30')
 
         Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, initiator=None, result=False, days=60)
 
@@ -115,7 +116,7 @@ class SowFarrowModelManagerTest(TestCase):
         
         self.assertEqual(NewBornPigletsGroup.objects.all().count(), 1)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Опоросилась, кормит')
+        self.assertEqual(sow.status.title, 'Опоросилась')
         self.assertEqual(sow.tour.week_number, 1)
 
         piglets_group1 = farrow1.new_born_piglets_group
@@ -225,3 +226,22 @@ class WeaningSowTest(TestCase):
         sow2.refresh_from_db()
         self.assertEqual(sow.tour, None)
         self.assertEqual(sow2.tour, None)
+
+
+class AbortionSowTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+
+    def test_create_abortion(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+
+        AbortionSow.objects.create_abortion(sow, None)
+        sow.refresh_from_db()
+        self.assertEqual(sow.tour, None)
+        self.assertEqual(sow.status.title, 'Аборт')
