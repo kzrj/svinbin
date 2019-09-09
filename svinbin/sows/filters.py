@@ -15,10 +15,17 @@ class SowStatusChoiceNotInFilter(filters.ModelMultipleChoiceFilter):
             qs = qs.filter(~Q(status__in=value))
         return qs
 
+class SowsToSeminateFilter(filters.ModelMultipleChoiceFilter):
+    def filter(self, qs, value):
+        if value:
+            qs = qs.filter(~Q(status__title__in=
+                ["Осеменена 1", "Осеменена 2", "Супорос 30", "Супорос 60"]))
+        return qs
+
 
 class SowFilter(filters.FilterSet):
     by_workshop_number = filters.NumberFilter(field_name='location',
-     method='filter_by_workshop_number')
+        method='filter_by_workshop_number')
 
     farm_id_starts = filters.NumberFilter(field_name='farm_id', lookup_expr='startswith')
     farm_id_contains = filters.NumberFilter(field_name='farm_id', lookup_expr='contains')
@@ -34,10 +41,20 @@ class SowFilter(filters.FilterSet):
         to_field_name='title',
         queryset=SowStatus.objects.all())
 
+    to_seminate = filters.BooleanFilter(
+        field_name='status__title',
+        method='filter_to_seminate')
+
     not_in_tour = filters.BooleanFilter(field_name='tour', lookup_expr='isnull')
 
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
+
+    def filter_to_seminate(self, queryset, name, value):
+        if value:
+            queryset = queryset.filter(~Q(status__title__in=
+                ["Осеменена 1", "Осеменена 2", "Супорос 30", "Супорос 60"]))
+        return queryset
 
     class Meta:
         model = Sow

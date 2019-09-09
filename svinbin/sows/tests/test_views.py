@@ -353,6 +353,7 @@ class SowViewSetTest(APITestCase):
         Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
          initiator=None, result=False, days=30)
 
+        # status in
         response = self.client.get('/api/sows/?status_title_in=Осеменена 1&status_title_in=Осеменена 2&')
         self.assertEqual(response.data['count'], 2)
         self.assertEqual(response.data['results'][0]['id'] in [seminated_sow1.pk, seminated_sow3.pk], True)
@@ -368,6 +369,7 @@ class SowViewSetTest(APITestCase):
         self.assertEqual(response.data['results'][0]['id'] in [seminated_sow2.pk, seminated_sow4.pk], True)
         self.assertEqual(response.data['results'][1]['id'] in [seminated_sow2.pk, seminated_sow4.pk], True)
 
+        # status not in
         response = self.client.get('/api/sows/?status_title_not_in=Супорос 30&status_title_not_in=Супорос 60')
         self.assertEqual(response.data['count'], 4)
         for result_sow in response.data['results']:
@@ -382,6 +384,49 @@ class SowViewSetTest(APITestCase):
                 result_sow['id'] in [sow1.pk, seminated_sow2.pk, seminated_sow3.pk, seminated_sow5.pk],
                 True)
 
+    def test_to_seminate(self):
+        self.client.force_authenticate(user=self.user)
+
+        # not seminated sow
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+
+        # sow one time seminated
+        seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
+        
+        # sow two times seminated
+        seminated_sow3 = sows_testing.create_sow_with_semination(sow1.location)
+        Semination.objects.create_semination(sow=seminated_sow3, week=1, initiator=None,
+         semination_employee=None)
+
+        # sow have usound 30
+        seminated_sow2 = sows_testing.create_sow_with_semination(sow1.location)
+        Semination.objects.create_semination(sow=seminated_sow2, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow2,
+         initiator=None, result=True, days=30)
+
+        # sow have usound 60
+        seminated_sow4 = sows_testing.create_sow_with_semination(sow1.location)
+        Semination.objects.create_semination(sow=seminated_sow4, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow4,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow4,
+         initiator=None, result=True, days=60)
+
+        # sow have usound 30
+        seminated_sow5 = sows_testing.create_sow_with_semination(sow1.location)
+        Semination.objects.create_semination(sow=seminated_sow5, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow=seminated_sow5,
+         initiator=None, result=False, days=30)
+
+        response =self.client.get('/api/sows/?to_seminate=True')
+        self.assertEqual(response.data['count'], 2)
+        for result_sow in response.data['results']:
+            self.assertEqual(
+                result_sow['id'] in [sow1.pk, seminated_sow5.pk],
+                True)
 
 class BoarViewSetTest(APITestCase):
     def setUp(self):
