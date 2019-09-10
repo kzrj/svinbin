@@ -47,6 +47,9 @@ class SowFilter(filters.FilterSet):
 
     not_in_tour = filters.BooleanFilter(field_name='tour', lookup_expr='isnull')
 
+    all_in_workshop_number = filters.NumberFilter(field_name='location',
+        method='filter_all_in_workshop_number')
+
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
 
@@ -55,6 +58,9 @@ class SowFilter(filters.FilterSet):
             queryset = queryset.filter(~Q(status__title__in=
                 ["Осеменена 1", "Осеменена 2", "Супорос 30", "Супорос 60"]))
         return queryset
+
+    def filter_all_in_workshop_number(self, queryset, name, value):
+        return queryset.filter(location__workshop__number=value)
 
     class Meta:
         model = Sow

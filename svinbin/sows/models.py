@@ -55,6 +55,17 @@ class SowsQuerySet(models.QuerySet):
                 more_than_once_seminated_sows.append(sow.pk)
 
         return self.filter(pk__in=once_seminated_sows), self.filter(pk__in=more_than_once_seminated_sows)
+
+    def get_all_sows_in_workshop(self, workshop):
+        return self.filter(
+            models.Q(
+                models.Q(location__workshop=workshop) |
+                models.Q(location__section__workshop=workshop) |
+                models.Q(location__sowGroupCell__workshop=workshop) |
+                models.Q(location__sowSingleCell__workshop=workshop) |
+                models.Q(location__sowAndPigletsCell__workshop=workshop)
+                )
+            )
         
 
 class SowManager(CoreModelManager):
@@ -98,15 +109,7 @@ class SowManager(CoreModelManager):
         return sow
 
     def get_all_sows_in_workshop(self, workshop):
-        return self.get_queryset().filter(
-            models.Q(
-                models.Q(location__workshop=workshop) |
-                models.Q(location__section__workshop=workshop) |
-                models.Q(location__sowGroupCell__workshop=workshop) |
-                models.Q(location__sowSingleCell__workshop=workshop) |
-                models.Q(location__sowAndPigletsCell__workshop=workshop)
-                )
-            )
+        return self.get_queryset().get_all_sows_in_workshop(workshop)
 
     def get_not_suporos_in_workshop(self, workshop):
         return self.get_queryset().filter(
