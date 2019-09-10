@@ -60,7 +60,7 @@ class SowFilter(filters.FilterSet):
         return queryset
 
     def filter_all_in_workshop_number(self, queryset, name, value):
-        return queryset.filter(location__workshop__number=value)
+        return queryset.get_all_sows_in_workshop(value)
 
     class Meta:
         model = Sow
