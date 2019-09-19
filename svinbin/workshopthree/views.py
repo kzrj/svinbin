@@ -100,6 +100,24 @@ class WorkShopThreePigletsViewSet(NewBornPigletsViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['post'], detail=False)
+    def create_nomad_group_from_merge(self, request):
+        serializer = serializers.NewBornGroupsToMerge(data=request.data)
+        if serializer.is_valid():
+            groups_to_merge = serializer.validated_data['piglets_groups']
+            merger, nomad_group = piglets_events_models.NewBornPigletsMerger.objects.create_merger_and_return_nomad_piglets_group(
+            new_born_piglets_groups=groups_to_merge, initiator=None)     
+
+            return Response(
+                {
+                 "nomad_group": piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data,
+                 "transaction": transactions_serializers.NomadPigletsTransactionSerializer(transaction).data,
+                 "merger": piglets_events_serializers.NewBornPigletsGroupMergerSerializer(merger).data
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
     @action(methods=['post'], detail=True)
