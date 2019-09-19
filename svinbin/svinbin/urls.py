@@ -49,7 +49,7 @@ router.register(r'workshoponetwo/sows', workshoponetwo_views.WorkShopOneTwoSowVi
  basename='workshoponetwo-sows')
 
 # workshop three
-router.register(r'workshopthree/piglets', workshopthree_views.WorkShopThreePigletsViewSet, \
+router.register(r'workshopthree/newbornpiglets', workshopthree_views.WorkShopThreeNewBornPigletsViewSet, \
  basename='workshopthree-piglets')
 router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsViewSet, \
  basename='workshopthree-sows')

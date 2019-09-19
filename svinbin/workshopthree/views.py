@@ -26,7 +26,7 @@ from sows.views import WorkShopSowViewSet
 from piglets.views import NewBornPigletsViewSet
 
 
-class WorkShopThreePigletsViewSet(NewBornPigletsViewSet):
+class WorkShopThreeNewBornPigletsViewSet(NewBornPigletsViewSet):
     # queryset = NewBornPigletsGroup.objects.all()
     # serializer_class = piglets_serializers.NewBornPigletsGroupSerializer
 
