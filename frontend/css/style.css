@@ -1,9 +1,11 @@
+
+
 .workshop-header-2{
-	background-color: gray;
+	background-color: #313131;
 }
 
 .sow-active{
-	background: #1CD623 !important;
+	background: #43ab92 !important;
 }
 
 .tab-active{
@@ -13,39 +15,40 @@
 }
 
 .cell{
-	border: 1px solid gray;
+	border: 1px solid #525252;
 	/*max-width: 65px !important;*/
 }
 
 .cell-full{
-	border: 1px solid gray;
-	background-color: red !important;
+	border: 1px solid #525252;
+	background-color: #525252 !important;
 	/*max-width: 65px !important;*/
 }
 
 .cell-active{
-	background-color: green;
+	background-color: #43ab92 ;
 }
 
 .section-button{
-	border: 2px solid blue;
+	border: 1px solid #525252;
 }
 
 .section-active{
-	background-color: green;
+	background-color: #525252;
 }
 
 .piglets{
-	border: 2px solid gray;
+	border: 2px solid #525252;
 }
 
 .piglets-active{
-	background-color: green;
+	background-color: #ca3e47;
 }
 
 .workshop{
 	background-color: #E0E0E0;
 	min-height: 768px;
+	color: #313131;
 }
 
 .workshop-header{
@@ -53,8 +56,11 @@
 	margin-right: -15px;
 	padding-left: 0px !important;
 	padding-right: 0px !important;
-	background-color: #747474;
+	background-color: #313131;
 	min-height: 24px;
+	color: white;
+	text-align: center;
+	font-weight: bold;
 }
 
 .workshop-tab{
@@ -62,6 +68,7 @@
 	border-right: 2px solid #747474 !important;
 	min-height: 62px !important;
 	text-align: center !important;
+	border-bottom: 2px solid #747474 !important;
 }
 
 .workshop-menu{
@@ -69,23 +76,35 @@
 }
 
 .workshop-header-2{
-	color: white;
-	min-height: 50px;
+	/* color: white; */
+	min-height: 30px;
 	background-color: #616161;
+	/* background-color: #313131; */
+	
+}
+
+.workshop-header-3{
+	color: white;
+	min-height: 30px;
+	background-color: #313131;
+	margin-left: -15px;
+	margin-right: -15px;
+	padding-left: 0px !important;
+	padding-right: 0px !important;
 }
 
 .workshop-left-column{
 	padding-left: 0px !important;
 	padding-right: 0px !important;
-	border-right: 3px solid #747474;
-	min-height: 500px !important;
+	border-right: 1px solid #747474;
+	/* min-height: 500px !important; */
 	
 }
 
 .workshop-right-column{
-	padding-left: 0px !important;
-	padding-right: 0px !important;
-	min-height: 500px ;
+	/* padding-left: 0px !important; */
+	/* padding-right: 0px !important; */
+	/* min-height: 500px ; */
 }
 
 .search-input{
@@ -93,11 +112,37 @@
 }
 
 .sow-li{
-	border-bottom: 2px solid #747474 !important;
+	border-bottom: 1px solid #747474 !important;
 	background: #E0E0E0;
 	min-height: 50px;
 }
 
 .sow-row-active {
-	background: green;
+	background: #43ab92;
+}
+
+.sow-seminations {
+	list-style: none;
+	padding-left: 0px;
+}
+
+.sow-row-date {
+	font-size: 10px;
+}
+
+.commonfilter{
+	padding-top: 10px;
+	padding-left: 20px;
+}
+
+.sow-event-label{
+	font-weight: bold;
+}
+
+.btn:hover{
+	background: #313131 !important;
+}
+
+.bottom-buttons-block{
+	margin-top: 10px;
 }
