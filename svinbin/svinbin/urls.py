@@ -72,9 +72,9 @@ router.register(r'tours', tours_views.TourViewSet, \
 router.register(r'users', staff_views.UsersViewSet, \
  basename='users')
 
-# piglets
-router.register(r'piglets', piglets_views.WorkShopNomadPigletsViewSet, \
- basename='piglets')
+# nomad piglets
+router.register(r'nomadpiglets', piglets_views.WorkShopNomadPigletsViewSet, \
+ basename='nomadpiglets')
 
 # inits
 router.register(r'inits', piglets_views.WorkShopNomadPigletsViewSet, \
