@@ -19,7 +19,7 @@ from locations.models import WorkShop, SowAndPigletsCell, PigletsGroupCell, Loca
 from transactions.models import PigletsTransaction, SowTransaction
 
 
-class WorkshopFourPigletsViewSetTest(APITestCase):
+class LocationsViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
         locations_testing.create_workshops_sections_and_cells()

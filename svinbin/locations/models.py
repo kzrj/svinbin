@@ -177,11 +177,18 @@ class Location(CoreModel):
             not self.get_located_active_new_born_groups() and \
             not self.sow_set.all() and \
             not self.gilt_set.all():
-            return True
+                return True
         return False
 
     @property
     def is_sow_empty(self):
         if not self.sow_set.all():
             return True
+        return False
+
+    @property
+    def is_piglets_empty(self):
+        if not self.get_located_active_nomad_groups() and \
+            not self.get_located_active_new_born_groups():
+                return True
         return False

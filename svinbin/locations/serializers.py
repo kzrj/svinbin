@@ -76,18 +76,10 @@ class LocationSerializer(serializers.ModelSerializer):
 
     # creating_new_born_merger = piglets_events_serializers.NewBornPigletsGroupMergerSerializer(read_only=True)
 
-    is_empty = serializers.SerializerMethodField()
-    is_sow_empty = serializers.SerializerMethodField()
+    is_empty = serializers.ReadOnlyField()
+    is_sow_empty = serializers.ReadOnlyField()
+    is_piglets_empty = serializers.ReadOnlyField()
 
     class Meta:
         model = Location
         exclude = ['created_at', 'modified_at' ]
-
-    def get_is_empty(self, obj):
-        return obj.is_empty
-
-    def get_is_sow_empty(self, obj):
-        return obj.is_sow_empty
-
-    def get_test_cell(self, obj):
-        obj.sowAndPigletsCell

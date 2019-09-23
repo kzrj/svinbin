@@ -111,7 +111,6 @@ class WorkShopThreeNewBornPigletsViewSet(NewBornPigletsViewSet):
             return Response(
                 {
                  "nomad_group": piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data,
-                 "transaction": transactions_serializers.NomadPigletsTransactionSerializer(transaction).data,
                  "merger": piglets_events_serializers.NewBornPigletsGroupMergerSerializer(merger).data
                  },
                 status=status.HTTP_200_OK)
