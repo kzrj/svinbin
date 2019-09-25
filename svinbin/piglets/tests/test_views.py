@@ -19,7 +19,7 @@ from locations.models import WorkShop, SowAndPigletsCell, PigletsGroupCell, Loca
 from transactions.models import PigletsTransaction, SowTransaction
 
 
-class WorkshopFourPigletsViewSetTest(APITestCase):
+class WorkShopNomadPigletsViewsTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
         locations_testing.create_workshops_sections_and_cells()
@@ -31,7 +31,7 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
     def test_weighing_piglets(self):
         nomad_piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
 
-        response = self.client.post('/api/workshopfour/piglets/%s/weighing_piglets/' %
+        response = self.client.post('/api/nomadpiglets/%s/weighing_piglets/' %
           nomad_piglets_group.pk, {'total_weight': 670, 'place': '3/4'})
         self.assertEqual(response.data['piglets_group']['id'], nomad_piglets_group.pk)
         self.assertEqual(response.data['piglets_group']['status'], 'Взвешены, готовы к заселению')
@@ -48,10 +48,10 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         nomad_piglets_group3.location = Location.objects.get(workshop__number=4)
         nomad_piglets_group3.save()
 
-        response = self.client.post('/api/workshopfour/piglets/%s/weighing_piglets/' %
+        response = self.client.post('/api/nomadpiglets/%s/weighing_piglets/' %
           nomad_piglets_group2.pk, {'total_weight': 670, 'place': '3/4'})
         
-        response = self.client.get('/api/workshopfour/piglets/get_weighted_piglets_outside_cells/')
+        response = self.client.get('/api/nomadpiglets/get_weighted_piglets_outside_cells/')
         self.assertEqual(response.data['piglets_groups'][0]['id'], nomad_piglets_group2.pk)
         self.assertEqual(len(response.data['piglets_groups']), 1)
 
@@ -66,10 +66,10 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         nomad_piglets_group3.location = Location.objects.get(workshop__number=4)
         nomad_piglets_group3.reset_status()
 
-        response = self.client.post('/api/workshopfour/piglets/%s/weighing_piglets/' %
+        response = self.client.post('/api/nomadpiglets/%s/weighing_piglets/' %
           nomad_piglets_group2.pk, {'total_weight': 670, 'place': '3/4'})
         
-        response = self.client.get('/api/workshopfour/piglets/waiting_for_weighing_piglets_outside_cells/')
+        response = self.client.get('/api/nomadpiglets/waiting_for_weighing_piglets_outside_cells/')
         self.assertEqual(len(response.data['piglets_groups']), 1)
         self.assertEqual(response.data['piglets_groups'][0]['id'], nomad_piglets_group1.pk)
 
@@ -86,14 +86,14 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         self.assertEqual(cell.workshop.number, 4)
 
         # empty cell
-        response = self.client.post('/api/workshopfour/piglets/%s/move_one_group_to_cell/' %
+        response = self.client.post('/api/nomadpiglets/%s/move_one_group_to_cell/' %
           nomad_piglets_group1.pk, {'location': location.pk })
         self.assertEqual(response.data['piglets_group']['id'], nomad_piglets_group1.pk)
         self.assertEqual(response.data['piglets_group']['status'], 'Кормятся')
         self.assertEqual(response.data['transaction']['piglets_group'], nomad_piglets_group1.pk)
         
         # not empty cell
-        response = self.client.post('/api/workshopfour/piglets/%s/move_one_group_to_cell/' %
+        response = self.client.post('/api/nomadpiglets/%s/move_one_group_to_cell/' %
           nomad_piglets_group2.pk, {'location': location.pk })
         self.assertEqual(response.data['merged_group']['quantity'],
          nomad_piglets_group1.start_quantity + nomad_piglets_group2.start_quantity)
@@ -118,10 +118,10 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         to_location = Location.objects.get(pigletsGroupCell=to_cell)
         self.assertEqual(to_cell.workshop.number, 4)
 
-        response = self.client.post('/api/workshopfour/piglets/%s/move_one_group_to_cell/' %
+        response = self.client.post('/api/nomadpiglets/%s/move_one_group_to_cell/' %
           nomad_piglets_group1.pk, {'location': from_location.pk })
 
-        response = self.client.post('/api/workshopfour/piglets/move_group_from_cell_to_cell/', 
+        response = self.client.post('/api/nomadpiglets/move_group_from_cell_to_cell/', 
           {'from_location': from_location.pk, 'to_location': to_location.pk, 'quantity': nomad_piglets_group1.quantity })
         self.assertEqual(response.data['moving_group']['id'], nomad_piglets_group1.pk)
         self.assertEqual(response.data['transaction']['piglets_group'], nomad_piglets_group1.pk)
@@ -142,7 +142,7 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         nomad_piglets_group2.location = to_location
         nomad_piglets_group2.save()
 
-        response = self.client.post('/api/workshopfour/piglets/move_group_from_cell_to_cell/', 
+        response = self.client.post('/api/nomadpiglets/move_group_from_cell_to_cell/', 
           {'from_location': from_location.pk, 'to_location': to_location.pk, 'quantity': nomad_piglets_group1.quantity })
 
         self.assertEqual(response.data['moving_group']['id'], nomad_piglets_group1.pk)
@@ -166,7 +166,7 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         to_cell = PigletsGroupCell.objects.all()[1]
         to_location = Location.objects.get(pigletsGroupCell=to_cell)
 
-        response = self.client.post('/api/workshopfour/piglets/move_group_from_cell_to_cell/', 
+        response = self.client.post('/api/nomadpiglets/move_group_from_cell_to_cell/', 
           {'from_location': from_location.pk, 'to_location': to_location.pk, 'quantity': 10 })
 
         self.assertEqual(response.data['moving_group']['quantity'], 10)
@@ -192,7 +192,7 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         nomad_piglets_group2.location = to_location
         nomad_piglets_group2.save()
 
-        response = self.client.post('/api/workshopfour/piglets/move_group_from_cell_to_cell/', 
+        response = self.client.post('/api/nomadpiglets/move_group_from_cell_to_cell/', 
           {'from_location': from_location.pk, 'to_location': to_location.pk, 'quantity': 10 })
 
         self.assertEqual(response.data['merged_group']['quantity'], 47)
@@ -204,7 +204,7 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         nomad_piglets_group1.location = from_location
         nomad_piglets_group1.save()
 
-        response = self.client.post('/api/workshopfour/piglets/%s/culling_piglets/' %
+        response = self.client.post('/api/nomadpiglets/%s/culling_piglets/' %
           nomad_piglets_group1.pk, {'culling_type': 'padej', 'reason': 'test reason' })
 
         self.assertEqual(response.data['culling']['culling_type'], 'padej')
@@ -218,7 +218,7 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         nomad_piglets_group1.gilts_quantity = 10
         nomad_piglets_group1.save()
 
-        response = self.client.post('/api/workshopfour/piglets/%s/culling_gilts/' %
+        response = self.client.post('/api/nomadpiglets/%s/culling_gilts/' %
           nomad_piglets_group1.pk, {'culling_type': 'padej', 'reason': 'test reason' })
 
         self.assertEqual(response.data['culling']['culling_type'], 'padej')
@@ -234,7 +234,7 @@ class WorkshopFourPigletsViewSetTest(APITestCase):
         nomad_piglets_group1.save()
 
         to_location = Location.objects.get(workshop__number=8)
-        response = self.client.post('/api/workshopfour/piglets/%s/move_to/' %
+        response = self.client.post('/api/nomadpiglets/%s/move_to/' %
           nomad_piglets_group1.pk, {'to_location': to_location.pk, 'quantity': 10 })
         print(response.data)
         self.assertEqual(response.data['piglets_group']['quantity'], 10)

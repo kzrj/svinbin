@@ -20,13 +20,14 @@ import locations.models as locations_models
 from piglets.filters import NomadPigletsGroupFilter
 
 
-class WorkShopNomadPigletsViewSet(viewsets.ModelViewSet):
+class NomadPigletsGroupViewSet(viewsets.ModelViewSet):
     queryset = piglets_models.NomadPigletsGroup.objects.all()
     serializer_class = piglets_serializers.NomadPigletsGroupSerializer
     filter_class = NomadPigletsGroupFilter
 
+
+class WorkShopNomadPigletsViewSet(NomadPigletsGroupViewSet):
     @action(methods=['get'], detail=False)
-    # to filters
     def waiting_for_weighing_piglets_outside_cells(self, request):
         location = locations_models.Location.objects.get(workshop__number=4)        
         piglets = piglets_models.NomadPigletsGroup.objects \
@@ -136,7 +137,7 @@ class WorkShopNomadPigletsViewSet(viewsets.ModelViewSet):
                 other_group, moving_group = piglets_events_models.SplitNomadPigletsGroup.objects.split_group(
                     parent_nomad_group=moving_group,
                     new_group_piglets_amount=quantity,
-                    gilts_quantity=gilts_quantity,
+                    new_group_gilts_quantity=gilts_quantity,
                     initiator=request.user
                     )
 
@@ -233,7 +234,7 @@ class WorkShopNomadPigletsViewSet(viewsets.ModelViewSet):
                 other_group, moving_group = piglets_events_models.SplitNomadPigletsGroup.objects.split_group(
                     parent_nomad_group=moving_group,
                     new_group_piglets_amount=quantity,
-                    gilts_quantity=gilts_quantity,
+                    new_group_gilts_quantity=gilts_quantity,
                     initiator=request.user
                     )
 
@@ -256,8 +257,3 @@ class WorkShopNomadPigletsViewSet(viewsets.ModelViewSet):
 class NewBornPigletsViewSet(viewsets.ModelViewSet):
     queryset = piglets_models.NewBornPigletsGroup.objects.all()
     serializer_class = piglets_serializers.NewBornPigletsGroupSerializer
-
-    # def get_serializer_class(self):
-    #     if self.action == 'mark_to_transfer_and_mark_size':
-    #         return piglets_serializers.NewBornPigletsGroupSerializer
-    #     return piglets_serializers.NewBornPigletsGroupSerializer
