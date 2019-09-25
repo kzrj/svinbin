@@ -27,7 +27,109 @@ from piglets.views import NewBornPigletsViewSet, WorkShopNomadPigletsViewSet
 
 
 class WorkShopThreeNewBornPigletsViewSet(NewBornPigletsViewSet):
-    pass
+    @action(methods=['post'], detail=True)
+    def culling_piglets(self, request, pk=None):        
+        serializer = piglets_events_serializers.CullingPigletsTypesSerializer(data=request.data)
+        if serializer.is_valid():
+            piglets_group = self.get_object()
+            culling = piglets_events_models.CullingNewBornPiglets.objects.create_culling_piglets(
+                piglets_group=piglets_group,
+                culling_type=serializer.validated_data['culling_type'],
+                quantity=1,
+                reason=serializer.validated_data['reason'],
+                initiator=request.user
+                )
+            # piglets_group.change_status_to()
+
+            return Response(
+                {"new_born_piglet_group": piglets_serializers.NewBornPigletsGroupSerializer(piglets_group).data,
+                 "message": '%s piglet from piglet group' % serializer.validated_data['culling_type'],
+                 "culling": piglets_events_serializers.CullingNewBornPigletsSerializer(culling).data},
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def culling_gilts(self, request, pk=None):        
+        serializer = piglets_events_serializers.CullingPigletsTypesSerializer(data=request.data)
+        if serializer.is_valid():
+            piglets_group = self.get_object()
+            culling = piglets_events_models.CullingNewBornPiglets.objects.create_culling_gilt(
+                piglets_group=piglets_group,
+                culling_type=serializer.validated_data['culling_type'],
+                reason=serializer.validated_data['reason'],
+                initiator=request.user
+                )
+
+            return Response(
+                {"piglets_group": piglets_serializers.NewBornPigletsGroupSerializer(piglets_group).data,
+                 "message": '%s gilt from piglet group' % serializer.validated_data['culling_type'],
+                 "culling": piglets_events_serializers.CullingNewBornPigletsSerializer(culling).data},
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # @action(methods=['post'], detail=True)
+    # def mark_to_transfer_mark_size_and_recount(self, request, pk=None):
+    #     serializer = serializers.NewBornPigletsGroupSizeSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         piglets_group = self.get_object()
+    #         piglets_group.mark_size_label(serializer.validated_data['size_label'])
+    #         piglets_group.mark_for_transfer()
+
+    #         new_amount = serializer.validated_data.get('new_amount')
+    #         recount = None
+    #         if new_amount:
+    #             recount = piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(piglets_group, new_amount)
+
+    #         return Response(
+    #             {"new_born_piglet_group": piglets_serializers.NewBornPigletsGroupSerializer(piglets_group).data,
+    #              "message": 'piglets marked for transaction, marked as %s.' % serializer.validated_data['size_label'],
+    #              "recount": piglets_events_serializers.NewBornPigletsGroupRecountSerializer(recount).data},
+    #             status=status.HTTP_200_OK)
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # @action(methods=['post'], detail=False)
+    # def create_nomad_group_from_merge_and_transfer_to_weight(self, request):
+    #     serializer = serializers.NewBornGroupsToMerge(data=request.data)
+    #     if serializer.is_valid():
+    #         groups_to_merge = serializer.validated_data['piglets_groups']
+    #         merger, nomad_group = piglets_events_models.NewBornPigletsMerger.objects.create_merger_and_return_nomad_piglets_group(
+    #         new_born_piglets_groups=groups_to_merge, initiator=None)     
+
+    #         to_location = locations_models.Location.objects.get(workshop__number=4)
+    #         transaction = transactions_models.PigletsTransaction.objects.create_transaction(
+    #             to_location, nomad_group, request.user)
+
+    #         return Response(
+    #             {
+    #              "nomad_group": piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data,
+    #              "transaction": transactions_serializers.NomadPigletsTransactionSerializer(transaction).data,
+    #              "merger": piglets_events_serializers.NewBornPigletsGroupMergerSerializer(merger).data
+    #              },
+    #             status=status.HTTP_200_OK)
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False)
+    def create_nomad_group_from_merge(self, request):
+        serializer = serializers.NewBornGroupsToMerge(data=request.data)
+        if serializer.is_valid():
+            groups_to_merge = serializer.validated_data['piglets_groups']
+            merger, nomad_group = piglets_events_models.NewBornPigletsMerger.objects.create_merger_and_return_nomad_piglets_group(
+            new_born_piglets_groups=groups_to_merge,
+            part_number=serializer.validated_data['part_number'],
+            initiator=None)     
+
+            return Response(
+                {
+                 "nomad_group": piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data,
+                 "merger": piglets_events_serializers.NewBornPigletsGroupMergerSerializer(merger).data
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class WorkShopThreeSowsViewSet(WorkShopSowViewSet):

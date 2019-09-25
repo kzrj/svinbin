@@ -26,8 +26,9 @@ class NewBornPigletsMergerManager(PigletsMergerManager):
         new_born_merger = self.create(initiator=initiator, date=timezone.now())
         return new_born_merger
 
-    def create_merger(self, new_born_piglets_groups, initiator=None):
-        new_born_merger = self.create(initiator=initiator, date=timezone.now())
+    def create_merger(self, new_born_piglets_groups, part_number=None, initiator=None):
+        new_born_merger = self.create(initiator=initiator, date=timezone.now(),
+            part_number=part_number)
         if isinstance(new_born_piglets_groups, list):
             pks = [group.pk for group in new_born_piglets_groups]
             new_born_piglets_groups = NewBornPigletsGroup.objects.filter(pk__in=pks)
@@ -35,14 +36,17 @@ class NewBornPigletsMergerManager(PigletsMergerManager):
         new_born_piglets_groups.update(merger=new_born_merger)
         return new_born_merger
 
-    def create_merger_and_return_nomad_piglets_group(self, new_born_piglets_groups, initiator=None):
-        new_born_merger = self.create_merger(new_born_piglets_groups, initiator=initiator)
+    def create_merger_and_return_nomad_piglets_group(self, new_born_piglets_groups, 
+            part_number=None, initiator=None):
+        new_born_merger = self.create_merger(new_born_piglets_groups, initiator=initiator,
+            part_number=part_number)
         return new_born_merger, new_born_merger.create_nomad_group()
 
 
 class NewBornPigletsMerger(PigletsMerger):
     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
      related_name='creating_new_born_merger')
+    part_number = models.IntegerField(null=True)
 
     objects = NewBornPigletsMergerManager()
 

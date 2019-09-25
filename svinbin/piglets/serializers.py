@@ -2,7 +2,10 @@
 from rest_framework import serializers, status
 
 from piglets.models import NomadPigletsGroup, NewBornPigletsGroup
+from piglets_events.models import NewBornPigletsMerger
 from piglets_events.serializers import WeighingPigletsSerializer
+
+from locations.models import Location
 
 
 class NomadPigletsGroupPkSerializer(serializers.ModelSerializer):
@@ -12,7 +15,7 @@ class NomadPigletsGroupPkSerializer(serializers.ModelSerializer):
 
 
 class NomadPigletsGroupSerializer(serializers.ModelSerializer):
-    creating_new_born_merger = serializers.StringRelatedField()
+    merger_part_number = serializers.ReadOnlyField()
     status = serializers.StringRelatedField()
     weighing_records = WeighingPigletsSerializer(many=True)
 
@@ -35,3 +38,22 @@ class NewBornPigletsGroupPkSerializer(serializers.ModelSerializer):
 
 class NewBornPigletsGetSerializer(serializers.Serializer):
     new_born_group = serializers.IntegerField()
+
+
+class MoveFromCellToCellSerializer(serializers.Serializer):
+    from_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    quantity = serializers.IntegerField()
+    gilts_quantity = serializers.IntegerField(default=0)
+
+
+class MoveToSerializer(serializers.Serializer):
+    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    quantity = serializers.IntegerField()
+    gilts_quantity = serializers.IntegerField(default=0)
+
+
+class NewBornGroupsToMerge(serializers.ModelSerializer):
+    class Meta:
+        model = NewBornPigletsMerger
+        fields = ['piglets_groups', ]

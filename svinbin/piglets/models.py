@@ -77,9 +77,10 @@ class PigletsGroup(CoreModel):
         self.save()
 
     def remove_gilts(self, quantity):
-        self.quantity -= quantity
-        self.gilts_quantity -= quantity
-        self.save()
+        if self.gilts_quantity > 0:
+            self.quantity -= quantity
+            self.gilts_quantity -= quantity
+            self.save()
 
 
 class NewBornPigletsQuerySet(models.QuerySet):
@@ -169,3 +170,9 @@ class NomadPigletsGroup(PigletsGroup):
         self.quantity = 0
         self.active = False
         self.save()
+
+    @property
+    def merger_part_number(self):
+        if self.creating_new_born_merger:
+            return self.creating_new_born_merger.part_number
+        return None

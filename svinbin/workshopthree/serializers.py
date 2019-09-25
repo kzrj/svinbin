@@ -29,7 +29,7 @@ class NewBornGroupsToMerge(serializers.Serializer):
 class NewBornGroupsToMerge(serializers.ModelSerializer):
     class Meta:
         model = NewBornPigletsMerger
-        fields = ['piglets_groups', ]
+        fields = ['piglets_groups', 'part_number']
 
 
 class SowsIdsSerializer(serializers.Serializer):
