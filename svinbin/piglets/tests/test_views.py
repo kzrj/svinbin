@@ -239,7 +239,10 @@ class WorkShopNomadPigletsViewsTest(APITestCase):
         self.assertEqual(response.data['piglets_group']['quantity'], 10)
 
     def test_serilalizers_fields(self):
+        piglets_group1 = piglets_testing.create_new_born_group(1, 10, 1, 10)
+        piglets_group2 = piglets_testing.create_new_born_group(1, 11, 1, 12)
         nomad_piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
 
         response = self.client.get('/api/nomadpiglets/%s/' % nomad_piglets_group1.pk)
         print(response.data)
+        self.assertEqual(len(response.data['cells_numbers_from_merger']), 3)

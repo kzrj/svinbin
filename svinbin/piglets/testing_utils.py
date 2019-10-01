@@ -39,7 +39,7 @@ def create_nomad_group_from_new_born_groups(new_born_groups):
 def create_nomad_group_from_three_new_born():
     piglets_group1 = create_new_born_group(1, 1, 1, 10)
     piglets_group2 = create_new_born_group(1, 2, 1, 12)
-    piglets_group3 = create_new_born_group(1, 1, 1, 15)
+    piglets_group3 = create_new_born_group(1, 3, 1, 15)
 
     piglets_groups = NewBornPigletsGroup.objects.filter(pk__in=
         [piglets_group1.pk, piglets_group2.pk, piglets_group3.pk])
