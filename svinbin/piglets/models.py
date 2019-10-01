@@ -93,6 +93,9 @@ class NewBornPigletsGroupManager(PigletsGroupManager):
     def get_queryset(self):
         return NewBornPigletsQuerySet(self.model, using=self._db).filter(active=True)
 
+    def get_with_inactive(self):
+        return NewBornPigletsQuerySet(self.model, using=self._db)
+
     def groups_with_gilts(self):
         return self.get_queryset().filter(active=True, gilts_quantity__gt=0)
 

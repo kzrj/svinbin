@@ -237,3 +237,9 @@ class WorkShopNomadPigletsViewsTest(APITestCase):
         response = self.client.post('/api/nomadpiglets/%s/move_to/' %
           nomad_piglets_group1.pk, {'to_location': to_location.pk, 'quantity': 10 })
         self.assertEqual(response.data['piglets_group']['quantity'], 10)
+
+    def test_serilalizers_fields(self):
+        nomad_piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
+
+        response = self.client.get('/api/nomadpiglets/%s/' % nomad_piglets_group1.pk)
+        print(response.data)

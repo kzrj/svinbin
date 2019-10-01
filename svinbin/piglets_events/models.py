@@ -120,7 +120,7 @@ class NewBornPigletsMerger(PigletsMerger):
 
     @property
     def cells(self):
-        locations = self.piglets_groups.all().values_list('location', flat=True)
+        locations = self.piglets_groups.get_with_inactive().values_list('location', flat=True)
         cells = SowAndPigletsCell.objects. \
             filter(location__id__in=locations).values_list('number', flat=True)
         return cells
