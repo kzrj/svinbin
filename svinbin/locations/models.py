@@ -192,3 +192,19 @@ class Location(CoreModel):
             not self.get_located_active_new_born_groups():
                 return True
         return False
+
+    @property
+    def get_cell_number(self):
+        if self.sowSingleCell:
+            return self.sowSingleCell.number
+
+        if self.pigletsGroupCell:
+            return self.pigletsGroupCell.number
+
+        if self.sowAndPigletsCell:
+            return self.sowAndPigletsCell.number
+
+        if self.sowGroupCell:
+            return self.sowGroupCell.number
+
+        return None

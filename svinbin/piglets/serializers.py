@@ -16,6 +16,7 @@ class NomadPigletsGroupPkSerializer(serializers.ModelSerializer):
 
 class NomadPigletsGroupSerializer(serializers.ModelSerializer):
     merger_part_number = serializers.ReadOnlyField()
+    cells_numbers_from_merger = serializers.ReadOnlyField()
     status = serializers.StringRelatedField()
     weighing_records = WeighingPigletsSerializer(many=True)
 

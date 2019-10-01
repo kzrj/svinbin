@@ -236,5 +236,4 @@ class WorkShopNomadPigletsViewsTest(APITestCase):
         to_location = Location.objects.get(workshop__number=8)
         response = self.client.post('/api/nomadpiglets/%s/move_to/' %
           nomad_piglets_group1.pk, {'to_location': to_location.pk, 'quantity': 10 })
-        print(response.data)
         self.assertEqual(response.data['piglets_group']['quantity'], 10)

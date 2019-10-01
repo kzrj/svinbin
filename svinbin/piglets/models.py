@@ -176,3 +176,9 @@ class NomadPigletsGroup(PigletsGroup):
         if self.creating_new_born_merger:
             return self.creating_new_born_merger.part_number
         return None
+
+    @property
+    def cells_numbers_from_merger(self):
+        if self.creating_new_born_merger:
+            return self.creating_new_born_merger.cells
+        return None

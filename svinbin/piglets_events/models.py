@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from core.models import Event, CoreModel, CoreModelManager
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup, PigletsStatus
-from locations.models import Location
+from locations.models import Location, SowAndPigletsCell
 
 
 class PigletsEvent(Event):
@@ -117,6 +117,13 @@ class NewBornPigletsMerger(PigletsMerger):
     def add_new_born_group(self, new_born_group):
         new_born_group.merger = self
         new_born_group.save()
+
+    @property
+    def cells(self):
+        locations = self.piglets_groups.all().values_list('location', flat=True)
+        cells = SowAndPigletsCell.objects. \
+            filter(location__id__in=locations).values_list('number', flat=True)
+        return cells
 
 
 class MergerRecord(CoreModel):
