@@ -15,7 +15,7 @@ from piglets_events import serializers as piglets_events_serializers
 from transactions import serializers as transactions_serializers
 from locations import serializers as locations_serializers
 
-from sows.models import Sow
+from sows.models import Sow, Gilt
 from sows_events import models as sows_events_models
 from piglets.models import NomadPigletsGroup, NewBornPigletsGroup
 from piglets_events import models as piglets_events_models
@@ -82,6 +82,25 @@ class WorkShopThreeNewBornPigletsViewSet(NewBornPigletsViewSet):
                 {
                  "nomad_group": piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data,
                  "merger": piglets_events_serializers.NewBornPigletsGroupMergerSerializer(merger).data
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def create_gilt(self, request, pk=None):
+        serializer = piglets_serializers.NewGiltBirthIdSerializer(data=request.data)
+        if serializer.is_valid():
+            new_born_group = self.get_object()
+            gilt = Gilt.objects.create_gilt(
+                    birth_id=serializer.validated_data['birth_id'],
+                    new_born_group=new_born_group
+                )
+            return Response(
+                {"piglets_group": piglets_serializers. \
+                    NewBornPigletsGroupSerializer(new_born_group).data,
+                 "message": 'ok',
+                 "gilt": sows_serializers.GiltSerializer(gilt).data,
                  },
                 status=status.HTTP_200_OK)
         else:

@@ -258,21 +258,3 @@ class WorkShopNomadPigletsViewSet(NomadPigletsGroupViewSet):
 class NewBornPigletsViewSet(viewsets.ModelViewSet):
     queryset = piglets_models.NewBornPigletsGroup.objects.all()
     serializer_class = piglets_serializers.NewBornPigletsGroupSerializer
-
-    @action(methods=['post'], detail=True)
-    def create_gilt(self, request, pk=None):
-        serializer = piglets_serializers.NewGiltBirthIdSerializer(data=request.data)
-        if serializer.is_valid():
-            gilt = sows_models.Gilt.objects.create_gilt(
-                    birth_id=serializer.validated_data['birth_id'],
-                    newborn_group=self.get_object()
-                )
-            return Response(
-                {"piglets_group": piglets_serializers.NewBornPigletsGroupSerializer(moving_group).data,
-                 "message": 'ok',
-                 "gilt": sows_serializers.GiltSerializer(gilt).data,
-                 },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

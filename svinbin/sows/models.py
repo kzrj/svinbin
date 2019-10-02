@@ -206,7 +206,7 @@ class Sow(Pig):
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, new_born_group, cell=None):
-        # carefully, here I get FIRST group.
+        # Here i dont check is birth_id unique. It check in serializer.
         mother_sow = new_born_group.farrows.all().first().sow
 
         gilt = self.create(birth_id=birth_id, mother_sow=mother_sow,

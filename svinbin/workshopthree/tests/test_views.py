@@ -12,6 +12,7 @@ import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 import staff.testing_utils as staff_testing
 
+from sows.models import Gilt
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
 from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger, CullingNewBornPiglets
 from locations.models import WorkShop, SowAndPigletsCell, Location
@@ -70,6 +71,21 @@ class WorkshopThreePigletsViewSetTest(APITestCase):
         new_born_merger = NewBornPigletsMerger.objects.filter(nomad_group=nomad_group).first()
         self.assertNotEqual(new_born_merger, None)
         self.assertEqual(new_born_merger.part_number, 1)
+
+    def test_create_gilt(self):
+        newBornPigletsGroup1 = piglets_testing.create_new_born_group(section_number=1, cell_number=3)
+        response = self.client.post('/api/workshopthree/newbornpiglets/%s/create_gilt/'
+             % newBornPigletsGroup1.pk, {'birth_id': 1})
+        gilt = Gilt.objects.filter(birth_id=1).first()
+        self.assertEqual(response.data['gilt']['id'], gilt.pk)
+
+        response = self.client.post('/api/workshopthree/newbornpiglets/%s/create_gilt/'
+             % newBornPigletsGroup1.pk, {'birth_id': 1})
+        self.assertEqual(response.status_code, 400)
+
+        response = self.client.post('/api/workshopthree/newbornpiglets/%s/create_gilt/'
+             % newBornPigletsGroup1.pk, {'birth_id': gilt.mother_sow.pk})
+        self.assertEqual(response.status_code, 400)
 
 
 class WorkshopThreeSowsViewSetTest(APITestCase):
