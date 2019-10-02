@@ -111,66 +111,11 @@ class SowManager(CoreModelManager):
     def get_all_sows_in_workshop(self, workshop):
         return self.get_queryset().get_all_sows_in_workshop(workshop)
 
-    def get_not_suporos_in_workshop(self, workshop):
-        return self.get_queryset().filter(
-            Q(
-                ~Q(status__title='Супорос'), 
-            ),
-            location=workshop.location
-            )
-
-    def get_suporos_in_workshop(self, workshop):
-        return self.get_queryset().filter(
-            Q(
-                Q(status__title='Супорос') 
-                ),
-            location=workshop.location
-            )
-
-    def get_not_seminated_not_suporos_in_workshop(self, workshop):
-        return self.get_queryset().filter(
-            Q(
-                ~Q(status__title='Супорос'), 
-                ~Q(status__title='Осеменена'),
-                Q(farm_id__isnull=False),
-                ),
-            location=workshop.location
-            )
-
     def get_without_farm_id_in_workshop(self, workshop):
         return self.get_queryset().filter(
             farm_id__isnull=True,            
             location=workshop.location
             )
-
-    def get_suporos_30(self):
-        return self.get_queryset().filter(
-                ~Q(ultrasound__u_type__days=60),
-                tour__isnull=False,
-                ultrasound__u_type__days=30,
-            )
-
-    def get_suporos_60(self):
-        return self.get_queryset().filter(
-                sowfarrow__sow__farm_id__isnull=True,
-                tour__isnull=False,
-                ultrasound__u_type__days=60,
-            )
-
-    def get_seminated(self):
-        # here cant use Prefetch with semination model because of circular import
-        # just return sow with tour(seminated), without usound and farrow
-        return self.get_queryset().filter(
-            ultrasound__sow__farm_id__isnull=True,
-            sowfarrow__sow__farm_id__isnull=True,
-            tour__isnull=False,
-            )
-            # ).prefetch_related(
-            #     Prefetch(
-            #         'semination_set',
-            #         queryset=
-            #     )
-            # )
 
 
 class Sow(Pig):
@@ -198,7 +143,6 @@ class Sow(Pig):
         self.save()
 
     def get_last_farrow(self):
-        # print(self._meta.get_fields())
         return self.sowfarrow_set.all().order_by('-created_at')
 
     @property

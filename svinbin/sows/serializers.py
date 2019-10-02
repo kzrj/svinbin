@@ -5,7 +5,7 @@ from rest_framework import serializers, status
 # import sows_events.serializers as sows_events_serializers
 
 from core.utils import CustomValidation
-from sows.models import Sow, Boar
+from sows.models import Sow, Boar, Gilt
 from sows_events.models import Semination
 from locations.models import Location
 
@@ -95,6 +95,12 @@ class SowsMassUltrasoundSerializer(serializers.Serializer):
     sows = serializers.ListField(child=serializers.IntegerField())
     days = serializers.IntegerField()
     result =serializers.BooleanField()  
+
+
+class GiltSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Gilt
+        fields = '__all__'
 
 
 # Init only
