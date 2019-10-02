@@ -30,7 +30,6 @@ class LocationsViewSetTest(APITestCase):
 
     def test_weighing_piglets(self):
         nomad_piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
-
         response = self.client.get('/api/locations/')
-        print(response.data)
+        print(response.data['results'][50])
         

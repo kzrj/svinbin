@@ -21,7 +21,8 @@ from piglets.filters import NomadPigletsGroupFilter
 
 
 class NomadPigletsGroupViewSet(viewsets.ModelViewSet):
-    queryset = piglets_models.NomadPigletsGroup.objects.all()
+    queryset = piglets_models.NomadPigletsGroup.objects. \
+        select_related('creating_new_born_merger').all()
     serializer_class = piglets_serializers.NomadPigletsGroupSerializer
     filter_class = NomadPigletsGroupFilter
 

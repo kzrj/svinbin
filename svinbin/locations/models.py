@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, connection
 
 from core.models import CoreModel, CoreModelManager
 
@@ -173,6 +173,7 @@ class Location(CoreModel):
 
     @property
     def is_empty(self):
+        print('is_empty',  self.pk)
         if not self.get_located_active_nomad_groups() and \
             not self.get_located_active_new_born_groups() and \
             not self.sow_set.all() and \
@@ -182,12 +183,14 @@ class Location(CoreModel):
 
     @property
     def is_sow_empty(self):
+        print('is_sow_empty',  self.pk)
         if not self.sow_set.all():
             return True
         return False
 
     @property
     def is_piglets_empty(self):
+        print('is_piglets_empty',  self.pk)
         if not self.get_located_active_nomad_groups() and \
             not self.get_located_active_new_born_groups():
                 return True
