@@ -213,7 +213,7 @@ class GiltManager(CoreModelManager):
          location=new_born_group.location,
          new_born_group=new_born_group, tour=new_born_group.tour
          )
-        new_born_group.add_gilts_increase_quantity(1)
+        new_born_group.add_gilts(1)
 
         return gilt
 
