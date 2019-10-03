@@ -271,13 +271,11 @@ class NomadMergerRecord(MergerRecord):
 
 class RecountManager(CoreModelManager):
     def create_recount(self, piglets_group, quantity, initiator=None):
-        if not piglets_group.is_quantities_same(quantity):
-            recount = self.create(date=timezone.now(), initiator=initiator, piglets_group=piglets_group,
-                quantity_after=quantity, quantity_before=piglets_group.quantity,
-                balance=quantity-piglets_group.quantity)
-            piglets_group.change_quantity(quantity)
-            return recount
-        return None
+        recount = self.create(date=timezone.now(), initiator=initiator, piglets_group=piglets_group,
+            quantity_after=quantity, quantity_before=piglets_group.quantity,
+            balance=quantity - piglets_group.quantity)
+        piglets_group.change_quantity(quantity)
+        return recount
 
 
 class Recount(PigletsEvent):

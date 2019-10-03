@@ -76,7 +76,7 @@ class WorkShopThreeNewBornPigletsViewSet(NewBornPigletsViewSet):
             merger, nomad_group = piglets_events_models.NewBornPigletsMerger.objects.create_merger_and_return_nomad_piglets_group(
             new_born_piglets_groups=groups_to_merge,
             part_number=serializer.validated_data['part_number'],
-            initiator=None)     
+            initiator=request.user)     
 
             return Response(
                 {
@@ -89,18 +89,39 @@ class WorkShopThreeNewBornPigletsViewSet(NewBornPigletsViewSet):
 
     @action(methods=['post'], detail=True)
     def create_gilt(self, request, pk=None):
-        serializer = piglets_serializers.NewGiltBirthIdSerializer(data=request.data)
+        serializer = serializers.NewGiltBirthIdSerializer(data=request.data)
         if serializer.is_valid():
             new_born_group = self.get_object()
             gilt = Gilt.objects.create_gilt(
                     birth_id=serializer.validated_data['birth_id'],
-                    new_born_group=new_born_group
+                    new_born_group=new_born_group,
                 )
             return Response(
                 {"piglets_group": piglets_serializers. \
                     NewBornPigletsGroupSerializer(new_born_group).data,
                  "message": 'ok',
                  "gilt": sows_serializers.GiltSerializer(gilt).data,
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def recount(self, request, pk=None):
+        serializer = serializers.CreateRecountSerializer(data=request.data)
+        if serializer.is_valid():
+            new_born_group = self.get_object()
+            recount = piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(
+                    piglets_group=new_born_group,
+                    quantity=serializer.validated_data['quantity'],
+                    initiator=request.user
+                )
+            return Response(
+                {"piglets_group": piglets_serializers. \
+                    NewBornPigletsGroupSerializer(new_born_group).data,
+                 "message": 'ok',
+                 "recount": piglets_events_serializers. \
+                    NewBornPigletsGroupRecountSerializer(recount).data,
                  },
                 status=status.HTTP_200_OK)
         else:

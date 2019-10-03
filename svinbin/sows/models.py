@@ -2,6 +2,7 @@
 from django.db import models
 from django.db.models import Q, Prefetch
 from django.core import exceptions
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location
@@ -206,12 +207,11 @@ class Sow(Pig):
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, new_born_group, cell=None):
-        # Here i dont check is birth_id unique. It check in serializer.
-        mother_sow = new_born_group.farrows.all().first().sow
-
-        gilt = self.create(birth_id=birth_id, mother_sow=mother_sow,
-         location=new_born_group.location,
-         new_born_group=new_born_group, tour=new_born_group.tour
+        gilt = self.create(
+            birth_id=birth_id,
+            mother_sow=new_born_group.farrows.all().first().sow,
+            location=new_born_group.location,
+            new_born_group=new_born_group, tour=new_born_group.tour
          )
         new_born_group.add_gilts(1)
 

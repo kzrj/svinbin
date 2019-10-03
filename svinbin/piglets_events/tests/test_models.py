@@ -296,18 +296,38 @@ class RecountManagerTest(TestCase):
     def test_create_recount_nomad_group(self):
         # quantity 37
         nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
-        recount = piglets_events_models.NomadPigletsGroupRecount.objects.create_recount(nomad_group, 35)
+        recount = piglets_events_models.NomadPigletsGroupRecount.objects. \
+            create_recount(nomad_group, 35)
         self.assertEqual(recount.quantity_before, 37)
         self.assertEqual(recount.quantity_after, 35)
         self.assertEqual(recount.balance, -2)
 
+    def test_create_recount_nomad_group2(self):
+        # quantity 37
+        nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
+        recount = piglets_events_models.NomadPigletsGroupRecount.objects. \
+            create_recount(nomad_group, 39)
+        self.assertEqual(recount.quantity_before, 37)
+        self.assertEqual(recount.quantity_after, 39)
+        self.assertEqual(recount.balance, 2)
+
     def test_create_recount_new_born_group(self):
         # quantity 10
         new_born_group = piglets_testing.create_new_born_group()
-        recount = piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(new_born_group, 8)
+        recount = piglets_events_models.NewBornPigletsGroupRecount.objects. \
+            create_recount(new_born_group, 8)
         self.assertEqual(recount.quantity_before, 10)
         self.assertEqual(recount.quantity_after, 8)
         self.assertEqual(recount.balance, -2)
+
+    def test_create_recount_new_born_group2(self):
+        # quantity 10
+        new_born_group = piglets_testing.create_new_born_group()
+        recount = piglets_events_models.NewBornPigletsGroupRecount.objects. \
+            create_recount(new_born_group, 12)
+        self.assertEqual(recount.quantity_before, 10)
+        self.assertEqual(recount.quantity_after, 12)
+        self.assertEqual(recount.balance, 2)
 
 
 class WeighingPigletsTest(TestCase):

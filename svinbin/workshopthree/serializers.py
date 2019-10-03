@@ -34,3 +34,17 @@ class NewBornGroupsToMerge(serializers.ModelSerializer):
 
 class SowsIdsSerializer(serializers.Serializer):
     sows = serializers.PrimaryKeyRelatedField(queryset=Sow.objects.all(), many=True)
+
+
+class NewGiltBirthIdSerializer(serializers.Serializer):
+    birth_id = serializers.IntegerField()
+
+    # def validate_birth_id(self, value):
+    #     if Sow.objects.filter(farm_id=value).first() or Gilt.objects.filter(birth_id=value):
+    #         raise CustomValidation('Not unique farm_id', 
+    #             'farm_id', status_code=status.HTTP_400_BAD_REQUEST)
+    #     return value
+
+
+class CreateRecountSerializer(serializers.Serializer):
+    quantity = serializers.IntegerField()

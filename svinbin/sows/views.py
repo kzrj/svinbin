@@ -244,29 +244,6 @@ class BoarViewSet(viewsets.ModelViewSet):
 
 
 class WorkShopSowViewSet(SowViewSet):
-    # queryset = sows_models.Sow.objects.all()
-    # serializer_class = sows_serializers.SowSerializer
-    # filter_class = SowFilter
-
-    @action(methods=['post'], detail=False)
-    def move_many_by_queryset(self, request):
-        # sows = here need to get queryset by filter
-
-        serializer = locations_serializers.LocationPKSerializer(data=request.data)
-        if serializer.is_valid():
-
-            # here create transaction for each in queryset
-
-            return Response(
-                {
-                    # "transaction": transactions_serializers.SowTransactionSerializer(transaction).data,
-                    # "sows": sows_serializers.SowSerializer(sows, many=True).data, 
-                },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        pass
-
     @action(methods=['post'], detail=True)
     def move_to(self, request, pk=None):
         sow = self.get_object()        

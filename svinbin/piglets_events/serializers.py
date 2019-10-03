@@ -56,3 +56,9 @@ class SplitPigletsSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.SplitNomadPigletsGroup
         fields = '__all__'        
+
+
+class NewBornPigletsGroupRecountSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.NewBornPigletsGroupRecount
+        fields = '__all__'        
