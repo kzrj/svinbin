@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import Event, CoreModel, CoreModelManager
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup, PigletsStatus
@@ -120,7 +121,6 @@ class NewBornPigletsMerger(PigletsMerger):
 
     @property
     def cells(self):
-        print('cells merger')
         groups = NewBornPigletsGroup.objects.get_with_inactive().filter(merger=self)
         locations = groups.values_list('location', flat=True)
         cells = SowAndPigletsCell.objects. \
@@ -174,6 +174,10 @@ class SplitNomadPigletsGroupManager(CoreModelManager):
 
     def split_group(self, parent_nomad_group, new_group_piglets_amount, initiator=None,
             new_group_gilts_quantity=0):
+        if new_group_piglets_amount >= parent_nomad_group.quantity:
+            raise DjangoValidationError(message=\
+                'new_group_piglets_amount >= parent_nomad_group.quantity')
+
         split_event = self.create(date=timezone.now(), initiator=initiator,
             parent_group=parent_nomad_group)
         
