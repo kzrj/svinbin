@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 
 import piglets_events.models as piglets_events_models
 import piglets.models as piglets_models
@@ -62,9 +63,9 @@ class NewBornMergerModelTest(TestCase):
          / self.new_born_merger_two_tours.count_all_piglets()
         self.assertEqual(model_percentage, percentage)
 
-    def test_count_quantity_and_percentage_by_tours(self):
-        print(self.new_born_merger_two_tours.count_quantity_and_percentage_by_tours())
-        # to write
+    # def test_count_quantity_and_percentage_by_tours(self):
+    #     print(self.new_born_merger_two_tours.count_quantity_and_percentage_by_tours())
+    #     # to write
 
     def test_create_records(self):
         self.new_born_merger_two_tours.create_records()
@@ -179,33 +180,6 @@ class NomadMergerRecordManagerTest(TestCase):
             self.merger.count_all_piglets())
 
 
-class SplitNomadPigletsGroupTest(TestCase):
-    def setUp(self):
-        locations_testing.create_workshops_sections_and_cells()
-        sows_testing.create_statuses()
-        piglets_testing.create_piglets_statuses()
-
-    def test_split_group(self):
-        parent_piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
-        self.assertEqual(parent_piglets_group.location.get_location.number, 3)
-        self.assertEqual(parent_piglets_group.quantity, 37)
-
-        first_group, second_group = piglets_events_models.SplitNomadPigletsGroup \
-            .objects.split_group(parent_piglets_group, 10)
-
-        self.assertEqual(first_group.quantity, 27)
-        self.assertEqual(second_group.quantity, 10)
-        self.assertEqual(first_group.location.get_location.number, 3)
-        self.assertEqual(second_group.location.get_location.number, 3)
-        self.assertEqual(first_group.status, parent_piglets_group.status)
-        self.assertEqual(second_group.status, parent_piglets_group.status)
-        self.assertEqual(first_group.active, True)
-        self.assertEqual(second_group.active, True)
-        self.assertEqual(parent_piglets_group.quantity, 0)
-        self.assertEqual(parent_piglets_group.active, False)
-        self.assertEqual(first_group.split_record, parent_piglets_group.split_event)
-
-
 class SplitNomadPigletsGroupManagerTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
@@ -232,6 +206,14 @@ class SplitNomadPigletsGroupManagerTest(TestCase):
 
         self.assertEqual(nomad_group.quantity, 0)
         self.assertEqual(nomad_group.active, False)
+
+    def test_validate(self):
+        # quantity 37
+        parent_piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
+        # first_group, second_group = piglets_events_models.SplitNomadPigletsGroup \
+        #     .objects.split_group(parent_piglets_group, 40)
+        self.assertRaises(ValidationError, piglets_events_models.SplitNomadPigletsGroup \
+            .objects.split_group, parent_piglets_group, 40)
 
 
 class NomadPigletsGroupMergerManagerTest(TestCase):
@@ -263,15 +245,15 @@ class NomadPigletsGroupMergerManagerTest(TestCase):
         merge_records = piglets_events_models.NomadMergerRecord.objects.create_records(nomad_merger)
         self.assertEqual(merge_records.first().quantity, 32)
         self.assertEqual(merge_records.first().nomad_group, first_group)
-        print(merge_records.first().percentage)
+        # print(merge_records.first().percentage)
 
         self.assertEqual(merge_records[1].quantity, 7)
         self.assertEqual(merge_records[1].nomad_group, fourth_group)
-        print(merge_records[1].percentage)
+        # print(merge_records[1].percentage)
 
-        print(merge_records[0].nomad_group.location)
-        print(merge_records[0].nomad_group.location)
-        print(type(merge_records[0].nomad_group.location))
+        # print(merge_records[0].nomad_group.location)
+        # print(merge_records[0].nomad_group.location)
+        # print(type(merge_records[0].nomad_group.location))
 
         nomad_group = nomad_merger.create_nomad_group()
         first_group.refresh_from_db()

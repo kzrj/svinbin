@@ -172,11 +172,19 @@ class SplitNomadPigletsGroupManager(CoreModelManager):
             gilts_quantity=gilts_quantity
             )
 
-    def split_group(self, parent_nomad_group, new_group_piglets_amount, initiator=None,
-            new_group_gilts_quantity=0):
-        if new_group_piglets_amount >= parent_nomad_group.quantity:
+    def validate(sefl, **kwargs):        
+        if kwargs.get('new_group_piglets_amount') >= kwargs.get('parent_nomad_group').quantity:
             raise DjangoValidationError(message=\
                 'new_group_piglets_amount >= parent_nomad_group.quantity')
+        
+    def split_group(self, parent_nomad_group, new_group_piglets_amount, initiator=None,
+            new_group_gilts_quantity=0):
+        self.validate(
+            parent_nomad_group=parent_nomad_group,
+            new_group_piglets_amount=new_group_piglets_amount,
+            initiator=initiator,
+            new_group_gilts_quantity=new_group_gilts_quantity
+            )
 
         split_event = self.create(date=timezone.now(), initiator=initiator,
             parent_group=parent_nomad_group)

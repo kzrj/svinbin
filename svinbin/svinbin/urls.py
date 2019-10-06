@@ -21,7 +21,6 @@ from staff import views as staff_views
 from piglets import views as piglets_views
 from workshoponetwo import views as workshoponetwo_views
 from workshopthree import views as workshopthree_views
-from workshopfour import views as workshopfour_views
 
 router = routers.DefaultRouter()
 
