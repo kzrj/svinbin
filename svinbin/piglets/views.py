@@ -80,10 +80,22 @@ class WorkShopNomadPigletsViewSet(NomadPigletsGroupViewSet):
 
     @action(methods=['post'], detail=True)
     def move_one_group_to_cell(self, request, pk=None):        
-        serializer = locations_serializers.LocationPKSerializer(data=request.data)
+        serializer = piglets_serializers.MoveToSerializer(data=request.data)
         if serializer.is_valid():
             piglets_group = self.get_object()
-            location = serializer.validated_data['location']
+            location = serializer.validated_data['to_location']
+            quantity = serializer.validated_data['quantity']
+            gilts_quantity = serializer.validated_data['gilts_quantity']
+
+            if quantity < piglets_group.quantity:
+                other_group, piglets_group = piglets_events_models.SplitNomadPigletsGroup.\
+                    objects.split_group(
+                        parent_nomad_group=piglets_group,
+                        new_group_piglets_amount=quantity,
+                        new_group_gilts_quantity=gilts_quantity,
+                        initiator=request.user
+                        )
+
             if location.is_nomad_piglet_group_cell_empty():
                 transaction = transactions_models.PigletsTransaction \
                     .objects.create_transaction(

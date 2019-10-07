@@ -55,6 +55,12 @@ class MoveToSerializer(serializers.Serializer):
     gilts_quantity = serializers.IntegerField(default=0)
 
 
+# class MoveOneToCellSerializer(serializers.Serializer):
+#     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+#     quantity = serializers.IntegerField()
+#     gilts_quantity = serializers.IntegerField(default=0)
+
+
 class NewBornGroupsToMerge(serializers.ModelSerializer):
     class Meta:
         model = NewBornPigletsMerger
