@@ -146,7 +146,7 @@ class NomadPigletsQuerySet(models.QuerySet):
 
 class NomadPigletsGroupManager(PigletsGroupManager):
     def get_queryset(self):
-        return NomadPigletsQuerySet(self.model, using=self._db)
+        return NomadPigletsQuerySet(self.model, using=self._db).filter(active=True)
 
     def reset_quantity_and_deactivate(self):
         return self.get_queryset().reset_quantity_and_deactivate()
