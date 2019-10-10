@@ -18,12 +18,12 @@ class NewBornModelManagerTest(TestCase):
     def test_groups_with_gilts(self):
         new_born_group1 = piglets_testing.create_new_born_group(cell_number=5)
         sow1 = new_born_group1.farrows.first().sow
-        gilt1 = sows_models.Gilt.objects.create_gilt(1, sow1)
+        gilt1 = sows_models.Gilt.objects.create_gilt(1, new_born_group1)
         new_born_group1.refresh_from_db()
         
         new_born_group2 = piglets_testing.create_new_born_group(cell_number=6)
         sow2 = new_born_group2.farrows.first().sow
-        gilt2 = sows_models.Gilt.objects.create_gilt(2, sow2)
+        gilt2 = sows_models.Gilt.objects.create_gilt(2, new_born_group2)
 
         new_born_group3 = piglets_testing.create_new_born_group(cell_number=4)
 
@@ -54,9 +54,11 @@ class NomadPigletsModelManagerTest(TransactionTestCase):
             [self.piglets_group1.pk, self.piglets_group2.pk, self.piglets_group3.pk])
 
         self.new_born_merger_same_tour = piglets_events_models.NewBornPigletsMerger.objects \
-            .create_merger_and_return_nomad_piglets_group(piglets_groups_same_tour, part_number=1)[0]
+            .create_merger_and_return_nomad_piglets_group(piglets_groups_same_tour, 
+                part_number=1)[0]
         self.new_born_merger_two_tours = piglets_events_models.NewBornPigletsMerger.objects \
-            .create_merger_and_return_nomad_piglets_group(piglets_groups_two_tours, part_number=2)[0]
+            .create_merger_and_return_nomad_piglets_group(piglets_groups_two_tours, 
+                part_number=2)[0]
 
     def test_merger_part_number(self):
         nomad_group1 = self.new_born_merger_same_tour.nomad_group
@@ -67,5 +69,10 @@ class NomadPigletsModelManagerTest(TransactionTestCase):
     def test_cells_numbers_from_merger(self):
         nomad_group1 = self.new_born_merger_same_tour.nomad_group
         nomad_group2 = self.new_born_merger_two_tours.nomad_group
-        self.assertQuerysetEqual(nomad_group1.cells_numbers_from_merger, self.new_born_merger_two_tours.cells)
-        self.assertQuerysetEqual(nomad_group2.cells_numbers_from_merger, self.new_born_merger_same_tour.cells)
+        self.assertEqual(list(nomad_group1.cells_numbers_from_merger), 
+            list(self.new_born_merger_same_tour.cells))
+        self.assertEqual(list(nomad_group2.cells_numbers_from_merger), 
+            list(self.new_born_merger_two_tours.cells))
+
+    def test_queryset_piglets_with_weighing_record(self):
+        pass

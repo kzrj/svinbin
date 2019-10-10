@@ -41,10 +41,6 @@
 	border: 2px solid #525252;
 }
 
-.piglets-active{
-	background-color: #ca3e47;
-}
-
 .workshop{
 	background-color: #E0E0E0;
 	min-height: 768px;
@@ -145,4 +141,25 @@
 
 .bottom-buttons-block{
 	margin-top: 10px;
+}
+
+.created-nomad-active{
+	background-color: #43ab92;
+}
+
+.newborn-group-table{
+	text-align: center; 
+    vertical-align: middle;
+	background: #313131 !important;
+	
+}
+
+/* nomad piglets */
+.piglets-active{
+	background-color: #43ab92;
+}
+
+.nomad-piglets-row{
+	border-bottom: 1px solid;
+	border-right: 1px solid;
 }
