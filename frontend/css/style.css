@@ -103,6 +103,10 @@
 	/* min-height: 500px ; */
 }
 
+.workshop-content{
+	margin-top: 15px;
+}
+
 .search-input{
 	width: 130px;
 }
@@ -162,4 +166,8 @@
 .nomad-piglets-row{
 	border-bottom: 1px solid;
 	border-right: 1px solid;
+}
+
+.input-group{
+	margin-top: 10px !important;
 }
