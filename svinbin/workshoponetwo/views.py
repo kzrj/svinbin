@@ -237,3 +237,24 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['post'], detail=False)
+    def mass_init_and_transfer(self, request):
+        serializer = serializers.MassSowCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            sows_qs = sows_models.Sow.objects.filter(pk__in=serializer.validated_data['sows'])
+            sows_events_models.Ultrasound.objects.mass_ultrasound(
+                sows_qs=sows_qs,
+                days=serializer.validated_data['days'],
+                result=serializer.validated_data['result'],
+                initiator=request.user
+                )
+
+            return Response(
+                {
+                    "message": "ok"
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

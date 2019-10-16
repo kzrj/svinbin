@@ -17,3 +17,8 @@ class CreateFarmIdSerializer(serializers.Serializer):
     		raise CustomValidation('Not unique farm_id', 
                 'farm_id', status_code=status.HTTP_400_BAD_REQUEST)
     	return value
+
+
+class MassSowCreateSerializer(serializers.Serializer):
+	# sows = serializers.IntegerField(many=True)
+	week = serializers.IntegerField()

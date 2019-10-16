@@ -65,8 +65,11 @@ def create_sow_with_semination_and_put_in_workshop_three(week=1, section_number=
      initiator=None, semination_employee=None)
     return sow
     
-def create_sow_with_location(location):
-    sow = Sow.objects.create(farm_id=random.randint(1, FARM_ID_COUNT), location=location)
+def create_sow_with_location(location, farm_id=None):
+    init_farm_id = random.randint(1, FARM_ID_COUNT)
+    if farm_id:
+        init_farm_id = farm_id
+    sow = Sow.objects.create(farm_id=init_farm_id, location=location)
     return sow
 
 def create_sow_with_semination(location, week=1):

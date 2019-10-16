@@ -98,13 +98,13 @@ class SowManager(CoreModelManager):
             location=Location.objects.get(workshop__number=1))
 
     def get_or_create_by_farm_id(self, farm_id):
-        sow = Sow.objects.filter(farm_id=farm_id).first()
+        sow = self.get_queryset().filter(farm_id=farm_id).first()
         if not sow:
             return self.create_new_from_gilt_and_put_in_workshop_one(farm_id)
         return sow
 
     def get_by_farm_id(self, farm_id):
-        sow = Sow.objects.filter(farm_id=farm_id).first()
+        sow = self.get_queryset().filter(farm_id=farm_id).first()
         # if not sow:
         #     raise error
         return sow
@@ -117,6 +117,20 @@ class SowManager(CoreModelManager):
             farm_id__isnull=True,            
             location=workshop.location
             )
+
+    def split_free_and_exist_farm_ids(self, farm_ids):
+        exist_farm_ids = list(
+            self.get_queryset().filter(farm_id__in=farm_ids).values_list('farm_id', flat=True)
+            )
+        free_farm_ids = list(set(farm_ids) - set(exist_farm_ids))
+        return free_farm_ids, exist_farm_ids
+
+    def create_bulk_at_ws(self, farm_ids, location):
+
+
+        for farm_id in farm_ids:
+            self.bulk_create([Sow(farm_id=farm_id, location=location)])
+
 
 
 class Sow(Pig):

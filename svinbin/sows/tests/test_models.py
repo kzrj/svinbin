@@ -232,6 +232,14 @@ class SowModelManagerTest(TestCase):
         self.assertEqual(sows_two_seminated_qs.count(), 0)
         self.assertEqual(sows_two_seminated_qs.first(), None)
 
+    def test_split_free_and_exist_farm_ids(self):
+        location = Location.objects.all()[1]
+        sow1 = sows_testings.create_sow_with_location(location=location, farm_id=1)
+        sow2 = sows_testings.create_sow_with_location(location=location, farm_id=2)
+        free_farm_ids, exist_farm_ids = Sow.objects.split_free_and_exist_farm_ids([1, 2, 3, 4])
+        self.assertEqual(free_farm_ids, [3, 4])
+        self.assertEqual(exist_farm_ids, [1, 2])
+
 
 class GiltModelManagerTest(TestCase):
     def setUp(self):
