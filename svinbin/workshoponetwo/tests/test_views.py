@@ -14,7 +14,7 @@ import sows.testing_utils as sows_testing
 import sows_events.utils as sows_events_testing
 import staff.testing_utils as staff_testing
 
-from sows.models import Boar
+from sows.models import Boar, Sow
 from locations.models import Location
 from transactions.models import SowTransaction
 from sows_events.models import Ultrasound, Semination
@@ -231,3 +231,22 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
 
         response = self.client.post('/api/workshoponetwo/sows/%s/abortion/' % sow1.pk)
         self.assertEqual(response.data['sow']['status'], 'Аборт')
+
+    def test_mass_init_and_transfer(self):
+        self.client.force_authenticate(user=self.user)
+        response = self.client.post('/api/workshoponetwo/sows/mass_init_and_transfer/', 
+            {'sows': [1, 2, 3, 4], 'week': 55})
+
+        self.assertEqual(Semination.objects.filter(tour__week_number=55).count(), 8)
+        self.assertEqual(Ultrasound.objects.filter(tour__week_number=55, u_type__days=30).count(), 4)
+        self.assertEqual(Ultrasound.objects.filter(tour__week_number=55, u_type__days=60).count(), 4)
+        self.assertEqual(SowTransaction.objects.all().count(), 4)
+
+        response = self.client.post('/api/workshoponetwo/sows/mass_init_and_transfer/', 
+            {'sows': [1, 2, 3, 4, 5, 6, 7], 'week': 55})
+        self.assertEqual(response.data['created'], [5, 6, 7])
+        self.assertEqual(response.data['not_created'], [1, 2, 3, 4])
+        self.assertEqual(Semination.objects.filter(tour__week_number=55).count(), 14)
+        self.assertEqual(Ultrasound.objects.filter(tour__week_number=55, u_type__days=30).count(), 7)
+        self.assertEqual(Ultrasound.objects.filter(tour__week_number=55, u_type__days=60).count(), 7)
+        self.assertEqual(SowTransaction.objects.all().count(), 7)

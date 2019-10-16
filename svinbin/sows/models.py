@@ -126,11 +126,12 @@ class SowManager(CoreModelManager):
         return free_farm_ids, exist_farm_ids
 
     def create_bulk_at_ws(self, farm_ids, location):
+        free_farm_ids, exist_farm_ids = self.split_free_and_exist_farm_ids(farm_ids)
 
-
-        for farm_id in farm_ids:
+        for farm_id in free_farm_ids:
             self.bulk_create([Sow(farm_id=farm_id, location=location)])
 
+        return free_farm_ids, exist_farm_ids
 
 
 class Sow(Pig):

@@ -240,6 +240,16 @@ class SowModelManagerTest(TestCase):
         self.assertEqual(free_farm_ids, [3, 4])
         self.assertEqual(exist_farm_ids, [1, 2])
 
+    def test_create_bulk_at_ws(self):
+        location = Location.objects.all()[1]
+        sow1 = sows_testings.create_sow_with_location(location=location, farm_id=1)
+        sow2 = sows_testings.create_sow_with_location(location=location, farm_id=2)
+
+        created, existed = Sow.objects.create_bulk_at_ws([1, 2, 3, 4], location)
+        self.assertEqual(created, [3, 4])
+        self.assertEqual(existed, [1, 2])
+        self.assertEqual(Sow.objects.filter(farm_id__in=[3, 4]).count(), 2)
+
 
 class GiltModelManagerTest(TestCase):
     def setUp(self):

@@ -243,17 +243,50 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
     def mass_init_and_transfer(self, request):
         serializer = serializers.MassSowCreateSerializer(data=request.data)
         if serializer.is_valid():
-            sows_qs = sows_models.Sow.objects.filter(pk__in=serializer.validated_data['sows'])
-            sows_events_models.Ultrasound.objects.mass_ultrasound(
-                sows_qs=sows_qs,
-                days=serializer.validated_data['days'],
-                result=serializer.validated_data['result'],
+            create_sows, existed_sows = sows_models.Sow.objects.create_bulk_at_ws(
+            	farm_ids=serializer.validated_data['sows'],
+            	location=locations_models.Location.objects.get(workshop__number=2)
+            	)
+            sows_to_create = sows_models.Sow.objects.filter(farm_id__in=create_sows)
+
+            sows_events_models.Semination.objects.mass_semination(
+                sows_qs=sows_to_create,
+                week=serializer.validated_data['week'],
+                semination_employee=request.user,
                 initiator=request.user
                 )
 
+            sows_events_models.Semination.objects.mass_semination(
+                sows_qs=sows_to_create,
+                week=serializer.validated_data['week'],
+                semination_employee=request.user,
+                initiator=request.user
+                )
+
+            sows_events_models.Ultrasound.objects.mass_ultrasound(
+                sows_qs=sows_to_create,
+                days=30,
+                result=True,
+                initiator=request.user
+                )
+
+            sows_events_models.Ultrasound.objects.mass_ultrasound(
+                sows_qs=sows_to_create,
+                days=60,
+                result=True,
+                initiator=request.user
+                )
+            
+            to_location = locations_models.Location.objects.get(workshop__number=3)
+            transactions_models.SowTransaction.objects.create_many_transactions(
+            	sows_to_create, to_location, request.user)
+
             return Response(
                 {
-                    "message": "ok"
+                	"created": create_sows,
+                	"not_created": existed_sows,
+                    "message": "Созданы и переведены {}, не созданы {}". \
+                    	format(str(create_sows), str(existed_sows)), 
                 },
                 status=status.HTTP_200_OK)
         else:
