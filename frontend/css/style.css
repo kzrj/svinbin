@@ -171,3 +171,12 @@
 .input-group{
 	margin-top: 10px !important;
 }
+
+.block-inactive{
+	pointer-events: none;
+	opacity: 0.7;
+}
+
+.error-message{
+	color: red;
+}

@@ -63,7 +63,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             {
                 "sow": sows_serializers.SowSerializer(sow).data,
                 "noname_sows_count": noname_sows.count(), 
-                "message": 'ok',
+                "message": 'Создана ремонтная свиноматка.',
             },
             status=status.HTTP_200_OK)
 
