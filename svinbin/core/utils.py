@@ -90,10 +90,11 @@ class CustomValidation(exceptions.APIException):
 
 
 def custom_exception_handler(exc, context):
-    # response = exception_handler(exc, context)
+    response = exception_handler(exc, context)
     if isinstance(exc, CustomValidation):
         field = list(exc.detail.keys())[0]
         response.data['errMessage'] = field + ' ' + exc.detail[field]
+        return response
 
     if isinstance(exc, DjangoValidationError):
         if hasattr(exc, 'message_dict'):
