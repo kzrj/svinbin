@@ -93,7 +93,7 @@ def custom_exception_handler(exc, context):
     response = drf_exception_handler(exc, context)
     if isinstance(exc, CustomValidation):
         field = list(exc.detail.keys())[0]
-        response.data['errMessage'] = field + ' ' + exc.detail[field]
+        response.data['message'] = field + ' ' + exc.detail[field]
         return response
 
     if isinstance(exc, DjangoValidationError):
