@@ -40,14 +40,15 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                 return Response(
                     {
                         "sow": sows_serializers.SowSerializer(sow).data,
-                        "message": 'ok',
+                        "message": 'Создана свиноматка с номером {}.' \
+                        	.format(serializer.validated_data['farm_id']),
                     },
                     status=status.HTTP_200_OK)
             else:
                 return Response(
                     {
                         "sow": None,
-                        "message": 'Net remontok',
+                        "message": 'Нет ремонтных свиноматок. Создайте свиноматку без номера.',
                     },
                     status=status.HTTP_400_BAD_REQUEST)
         else:
