@@ -14,7 +14,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class WorkshopEmployeeSerializer(serializers.ModelSerializer):
 	user = serializers.StringRelatedField()
-	workshop_number = serializers.IntegerField(source='workshop.number')
+	workshop_number = serializers.IntegerField(source='workshop.number', allow_null=True)
 
 	class Meta:
 		model = WorkShopEmployee
