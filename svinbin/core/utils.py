@@ -12,6 +12,7 @@ from django.utils.encoding import force_text
 from django.core.mail import send_mail
 from django.db.utils import IntegrityError as DjangoIntegrityError
 
+from staff.serializers import WorkshopEmployeeSerializer
 
 class CustomValidation(exceptions.APIException):
     status_code = status.HTTP_400_BAD_REQUEST
@@ -115,3 +116,10 @@ def custom_exception_handler(exc, context):
     #         response.data['errMessage'] = 'ValidationError.'
 
     return drf_exception_handler(exc, context)
+
+
+def jwt_response_payload_handler(token, user=None, request=None):
+    return {
+        'token': token,
+        'user': WorkshopEmployeeSerializer(user.employee).data
+    }
