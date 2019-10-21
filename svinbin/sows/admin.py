@@ -1,3 +1,8 @@
 from django.contrib import admin
 
-# Register your models here.
+from sows.models import Sow, Gilt, Boar
+
+
+admin.site.register(Sow)
+admin.site.register(Gilt)
+admin.site.register(Boar)
