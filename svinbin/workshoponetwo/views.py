@@ -41,7 +41,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                     {
                         "sow": sows_serializers.SowSerializer(sow).data,
                         "message": 'Создана свиноматка с номером {}.' \
-                        	.format(serializer.validated_data['farm_id']),
+                            .format(serializer.validated_data['farm_id']),
                     },
                     status=status.HTTP_200_OK)
             else:
@@ -239,15 +239,14 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     @action(methods=['post'], detail=False)
     def mass_init_and_transfer(self, request):
         serializer = serializers.MassSowCreateSerializer(data=request.data)
         if serializer.is_valid():
             create_sows, existed_sows = sows_models.Sow.objects.create_bulk_at_ws(
-            	farm_ids=serializer.validated_data['sows'],
-            	location=locations_models.Location.objects.get(workshop__number=2)
-            	)
+                farm_ids=serializer.validated_data['sows'],
+                location=locations_models.Location.objects.get(workshop__number=2)
+                )
             sows_to_create = sows_models.Sow.objects.filter(farm_id__in=create_sows)
 
             sows_events_models.Semination.objects.mass_semination(
@@ -280,14 +279,41 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             
             to_location = locations_models.Location.objects.get(workshop__number=3)
             transactions_models.SowTransaction.objects.create_many_transactions(
-            	sows_to_create, to_location, request.user)
+                sows_to_create, to_location, request.user)
 
             return Response(
                 {
-                	"created": create_sows,
-                	"not_created": existed_sows,
+                    "created": create_sows,
+                    "not_created": existed_sows,
                     "message": "Созданы и переведены {}, не созданы {}". \
-                    	format(str(create_sows), str(existed_sows)), 
+                        format(str(create_sows), str(existed_sows)), 
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def double_semination(self, request, pk=None):
+        sow = self.get_object() 
+        serializer = serializers.DoubleSeminationSerializer(data=request.data)
+        if serializer.is_valid():
+            semination1 = sows_events_models.Semination.objects.create_semination(
+                sow=sow, week=serializer.validated_data['week'],
+                initiator=request.user, 
+                semination_employee=serializer.validated_data['semination_employee'],
+                boar=serializer.validated_data['boar1'])
+
+            semination2 = sows_events_models.Semination.objects.create_semination(
+                sow=sow, week=serializer.validated_data['week'],
+                initiator=request.user, 
+                semination_employee=serializer.validated_data['semination_employee'],
+                boar=serializer.validated_data['boar2'])
+            return Response(
+                {
+                    "semination1": sows_events_serializers.SeminationSerializer(semination1).data,
+                    "semination2": sows_events_serializers.SeminationSerializer(semination2).data,
+                    "sow": sows_serializers.SowSerializer(sow).data, 
+                    "message": "Свиноматка {} осеменена 2 раза".format(sow.farm_id)
                 },
                 status=status.HTTP_200_OK)
         else:

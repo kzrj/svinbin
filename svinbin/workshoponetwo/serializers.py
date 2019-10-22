@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.models import User
+
 from rest_framework import serializers, status
 
 from core.utils import CustomValidation
@@ -26,3 +28,11 @@ class MassSowCreateSerializer(serializers.Serializer):
     week = serializers.IntegerField()
     # boar = serializers.PrimaryKeyRelatedField(required=False, allow_null=True,
     #   queryset=Boar.objects.all())
+
+
+class DoubleSeminationSerializer(serializers.Serializer):
+    week = serializers.IntegerField()
+    boar1 = serializers.PrimaryKeyRelatedField(queryset=Boar.objects.all())
+    boar2 = serializers.PrimaryKeyRelatedField(queryset=Boar.objects.all())
+    semination_employee = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.filter(employee__is_seminator=True))
