@@ -51,6 +51,15 @@ class SeminationManager(CoreModelManager):
         once_seminated_sows_qs.update_status('Осеменена 1')
         more_than_once_seminated_sows_qs.update_status('Осеменена 2')
 
+    def is_there_semination(self, sow, tour):
+        if self.get_queryset().filter(sow=sow, tour=tour).first():
+            return True
+        return False
+
+    def double_semination_or_not(self, sow, not_parsed_tour, boar1_birth_id,
+         farm_name_semination_employee1, boar2_birth_id, farm_name_semination_employee2):
+        pass
+
 
 class Semination(SowEvent):
     semination_employee = models.ForeignKey(settings.AUTH_USER_MODEL,

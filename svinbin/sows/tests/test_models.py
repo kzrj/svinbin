@@ -250,6 +250,14 @@ class SowModelManagerTest(TestCase):
         self.assertEqual(existed, [1, 2])
         self.assertEqual(Sow.objects.filter(farm_id__in=[3, 4]).count(), 2)
 
+    def test_create_or_return(self):
+        sow, created = Sow.objects.create_or_return(123)
+        self.assertEqual(sow.farm_id, 123)
+        self.assertEqual(created, True)
+
+        sow, created = Sow.objects.create_or_return(123)
+        self.assertEqual(sow.farm_id, 123)
+        self.assertEqual(created, False)
 
 class GiltModelManagerTest(TestCase):
     def setUp(self):

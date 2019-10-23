@@ -36,3 +36,7 @@ class DoubleSeminationSerializer(serializers.Serializer):
     boar2 = serializers.PrimaryKeyRelatedField(queryset=Boar.objects.all())
     semination_employee = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.filter(employee__is_seminator=True))
+
+
+class ImportSeminationsFile(serializers.Serializer):
+    file = serializers.FileField(max_length=None, use_url=False)

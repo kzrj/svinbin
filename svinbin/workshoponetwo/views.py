@@ -5,6 +5,8 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
+from core import wsxlrd
+
 from workshoponetwo import serializers
 import sows.serializers as sows_serializers
 import sows_events.serializers as sows_events_serializers
@@ -21,7 +23,6 @@ import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
 import tours.models as tours_models
-
 
 from sows.views import WorkShopSowViewSet
     
@@ -318,3 +319,26 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    # @action(methods=['post'], detail=False)
+    # def import_seminations_from_farm(self, request):
+    #     serializer = serializers.ImportSeminationsFile(data=request.data)
+    #     if serializer.is_valid():
+    #         with open('seminations.xls', 'wb') as file:
+    #             for chunk in serializer.validated_data['file'].chunks():
+    #                 file.write(chunk)
+
+    #         wb = wsxlrd.init_wb('seminations.xls')
+    #         rows = wsxlrd.get_semenation_rows(wb)
+    #         for row in rows:
+    #             print(row)
+    #             sow, created = sows_models.Sow.objects.create_or_return(row[0])
+    #             tour = tours_models.Tour.objects.create_or_return_by_raw(row[3])
+    #             print(sow, created)
+    #             print('_______________________________')
+
+
+        
+
+    #     return Response({'opa'}, status=status.HTTP_400_BAD_REQUEST)

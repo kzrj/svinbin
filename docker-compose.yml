@@ -29,19 +29,20 @@ services:
       - .:/code
     depends_on:
       - db
-    # command: bash -c "cd svinbin &&
-    #                   python manage.py migrate &&
-    #                   python manage.py makemigrations --no-input &&
-    #                   python manage.py test workshoponetwo.tests.test_views"
+    command: bash -c "cd svinbin &&
+                      python manage.py migrate &&
+                      python manage.py makemigrations --no-input &&
+                      python manage.py test sows_events.tests.test_models"
+                      # python manage.py test workshoponetwo.tests.test_views"
                       # python manage.py test workshopfour.tests.test_views"
                       # python manage.py test transactions.tests.test_models"
                       # python manage.py test sows.tests.test_managers"
 
-    command: bash -c "cd svinbin && 
-                      python manage.py makemigrations --no-input &&
-                      python manage.py migrate &&
-                      python manage.py collectstatic --no-input &&
-                      gunicorn svinbin.wsgi -b 0.0.0.0:8000"
+    # command: bash -c "cd svinbin && 
+    #                   python manage.py makemigrations --no-input &&
+    #                   python manage.py migrate &&
+    #                   python manage.py collectstatic --no-input &&
+    #                   gunicorn svinbin.wsgi -b 0.0.0.0:8000"
                       # python manage.py runserver 0.0.0.0:8000"
    
     volumes:

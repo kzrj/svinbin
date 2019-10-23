@@ -1,3 +1,4 @@
+import datetime
 from django.db import models
 from django.utils import timezone
 from django.apps import apps
@@ -22,14 +23,15 @@ class TourManager(CoreModelManager):
         tours_list = list(set(tours_list))
         return self.get_queryset().filter(pk__in=tours_list).prefetch_related('sows')
 
-    # def get_sows(self)
+    def create_or_return_by_raw(self, raw_tour):
+        week_number = int(raw_tour[2:])
+        return self.get_tour_by_week_in_current_year(week_number)
 
 
 class Tour(CoreModel):
     start_date = models.DateTimeField()
     week_number = models.IntegerField()
     year = models.IntegerField()
-    # status
 
     objects = TourManager()
 
@@ -39,37 +41,19 @@ class Tour(CoreModel):
     @property
     def get_inseminated_sows(self):
         seminations = events_models.Semination.objects.filter(tour=self)
-        return Sow.objects.filter(semination__in=seminations)
+        return sows_models.Sow.objects.filter(semination__in=seminations)
 
     @property
     def get_ultrasounded_sows(self):
         ultrasounds = events_models.Ultrasound.objects.filter(tour=self)
-        return Sow.objects.filter(ultrasound__in=ultrasounds)
+        return sows_models.Sow.objects.filter(ultrasound__in=ultrasounds)
 
     @property
     def get_ultrasounded_sows_success(self):
         ultrasounds = events_models.Ultrasound.objects.filter(tour=self, result=True)
-        return Sow.objects.filter(ultrasound__in=ultrasounds)
+        return sows_models.Sow.objects.filter(ultrasound__in=ultrasounds)
 
     @property
     def get_ultrasounded_sows_fail(self):
         ultrasounds = events_models.Ultrasound.objects.filter(tour=self, result=False)
-        return Sow.objects.filter(ultrasound__in=ultrasounds)
-
-
-# class SowInfoTourManager(models.Manager):
-#     def create_sow_info_tour_record(self, week, sow):
-#         tour = Tour.objects.get_or_create_by_week_in_current_year(week)
-#         return self.create(tour=tour, sow=sow)
-
-
-# class SowInfoTour(models.Model):
-#     sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE)
-#     tour = models.ForeignKey(Tour, on_delete=models.CASCADE)
-#     sow_status_in_tour = models.CharField(max_length=30, null=True)
-#     closed = models.BooleanField(default=False)
-
-#     objects = SowInfoTourManager()
-
-#     def __str__(self):
-#         return "Info Tour#{} for sow #{}".format(self.tour.number, self.sow.birth_id)
+        return sows_models.Sow.objects.filter(ultrasound__in=ultrasounds)

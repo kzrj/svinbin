@@ -7,6 +7,7 @@ from sows.models import Sow, Boar
 from piglets.models import NewBornPigletsGroup
 from locations.models import Location
 from transactions.models import SowTransaction
+from tours.models import Tour
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -47,6 +48,18 @@ class SeminationModelManagerTest(TestCase):
         sow1.refresh_from_db()
         self.assertEqual(sow1.status.title, 'Осеменена 1')
         self.assertEqual(sow1.tour.week_number, 1)
+
+    def test_is_there_semination(self):
+        sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
+        boar = Boar.objects.all().first()
+        semination = Semination.objects.create_semination(sow=sow, week=54,
+         initiator=None, semination_employee=None, boar=boar)
+        # tour week = 54, year = 2019
+        is_there_semination1 =  Semination.objects.is_there_semination(sow, sow.tour)
+        self.assertEqual(is_there_semination1, True)
+        tour2 = Tour.objects.get_or_create_by_week_in_current_year(53)
+        is_there_semination2 =  Semination.objects.is_there_semination(sow, tour2)
+        self.assertEqual(is_there_semination2, False)
 
 
 class UltrasoundModelManagerTest(TestCase):
