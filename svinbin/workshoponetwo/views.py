@@ -333,16 +333,12 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
 
             return Response(
             {
-                # "seminated_list": sows_serializers.SowSerializer(seminated_list, many=True).data,
                 "seminated_list_count": len(seminated_list),
-                # "already_seminated_in_tour": sows_serializers.SowSerializer(already_seminated_in_tour, \
-                #      many=True).data,
                 "already_seminated_in_tour_count": len(already_seminated_in_tour),
-                # "sows_in_another_tour": sows_serializers.SowSerializer(sows_in_another_tour, \
-                #      many=True).data, 
+                "sows_in_another_tour_farm_ids": [sow.farm_id for sow in sows_in_another_tour], 
                 "sows_in_another_tour_count": len(sows_in_another_tour),  
                 "message": "Файл загружен и обработан."
             },
             status=status.HTTP_200_OK)
 
-        return Response({'opa'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -8,14 +8,14 @@ from staff.models import WorkShopEmployee
 from sows_events.models import Semination
 
 
-def init_wb(file_from_request):
+def init_wb(file_from_request): # to test
     with open('../data/seminations.xls', 'wb') as file:
         for chunk in file_from_request.chunks():
             file.write(chunk)
     wb = open_workbook('../data/seminations.xls')
     return wb
 
-def normalize_row(row, workbook):
+def normalize_row(row, workbook): # to test
     row[0] = int(row[0]) # farm_id to int
     row[4] = datetime.datetime(*xldate_as_tuple(row[4], workbook.datemode)) # date to dttime
     if row[5] == '*' or row[5] == '**':
@@ -25,7 +25,7 @@ def normalize_row(row, workbook):
 
     return row
 
-def define_match_row_and_convert_datetime(row_values):
+def define_match_row_and_convert_datetime(row_values): # to test
     if len(row_values) > 3 and \
         re.match(r'^[0-9]+$', str(row_values[0])) and \
         re.match(r'^[0-9A-Z]+$', str(row_values[1])) and \
@@ -34,7 +34,7 @@ def define_match_row_and_convert_datetime(row_values):
         
     return False
 
-def get_semenation_rows(workbook):
+def get_semenation_rows(workbook): # to test
     rows = list()
     for s in workbook.sheets():
         for row in range(s.nrows):
