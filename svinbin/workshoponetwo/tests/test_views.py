@@ -12,7 +12,7 @@ from rest_framework.test import APITestCase
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import sows_events.utils as sows_events_testing
-import staff.testing_utils as staff_testing
+import staff.testing_utils as staff_testings
 
 from sows.models import Boar, Sow
 from locations.models import Location
@@ -28,7 +28,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         sows_testing.create_boars()
         sows_events_testing.create_types()
         self.boar = Boar.objects.all().first()
-        self.user = staff_testing.create_employee() # is_seminator = True
+        self.user = staff_testings.create_employee() # is_seminator = True
 
     # def test_assing_farm_id(self):
     #     sow_without_farm_id = sows_testing.create_sow_without_farm_id_with_birth_id(1)
@@ -51,7 +51,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
     #     self.client.force_authenticate(user=self.user)
     #     sow = sows_testing.create_sow_and_put_in_workshop_one()
     #     boar = Boar.objects.all().first()
-    #     semination_employee = staff_testing.create_employee()
+    #     semination_employee = staff_testings.create_employee()
 
     #     response = self.client.post('/api/workshoponetwo/sows/%s/semination/' %
     #       sow.pk, {'week': 7, 'semination_employee': semination_employee.pk, 'boar': boar.pk})
@@ -63,7 +63,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
     # def test_ultrasound(self):
     #     self.client.force_authenticate(user=self.user)
     #     sow = sows_testing.create_sow_and_put_in_workshop_one()
-    #     semination_employee = staff_testing.create_employee()
+    #     semination_employee = staff_testings.create_employee()
     #     boar = Boar.objects.all().first()
     #     response = self.client.post('/api/workshoponetwo/sows/%s/semination/' %
     #       sow.pk, {'week': 7, 'semination_employee': semination_employee.pk, 'boar': boar.pk})
@@ -77,7 +77,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
     # def test_culling(self):
     #     self.client.force_authenticate(user=self.user)
     #     sow = sows_testing.create_sow_and_put_in_workshop_one()
-    #     semination_employee = staff_testing.create_employee()
+    #     semination_employee = staff_testings.create_employee()
 
     #     response = self.client.post('/api/workshoponetwo/sows/%s/culling/' %
     #       sow.pk, {'culling_type': 'padej', 'reason': 'test reason'})
@@ -221,8 +221,25 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
 
     def test_import_seminations_from_farm(self):
         self.client.force_authenticate(user=self.user)
+        shmigina = staff_testings.create_employee('ШМЫГИ')
+        ivanov = staff_testings.create_employee('ИВАНО')
+        semen = staff_testings.create_employee('СЕМЕН')
+        boris = staff_testings.create_employee('БОРИС')
+        gary = staff_testings.create_employee('ГАРИ')
 
         file_path ='../data/1.xls'
         with open(file_path, 'rb') as file:
             response = self.client.post('/api/workshoponetwo/sows/import_seminations_from_farm/', 
                 {'file': file})
+            self.assertEqual(response.status_code, 200)
+            self.assertNotEqual(response.data.get('seminated_list_count'), None)
+            self.assertNotEqual(response.data.get('already_seminated_in_tour_count'), None)
+            self.assertNotEqual(response.data.get('sows_in_another_tour_count'), None)
+            self.assertEqual(response.data.get('message'), "Файл загружен и обработан.")
+
+        # with open(file_path, 'rb') as file:
+        #     response = self.client.post('/api/workshoponetwo/sows/import_seminations_from_farm/', 
+        #         {'file': file})
+
+        #     print(response.data)
+        #     print(response.status_code)

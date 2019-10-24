@@ -9,14 +9,17 @@ from sows import models as sows_models
 
 
 class TourManager(CoreModelManager):
-    def get_or_create_by_week_in_current_year(self, week_number):
-        tour = Tour.objects.filter(week_number=week_number, year=timezone.now().year).first()
+    def get_or_create_by_week(self, week_number, year):
+        tour = self.get_queryset().filter(week_number=week_number, year=year).first()
         if not tour:
-            return self.create(start_date=timezone.now(), week_number=week_number, year=timezone.now().year)
+            tour = self.create(start_date=timezone.now(), week_number=week_number, year=year)
         return tour
 
+    def get_or_create_by_week_in_current_year(self, week_number):
+        return self.get_or_create_by_week(week_number, timezone.now().year)
+
     def get_tour_by_week_in_current_year(self, week_number):
-        return Tour.objects.filter(week_number=week_number, year=timezone.now().year).first()
+        return self.get_queryset().filter(week_number=week_number, year=timezone.now().year).first()
 
     def get_tours_in_workshop_by_sows(self, workshop):
         tours_list = list(sows_models.Sow.objects.get_all_sows_in_workshop(workshop).values_list('tour', flat=True))
@@ -25,7 +28,8 @@ class TourManager(CoreModelManager):
 
     def create_or_return_by_raw(self, raw_tour):
         week_number = int(raw_tour[2:])
-        return self.get_tour_by_week_in_current_year(week_number)
+        year = int('20' + raw_tour[:2])
+        return self.get_or_create_by_week(week_number, year)
 
 
 class Tour(CoreModel):

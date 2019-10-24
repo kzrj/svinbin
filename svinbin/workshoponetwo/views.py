@@ -5,7 +5,7 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-from core import wsxlrd
+from core import import_farm
 
 from workshoponetwo import serializers
 import sows.serializers as sows_serializers
@@ -326,39 +326,23 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
     def import_seminations_from_farm(self, request):
         serializer = serializers.ImportSeminationsFile(data=request.data)
         if serializer.is_valid():
-            with open('seminations.xls', 'wb') as file:
-                for chunk in serializer.validated_data['file'].chunks():
-                    file.write(chunk)
+            wb = import_farm.init_wb(serializer.validated_data['file'])
+            rows = import_farm.get_semenation_rows(wb)
+            seminated_list, already_seminated_in_tour, sows_in_another_tour = \
+                import_farm.create_semination_lists(rows, request.user)
 
-            wb = wsxlrd.init_wb('seminations.xls')
-            rows = wsxlrd.get_semenation_rows(wb)
-            seminated_list = list()
-            not_seminated_list = list()
-            for row in rows:
-                print(row)
-                sow, created = sows_models.Sow.objects.create_or_return(row[0])
-                tour = tours_models.Tour.objects.create_or_return_by_raw(row[3])
-                boar1 = sows_models.Boar.get_or_create_boar(row[5])
-                boar2 = sows_models.Boar.get_or_create_boar(row[7])
-                semination_employee1 = staff_models.WorkShopEmployee.objects. \
-                    get_seminator_by_farm_name(row[6])
-                semination_employee2 = staff_models.WorkShopEmployee.objects. \
-                    get_seminator_by_farm_name(row[8])
-
-                # sow, seminated = sows_events_models.Semination.objects.double_semination_or_not(
-                #     sow=sow,
-                #     tour=tour,
-                #     # boar1_birth_id=row[],
-                #     # farm_name_semination_employee1=row[],
-                #     # boar2_birth_id=row[],
-                #     # farm_name_semination_employee2=row[],
-                #     # date=row[],
-                #     # initiator=request.user
-                #     )
-                # if seminated:
-                #     seminated_list.append(sow)
-                # else:
-                #     not_seminated_list.append(sow)
-                
+            return Response(
+            {
+                # "seminated_list": sows_serializers.SowSerializer(seminated_list, many=True).data,
+                "seminated_list_count": len(seminated_list),
+                # "already_seminated_in_tour": sows_serializers.SowSerializer(already_seminated_in_tour, \
+                #      many=True).data,
+                "already_seminated_in_tour_count": len(already_seminated_in_tour),
+                # "sows_in_another_tour": sows_serializers.SowSerializer(sows_in_another_tour, \
+                #      many=True).data, 
+                "sows_in_another_tour_count": len(sows_in_another_tour),  
+                "message": "Файл загружен и обработан."
+            },
+            status=status.HTTP_200_OK)
 
         return Response({'opa'}, status=status.HTTP_400_BAD_REQUEST)

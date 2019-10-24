@@ -68,15 +68,18 @@ class SeminationManager(CoreModelManager):
         return False
 
     def double_semination_or_not(self, sow, tour, boar1, semination_employee1, boar2,
-         semination_employee2, date, initiator):
+         semination_employee2, date, initiator=None):
         
         if self.is_there_semination(sow, tour):
             # sow has seminated already. skip/
             return sow, False
 
         # seminate two times
-        self.create_semination()
+        seminations1 = self.create_semination_tour(sow=sow, tour=tour, date=date, initiator=initiator,
+            boar=boar1, semination_employee=semination_employee1)
 
+        seminations2 = self.create_semination_tour(sow=sow, tour=tour, date=date, initiator=initiator,
+            boar=boar2, semination_employee=semination_employee2)
 
         return sow, True
 

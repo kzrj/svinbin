@@ -43,8 +43,10 @@ class TourModelManagerTest(TestCase):
 
         self.assertEqual(Tour.objects.get_tours_in_workshop_by_sows(location2.workshop).count(), 2)
 
-    def test_create_or_return(self):
-        print(Tour.objects.create_or_return('1940'))
+    def test_create_or_return_by_raw(self):
+        tour = Tour.objects.create_or_return_by_raw('1940')
+        self.assertEqual(tour.week_number, 40)
+        self.assertEqual(tour.year, 2019)
 
     
 class TourModelTest(TestCase):

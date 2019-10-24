@@ -23,5 +23,3 @@ class WorkshopEmployeeManagerTest(TestCase):
         
         user = WorkShopEmployee.objects.get_seminator_by_farm_name('ШМЫГИ')
         self.assertEqual(user, shmigina)
-
-    

@@ -11,7 +11,7 @@ class WorkShopEmployeeModelManager(CoreModelManager):
 		ws_employee = self.get_queryset().filter(farm_name=farm_name).first()
 		if ws_employee:
 			return ws_employee.user
-		raise DjangoValidationError(message='Нет собрудника с фарм_именем {}'.format(farm_name))
+		raise DjangoValidationError(message='Нет сотрудника с фарм_именем {}'.format(farm_name))
 
 
 class WorkShopEmployee(CoreModel):

@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.utils import timezone
 from django.test import TestCase
 
 from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, \
@@ -12,6 +13,7 @@ from tours.models import Tour
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import sows_events.utils as sows_events_testing
+import staff.testing_utils as staff_testings
 
 
 class SeminationModelManagerTest(TestCase):
@@ -57,9 +59,43 @@ class SeminationModelManagerTest(TestCase):
         # tour week = 54, year = 2019
         is_there_semination1 =  Semination.objects.is_there_semination(sow, sow.tour)
         self.assertEqual(is_there_semination1, True)
+
         tour2 = Tour.objects.get_or_create_by_week_in_current_year(53)
         is_there_semination2 =  Semination.objects.is_there_semination(sow, tour2)
         self.assertEqual(is_there_semination2, False)
+
+    def test_double_semination_or_not(self):
+        sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
+
+        shmigina = staff_testings.create_employee('ШМЫГИ')
+        ivanov = staff_testings.create_employee('ИВАНО')
+
+        boar1 = Boar.objects.get_or_create_boar(123)
+        boar2 = Boar.objects.get_or_create_boar(124)
+
+        date = timezone.now()
+        tour = Tour.objects.get_or_create_by_week_in_current_year(50)
+
+        sow, seminated = Semination.objects.double_semination_or_not(
+            sow=sow, tour=tour, date=date, 
+            boar1=boar1, boar2=boar2,
+            semination_employee1=shmigina, semination_employee2=ivanov,
+            initiator=None
+            )
+        self.assertEqual(seminated, True)
+
+        is_there_semination1 = Semination.objects.is_there_semination(sow, tour)
+        self.assertEqual(is_there_semination1, True)
+        self.assertEqual(Semination.objects.filter(sow=sow, tour=tour).count(), 2)
+
+        # already seminated in tour
+        sow, seminated = Semination.objects.double_semination_or_not(
+            sow=sow, tour=tour, date=date, 
+            boar1=boar1, boar2=boar2,
+            semination_employee1=shmigina, semination_employee2=ivanov,
+            initiator=None
+            )
+        self.assertEqual(seminated, False)
 
 
 class UltrasoundModelManagerTest(TestCase):
