@@ -56,9 +56,17 @@ class SeminationManager(CoreModelManager):
             return True
         return False
 
-    def double_semination_or_not(self, sow, not_parsed_tour, boar1_birth_id,
-         farm_name_semination_employee1, boar2_birth_id, farm_name_semination_employee2):
-        pass
+    def double_semination_or_not(self, sow, tour, boar1_birth_id,
+         farm_name_semination_employee1, boar2_birth_id, farm_name_semination_employee2, date, initiator):
+        
+        if self.is_there_semination(sow, tour):
+            return sow, False
+
+        # get or create boar
+        # get employee by farm name
+        # seminate two times
+
+        return sow, True
 
 
 class Semination(SowEvent):

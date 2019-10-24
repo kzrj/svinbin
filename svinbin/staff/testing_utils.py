@@ -7,9 +7,9 @@ from staff.models import WorkShopEmployee
 from locations.models import WorkShop
 
 
-def create_employee():
+def create_employee(farm_name=''):
     user = mixer.blend('auth.user')
-    WorkShopEmployee.objects.create(user=user, is_seminator=True)
+    WorkShopEmployee.objects.create(user=user, is_seminator=True, farm_name=farm_name)
     return user
 
 

@@ -23,6 +23,7 @@ import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
 import tours.models as tours_models
+import staff.models as staff_models
 
 from sows.views import WorkShopSowViewSet
     
@@ -321,24 +322,43 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-    # @action(methods=['post'], detail=False)
-    # def import_seminations_from_farm(self, request):
-    #     serializer = serializers.ImportSeminationsFile(data=request.data)
-    #     if serializer.is_valid():
-    #         with open('seminations.xls', 'wb') as file:
-    #             for chunk in serializer.validated_data['file'].chunks():
-    #                 file.write(chunk)
+    @action(methods=['post'], detail=False)
+    def import_seminations_from_farm(self, request):
+        serializer = serializers.ImportSeminationsFile(data=request.data)
+        if serializer.is_valid():
+            with open('seminations.xls', 'wb') as file:
+                for chunk in serializer.validated_data['file'].chunks():
+                    file.write(chunk)
 
-    #         wb = wsxlrd.init_wb('seminations.xls')
-    #         rows = wsxlrd.get_semenation_rows(wb)
-    #         for row in rows:
-    #             print(row)
-    #             sow, created = sows_models.Sow.objects.create_or_return(row[0])
-    #             tour = tours_models.Tour.objects.create_or_return_by_raw(row[3])
-    #             print(sow, created)
-    #             print('_______________________________')
+            wb = wsxlrd.init_wb('seminations.xls')
+            rows = wsxlrd.get_semenation_rows(wb)
+            seminated_list = list()
+            not_seminated_list = list()
+            for row in rows:
+                print(row)
+                sow, created = sows_models.Sow.objects.create_or_return(row[0])
+                tour = tours_models.Tour.objects.create_or_return_by_raw(row[3])
+                boar1 = sows_models.Boar.get_or_create_boar(row[5])
+                boar2 = sows_models.Boar.get_or_create_boar(row[7])
+                semination_employee1 = staff_models.WorkShopEmployee.objects. \
+                    get_seminator_by_farm_name(row[6])
+                semination_employee2 = staff_models.WorkShopEmployee.objects. \
+                    get_seminator_by_farm_name(row[8])
 
+                # sow, seminated = sows_events_models.Semination.objects.double_semination_or_not(
+                #     sow=sow,
+                #     tour=tour,
+                #     # boar1_birth_id=row[],
+                #     # farm_name_semination_employee1=row[],
+                #     # boar2_birth_id=row[],
+                #     # farm_name_semination_employee2=row[],
+                #     # date=row[],
+                #     # initiator=request.user
+                #     )
+                # if seminated:
+                #     seminated_list.append(sow)
+                # else:
+                #     not_seminated_list.append(sow)
+                
 
-        
-
-    #     return Response({'opa'}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'opa'}, status=status.HTTP_400_BAD_REQUEST)
