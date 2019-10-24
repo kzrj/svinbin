@@ -226,6 +226,14 @@ class Sow(Pig):
     def get_tours_pk(self):
         return self.semination_set.all().values_list('tour', flat=True).distinct()
 
+    def update_info_after_semination(self, tour):
+        self.tour = tour
+        if len(self.get_seminations_by_current_tour_values_list) == 1:
+            self.change_status_without_save('Осеменена 1')
+        if len(self.get_seminations_by_current_tour_values_list) > 1:
+            self.change_status_without_save('Осеменена 2')
+        self.save()
+
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, new_born_group, cell=None):

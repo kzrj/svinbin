@@ -20,26 +20,37 @@ class SowEvent(Event):
 
     
 class SeminationManager(CoreModelManager):
-    def create_semination(self, sow, week, initiator=None, semination_employee=None, boar=None):
-        tour = Tour.objects.get_or_create_by_week_in_current_year(week)
-        semination = self.create(sow=sow, tour=tour, initiator=initiator,
-         semination_employee=semination_employee, date=timezone.now(), boar=boar)
+    def create_semination_tour(self, sow, tour, initiator=None, semination_employee=None, boar=None,
+         date=None):
 
-        sow.tour = tour
-        if len(sow.get_seminations_by_current_tour_values_list) == 1:
-            sow.change_status_to('Осеменена 1')
-        if len(sow.get_seminations_by_current_tour_values_list) > 1:
-            sow.change_status_to('Осеменена 2')
+        if not date:
+            date=timezone.now()
+
+        semination = self.create(sow=sow, tour=tour, initiator=initiator,
+         semination_employee=semination_employee, date=date, boar=boar)
+
+        sow.update_info_after_semination(tour)
+
         return semination
 
+    def create_semination(self, sow, week, initiator=None, semination_employee=None, boar=None,
+         date=None):
+        if not date:
+            date=timezone.now()
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week)
+        return self.create_semination_tour(sow, tour, initiator, semination_employee, boar, date)
+
     def mass_semination(self, sows_qs, week, initiator=None, semination_employee=None,
-            boar=None):
+            boar=None, date=None):
         # sows needs as qs
+        if not date:
+            date=timezone.now()
+
         tour = Tour.objects.get_or_create_by_week_in_current_year(week)
         seminations = list()
         for sow in sows_qs:
             seminations.append(Semination(sow=sow, tour=tour, initiator=initiator,
-             semination_employee=semination_employee, boar=boar, date=timezone.now()))    
+             semination_employee=semination_employee, boar=boar, date=date))    
 
         self.bulk_create(seminations)
 
@@ -56,15 +67,16 @@ class SeminationManager(CoreModelManager):
             return True
         return False
 
-    def double_semination_or_not(self, sow, tour, boar1_birth_id,
-         farm_name_semination_employee1, boar2_birth_id, farm_name_semination_employee2, date, initiator):
+    def double_semination_or_not(self, sow, tour, boar1, semination_employee1, boar2,
+         semination_employee2, date, initiator):
         
         if self.is_there_semination(sow, tour):
+            # sow has seminated already. skip/
             return sow, False
 
-        # get or create boar
-        # get employee by farm name
         # seminate two times
+        self.create_semination()
+
 
         return sow, True
 

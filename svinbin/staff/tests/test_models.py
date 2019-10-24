@@ -17,5 +17,11 @@ class WorkshopEmployeeManagerTest(TestCase):
 
     def test_get_seminator_by_farm_name(self):
         shmigina = staff_testings.create_employee('ШМЫГИ')
+        ivanov = staff_testings.create_employee('ИВАНО')
+        semen = staff_testings.create_employee('СЕМЕН')
+        boris = staff_testings.create_employee('БОРИС')
+        
         user = WorkShopEmployee.objects.get_seminator_by_farm_name('ШМЫГИ')
         self.assertEqual(user, shmigina)
+
+    
