@@ -334,6 +334,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             return Response(
             {
                 "seminated_list_count": len(seminated_list),
+                "seminated_list_farm_ids": [sow.farm_id for sow in seminated_list],
                 "already_seminated_in_tour_count": len(already_seminated_in_tour),
                 "sows_in_another_tour_farm_ids": [sow.farm_id for sow in sows_in_another_tour], 
                 "sows_in_another_tour_count": len(sows_in_another_tour),  
