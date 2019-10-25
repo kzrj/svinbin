@@ -88,5 +88,6 @@ urlpatterns = [
     url(r'^api/jwt/api-token-refresh/', refresh_jwt_token),
     url(r'^api/jwt/api-token-verify/', verify_jwt_token),
     url(r'^api/init_data/', locations_views.CreateWorkshopsView.as_view()),
-    url(r'^api/docs/$', schema_view)
+    url(r'^api/docs/$', schema_view) + \
+    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     ]

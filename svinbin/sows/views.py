@@ -59,7 +59,6 @@ class SowViewSet(viewsets.ModelViewSet):
         )
 
     def list(self, request):
-        # should be in model!
         queryset = self.filter_queryset(
             self.get_queryset().prefetch_related(
                 Prefetch(
