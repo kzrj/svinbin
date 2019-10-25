@@ -2,9 +2,11 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
+from django.core.exceptions import ValidationError
 
 from core.models import CoreModel, CoreModelManager, Event
 from sows_events.models import WeaningSow
+from locations.models import SowAndPigletsCell
 
 
 class Transaction(Event):
@@ -15,6 +17,11 @@ class Transaction(Event):
 class SowTransactionManager(CoreModelManager):
     def create_transaction(self, sow, to_location,  initiator=None):
         # need to refractor to atomic transactions.
+
+        if isinstance(to_location.get_location, SowAndPigletsCell) and not to_location.is_sow_empty:
+            raise ValidationError(message='Клетка №{} не пустая'. \
+                format(to_location.sowAndPigletsCell.number))
+
         transaction = SowTransaction.objects.create(
                 date=timezone.now(),
                 initiator=initiator,

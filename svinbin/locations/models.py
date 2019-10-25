@@ -183,7 +183,6 @@ class Location(CoreModel):
 
     @property
     def is_sow_empty(self):
-        print('is_sow_empty',  self.pk)
         if not self.sow_set.all():
             return True
         return False

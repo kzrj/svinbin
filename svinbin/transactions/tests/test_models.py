@@ -2,6 +2,7 @@ from mixer.backend.django import mixer
 
 from django.test import TestCase
 from django.utils import timezone
+from django.core.exceptions import ValidationError
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -19,8 +20,8 @@ class SowTransactionManagerTest(TestCase):
         locations_testing.create_workshops_sections_and_cells()
 
     def test_create_transaction(self):
-        sow = sows_testing.create_sow_and_put_in_workshop_one(1, '100')
-        to_location = Location.objects.get(sowSingleCell__number='2')
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        to_location = Location.objects.get(workshop__number='2')
         transaction = SowTransaction.objects.create_transaction(
             to_location=to_location,
             initiator=None,
@@ -30,12 +31,21 @@ class SowTransactionManagerTest(TestCase):
         self.assertEqual(transaction.sow, sow)
         self.assertEqual(transaction.initiator, None)
         self.assertEqual(transaction.from_location,
-         Location.objects.get(sowSingleCell__number=100))
+         Location.objects.get(workshop__number=1))
         self.assertEqual(transaction.to_location, to_location)
 
+    def test_create_transaction_to_not_empty_cell(self):
+        sow1 = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=1)
+        sow2 = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=2)
+        with self.assertRaises(ValidationError):
+            transaction = SowTransaction.objects.create_transaction(
+                to_location=sow2.location,
+                sow=sow1
+                )
+
     def test_create_many_transaction(self):
-        sow1 = sows_testing.create_sow_and_put_in_workshop_one(1, '100')
-        sow2 = sows_testing.create_sow_and_put_in_workshop_one(1, '101')
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
         to_location = Location.objects.get(workshop__number=3)
 
         transactions = SowTransaction.objects.create_many_transactions([sow1, sow2],
@@ -72,9 +82,9 @@ class LocationModelTest(TestCase):
         location = Location.objects.get(section=section)
         self.assertEqual(location.get_location, section)
         
-        cell = SowSingleCell.objects.get(number='1')
-        location = Location.objects.get(sowSingleCell=cell)
-        self.assertEqual(location.get_location, cell)
+        # cell = SowSingleCell.objects.get(number='1')
+        # location = Location.objects.get(sowSingleCell=cell)
+        # self.assertEqual(location.get_location, cell)
 
         cell = SowGroupCell.objects.first()
         location = Location.objects.get(sowGroupCell=cell)
@@ -97,9 +107,9 @@ class LocationModelTest(TestCase):
         location = Location.objects.get(section=section)
         self.assertEqual(location.get_workshop, workshop)
         
-        cell = SowSingleCell.objects.get(number='1')
-        location = Location.objects.get(sowSingleCell=cell)
-        self.assertEqual(location.get_workshop, workshop)
+        # cell = SowSingleCell.objects.get(number='1')
+        # location = Location.objects.get(sowSingleCell=cell)
+        # self.assertEqual(location.get_workshop, workshop)
 
         cell = SowGroupCell.objects.first()
         location = Location.objects.get(sowGroupCell=cell)
