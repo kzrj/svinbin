@@ -193,14 +193,14 @@ class Sow(Pig):
 
     @property
     def get_seminations_by_current_tour_values_list(self):
-        return list( date.strftime('%d-%m-%Y %H:%M')
+        return list( date.strftime('%d-%m-%Y')
                 for date in
                 self.semination_set.filter(tour=self.tour).values_list('date', flat=True)
                 )
     
     @property
     def get_ultrasound_30_by_current_tour_values_list(self):
-        return list( date.strftime('%d-%m-%Y %H:%M')
+        return list( date.strftime('%d-%m-%Y')
                 for date in
                     self.ultrasound_set.filter(tour=self.tour, u_type__days=30)
                         .values_list('date', flat=True)
@@ -208,7 +208,7 @@ class Sow(Pig):
 
     @property
     def get_ultrasound_60_by_current_tour_values_list(self):
-        return list( date.strftime('%d-%m-%Y %H:%M')
+        return list( date.strftime('%d-%m-%Y')
                 for date in
                     self.ultrasound_set.filter(tour=self.tour, u_type__days=60)
                         .values_list('date', flat=True)
