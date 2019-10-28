@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers, status
 
-# from sows_events.serializers import SeminationSerializer
-# import sows_events.serializers as sows_events_serializers
-
 from core.utils import CustomValidation
 from sows.models import Sow, Boar, Gilt
 from sows_events.models import Semination
@@ -20,15 +17,10 @@ class SowSerializer(serializers.ModelSerializer):
     location = serializers.StringRelatedField()
     status = serializers.StringRelatedField()
     tour = serializers.StringRelatedField()
-    status = serializers.StringRelatedField()
-
-    # seminations in current tour
-    # ultrasounds in current tour
 
     class Meta:
         model = Sow
         fields = '__all__'
-
 
 
 class SowManySerializer(serializers.ModelSerializer):
