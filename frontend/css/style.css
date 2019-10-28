@@ -180,3 +180,7 @@
 .error-message{
 	color: red;
 }
+
+.loading{
+	font-weight: bold !important;
+}
