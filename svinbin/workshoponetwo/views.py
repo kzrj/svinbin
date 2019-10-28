@@ -337,7 +337,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                 "seminated_list_farm_ids": [sow.farm_id for sow in seminated_list],
                 "already_seminated_in_tour_count": len(already_seminated_in_tour),
                 # "sows_in_another_tour_farm_ids": [sow.farm_id for sow in sows_in_another_tour], 
-                "sows_in_another_tour": sows_serializers.SowSerializer(data=sows_in_another_tour,
+                "sows_in_another_tour": sows_serializers.SowSerializer(sows_in_another_tour, \
                 	 many=True).data,
                 "sows_in_another_tour_count": len(sows_in_another_tour),  
                 "message": "Файл загружен и обработан."
