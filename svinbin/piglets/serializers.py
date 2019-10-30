@@ -27,6 +27,8 @@ class NomadPigletsGroupSerializer(serializers.ModelSerializer):
 
 
 class NewBornPigletsGroupSerializer(serializers.ModelSerializer):
+    tour = serializers.StringRelatedField()
+    
     class Meta:
         model = NewBornPigletsGroup
         fields = "__all__"
