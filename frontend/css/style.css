@@ -15,12 +15,12 @@
 }
 
 .cell{
-	border: 1px solid #525252;
+	border: 1px solid white;
 	/*max-width: 65px !important;*/
 }
 
 .cell-full{
-	border: 1px solid #525252;
+	border: 1px solid white;
 	background-color: #525252 !important;
 	/*max-width: 65px !important;*/
 }
@@ -143,6 +143,15 @@
 	background: #313131 !important;
 }
 
+.btn-dark{
+	background: #313131 !important;
+}
+
+.btn-inc-dec{
+	font-weight: bold !important;
+	font-size: 25px !important;
+}
+
 .bottom-buttons-block{
 	margin-top: 10px;
 }
@@ -183,4 +192,10 @@
 
 .loading{
 	font-weight: bold !important;
+}
+
+.farrow-button-block{
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	border-bottom: 1px solid #525252;
 }
