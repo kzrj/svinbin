@@ -40,7 +40,7 @@ class Tour(CoreModel):
     objects = TourManager()
 
     def __str__(self):
-        return "Tour #%s" % self.week_number
+        return "Тур {} {}г".format(self.week_number, self.year)
 
     @property
     def get_inseminated_sows(self):
