@@ -81,7 +81,27 @@ class SowAndPigletsCell(Cell):
         return 'section {}, cell {}'.format(str(self.section.number), self.number)
     
 
+class LocationQuerySet(models.QuerySet):
+    def get_cells_data(self):
+        empty, not_empty, with_sow_and_piglets, sow_only = 0, 0, 0, 0
+        for location in self.prefetch_related('sow_set', 'newbornpigletsgroup_set',
+            'nomadpigletsgroup_set', 'gilt_set'):
+            if location.is_empty:
+                empty += 1
+            else:
+                not_empty += 1
+                if location.get_located_active_new_born_groups():
+                    with_sow_and_piglets += 1
+                else:
+                    sow_only += 1
+
+        return [empty, not_empty, with_sow_and_piglets, sow_only]
+        
+
 class LocationManager(CoreModelManager):
+    def get_queryset(self):
+        return LocationQuerySet(self.model, using=self._db)
+
     def create_location(self, pre_location):
         if isinstance(pre_location, WorkShop):
             location = self.create(workshop=pre_location)
@@ -96,6 +116,12 @@ class LocationManager(CoreModelManager):
         elif isinstance(pre_location, SowAndPigletsCell):
             location = self.create(sowAndPigletsCell=pre_location)
         return location
+
+    def get_sowandpiglets_cells_by_section(self, section):
+            return self.get_queryset().filter(sowAndPigletsCell__section=section)
+
+    def get_sowandpiglets_cells_by_workshop(self, workshop):
+            return self.get_queryset().filter(sowAndPigletsCell__workshop=workshop)
 
 
 class Location(CoreModel):
