@@ -359,25 +359,25 @@ class SowViewSetTest(APITestCase):
         self.assertEqual(response.data['results'][0]['id'] in [seminated_sow1.pk, seminated_sow3.pk], True)
         self.assertEqual(response.data['results'][1]['id'] in [seminated_sow1.pk, seminated_sow3.pk], True)
 
-        response = self.client.get('/api/sows/?status_title_in=Осеменена 1&status_title_in=Супорос 30')
+        response = self.client.get('/api/sows/?status_title_in=Осеменена 1&status_title_in=Супорос 28')
         self.assertEqual(response.data['count'], 2)
         self.assertEqual(response.data['results'][0]['id'] in [seminated_sow1.pk, seminated_sow2.pk], True)
         self.assertEqual(response.data['results'][1]['id'] in [seminated_sow1.pk, seminated_sow2.pk], True)
 
-        response = self.client.get('/api/sows/?status_title_in=Супорос 30&status_title_in=Супорос 60')
+        response = self.client.get('/api/sows/?status_title_in=Супорос 30&status_title_in=Супорос 35')
         self.assertEqual(response.data['count'], 2)
         self.assertEqual(response.data['results'][0]['id'] in [seminated_sow2.pk, seminated_sow4.pk], True)
         self.assertEqual(response.data['results'][1]['id'] in [seminated_sow2.pk, seminated_sow4.pk], True)
 
         # status not in
-        response = self.client.get('/api/sows/?status_title_not_in=Супорос 30&status_title_not_in=Супорос 60')
+        response = self.client.get('/api/sows/?status_title_not_in=Супорос 28&status_title_not_in=Супорос 35')
         self.assertEqual(response.data['count'], 4)
         for result_sow in response.data['results']:
             self.assertEqual(
                 result_sow['id'] in [sow1.pk, seminated_sow1.pk, seminated_sow3.pk, seminated_sow5.pk],
                 True)
 
-        response = self.client.get('/api/sows/?status_title_not_in=Осеменена 1&status_title_not_in=Супорос 60')
+        response = self.client.get('/api/sows/?status_title_not_in=Осеменена 1&status_title_not_in=Супорос 35')
         self.assertEqual(response.data['count'], 4)
         for result_sow in response.data['results']:
             self.assertEqual(

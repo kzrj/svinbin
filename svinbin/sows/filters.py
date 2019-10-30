@@ -19,7 +19,7 @@ class SowsToSeminateFilter(filters.ModelMultipleChoiceFilter):
     def filter(self, qs, value):
         if value:
             qs = qs.filter(~Q(status__title__in=
-                ["Осеменена 1", "Осеменена 2", "Супорос 30", "Супорос 60"]))
+                ["Осеменена 1", "Осеменена 2", "Супорос 28", "Супорос 35"]))
         return qs
 
 
@@ -56,7 +56,7 @@ class SowFilter(filters.FilterSet):
     def filter_to_seminate(self, queryset, name, value):
         if value:
             queryset = queryset.filter(~Q(status__title__in=
-                ["Осеменена 1", "Осеменена 2", "Супорос 30", "Супорос 60"]))
+                ["Осеменена 1", "Осеменена 2", "Супорос 28", "Супорос 35"]))
         return queryset
 
     def filter_all_in_workshop_number(self, queryset, name, value):

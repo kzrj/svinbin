@@ -16,8 +16,8 @@ def create_statuses():
         SowStatus.objects.bulk_create([
             SowStatus(title='Осеменена 1'),
             SowStatus(title='Осеменена 2'),
-            SowStatus(title='Супорос 30'),
-            SowStatus(title='Супорос 60'),
+            SowStatus(title='Супорос 28'),
+            SowStatus(title='Супорос 35'),
             SowStatus(title='Прохолост'),
             SowStatus(title='Аборт'),
             SowStatus(title='Отъем'),            

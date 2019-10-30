@@ -110,9 +110,9 @@ class UltrasoundManager(CoreModelManager):
          date=timezone.now(), result=result, u_type=u_type)
         if result:
             if days == 30:
-                sow.change_status_to('Супорос 30')
+                sow.change_status_to('Супорос 28')
             if days == 60:
-                sow.change_status_to('Супорос 60')
+                sow.change_status_to('Супорос 35')
         else:
             sow.tour = None
             sow.change_status_to('Прохолост')
@@ -128,9 +128,9 @@ class UltrasoundManager(CoreModelManager):
 
         if result:
             if days == 30:
-                sows_qs.update_status('Супорос 30')
+                sows_qs.update_status('Супорос 28')
             if days == 60:
-                sows_qs.update_status('Супорос 60')
+                sows_qs.update_status('Супорос 35')
         else:
             sows_qs.update(tour=None)
             sows_qs.update_status('Прохолост')
