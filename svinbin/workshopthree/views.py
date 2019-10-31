@@ -156,7 +156,7 @@ class WorkshopInfo(viewsets.ViewSet):
     def info(self, request, format=None):
         # to move to models
         data = dict()
-        data['workshop'] = dict()
+        data['Цех'] = dict()
         for section in locations_models.Section.objects.filter(workshop__number=3):
             data[str(section.number)] = locations_models.Location.objects \
                 .get_sowandpiglets_cells_by_section(section) \
@@ -164,12 +164,12 @@ class WorkshopInfo(viewsets.ViewSet):
             data[str(section.number)]['sow_count'] = Sow.objects.filter( \
                 location__sowAndPigletsCell__section=section).count()
             data[str(section.number)]['piglets_count'] = NewBornPigletsGroup.objects.filter( \
-                location__sowAndPigletsCell__section=section).count()
+                location__sowAndPigletsCell__section=section).aggregate(Sum('quantity'))['quantity__sum']
 
             for key in data[str(section.number)].keys():
-                if data['workshop'].get(key):
-                    data['workshop'][key] = data['workshop'][key] + data[str(section.number)][key]
+                if data['Цех'].get(key):
+                    data['Цех'][key] = data['Цех'][key] + data[str(section.number)][key]
                 else:
-                    data['workshop'][key] = data[str(section.number)][key]
+                    data['Цех'][key] = data[str(section.number)][key]
 
         return Response(data)
