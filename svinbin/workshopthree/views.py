@@ -164,8 +164,9 @@ class WorkshopInfo(viewsets.ViewSet):
                 .get_cells_data()
             data[str(section.number)]['sow_count'] = Sow.objects.filter( \
                 location__sowAndPigletsCell__section=section).count()
-            data[str(section.number)]['piglets_count'] = NewBornPigletsGroup.objects.filter( \
+            piglets_count = NewBornPigletsGroup.objects.filter( \
                 location__sowAndPigletsCell__section=section).aggregate(Sum('quantity'))['quantity__sum']
+            data[str(section.number)]['piglets_count'] = piglets_count if piglets_count else 0
 
             for key in data[str(section.number)].keys():
                 if data['Цех'].get(key):

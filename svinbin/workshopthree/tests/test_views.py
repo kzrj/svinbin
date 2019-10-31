@@ -127,5 +127,17 @@ class WorkshopThreeInfoViewTest(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_info(self):
+        sow1 = sows_testing.create_sow_with_semination_and_put_in_workshop_three(section_number=1,
+         cell_number=1, week=7)
+        sow2 = sows_testing.create_sow_with_semination_and_put_in_workshop_three(section_number=1,
+         cell_number=2, week=7)
+        sow3 = sows_testing.create_sow_with_semination_and_put_in_workshop_three(section_number=1,
+         cell_number=3, week=7)
+
+        response = self.client.post('/api/workshopthree/sows/%s/sow_farrow/' %
+          sow1.pk, {'alive_quantity': 10, 'dead_quantity': 1, 'mummy_quantity': 2, 'week': 7 })
+        response = self.client.post('/api/workshopthree/sows/%s/sow_farrow/' %
+          sow2.pk, {'alive_quantity': 15, 'dead_quantity': 1, 'mummy_quantity': 2, 'week': 7 })
+
         response = self.client.get('/api/workshopthree/wsinfo/info/')
-        # print(response.data)
+        print(response.data)
