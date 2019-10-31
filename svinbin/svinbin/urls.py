@@ -52,6 +52,8 @@ router.register(r'workshopthree/newbornpiglets', workshopthree_views.WorkShopThr
  basename='workshopthree-piglets')
 router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsViewSet, \
  basename='workshopthree-sows')
+router.register(r'workshopthree/wsinfo', workshopthree_views.WorkshopInfo, \
+ basename='workshopthree-info')
 
 # workshop four
 # router.register(r'workshopfour/piglets', workshopfour_views.WorkShopFourPigletsViewSet, \

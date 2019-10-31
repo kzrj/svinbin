@@ -12,6 +12,34 @@ class WorkShop(CoreModel):
     def __str__(self):
         return self.title
 
+    # def get_info_data_ws3(self):
+    #     data = dict()
+    #     data['workshop'] = dict()
+    #     for section in Section.objects.filter(workshop=self):
+    #         data[str(section.number)] = Location.objects \
+    #             .get_sowandpiglets_cells_by_section(section) \
+    #             .get_cells_data()
+    #         data[str(section.number)]['sow_count'] = 0
+            # data[str(section.number)]['sow_count'] = Sow.objects.filter( \
+            #     location__sowAndPigletsCell__section=section).count()
+            # locations = Location.objects.filter(sowAndPigletsCell__section=section) \
+            #     .prefetch_related('sow_set', 'newbornpigletsgroup_set')
+            # print(locations.sow_set.count())
+            # print(locations.annotate(num_sows=models.Count('sow'))[0].num_sows)
+            # for loc_cell in Location.objects.filter(sowAndPigletsCell__section=section) \
+            #     .prefetch_related('sow_set', 'newbornpigletsgroup_set'):
+            #     data[str(section.number)]['sow_count'] = data[str(section.number)]['sow_count'] + 
+
+
+            # data[str(section.number)]['piglets_count'] = NewBornPigletsGroup.objects.filter( \
+            #     location__sowAndPigletsCell__section=section).count()
+
+            # for key in data[str(section.number)].keys():
+            #     if data['workshop'].get(key):
+            #         data['workshop'][key] = data['workshop'][key] + data[str(section.number)][key]
+            #     else:
+            #         data['workshop'][key] = data[str(section.number)][key]
+
 
 class Section(CoreModel):
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
@@ -83,7 +111,7 @@ class SowAndPigletsCell(Cell):
 
 class LocationQuerySet(models.QuerySet):
     def get_cells_data(self):
-        empty, not_empty, with_sow_and_piglets, sow_only = 0, 0, 0, 0
+        empty, not_empty, with_piglets, sow_only = 0, 0, 0, 0
         for location in self.prefetch_related('sow_set', 'newbornpigletsgroup_set',
             'nomadpigletsgroup_set', 'gilt_set'):
             if location.is_empty:
@@ -91,11 +119,11 @@ class LocationQuerySet(models.QuerySet):
             else:
                 not_empty += 1
                 if location.get_located_active_new_born_groups():
-                    with_sow_and_piglets += 1
+                    with_piglets += 1
                 else:
                     sow_only += 1
 
-        return [empty, not_empty, with_sow_and_piglets, sow_only]
+        return {'empty':empty, 'not_empty': not_empty, 'with_piglets': with_piglets, 'sow_only': sow_only}
         
 
 class LocationManager(CoreModelManager):

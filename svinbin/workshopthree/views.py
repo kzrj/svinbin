@@ -149,3 +149,27 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class WorkshopInfo(viewsets.ViewSet):
+    @action(methods=['get'], detail=False)
+    def info(self, request, format=None):
+        # to move to models
+        data = dict()
+        data['workshop'] = dict()
+        for section in locations_models.Section.objects.filter(workshop__number=3):
+            data[str(section.number)] = locations_models.Location.objects \
+                .get_sowandpiglets_cells_by_section(section) \
+                .get_cells_data()
+            data[str(section.number)]['sow_count'] = Sow.objects.filter( \
+                location__sowAndPigletsCell__section=section).count()
+            data[str(section.number)]['piglets_count'] = NewBornPigletsGroup.objects.filter( \
+                location__sowAndPigletsCell__section=section).count()
+
+            for key in data[str(section.number)].keys():
+                if data['workshop'].get(key):
+                    data['workshop'][key] = data['workshop'][key] + data[str(section.number)][key]
+                else:
+                    data['workshop'][key] = data[str(section.number)][key]
+
+        return Response(data)

@@ -111,8 +111,21 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
 
         self.assertEqual(response.data['sow']['id'], sow.pk)
         self.assertEqual(response.data['sow']['farm_id'], sow.farm_id)
-        self.assertEqual(response.data['sow']['tour'], 'Tour #7')
+        self.assertEqual(response.data['sow']['tour'], 'Тур 7 2019г')
         self.assertEqual(response.data['sow']['status'], 'Опоросилась')
         self.assertEqual(response.data['farrow']['alive_quantity'], 10)
         self.assertEqual(response.data['farrow']['dead_quantity'], 1)
         self.assertEqual(response.data['farrow']['mummy_quantity'], 2)
+
+
+class WorkshopThreeInfoViewTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        self.user = staff_testing.create_employee()
+        self.client.force_authenticate(user=self.user)
+
+    def test_info(self):
+        response = self.client.get('/api/workshopthree/wsinfo/info/')
+        # print(response.data)
