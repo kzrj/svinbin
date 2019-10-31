@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.models import Sum
 
 from rest_framework.views import APIView
 from rest_framework import viewsets, status, generics
