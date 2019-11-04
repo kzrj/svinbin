@@ -22,6 +22,7 @@
 .cell-full{
 	border: 1px solid white;
 	background-color: #525252 !important;
+	color: white;
 	/*max-width: 65px !important;*/
 }
 
@@ -35,6 +36,7 @@
 
 .section-active{
 	background-color: #525252;
+	color: white;
 }
 
 .piglets{
