@@ -28,20 +28,6 @@ class NomadPigletsGroupViewSet(viewsets.ModelViewSet):
 
 
 class WorkShopNomadPigletsViewSet(NomadPigletsGroupViewSet):
-    @action(methods=['get'], detail=False)
-    def waiting_for_weighing_piglets_outside_cells(self, request):
-        location = locations_models.Location.objects.get(workshop__number=4)        
-        piglets = piglets_models.NomadPigletsGroup.objects \
-                    .filter(location=location) \
-                    .filter(status__title='Готовы ко взвешиванию')
-
-        return Response(
-            {
-             "piglets_groups": piglets_serializers.NomadPigletsGroupSerializer(piglets, many=True).data,
-             "message": 'Поросята ожидающие взвешивания.',
-             },
-            status=status.HTTP_200_OK)
-       
     @action(methods=['post'], detail=True)
     def weighing_piglets(self, request, pk=None):        
         serializer = piglets_events_serializers.WeighingPigletsCreateSerializer(data=request.data)
@@ -63,20 +49,6 @@ class WorkShopNomadPigletsViewSet(NomadPigletsGroupViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # to filters
-    @action(methods=['get'], detail=False)
-    def get_weighted_piglets_outside_cells(self, request):
-        location = locations_models.Location.objects.get(workshop__number=4)       
-        piglets = piglets_models.NomadPigletsGroup.objects \
-                    .filter(location=location) \
-                    .filter(status__title='Взвешены, готовы к заселению')
-        return Response(
-            {
-             "piglets_groups": piglets_serializers.NomadPigletsGroupSerializer(piglets, many=True).data,
-             "message": 'Взвешенные поросята, готовые к заселению в клетки.',
-             },
-            status=status.HTTP_200_OK)
 
     @action(methods=['post'], detail=True)
     def move_one_group_to_cell(self, request, pk=None):        

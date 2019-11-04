@@ -14,7 +14,8 @@ import piglets.testing_utils as piglets_testing
 import staff.testing_utils as staff_testing
 
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
-from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger, CullingNewBornPiglets
+from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger, \
+    CullingNewBornPiglets, WeighingPiglets
 from locations.models import WorkShop, SowAndPigletsCell, PigletsGroupCell, Location
 from transactions.models import PigletsTransaction, SowTransaction
 
@@ -38,40 +39,6 @@ class WorkShopNomadPigletsViewsTest(APITestCase):
         self.assertEqual(response.data['weighing_record']['piglets_group'], nomad_piglets_group.pk)
         self.assertEqual(response.data['weighing_record']['total_weight'], 670)
         self.assertEqual(response.data['weighing_record']['place'], '3/4')
-
-    def test_get_weighted_piglets_outside_cells(self):
-        nomad_piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
-        nomad_piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
-        nomad_piglets_group2.location = Location.objects.get(workshop__number=4)
-        nomad_piglets_group2.save()
-        nomad_piglets_group3 = piglets_testing.create_nomad_group_from_three_new_born()
-        nomad_piglets_group3.location = Location.objects.get(workshop__number=4)
-        nomad_piglets_group3.save()
-
-        response = self.client.post('/api/nomadpiglets/%s/weighing_piglets/' %
-          nomad_piglets_group2.pk, {'total_weight': 670, 'place': '3/4'})
-        
-        response = self.client.get('/api/nomadpiglets/get_weighted_piglets_outside_cells/')
-        self.assertEqual(response.data['piglets_groups'][0]['id'], nomad_piglets_group2.pk)
-        self.assertEqual(len(response.data['piglets_groups']), 1)
-
-    def test_waiting_for_weighing_piglets_outside_cells(self):
-        nomad_piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
-        nomad_piglets_group1.location = Location.objects.get(workshop__number=4)
-        nomad_piglets_group1.save()
-        nomad_piglets_group2 = piglets_testing.create_nomad_group_from_three_new_born()
-        nomad_piglets_group2.location = Location.objects.get(workshop__number=4)
-        nomad_piglets_group2.save()
-        nomad_piglets_group3 = piglets_testing.create_nomad_group_from_three_new_born()
-        nomad_piglets_group3.location = Location.objects.get(workshop__number=4)
-        nomad_piglets_group3.reset_status()
-
-        response = self.client.post('/api/nomadpiglets/%s/weighing_piglets/' %
-          nomad_piglets_group2.pk, {'total_weight': 670, 'place': '3/4'})
-        
-        response = self.client.get('/api/nomadpiglets/waiting_for_weighing_piglets_outside_cells/')
-        self.assertEqual(len(response.data['piglets_groups']), 1)
-        self.assertEqual(response.data['piglets_groups'][0]['id'], nomad_piglets_group1.pk)
 
     def test_move_one_group_to_cell(self):
         nomad_piglets_group1 = piglets_testing.create_nomad_group_from_three_new_born()
@@ -288,3 +255,24 @@ class WorkShopNomadPigletsViewsTest(APITestCase):
 
         response = self.client.get('/api/nomadpiglets/%s/' % nomad_piglets_group1.pk)
         self.assertEqual(len(response.data['cells_numbers_from_merger']), 3)
+
+    def test_filter_piglets_without_weighing_record(self):
+        nbpiglets_group1 = piglets_testing.create_new_born_group(1, 10, 1, 10)
+        nbpiglets_group2 = piglets_testing.create_new_born_group(1, 11, 1, 12)
+        nomad_piglets1 = piglets_testing.create_nomad_group_from_new_born_groups([nbpiglets_group1,
+            nbpiglets_group2])
+
+        nbpiglets_group3 = piglets_testing.create_new_born_group(1, 12, 1, 10)
+        nbpiglets_group4 = piglets_testing.create_new_born_group(1, 13, 1, 12)
+        nomad_piglets2 = piglets_testing.create_nomad_group_from_new_born_groups([nbpiglets_group3,
+            nbpiglets_group4])
+
+        WeighingPiglets.objects.create_weighing(nomad_piglets1, 240, '3/4')
+
+        response = self.client.get('/api/nomadpiglets/?piglets_without_weighing_record=3/4')
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['id'], nomad_piglets2.pk)
+
+        response = self.client.get('/api/nomadpiglets/?piglets_with_weighing_record=3/4')
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['id'], nomad_piglets1.pk)
