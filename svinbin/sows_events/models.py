@@ -143,7 +143,16 @@ class Ultrasound(SowEvent):
     objects = UltrasoundManager()
 
 
+class SowFarrowQuerySet(models.QuerySet):
+    def update_status_related_sows(self):
+        print(self.values('sow'))
+
+
+
 class SowFarrowManager(CoreModelManager):
+    def get_queryset(self):
+        return SowFarrowQuerySet(self.model, using=self._db)
+
     def create_sow_farrow(self, sow, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
         tour = sow.tour

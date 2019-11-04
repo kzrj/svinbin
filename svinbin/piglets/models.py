@@ -127,7 +127,7 @@ class NewBornPigletsGroup(PigletsGroup):
     objects = NewBornPigletsGroupManager()
 
     def __str__(self):
-        return 'NewBornPiglets group #%s' % self.pk
+        return 'NBPiglets #{} {}'.format(self.pk, self.location)
 
     def mark_size_label(self, size_label):
         self.size_label = size_label

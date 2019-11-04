@@ -29,15 +29,15 @@ class NewBornMergerModelTest(TestCase):
         self.piglets_group5 = piglets_testing.create_new_born_group(1, 5, 1, 12)
         
 
-        piglets_groups_same_tour = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
+        self.piglets_groups_same_tour = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
             [self.piglets_group4.pk, self.piglets_group5.pk])
-        piglets_groups_two_tours = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
+        self.piglets_groups_two_tours = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
             [self.piglets_group1.pk, self.piglets_group2.pk, self.piglets_group3.pk])
 
         self.new_born_merger_same_tour = piglets_events_models.NewBornPigletsMerger.objects \
-            .create_merger(piglets_groups_same_tour)
+            .create_merger(self.piglets_groups_same_tour)
         self.new_born_merger_two_tours = piglets_events_models.NewBornPigletsMerger.objects \
-            .create_merger(piglets_groups_two_tours)
+            .create_merger(self.piglets_groups_two_tours)
 
         self.tour1 = self.new_born_merger_two_tours.get_first_tour()
 
@@ -95,6 +95,13 @@ class NewBornMergerModelTest(TestCase):
         self.assertEqual([self.piglets_group4.location.get_cell_number,
             self.piglets_group5.location.get_cell_number],
             cell1_list)
+
+    def test_sow_status_update_after_merge(self):
+        new_born_merger_same_tour = piglets_events_models.NewBornPigletsMerger.objects \
+            .create_merger(self.piglets_groups_same_tour)
+
+
+
 
 #to do MergerRecordsTest
 

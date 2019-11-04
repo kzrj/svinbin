@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from core.models import Event, CoreModel, CoreModelManager
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup, PigletsStatus
 from locations.models import Location, SowAndPigletsCell
+from sows_events.models import SowFarrow
 
 
 class PigletsEvent(Event):
@@ -35,6 +36,8 @@ class NewBornPigletsMergerManager(PigletsMergerManager):
             new_born_piglets_groups = NewBornPigletsGroup.objects.filter(pk__in=pks)
         
         new_born_piglets_groups.update(merger=new_born_merger)
+        # farrows = SowFarrow.objects.filter(new_born_piglets_group__in=new_born_piglets_groups)
+        # print(farrows.update_status_related_sows())
         return new_born_merger
 
     def create_merger_and_return_nomad_piglets_group(self, new_born_piglets_groups, 
