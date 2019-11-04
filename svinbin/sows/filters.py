@@ -50,6 +50,8 @@ class SowFilter(filters.FilterSet):
     all_in_workshop_number = filters.NumberFilter(field_name='location',
         method='filter_all_in_workshop_number')
 
+    # created_at_gt = filters.Da
+
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
 

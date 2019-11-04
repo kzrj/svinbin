@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action, api_view
 from rest_framework import status, exceptions
 
-from sows_events.models import Semination, Ultrasound, CullingSow
+from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow
 from sows_events import serializers
 
 
@@ -81,3 +81,8 @@ class CullingSowViewSet(viewsets.ModelViewSet):
             return Response(serializers.CullingSowSerializer(culling).data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SowFarrowViewSet(viewsets.ModelViewSet):
+    queryset = SowFarrow.objects.all()
+    serializer_class = serializers.SowFarrowSerializer
