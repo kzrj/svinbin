@@ -88,6 +88,11 @@ class NewBornPigletsQuerySet(models.QuerySet):
         return self.update(quantity=(models.F('quantity') - models.F('gilts_quantity')),
          gilts_quantity=0) 
 
+    def filter_by_weighing_place_reverse(self, value):
+        return self.select_related('weighing_records') \
+                    .filter(~Q(weighing_records__place=value)) \
+                    .distinct()
+
 
 class NewBornPigletsGroupManager(PigletsGroupManager):
     def get_queryset(self):
@@ -138,10 +143,14 @@ class NomadPigletsQuerySet(models.QuerySet):
         return self.update(quantity=0, active=False)
 
     def piglets_with_weighing_record(self, place):
-        return self.filter(weighing_records__place=place)
+        return self.prefetch_related('weighing_records') \
+                    .filter(weighing_records__place=place) \
+                    .distinct()
 
     def piglets_without_weighing_record(self, place):
-        return self.filter(~Q(weighing_records__place=place))
+        return self.prefetch_related('weighing_records') \
+                    .filter(~Q(weighing_records__place=place)) \
+                    .distinct()
 
 
 class NomadPigletsGroupManager(PigletsGroupManager):

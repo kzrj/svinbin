@@ -14,20 +14,20 @@ class NomadPigletsGroupFilter(filters.FilterSet):
     by_workshop_number = filters.NumberFilter(field_name='location',
      method='filter_by_workshop_number')
 
-    by_weighing_place = filters.CharFilter(field_name='weighing_records',
-        method='filter_by_weighing_place')
+    piglets_with_weighing_record = filters.CharFilter(field_name='weighing_records',
+        method='piglets_with_weighing_record')
 
-    by_weighing_place_reverse = filters.CharFilter(field_name='weighing_records',
-        method='filter_by_weighing_place_reverse')
+    piglets_without_weighing_record = filters.CharFilter(field_name='weighing_records',
+        method='piglets_without_weighing_record')
 
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
 
-    def filter_by_weighing_place(self, queryset, name, value):
-        return queryset.filter(weighing_records__place=value).distinct()
+    def piglets_with_weighing_record(self, queryset, name, value):
+        return queryset.piglets_with_weighing_record(value)
 
-    def filter_by_weighing_place_reverse(self, queryset, name, value):
-        return queryset.filter(~Q(weighing_records__place=value)).distinct()
+    def piglets_without_weighing_record(self, queryset, name, value):
+        return queryset.piglets_without_weighing_record(value)
 
     class Meta:
         model = NomadPigletsGroup

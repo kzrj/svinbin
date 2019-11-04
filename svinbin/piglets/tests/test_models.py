@@ -10,7 +10,7 @@ import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
 
-class NewBornModelManagerTest(TestCase):
+class NewBornModelManagerQuerysetTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
@@ -74,5 +74,28 @@ class NomadPigletsModelManagerTest(TransactionTestCase):
         self.assertEqual(list(nomad_group2.cells_numbers_from_merger), 
             list(self.new_born_merger_two_tours.cells))
 
-    def test_queryset_piglets_with_weighing_record(self):
-        pass
+    def test_piglets_without_weighing_record(self):
+        nomad_group1 = self.new_born_merger_same_tour.nomad_group
+        nomad_group2 = self.new_born_merger_two_tours.nomad_group
+
+        piglets_events_models.WeighingPiglets.objects.create_weighing(nomad_group1, 100, '3/4')
+
+        self.assertEqual(piglets_models.NomadPigletsGroup.objects\
+                .piglets_without_weighing_record('3/4').count(), 1)
+        self.assertEqual(piglets_models.NomadPigletsGroup.objects\
+                .piglets_without_weighing_record('3/4').first().pk, nomad_group2.pk)
+        self.assertEqual(piglets_models.NomadPigletsGroup.objects\
+            .piglets_without_weighing_record('4/8').count(), 2)
+
+    def test_piglets_with_weighing_record(self):
+        nomad_group1 = self.new_born_merger_same_tour.nomad_group
+        nomad_group2 = self.new_born_merger_two_tours.nomad_group
+
+        piglets_events_models.WeighingPiglets.objects.create_weighing(nomad_group1, 100, '3/4')
+
+        self.assertEqual(piglets_models.NomadPigletsGroup.objects\
+                .piglets_with_weighing_record('3/4').count(), 1)
+        self.assertEqual(piglets_models.NomadPigletsGroup.objects\
+                .piglets_with_weighing_record('3/4').first().pk, nomad_group1.pk)
+        self.assertEqual(piglets_models.NomadPigletsGroup.objects\
+            .piglets_with_weighing_record('4/8').count(), 0)
