@@ -2,7 +2,6 @@
 from django.db import models
 from django.db.models import Q, Prefetch
 from django.core import exceptions
-from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location

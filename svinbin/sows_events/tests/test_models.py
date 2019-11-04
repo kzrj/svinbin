@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.utils import timezone
 from django.test import TestCase
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from sows_events.models import Semination, Ultrasound, SowFarrow, CullingSow, \
     UltrasoundType, WeaningSow, AbortionSow
@@ -120,7 +121,7 @@ class UltrasoundModelManagerTest(TestCase):
         Ultrasound.objects.create_ultrasound(sow=sow, 
          initiator=None, result=True, days=30)
         sow.refresh_from_db()
-        self.assertEqual(sow.status.title, 'Супорос 30')
+        self.assertEqual(sow.status.title, 'Супорос 28')
 
         Ultrasound.objects.create_ultrasound(sow=sow, 
          initiator=None, result=False, days=60)
@@ -137,7 +138,7 @@ class UltrasoundModelManagerTest(TestCase):
         Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, initiator=None, result=True, days=30)
 
         seminated_sow2.refresh_from_db()
-        self.assertEqual(seminated_sow2.status.title, 'Супорос 30')
+        self.assertEqual(seminated_sow2.status.title, 'Супорос 28')
 
         Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, initiator=None, result=False, days=60)
 
@@ -175,21 +176,22 @@ class SowFarrowModelManagerTest(TestCase):
         self.assertEqual(piglets_group1.start_quantity, farrow1.alive_quantity)
 
         # second sow farrow in tour
-        farrow2 = SowFarrow.objects.create_sow_farrow(
-            sow=sow,
-            alive_quantity=7,
-            mummy_quantity=1
-            )
+        with self.assertRaises(DjangoValidationError):
+            farrow2 = SowFarrow.objects.create_sow_farrow(
+                sow=sow,
+                alive_quantity=7,
+                mummy_quantity=1
+                )
 
-        self.assertEqual(NewBornPigletsGroup.objects.all().count(), 1)
+        # self.assertEqual(NewBornPigletsGroup.objects.all().count(), 1)
 
-        piglets_group2 = farrow2.new_born_piglets_group
-        self.assertEqual(piglets_group1, piglets_group2)
-        self.assertEqual(piglets_group2.quantity, 17)
-        self.assertEqual(piglets_group2.start_quantity, 10)
+        # piglets_group2 = farrow2.new_born_piglets_group
+        # self.assertEqual(piglets_group1, piglets_group2)
+        # self.assertEqual(piglets_group2.quantity, 17)
+        # self.assertEqual(piglets_group2.start_quantity, 10)
 
-        self.assertEqual(SowFarrow.objects.all().count(), 2)
-        self.assertEqual(farrow1.new_born_piglets_group, farrow2.new_born_piglets_group)
+        # self.assertEqual(SowFarrow.objects.all().count(), 2)
+        # self.assertEqual(farrow1.new_born_piglets_group, farrow2.new_born_piglets_group)
 
 
 class CullingSowManagerTest(TestCase):

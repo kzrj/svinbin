@@ -101,8 +101,6 @@ class NewBornMergerModelTest(TestCase):
             .create_merger(self.piglets_groups_same_tour)
 
 
-
-
 #to do MergerRecordsTest
 
 class NomadPigletsGroupMergerTest(TestCase):

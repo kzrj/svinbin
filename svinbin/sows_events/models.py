@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from django.conf import settings
 from django.db import connection
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import Event, CoreModel, CoreModelManager
 from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
@@ -156,6 +157,10 @@ class SowFarrowManager(CoreModelManager):
     def create_sow_farrow(self, sow, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
         tour = sow.tour
+        
+        if self.get_queryset().filter(sow=sow, tour=tour).first():
+            raise DjangoValidationError(message='Свинья уже опоросилась.')
+
         sow.change_status_to('Опоросилась')
 
         # check is it first sow_farrow in current tour
