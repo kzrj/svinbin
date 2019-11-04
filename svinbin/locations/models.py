@@ -212,8 +212,8 @@ class Location(CoreModel):
             return self.sowGroupCell.section.workshop
 
     def __str__(self):
-        # return str(self.get_location)
-        return 'location {}'.format(self.pk)
+        return str(self.get_location)
+        # return 'location {}'.format(self.pk)
 
     def get_located_active_new_born_groups(self):
         return self.newbornpigletsgroup_set.all()
