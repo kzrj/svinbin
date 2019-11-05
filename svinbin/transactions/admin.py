@@ -1,3 +1,16 @@
 from django.contrib import admin
 
-# Register your models here.
+from transactions.models import SowTransaction, PigletsTransaction
+
+
+
+@admin.register(SowTransaction)
+class SowTransactionAdmin(admin.ModelAdmin):
+    list_display =  [f.name for f in SowTransaction._meta.fields]
+    search_fields = ['date']
+
+
+@admin.register(PigletsTransaction)
+class PigletsTransactionAdmin(admin.ModelAdmin):
+    list_display =  [f.name for f in PigletsTransaction._meta.fields]
+    search_fields = ['date']
