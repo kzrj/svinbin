@@ -22,7 +22,7 @@
 .cell-full{
 	border: 1px solid white;
 	background-color: #525252 !important;
-	color: white;
+	color: white !important;
 	/*max-width: 65px !important;*/
 }
 
@@ -36,7 +36,7 @@
 
 .section-active{
 	background-color: #525252;
-	color: white;
+	color: white !important;
 }
 
 .piglets{
@@ -47,6 +47,10 @@
 	background-color: #E0E0E0;
 	min-height: 768px;
 	color: #313131;
+	
+	/* flex-direction: row; */
+	/* height:1000px; */
+	
 }
 
 .workshop-header{
@@ -210,4 +214,32 @@
 
 .table-info{
 	/*border: 1px solid #313131 !important;*/
+}
+
+.cell-setion-number{
+	font-size: 12px;
+}
+
+.cell-sow-farmId{
+	font-size: 11px;
+}
+
+.cell-sow-status{
+	font-size: 9px;
+}
+
+.cell-tour{
+	font-size: 8px;
+	font-weight: bold;
+}
+
+.cell-piglets-count{
+	font-size: 10px;
+	font-weight: bold;
+}
+
+.div-scroll{
+	/* flex: 1 !important; */
+	overflow-y: scroll !important;
+	height: 400px;
 }
