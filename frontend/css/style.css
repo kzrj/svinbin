@@ -17,6 +17,15 @@
 .cell{
 	border: 1px solid white;
 	/*max-width: 65px !important;*/
+	text-align: center;
+	vertical-align: middle;
+	height: 100px;
+	
+	padding-left: 2px !important;
+	padding-right: 2px !important;
+	padding-top: 10px !important;
+	padding-bottom: 10px !important;
+	line-height: 15px;
 }
 
 .cell-full{
@@ -217,20 +226,25 @@
 }
 
 .cell-setion-number{
-	font-size: 12px;
+	font-size: 13px;
+	
 }
 
 .cell-sow-farmId{
-	font-size: 11px;
+	font-size: 13px;
+	font-weight: bold;
 }
 
 .cell-sow-status{
-	font-size: 9px;
+	font-size: 10px;
+	color: #b8b800;
+	font-weight: bold;
 }
 
 .cell-tour{
-	font-size: 8px;
+	font-size: 10px;
 	font-weight: bold;
+	color: #0a3382;
 }
 
 .cell-piglets-count{
@@ -246,4 +260,9 @@
 
 .whois{
 	float: right;
+}
+
+.div-cells{
+	overflow-y: scroll !important;
+	height: 400px;
 }
