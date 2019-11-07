@@ -6,9 +6,21 @@ from django.apps import apps
 from core.models import CoreModel, CoreModelManager
 from sows_events import models as events_models
 from sows import models as sows_models
+from piglets_events.models import NewBornPigletsGroupRecount
+
+
+class TourQuerySet(models.QuerySet):
+    def get_recounts_balance_data(self):
+        data = dict()
+        for tour in self:
+            data[str(tour)] = tour.get_recount_balance_info
+        return data
 
 
 class TourManager(CoreModelManager):
+    def get_queryset(self):
+        return TourQuerySet(self.model, using=self._db)
+
     def get_or_create_by_week(self, week_number, year):
         tour = self.get_queryset().filter(week_number=week_number, year=year).first()
         if not tour:
@@ -61,3 +73,26 @@ class Tour(CoreModel):
     def get_ultrasounded_sows_fail(self):
         ultrasounds = events_models.Ultrasound.objects.filter(tour=self, result=False)
         return sows_models.Sow.objects.filter(ultrasound__in=ultrasounds)
+
+    @property
+    def get_positive_recounts_balance(self):
+        return NewBornPigletsGroupRecount.objects \
+            .get_recounts_with_positive_balance(self.new_born_piglets.all()) \
+            .get_sum_balance()
+
+    @property
+    def get_negative_recounts_balance(self):
+        return NewBornPigletsGroupRecount.objects \
+            .get_recounts_with_negative_balance(self.new_born_piglets.all()) \
+            .get_sum_balance()
+
+    @property
+    def get_recount_balance_info(self):
+        negative, positive = self.get_negative_recounts_balance, self.get_positive_recounts_balance
+        return {
+            'negative': negative,
+            'positive': positive,
+            'balance': negative + positive,
+            'count_newborn_piglets': self.new_born_piglets.all().aggregate(models.Sum('quantity'))\
+                ['quantity__sum']
+        }

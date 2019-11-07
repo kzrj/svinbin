@@ -390,9 +390,7 @@ class RecountManagerTest(TestCase):
                 .get_recounts_with_positive_balance(piglets_group_qs).count(), 10)
 
         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-                .get_recounts_with_negative_balance(piglets_group_qs).get_sum_balance(),
-                {'balance__sum': -10})
+                .get_recounts_with_negative_balance(piglets_group_qs).get_sum_balance(), -10)
 
         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-                .get_recounts_with_positive_balance(piglets_group_qs).get_sum_balance(),
-                {'balance__sum': 10})
+                .get_recounts_with_positive_balance(piglets_group_qs).get_sum_balance(), 10)
