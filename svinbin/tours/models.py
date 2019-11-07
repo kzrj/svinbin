@@ -6,7 +6,8 @@ from django.apps import apps
 from core.models import CoreModel, CoreModelManager
 from sows_events import models as events_models
 from sows import models as sows_models
-from piglets_events.models import NewBornPigletsGroupRecount
+from piglets import models as piglets_models
+from piglets_events import models as piglets_events_models
 
 
 class TourQuerySet(models.QuerySet):
@@ -34,9 +35,20 @@ class TourManager(CoreModelManager):
         return self.get_queryset().filter(week_number=week_number, year=timezone.now().year).first()
 
     def get_tours_in_workshop_by_sows(self, workshop):
-        tours_list = list(sows_models.Sow.objects.get_all_sows_in_workshop(workshop).values_list('tour', flat=True))
+        tours_list = list(sows_models.Sow.objects.get_all_sows_in_workshop(workshop) \
+            .values_list('tour', flat=True))
         tours_list = list(set(tours_list))
         return self.get_queryset().filter(pk__in=tours_list).prefetch_related('sows')
+
+    # move to workshop or create analog
+    def get_tours_in_workshop_by_sows_and_piglets(self, workshop):
+        sows_tours_list = list(sows_models.Sow.objects.get_all_sows_in_workshop(workshop) \
+            .values_list('tour', flat=True))
+        piglets_tours_list = list(piglets_models.NewBornPigletsGroup.objects \
+            .filter(location__workshop=workshop) \
+            .values_list('tour', flat=True))
+        tours_list = list(set(sows_tours_list + piglets_tours_list))
+        return self.get_queryset().filter(pk__in=tours_list)
 
     def create_or_return_by_raw(self, raw_tour):
         week_number = int(raw_tour[2:])
@@ -76,13 +88,13 @@ class Tour(CoreModel):
 
     @property
     def get_positive_recounts_balance(self):
-        return NewBornPigletsGroupRecount.objects \
+        return piglets_events_models.NewBornPigletsGroupRecount.objects \
             .get_recounts_with_positive_balance(self.new_born_piglets.all()) \
             .get_sum_balance()
 
     @property
     def get_negative_recounts_balance(self):
-        return NewBornPigletsGroupRecount.objects \
+        return piglets_events_models.NewBornPigletsGroupRecount.objects \
             .get_recounts_with_negative_balance(self.new_born_piglets.all()) \
             .get_sum_balance()
 

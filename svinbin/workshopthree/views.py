@@ -179,6 +179,6 @@ class WorkshopInfo(viewsets.ViewSet):
 
     @action(methods=['get'], detail=False)
     def balances_by_tours(self, request, format=None):
-        tours = Tour.objects.get_tours_in_workshop_by_sows(locations_models.WorkShop.objects \
-            .filter(number=3).first())
+        tours = Tour.objects.get_tours_in_workshop_by_sows_and_piglets( \
+            locations_models.WorkShop.objects.filter(number=3).first())
         return Response(tours.get_recounts_balance_data())

@@ -37,7 +37,7 @@ class TourModelManagerTest(TestCase):
         seminated_sow1 = pigs_testings.create_sow_with_semination(sow1.location)
 
         location2 = Location.objects.get(workshop__number=2)
-        seminated_sow2 = pigs_testings.create_sow_with_semination(location2)
+        seminated_sow2 = pigs_testings.create_sow_with_semination(location2, 1)
         seminated_sow3 = pigs_testings.create_sow_with_semination(location2, 2)
         seminated_sow3 = pigs_testings.create_sow_with_semination(location2, 2)
         sow3 = pigs_testings.create_sow_and_put_in_workshop_one()
@@ -71,6 +71,23 @@ class TourModelManagerTest(TestCase):
         output_data = Tour.objects.all().get_recounts_balance_data()
         self.assertEqual('Тур 1 2019г' in output_data.keys(), True)
         self.assertEqual('positive' in output_data['Тур 1 2019г'].keys(), True)
+
+    def test_get_tours_in_workshop_by_sows_and_piglets(self):
+        for cell_number in range(1, 11):
+            piglets_testing.create_new_born_group(section_number=1, cell_number=cell_number,
+                week=1, quantity=10)
+
+        location3 = Location.objects.get(workshop__number=3)
+        seminated_sow2 = pigs_testings.create_sow_with_semination(location3, 2)
+
+        location2 = Location.objects.get(workshop__number=2)
+        seminated_sow2 = pigs_testings.create_sow_with_semination(location2, 2)
+        seminated_sow3 = pigs_testings.create_sow_with_semination(location2, 3)
+
+        tours = Tour.objects.get_tours_in_workshop_by_sows_and_piglets(location3.workshop)
+        self.assertEqual(tours.count(), 2)
+        self.assertEqual(tours[0].week_number in [1,2], True)
+        self.assertEqual(tours[1].week_number in [1,2], True)
 
     
 class TourModelTest(TestCase):
@@ -149,4 +166,30 @@ class TourModelTest(TestCase):
 
         tour.refresh_from_db()
         self.assertEqual(tour.get_recount_balance_info,
-            {'negative': -10, 'positive': 10, 'balance': 0, 'count_newborn_piglets': 100}) 
+            {'negative': -10, 'positive': 10, 'balance': 0, 'count_newborn_piglets': 100})
+
+
+    # def test_test_get_recounts_balances_inactive_groups(self):
+    #     for cell_number in range(1, 11):
+    #         piglets_testing.create_new_born_group(section_number=1, cell_number=cell_number,
+    #             week=1, quantity=10)
+    #     piglets_group_qs = NewBornPigletsGroup.objects.all()
+
+    #     # get 1 piglet from every group. recount -1. negative recount
+    #     for nbgroup in piglets_group_qs:
+    #         NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 9)
+
+    #     # add 1 piglet to every group. recount +1. positive recount
+    #     for nbgroup in piglets_group_qs:
+    #         NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 10)
+
+    #     nbgroup = NewBornPigletsGroup.objects.filter(tour__week_number=1).first()
+    #     nbgroup.active = False
+    #     nbgroup.save()
+
+    #     tour = Tour.objects.filter(week_number=1).first()
+    #     self.assertEqual(tour.get_positive_recounts_balance, 10)
+    #     self.assertEqual(tour.get_negative_recounts_balance, -10)
+
+    #     self.assertEqual(tour.get_recount_balance_info,
+    #         {'negative': -10, 'positive': 10, 'balance': 0, 'count_newborn_piglets': 100}) 
