@@ -284,13 +284,30 @@ class NomadMergerRecord(MergerRecord):
     objects = NomadMergerRecordManager()
 
 
+class RecountQuerySet(models.QuerySet):
+    def get_sum_balance(self):
+        return self.aggregate(models.Sum('balance'))
+
+
 class RecountManager(CoreModelManager):
+    def get_queryset(self):
+        return RecountQuerySet(self.model, using=self._db)
+
     def create_recount(self, piglets_group, quantity, initiator=None):
         recount = self.create(date=timezone.now(), initiator=initiator, piglets_group=piglets_group,
             quantity_after=quantity, quantity_before=piglets_group.quantity,
             balance=quantity - piglets_group.quantity)
         piglets_group.change_quantity(quantity)
         return recount
+
+    def get_recounts_from_groups(self, piglets_groups_qs):
+        return self.get_queryset().filter(piglets_group__in=piglets_groups_qs)
+
+    def get_recounts_with_negative_balance(self, piglets_groups_qs):
+        return self.get_queryset().filter(piglets_group__in=piglets_groups_qs, balance__lt=0)
+
+    def get_recounts_with_positive_balance(self, piglets_groups_qs):
+        return self.get_queryset().filter(piglets_group__in=piglets_groups_qs, balance__gt=0)
 
 
 class Recount(PigletsEvent):
