@@ -68,7 +68,9 @@ class TourModelManagerTest(TestCase):
 
         tour = Tour.objects.filter(week_number=1).first()
 
-        print(Tour.objects.all().get_recounts_balance_data())
+        output_data = Tour.objects.all().get_recounts_balance_data()
+        self.assertEqual('Тур 1 2019г' in output_data.keys(), True)
+        self.assertEqual('positive' in output_data['Тур 1 2019г'].keys(), True)
 
     
 class TourModelTest(TestCase):

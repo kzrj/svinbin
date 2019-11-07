@@ -22,6 +22,7 @@ from piglets.models import NomadPigletsGroup, NewBornPigletsGroup
 from piglets_events import models as piglets_events_models
 from transactions import models as transactions_models
 from locations import models as locations_models
+from tours.models import Tour
 
 from sows.views import WorkShopSowViewSet
 from piglets.views import NewBornPigletsViewSet, WorkShopNomadPigletsViewSet
@@ -175,3 +176,9 @@ class WorkshopInfo(viewsets.ViewSet):
                     data['Цех'][key] = data[str(section.number)][key]
 
         return Response(data)
+
+    @action(methods=['get'], detail=False)
+    def balances_by_tours(self, request, format=None):
+        tours = Tour.objects.get_tours_in_workshop_by_sows(locations_models.WorkShop.objects \
+            .filter(number=3).first())
+        return Response(tours.get_recounts_balance_data())

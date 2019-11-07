@@ -140,4 +140,44 @@ class WorkshopThreeInfoViewTest(APITestCase):
           sow2.pk, {'alive_quantity': 15, 'dead_quantity': 1, 'mummy_quantity': 2, 'week': 7 })
 
         response = self.client.get('/api/workshopthree/wsinfo/info/')
-        print(response.data)
+        self.assertEqual('Цех' in response.data.keys(), True)
+        self.assertEqual('1' in response.data.keys(), True)
+        self.assertEqual('2' in response.data.keys(), True)
+        self.assertEqual('3' in response.data.keys(), True)
+        self.assertEqual('4' in response.data.keys(), True)
+        self.assertEqual('5' in response.data.keys(), True)
+        self.assertEqual('6' in response.data.keys(), True)
+
+    def test_balances_by_tours(self):
+        # create newborngroups tour=1, qnty=10
+        for cell_number in range(1, 11):
+            piglets_testing.create_new_born_group(section_number=1, cell_number=cell_number,
+                week=1, quantity=10)
+        piglets_group_qs = NewBornPigletsGroup.objects.all()
+
+        # get 1 piglet from every group. recount -1. negative recount
+        for nbgroup in piglets_group_qs:
+            NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 9)
+
+        # add 1 piglet to every group. recount +1. positive recount
+        for nbgroup in piglets_group_qs:
+            NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 10)
+
+        # add another tour
+        # create newborngroups tour=1, qnty=10
+        for cell_number in range(1, 11):
+            piglets_testing.create_new_born_group(section_number=2, cell_number=cell_number,
+                week=2, quantity=10)
+        piglets_group_qs = NewBornPigletsGroup.objects.filter(tour__week_number=2)
+
+        # get 1 piglet from every group. recount -1. negative recount
+        for nbgroup in piglets_group_qs:
+            NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 8)
+
+        # add 1 piglet to every group. recount +1. positive recount
+        for nbgroup in piglets_group_qs:
+            NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 12)
+
+        response = self.client.get('/api/workshopthree/wsinfo/balances_by_tours/')
+        self.assertEqual('Тур 1 2019г' in response.data.keys(), True)
+        self.assertEqual('Тур 2 2019г' in response.data.keys(), True)
