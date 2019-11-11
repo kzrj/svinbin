@@ -283,8 +283,10 @@ class NomadMergerRecord(MergerRecord):
 
 class RecountQuerySet(models.QuerySet):
     def get_sum_balance(self):
-        return self.aggregate(models.Sum('balance'))['balance__sum']
-
+        balance_sum = self.aggregate(models.Sum('balance'))['balance__sum']
+        if balance_sum:
+            return balance_sum
+        return 0
 
 class RecountManager(CoreModelManager):
     def get_queryset(self):
