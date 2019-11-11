@@ -102,6 +102,7 @@ class Tour(CoreModel):
     def get_recount_balance_info(self):
         negative, positive = self.get_negative_recounts_balance, self.get_positive_recounts_balance
         return {
+            'title': str(self),
             'negative': negative,
             'positive': positive,
             'balance': negative + positive,
