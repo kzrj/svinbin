@@ -6,6 +6,7 @@ import sows.serializers as sows_serializers
 from piglets.models import NewBornPigletsGroup
 from piglets_events.models import NewBornPigletsMerger
 from sows.models import Sow
+from tours.models import Tour
 
 
 class NewBornPigletsGroupSizeSerializer(serializers.ModelSerializer):
@@ -48,3 +49,7 @@ class NewGiltBirthIdSerializer(serializers.Serializer):
 
 class CreateRecountSerializer(serializers.Serializer):
     quantity = serializers.IntegerField()
+
+
+class MarkSowAsNurseSerializer(serializers.Serializer):
+    piglets_tour = serializers.PrimaryKeyRelatedField(queryset=Tour.objects.all(), required=False)

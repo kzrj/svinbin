@@ -13,7 +13,7 @@ from piglets_events import models as piglets_events_models
 class TourQuerySet(models.QuerySet):
     def get_recounts_balance_data(self):
         data = dict()
-        for tour in self:
+        for tour in self.prefetch_related('new_born_piglets'):
             data[str(tour)] = tour.get_recount_balance_info
         return data
 

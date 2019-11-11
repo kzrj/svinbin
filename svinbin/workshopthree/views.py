@@ -152,6 +152,25 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['post'], detail=True)
+    def mark_as_nurse(self, request, pk=None):
+        serializer = serializers.MarkSowAsNurseSerializer(data=request.data)
+        if serializer.is_valid():
+            message = 'Свинья почемена как кормилица.'
+            sow = self.get_object()
+            sow.mark_as_nurse
+            if serializer.validated_data.get('piglets_tour'):
+                NewBornPigletsGroup.objects.create_new_born_group(sow.location, sow.tour)
+                message = message + ' Создана группа поросят.'
+            return Response(
+                {
+                 "sow": sows_serializers.SowSerializer(sow).data,
+                 "message": message,
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class WorkshopInfo(viewsets.ViewSet):
     @action(methods=['get'], detail=False)

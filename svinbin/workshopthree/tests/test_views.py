@@ -17,6 +17,7 @@ from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
 from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger, CullingNewBornPiglets
 from locations.models import WorkShop, SowAndPigletsCell, Location
 from transactions.models import PigletsTransaction, SowTransaction
+from tours.models import Tour
 
 
 class WorkshopThreePigletsViewSetTest(APITestCase):
@@ -116,6 +117,20 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         self.assertEqual(response.data['farrow']['alive_quantity'], 10)
         self.assertEqual(response.data['farrow']['dead_quantity'], 1)
         self.assertEqual(response.data['farrow']['mummy_quantity'], 2)
+
+    def test_mark_as_nurse_without_creating_piglets(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=1)
+        response = self.client.post('/api/workshopthree/sows/%s/mark_as_nurse/' % sow.pk)
+        sow.refresh_from_db()
+        self.assertEqual(sow.status.title, 'Кормилица')
+        self.assertEqual(response.data['message'], 'Свинья почемена как кормилица.')
+
+    def test_mark_as_nurse_creating_piglets(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=1)
+        tour = Tour.objects.get_or_create_by_week_in_current_year(45)
+        response = self.client.post('/api/workshopthree/sows/%s/mark_as_nurse/' % sow.pk,
+            {'piglets_tour': tour.pk})
+        self.assertEqual(response.data['message'], 'Свинья почемена как кормилица. Создана группа поросят.')
 
 
 class WorkshopThreeInfoViewTest(APITestCase):

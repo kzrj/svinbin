@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.db.models import Q
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
 
@@ -114,6 +115,12 @@ class NewBornPigletsGroupManager(PigletsGroupManager):
 
     def remove_gilts_and_update_quantity(self):
         return self.get_queryset().remove_gilts_and_update_quantity()
+
+    # use only when create nurse sow. Sows anf Piglets weaning. mb temporary
+    def create_new_born_group(self, location, tour):
+        if location.newbornpigletsgroup_set.all().first():
+            raise DjangoValidationError(message='В клетке есть другие поросята.')
+        return self.create(quantity=0, start_quantity=0, location=location, tour=tour)
 
 
 class NewBornPigletsGroup(PigletsGroup):

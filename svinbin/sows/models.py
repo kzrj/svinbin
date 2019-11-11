@@ -233,6 +233,11 @@ class Sow(Pig):
             self.change_status_without_save('Осеменена 2')
         self.save()
 
+    @property
+    def mark_as_nurse(self):
+        self.tour = None
+        self.change_status_to('Кормилица')
+
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, new_born_group, cell=None):

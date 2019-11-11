@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase, TransactionTestCase
+from django.core.exceptions import ValidationError
 
 import sows.models as sows_models
 import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
+import tours.models as tours_models
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -29,6 +31,15 @@ class NewBornModelManagerQuerysetTest(TestCase):
 
         self.assertEqual(piglets_models.NewBornPigletsGroup.objects.groups_with_gilts().count(), 2)
         self.assertEqual(piglets_models.NewBornPigletsGroup.objects.all().count(), 3)
+
+    def test_create_new_born_group(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=1)
+        tour = tours_models.Tour.objects.get_or_create_by_week_in_current_year(45)
+        piglets = piglets_models.NewBornPigletsGroup.objects.create_new_born_group(sow.location, tour)
+        self.assertEqual(piglets.tour, tour)
+        self.assertEqual(piglets.location, sow.location)
+        self.assertRaises(ValidationError, piglets_models.NewBornPigletsGroup.objects\
+            .create_new_born_group, sow.location, tour)
 
 
 class NomadPigletsModelManagerTest(TransactionTestCase):

@@ -23,6 +23,7 @@ def create_statuses():
             SowStatus(title='Отъем'),            
             SowStatus(title='Брак'),
             SowStatus(title='Опоросилась'),
+            SowStatus(title='Кормилица'),
             SowStatus(title='Ожидает осеменения'),
             ])
 
