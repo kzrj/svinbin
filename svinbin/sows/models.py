@@ -2,6 +2,7 @@
 from django.db import models
 from django.db.models import Q, Prefetch
 from django.core import exceptions
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location
@@ -235,6 +236,8 @@ class Sow(Pig):
 
     @property
     def mark_as_nurse(self):
+        if self.status.title != 'Опоросилась':
+            raise DjangoValidationError(message='Кормилицей свинья может стать только полсе опороса.')
         self.tour = None
         self.change_status_to('Кормилица')
 
