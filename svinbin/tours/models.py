@@ -45,8 +45,8 @@ class TourManager(CoreModelManager):
     def get_tours_in_workshop_by_sows_and_piglets(self, workshop):
         sows_tours_list = list(sows_models.Sow.objects.get_all_sows_in_workshop(workshop) \
             .values_list('tour', flat=True))
-        piglets_tours_list = list(piglets_models.NewBornPigletsGroup.objects \
-            .filter(location__workshop=workshop) \
+        piglets_tours_list = list(piglets_models.NewBornPigletsGroup.objects.all() \
+            .get_all_in_workshop(workshop) \
             .values_list('tour', flat=True))
         tours_list = list(set(sows_tours_list + piglets_tours_list))
         return self.get_queryset().filter(pk__in=tours_list)

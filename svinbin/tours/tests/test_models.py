@@ -93,9 +93,18 @@ class TourModelManagerTest(TestCase):
         location = Location.objects.get(workshop__number=3)
         tour = Tour.objects.get_or_create_by_week_in_current_year(40)
         NewBornPigletsGroup.objects.create_new_born_group(location, tour)
-        
+
+        location2 = Location.objects.get(
+            sowAndPigletsCell__number=1,
+            sowAndPigletsCell__section__number=1,
+            sowAndPigletsCell__workshop__number=3,
+            )
+        tour2 = Tour.objects.get_or_create_by_week_in_current_year(41)
+        NewBornPigletsGroup.objects.create_new_born_group(location2, tour2)
+
         tours = Tour.objects.get_tours_in_workshop_by_sows_and_piglets(location.workshop)
         self.assertEqual(tours.first().week_number, 40)
+        self.assertEqual(tours[1].week_number, 41)
 
     
 class TourModelTest(TestCase):
