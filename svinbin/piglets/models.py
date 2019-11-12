@@ -94,6 +94,15 @@ class NewBornPigletsQuerySet(models.QuerySet):
                     .filter(~Q(weighing_records__place=value)) \
                     .distinct()
 
+    def get_all_in_workshop(self, workshop):
+        return self.filter(
+            models.Q(
+                models.Q(location__workshop=workshop) |
+                models.Q(location__section__workshop=workshop) |
+                models.Q(location__pigletsGroupCell__workshop=workshop) |
+                models.Q(location__sowAndPigletsCell__workshop=workshop)
+                )
+            )
 
 class NewBornPigletsGroupManager(PigletsGroupManager):
     def get_queryset(self):

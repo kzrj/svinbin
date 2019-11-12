@@ -6,6 +6,7 @@ import sows.models as sows_models
 import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
 import tours.models as tours_models
+import locations.models as locations_models
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -40,6 +41,21 @@ class NewBornModelManagerQuerysetTest(TestCase):
         self.assertEqual(piglets.location, sow.location)
         self.assertRaises(ValidationError, piglets_models.NewBornPigletsGroup.objects\
             .create_new_born_group, sow.location, tour)
+
+    def test_get_all_in_workshop(self):
+        piglets_testing.create_new_born_group(section_number=1, cell_number=1)
+        
+        nbp2 = piglets_testing.create_new_born_group(section_number=1, cell_number=2)
+        nbp2.location = locations_models.Location.objects.get(workshop__number=3)
+        nbp2.save()
+
+        nbp3 = piglets_testing.create_new_born_group(section_number=1, cell_number=3)
+        nbp3.location = locations_models.Location.objects.get(workshop__number=2)
+        nbp3.save()
+
+        workshop = locations_models.WorkShop.objects.filter(number=3).first()
+        piglets_qs = piglets_models.NewBornPigletsGroup.objects.all().get_all_in_workshop(workshop)
+        self.assertEqual(piglets_qs.count(), 2)
 
 
 class NomadPigletsModelManagerTest(TransactionTestCase):
