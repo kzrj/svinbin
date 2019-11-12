@@ -266,3 +266,20 @@
 	overflow-y: scroll !important;
 	height: 400px;
 }
+
+.thead-dark th{
+	background-color: #313131 !important;
+}
+
+.table-balances{
+	font-size: 17px;
+}
+
+.table-balances td{
+	font-size: 19px;
+	font-weight: bold;
+}
+
+.block-border{
+	border: 1px solid #0a3382!important;
+}
