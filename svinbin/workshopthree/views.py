@@ -159,7 +159,8 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
             message = 'Свинья почемена как кормилица.'
             sow = self.get_object()
             if serializer.validated_data.get('piglets_tour'):
-                NewBornPigletsGroup.objects.create_new_born_group(sow.location, sow.tour)
+                NewBornPigletsGroup.objects.create_new_born_group(sow.location,
+                        serializer.validated_data.get('piglets_tour'))
                 message = message + ' Создана группа поросят.'
             sow.mark_as_nurse
             
@@ -201,4 +202,5 @@ class WorkshopInfo(viewsets.ViewSet):
     def balances_by_tours(self, request, format=None):
         tours = Tour.objects.get_tours_in_workshop_by_sows_and_piglets( \
             locations_models.WorkShop.objects.filter(number=3).first())
+        print(tours )
         return Response(tours.get_recounts_balance_data())

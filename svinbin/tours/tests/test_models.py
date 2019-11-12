@@ -69,10 +69,10 @@ class TourModelManagerTest(TestCase):
         tour = Tour.objects.filter(week_number=1).first()
 
         output_data = Tour.objects.all().get_recounts_balance_data()
-        self.assertEqual('Тур 1 2019г' in output_data.keys(), True)
-        self.assertEqual('positive' in output_data['Тур 1 2019г'].keys(), True)
+        self.assertEqual(output_data[0]['title'], 'Тур 1 2019г')
+        self.assertEqual(output_data[0]['positive'], 10)
 
-    def test_get_tours_in_workshop_by_sows_and_piglets(self):
+    def test_get_tours_in_workshop_by_sows_and_piglets_sows(self):
         for cell_number in range(1, 11):
             piglets_testing.create_new_born_group(section_number=1, cell_number=cell_number,
                 week=1, quantity=10)
@@ -88,6 +88,14 @@ class TourModelManagerTest(TestCase):
         self.assertEqual(tours.count(), 2)
         self.assertEqual(tours[0].week_number in [1,2], True)
         self.assertEqual(tours[1].week_number in [1,2], True)
+
+    def test_get_tours_in_workshop_by_sows_and_piglets_piglets(self):
+        location = Location.objects.get(workshop__number=3)
+        tour = Tour.objects.get_or_create_by_week_in_current_year(40)
+        NewBornPigletsGroup.objects.create_new_born_group(location, tour)
+        
+        tours = Tour.objects.get_tours_in_workshop_by_sows_and_piglets(location.workshop)
+        self.assertEqual(tours.first().week_number, 40)
 
     
 class TourModelTest(TestCase):
@@ -146,8 +154,11 @@ class TourModelTest(TestCase):
         self.assertEqual(tour.get_positive_recounts_balance, 10)
         self.assertEqual(tour.get_negative_recounts_balance, -10)
 
-        self.assertEqual(tour.get_recount_balance_info,
-            {'negative': -10, 'positive': 10, 'balance': 0, 'count_newborn_piglets': 100}) 
+        self.assertEqual(tour.get_recount_balance_info['title'], 'Тур 1 2019г')
+        self.assertEqual(tour.get_recount_balance_info['negative'], -10)
+        self.assertEqual(tour.get_recount_balance_info['positive'], 10)
+        self.assertEqual(tour.get_recount_balance_info['balance'], 0)
+        self.assertEqual(tour.get_recount_balance_info['count_newborn_piglets'], 100)
 
         # add another tour
         # create newborngroups tour=1, qnty=10
@@ -156,17 +167,18 @@ class TourModelTest(TestCase):
                 week=2, quantity=10)
         piglets_group_qs = NewBornPigletsGroup.objects.filter(tour__week_number=2)
 
-        # get 1 piglet from every group. recount -1. negative recount
         for nbgroup in piglets_group_qs:
             NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 8)
 
-        # add 1 piglet to every group. recount +1. positive recount
         for nbgroup in piglets_group_qs:
             NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 12)
 
         tour.refresh_from_db()
-        self.assertEqual(tour.get_recount_balance_info,
-            {'negative': -10, 'positive': 10, 'balance': 0, 'count_newborn_piglets': 100})
+        self.assertEqual(tour.get_recount_balance_info['title'], 'Тур 1 2019г')
+        self.assertEqual(tour.get_recount_balance_info['negative'], -10)
+        self.assertEqual(tour.get_recount_balance_info['positive'], 10)
+        self.assertEqual(tour.get_recount_balance_info['balance'], 0)
+        self.assertEqual(tour.get_recount_balance_info['count_newborn_piglets'], 100)
 
 
     def test_test_get_recounts_balances_inactive_groups(self):
@@ -188,8 +200,11 @@ class TourModelTest(TestCase):
         nbgroup.save()
 
         tour = Tour.objects.filter(week_number=1).first()
-        self.assertEqual(tour.get_positive_recounts_balance, 10)
-        self.assertEqual(tour.get_negative_recounts_balance, -10)
+        self.assertEqual(tour.get_positive_recounts_balance, 9)
+        self.assertEqual(tour.get_negative_recounts_balance, -9)
 
-        self.assertEqual(tour.get_recount_balance_info,
-            {'negative': -10, 'positive': 10, 'balance': 0, 'count_newborn_piglets': 100}) 
+        self.assertEqual(tour.get_recount_balance_info['title'], 'Тур 1 2019г')
+        self.assertEqual(tour.get_recount_balance_info['negative'], -9)
+        self.assertEqual(tour.get_recount_balance_info['positive'], 9)
+        self.assertEqual(tour.get_recount_balance_info['balance'], 0)
+        self.assertEqual(tour.get_recount_balance_info['count_newborn_piglets'], 90)

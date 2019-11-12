@@ -193,6 +193,12 @@ class WorkshopThreeInfoViewTest(APITestCase):
         for nbgroup in piglets_group_qs:
             NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 12)
 
+        
+        location = Location.objects.get(workshop__number=3)
+        tour = Tour.objects.get_or_create_by_week_in_current_year(40)
+        NewBornPigletsGroup.objects.create_new_born_group(location, tour)
+
         response = self.client.get('/api/workshopthree/wsinfo/balances_by_tours/')
-        self.assertEqual('Тур 1 2019г' in response.data.keys(), True)
-        self.assertEqual('Тур 2 2019г' in response.data.keys(), True)
+        print(response.data)
+        self.assertEqual(response.data[0]['title'], 'Тур 1 2019г')
+        self.assertEqual(response.data[1]['title'], 'Тур 2 2019г')
