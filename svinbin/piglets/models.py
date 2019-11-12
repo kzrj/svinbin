@@ -106,7 +106,8 @@ class NewBornPigletsQuerySet(models.QuerySet):
 
 class NewBornPigletsGroupManager(PigletsGroupManager):
     def get_queryset(self):
-        return NewBornPigletsQuerySet(self.model, using=self._db).filter(active=True).select_related('location')
+        return NewBornPigletsQuerySet(self.model, using=self._db).filter(active=True) \
+            .select_related('location')
 
     def get_with_inactive(self):
         return NewBornPigletsQuerySet(self.model, using=self._db)

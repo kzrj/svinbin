@@ -71,6 +71,9 @@ class SowsQuerySet(models.QuerySet):
 
 class SowManager(CoreModelManager):
     def get_queryset(self):
+        return SowsQuerySet(self.model, using=self._db).filter(alive=True)
+
+    def get_queryset_with_bot_alive(self):
         return SowsQuerySet(self.model, using=self._db)
 
     def init_only_create_new(self, farm_id, location):

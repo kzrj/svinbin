@@ -149,7 +149,6 @@ class SowFarrowQuerySet(models.QuerySet):
         print(self.values('sow'))
 
 
-
 class SowFarrowManager(CoreModelManager):
     def get_queryset(self):
         return SowFarrowQuerySet(self.model, using=self._db)
@@ -159,10 +158,10 @@ class SowFarrowManager(CoreModelManager):
         tour = sow.tour
         
         if self.get_queryset().filter(sow=sow, tour=tour).first():
-            raise DjangoValidationError(message='Свинья уже опоросилась.')
+            raise DjangoValidationError(message='Свинья уже опоросилась в этом туре.')
 
         if not sow.tour:
-            raise DjangoValidationError(message='У свиньи нет тура.')            
+            raise DjangoValidationError(message='У свиньи нет тура.')
 
         sow.change_status_to('Опоросилась')
 
