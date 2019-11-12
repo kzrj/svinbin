@@ -19,9 +19,8 @@ services:
     restart: unless-stopped
     image: postgres:10.1-alpine
     volumes:
-      - ./postgres_data:/var/lib/postgresql/data
-        
-       
+      - ./postgres_data:/var/lib/postgresql
+
   backend:
     build: .
     volumes:
