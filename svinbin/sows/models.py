@@ -237,7 +237,7 @@ class Sow(Pig):
     @property
     def mark_as_nurse(self):
         if self.status.title != 'Опоросилась':
-            raise DjangoValidationError(message='Кормилицей свинья может стать только полсе опороса.')
+            raise DjangoValidationError(message='Кормилицей свинья может стать только после опороса.')
         self.tour = None
         self.change_status_to('Кормилица')
 

@@ -161,6 +161,9 @@ class SowFarrowManager(CoreModelManager):
         if self.get_queryset().filter(sow=sow, tour=tour).first():
             raise DjangoValidationError(message='Свинья уже опоросилась.')
 
+        if not sow.tour:
+            raise DjangoValidationError(message='У свиньи нет тура.')            
+
         sow.change_status_to('Опоросилась')
 
         # check is it first sow_farrow in current tour
