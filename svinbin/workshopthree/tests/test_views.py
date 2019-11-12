@@ -203,8 +203,7 @@ class WorkshopThreeInfoViewTest(APITestCase):
         NewBornPigletsGroup.objects.create_new_born_group(location2, tour2)
 
         response = self.client.get('/api/workshopthree/wsinfo/balances_by_tours/')
-        print(response.data)
         self.assertEqual(response.data[0]['title'], 'Тур 1 2019г')
         self.assertEqual(response.data[1]['title'], 'Тур 2 2019г')
         self.assertEqual(response.data[2]['title'], 'Тур 40 2019г')
-        # self.assertEqual(len(response.data), 4)
+        self.assertEqual(len(response.data), 4)
