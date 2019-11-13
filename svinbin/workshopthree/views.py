@@ -101,7 +101,7 @@ class WorkShopThreeNewBornPigletsViewSet(NewBornPigletsViewSet):
             return Response(
                 {"piglets_group": piglets_serializers. \
                     NewBornPigletsGroupSerializer(new_born_group).data,
-                 "message": 'ok',
+                 "message": 'Ремонтная свинка пронумерована.',
                  "gilt": sows_serializers.GiltSerializer(gilt).data,
                  },
                 status=status.HTTP_200_OK)

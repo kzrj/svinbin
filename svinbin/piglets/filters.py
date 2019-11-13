@@ -10,6 +10,7 @@ from piglets.models import NomadPigletsGroup
 
 class NomadPigletsGroupFilter(filters.FilterSet):
     status_title = filters.CharFilter(field_name='status__title', lookup_expr='exact')
+    not_status_title = filters.CharFilter(field_name='status__title', method='filter_not_status_title')
 
     by_workshop_number = filters.NumberFilter(field_name='location',
      method='filter_by_workshop_number')
@@ -28,6 +29,9 @@ class NomadPigletsGroupFilter(filters.FilterSet):
 
     def filter_piglets_without_weighing_record(self, queryset, name, value):
         return queryset.piglets_without_weighing_record(value)
+
+    def filter_not_status_title(self, queryset, name, value):
+        return queryset.filter(~Q(status__title=value))
 
     class Meta:
         model = NomadPigletsGroup
