@@ -41,6 +41,7 @@
 
 .section-button{
 	border: 1px solid #525252;
+	min-height: 50px !important;
 }
 
 .section-active{
@@ -190,6 +191,7 @@
 .nomad-piglets-row{
 	border-bottom: 1px solid;
 	border-right: 1px solid;
+	min-height: 70px;
 }
 
 .input-group{
@@ -281,5 +283,27 @@
 }
 
 .block-border{
-	border: 1px solid #0a3382!important;
+	border-top: 1px solid #313131 !important;
+}
+
+.table{
+	text-align: center; 
+    vertical-align: middle;
+}
+
+.created-nomads-table{
+	border-top: 1px solid #313131 !important;
+}
+
+.created-nomads-table td{
+	border-top: 1px solid #313131 !important;
+}
+
+hr {
+	border-top: 2px solid #313131 !important;
+}
+
+.error-message{
+	color: red;
+	font-weight: bold;
 }
