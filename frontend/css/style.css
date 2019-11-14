@@ -307,3 +307,11 @@ hr {
 	color: red;
 	font-weight: bold;
 }
+
+.span-block{
+	display: block;
+}
+
+.sow-list-farm-id{
+	font-size: 20px;
+}
