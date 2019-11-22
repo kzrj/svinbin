@@ -91,8 +91,13 @@ class NewBornPigletsMerger(PigletsMerger):
         while tour:
             count_quantity_by_tour = self.count_quantity_by_tour(tour)
 
-            quantity_by_tours.append((tour, count_quantity_by_tour,
-             self.get_percentage_by_tour_less_queries(count_quantity_by_tour, quantity_all_piglets)))
+            quantity_by_tours.append(
+                (
+                    tour, 
+                    count_quantity_by_tour,
+                    self.get_percentage_by_tour_less_queries(count_quantity_by_tour, quantity_all_piglets)
+                )
+            )
 
             tour = self.get_next_tour(tours)
             tours.append(tour)
@@ -104,7 +109,8 @@ class NewBornPigletsMerger(PigletsMerger):
 
     def create_nomad_group(self):
         location = Location.objects.get(workshop__number=3)
-        self.create_records()
+        # self.create_records()
+        NewBornMergerRecord.objects.create_records(self)
         nomad_group = NomadPigletsGroup.objects.create(location=location,
          start_quantity=self.count_all_piglets(), quantity=self.count_all_piglets(),
          status=PigletsStatus.objects.get(title='Готовы ко взвешиванию')
@@ -139,6 +145,7 @@ class MergerRecordManager(CoreModelManager):
 
 class NewBornMergerRecordManager(MergerRecordManager):
     def create_records(self, merger):
+        # create records for each tour
         if not merger.records.all().first():
             for init_data in merger.count_quantity_and_percentage_by_tours():
                 self.create(merger=merger, tour=init_data[0], quantity=init_data[1],
@@ -189,9 +196,11 @@ class SplitNomadPigletsGroupManager(CoreModelManager):
         split_event = self.create(date=timezone.now(), initiator=initiator,
             parent_group=parent_nomad_group)
         
-        first_group = self._create_split_group(split_event,
-         (parent_nomad_group.quantity - new_group_piglets_amount), initiator,
-         (parent_nomad_group.gilts_quantity - new_group_gilts_quantity))
+        first_group = self._create_split_group(
+            split_event,
+            (parent_nomad_group.quantity - new_group_piglets_amount), 
+            initiator,
+            (parent_nomad_group.gilts_quantity - new_group_gilts_quantity))
 
         second_group = self._create_split_group(split_event, new_group_piglets_amount, initiator,
             new_group_gilts_quantity)
@@ -228,8 +237,6 @@ class NomadPigletsGroupMergerManager(PigletsMergerManager):
         nomad_merger.create_records()
         return nomad_merger.create_nomad_group()
 
-    # def create_nomda_group_from_merger(self, merger)
-
 
 class NomadPigletsGroupMerger(PigletsMerger):
     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
@@ -237,7 +244,7 @@ class NomadPigletsGroupMerger(PigletsMerger):
     new_location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL, null=True,
      related_name='creating_nomad_merger')
 
-    objects =  NomadPigletsGroupMergerManager()
+    objects = NomadPigletsGroupMergerManager()
 
     def count_all_piglets(self):
         return self.groups_merger.aggregate(models.Sum('quantity'))['quantity__sum']

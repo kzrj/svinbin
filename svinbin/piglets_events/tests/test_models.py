@@ -26,8 +26,7 @@ class NewBornMergerModelTest(TestCase):
             cell_number=4,
             week=1,
             quantity=10)
-        self.piglets_group5 = piglets_testing.create_new_born_group(1, 5, 1, 12)
-        
+        self.piglets_group5 = piglets_testing.create_new_born_group(1, 5, 1, 12)        
 
         self.piglets_groups_same_tour = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
             [self.piglets_group4.pk, self.piglets_group5.pk])
@@ -48,8 +47,7 @@ class NewBornMergerModelTest(TestCase):
         next_tour = self.new_born_merger_two_tours.get_next_tour([self.tour1])
         self.assertEqual(next_tour.week_number, 2)
 
-    def test_get_piglets_groups_by_tour(self):
-        tour1_piglets = self.new_born_merger_two_tours.get_piglets_groups_by_tour(self.tour1)
+    def test_count_quantity_by_tour(self):
         quantity_piglets_by_tour = self.new_born_merger_two_tours.count_quantity_by_tour(self.tour1)
         self.assertEqual(quantity_piglets_by_tour, 22)
 
@@ -63,14 +61,31 @@ class NewBornMergerModelTest(TestCase):
          / self.new_born_merger_two_tours.count_all_piglets()
         self.assertEqual(model_percentage, percentage)
 
-    # def test_count_quantity_and_percentage_by_tours(self):
-    #     print(self.new_born_merger_two_tours.count_quantity_and_percentage_by_tours())
-    #     # to write
+    def test_get_percentage_by_tour(self):
+        percentage_by_tour1 = self.new_born_merger_two_tours.get_percentage_by_tour(self.tour1)
+        self.assertEqual(round(percentage_by_tour1), 59)
+
+    def test_count_quantity_and_percentage_by_tours(self):
+        # print(self.new_born_merger_two_tours.count_quantity_and_percentage_by_tours())
+        quantity_by_tours = self.new_born_merger_two_tours.count_quantity_and_percentage_by_tours()
+        # should return 2 tuples
+        self.assertEqual(len(quantity_by_tours), 2)
+
+        # count_quantity_by_tour1 == 22
+        self.assertEqual(quantity_by_tours[0][1], 22)
+        # count_quantity_by_tour2 == 15
+        self.assertEqual(quantity_by_tours[1][1], 15)
+
+        # percentage_by_tour1 == 59
+        self.assertEqual(round(quantity_by_tours[0][2]), 59)
+        # percentage_by_tour2 == 41
+        self.assertEqual(round(quantity_by_tours[1][2]), 41)
 
     def test_create_records(self):
         self.new_born_merger_two_tours.create_records()
         self.assertEqual(self.new_born_merger_two_tours.create_records().first().tour.week_number, 1)
         self.assertEqual(self.new_born_merger_two_tours.create_records().first().quantity, 22)
+        self.assertEqual(round(self.new_born_merger_two_tours.create_records().first().percentage), 59)
         self.assertEqual(self.new_born_merger_two_tours.records.all().count(), 2)
 
     def tes_deactivate_groups(self):    
