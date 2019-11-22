@@ -13,16 +13,11 @@ class PigletsStatus(CoreModel):
         return self.title
 
 
-class PigletsGroupManager(CoreModelManager):
-    def reset_quantity_and_deactivate(self):
-        self.update(quantity=0, active=False)
-        # return self.update(quantity=0, active=False)
-
-    def piglets_in_workshop_not_in_cells(self):
-        return self.filter(~Q(location__workshop=None))
+class PigletsManager(CoreModelManager):
+	pass
 
 
-class PigletsGroup(CoreModel):
+class Piglets(CoreModel):
     location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL,
      	null=True, related_name='piglets')
     status = models.ForeignKey(PigletsStatus, on_delete=models.SET_NULL, null=True)
@@ -36,8 +31,7 @@ class PigletsGroup(CoreModel):
 
     active = models.BooleanField(default=True)  
 
-    # class Meta:
-    #     abstract = True
+    objects = PigletsManager()
 
     def is_quantities_same(self, quantity):
         return self.quantity == quantity

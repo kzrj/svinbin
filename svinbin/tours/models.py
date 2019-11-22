@@ -110,3 +110,44 @@ class Tour(CoreModel):
             'count_newborn_piglets': self.new_born_piglets.all().aggregate(models.Sum('quantity'))\
                 ['quantity__sum']
         }
+
+
+class MetaTourManager(CoreModelManager):
+    def create_metatour(self):
+        pass
+
+    def create_metatour_from_farrow(self, farrow):
+        pass
+
+    def create_metatour_from_merge(self, merge):
+        pass
+
+    def create_metatour_from_split(self, split):
+        pass
+
+
+class MetaTour(CoreModel):
+    piglets = models.OneToOneField('piglets.Piglets', on_delete=models.CASCADE)
+
+    objects = MetaTourManager()
+
+    def __str__(self):
+        return 'Piglets {} MetaTour {}'.format(self.piglets, self.pk)
+
+
+class MetaTourRecordManager(CoreModelManager):
+    def create_record(self, metatour, tour, quantity, total_quantity):
+        percentage = (quantity * 100) / total_quantity
+        return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage)
+
+
+class MetaTourRecord(CoreModel):
+    metatour = models.ForeignKey(MetaTour, on_delete=models.CASCADE, related_name='records')
+    tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='metatourrecords')
+    quantity = models.IntegerField()
+    percentage = models.FloatField()
+
+    objects = MetaTourRecordManager()
+
+    def __str__(self):
+        return 'MetaTourRecord {}'.format(self.pk)

@@ -1,14 +1,6 @@
 # -*- coding: utf-8 -*-
-import random
-
-from locations.models import Location
-# from transactions.models import PigletsTransaction
-
-from piglets.models import PigletsStatus
-# from sows_events.models import Semination, SowFarrow
-# from piglets_events.models import NewBornPigletsMerger
-
-# from sows import testing_utils as sows_testing_utils
+from piglets.models import PigletsStatus, Piglets
+from tours.models import Tour, MetaTour, MetaTourRecord
 
 
 def create_piglets_statuses():
@@ -22,9 +14,15 @@ def create_piglets_statuses():
             ])
 
 
-def create_new_group():
-    pass
+def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_quantity=0, status=None):
+	piglets = Piglets.objects.create(location=location, quantity=quantity, start_quantity=quantity,
+		gilts_quantity=gilts_quantity, status=status)
 
+	meta_tour = MetaTour.objects.create(piglets=piglets)
+	# meta_tour.records.create
+
+
+    
 # def create_new_born_group(section_number=1, cell_number=1, week=1, quantity=10):
 #     sow = sows_testing_utils.create_sow_and_put_in_workshop_three(section_number, cell_number)
 #     Semination.objects.create_semination(sow=sow, week=week,
