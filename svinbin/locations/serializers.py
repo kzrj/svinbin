@@ -5,8 +5,8 @@ from core.utils import CustomValidation
 
 import transactions.serializers as transactions_serializers
 import sows.serializers as sows_serializers
-import piglets.serializers as piglets_serializers
-import piglets_events.serializers as piglets_events_serializers
+# import piglets.serializers as piglets_serializers
+# import piglets_events.serializers as piglets_events_serializers
 
 from locations.models import PigletsGroupCell, SowAndPigletsCell, Location, WorkShop, Section
 
@@ -32,17 +32,17 @@ class SowAndPigletsCellSerializer(serializers.ModelSerializer):
         exclude = ['created_at', 'modified_at' ]
 
 
-class PigletsGroupCellSerializer(serializers.ModelSerializer):
-    workshop = serializers.StringRelatedField()
-    section = serializers.StringRelatedField()
+# class PigletsGroupCellSerializer(serializers.ModelSerializer):
+#     workshop = serializers.StringRelatedField()
+#     section = serializers.StringRelatedField()
 
-    class Meta:
-        model = PigletsGroupCell
-        exclude = ['created_at', 'modified_at' ]
+#     class Meta:
+#         model = PigletsGroupCell
+#         exclude = ['created_at', 'modified_at' ]
 
 
-class PigletsGroupCellPkSerializer(serializers.Serializer):
-    cell = serializers.PrimaryKeyRelatedField(queryset=PigletsGroupCell.objects.all())
+# class PigletsGroupCellPkSerializer(serializers.Serializer):
+#     cell = serializers.PrimaryKeyRelatedField(queryset=PigletsGroupCell.objects.all())
 
 
 class LocationPKSerializer(serializers.Serializer):
@@ -54,25 +54,25 @@ class LocationsFromToSerializer(serializers.Serializer):
     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
 
 
-class LocationPigletsGrouspCellSerializer(serializers.ModelSerializer):
-    pigletsGroupCell = serializers.StringRelatedField()
+# class LocationPigletsGrouspCellSerializer(serializers.ModelSerializer):
+#     pigletsGroupCell = serializers.StringRelatedField()
 
-    class Meta:
-        model = Location
-        fields = ['id', 'pigletsGroupCell']
+#     class Meta:
+#         model = Location
+#         fields = ['id', 'pigletsGroupCell']
 
 
 class LocationSerializer(serializers.ModelSerializer):
     workshop = serializers.StringRelatedField()
     section = serializers.StringRelatedField()
     sowAndPigletsCell = SowAndPigletsCellSerializer(read_only=True)
-    pigletsGroupCell = PigletsGroupCellSerializer(read_only=True)
+    # pigletsGroupCell = PigletsGroupCellSerializer(read_only=True)
 
     sow_set = sows_serializers.SowSimpleSerializer(many=True, read_only=True)
-    newbornpigletsgroup_set = piglets_serializers.NewBornPigletsGroupSerializer(many=True,
-        read_only=True)
-    nomadpigletsgroup_set = piglets_serializers.NomadPigletsGroupSerializer(many=True,
-        read_only=True)
+    # newbornpigletsgroup_set = piglets_serializers.NewBornPigletsGroupSerializer(many=True,
+    #     read_only=True)
+    # nomadpigletsgroup_set = piglets_serializers.NomadPigletsGroupSerializer(many=True,
+    #     read_only=True)
 
     is_empty = serializers.ReadOnlyField()
     is_sow_empty = serializers.ReadOnlyField()

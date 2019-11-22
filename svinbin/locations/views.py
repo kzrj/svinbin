@@ -29,9 +29,9 @@ class CreateWorkshopsView(APIView):
         return Response({'msg': 'success'})
 
 
-class PigletsGroupCellViewSet(viewsets.ModelViewSet):
-    queryset = PigletsGroupCell.objects.all()
-    serializer_class = serializers.PigletsGroupCellSerializer
+# class PigletsGroupCellViewSet(viewsets.ModelViewSet):
+#     queryset = PigletsGroupCell.objects.all()
+#     serializer_class = serializers.PigletsGroupCellSerializer
 
 
 class LocationViewSet(viewsets.ModelViewSet):

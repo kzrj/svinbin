@@ -3,10 +3,11 @@ from django.db.models import FieldDoesNotExist
 
 from rest_framework import serializers, status
 
-from transactions.models import SowTransaction, PigletsTransaction
+from transactions.models import SowTransaction
+    # PigletsTransaction
 from locations.models import Location
 from sows.models import Sow
-from piglets.models import NomadPigletsGroup
+# from piglets.models import NomadPigletsGroup
 
 import sows.serializers as sows_serializers
 import piglets.serializers as piglets_serializers
@@ -22,21 +23,21 @@ class LocationSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class LocationPigletsSerializer(serializers.ModelSerializer):
-    pigletsGroupCell = serializers.StringRelatedField()
-    nomadpigletsgroup = piglets_serializers.NomadPigletsGroupSerializer()
+# class LocationPigletsSerializer(serializers.ModelSerializer):
+#     pigletsGroupCell = serializers.StringRelatedField()
+#     nomadpigletsgroup = piglets_serializers.NomadPigletsGroupSerializer()
 
-    class Meta:
-        model = Location  
-        fields = ['id', 'pigletsGroupCell', 'nomadpigletsgroup']
+#     class Meta:
+#         model = Location  
+#         fields = ['id', 'pigletsGroupCell', 'nomadpigletsgroup']
 
 
-class NomadGroupsListingFromLocationsField(serializers.RelatedField):
-    def to_representation(self, value):
-        nomad_group = NomadPigletsGroup.objects.filter(location=value).first()
-        if nomad_group:
-            return piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data
-        return 'No group'
+# class NomadGroupsListingFromLocationsField(serializers.RelatedField):
+#     def to_representation(self, value):
+#         nomad_group = NomadPigletsGroup.objects.filter(location=value).first()
+#         if nomad_group:
+#             return piglets_serializers.NomadPigletsGroupSerializer(nomad_group).data
+#         return 'No group'
             
 
 class SowTransactionSerializer(serializers.ModelSerializer):
@@ -94,19 +95,19 @@ class PutSowInCellSerializer(serializers.ModelSerializer):
         fields = ('sow', 'cell_number')
 
 
-class PutPigletsInCellSerializer(serializers.Serializer):
-    piglets_transaction_id = serializers.IntegerField()
-    to_cell_number = serializers.IntegerField()
-    quantity = serializers.IntegerField()
+# class PutPigletsInCellSerializer(serializers.Serializer):
+#     piglets_transaction_id = serializers.IntegerField()
+#     to_cell_number = serializers.IntegerField()
+#     quantity = serializers.IntegerField()
     
-    class Meta:
-        fields = ('piglets_transaction_id', 'quantity', 'to_cell_number')
+#     class Meta:
+#         fields = ('piglets_transaction_id', 'quantity', 'to_cell_number')
 
 
-class NomadPigletsTransactionSerializer(serializers.ModelSerializer):
-    from_location = serializers.StringRelatedField()
-    to_location = serializers.StringRelatedField()
+# class NomadPigletsTransactionSerializer(serializers.ModelSerializer):
+#     from_location = serializers.StringRelatedField()
+#     to_location = serializers.StringRelatedField()
     
-    class Meta:
-        model = PigletsTransaction
-        fields = '__all__'
+#     class Meta:
+#         model = PigletsTransaction
+#         fields = '__all__'

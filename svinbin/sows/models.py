@@ -266,12 +266,12 @@ class Gilt(Pig):
     mother_sow = models.ForeignKey(Sow, on_delete=models.SET_NULL, null=True)
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
     status = models.ForeignKey(GiltStatus, on_delete=models.SET_NULL, null=True)
-    new_born_group = models.ForeignKey('piglets.NewBornPigletsGroup', on_delete=models.SET_NULL,
-     null=True, related_name='gilts')
-    merger = models.ForeignKey('gilts_events.GiltMerger', on_delete=models.SET_NULL, null=True,
-        related_name='gilts')
-    casting_list_to_seven_five = models.ForeignKey('gilts_events.CastingListToSevenFiveEvent',
-     on_delete=models.SET_NULL, null=True, related_name='gilts')
+    # new_born_group = models.ForeignKey('piglets.NewBornPigletsGroup', on_delete=models.SET_NULL,
+    #  null=True, related_name='gilts')
+    # merger = models.ForeignKey('gilts_events.GiltMerger', on_delete=models.SET_NULL, null=True,
+    #     related_name='gilts')
+    # casting_list_to_seven_five = models.ForeignKey('gilts_events.CastingListToSevenFiveEvent',
+    #  on_delete=models.SET_NULL, null=True, related_name='gilts')
 
     objects = GiltManager()
 

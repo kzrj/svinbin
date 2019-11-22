@@ -8,13 +8,13 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from sows.models import Sow
-from piglets.models import NomadPigletsGroup
+# from piglets.models import NomadPigletsGroup
 from locations.models import WorkShop, Section, SowSingleCell, SowGroupCell, SowAndPigletsCell, \
     Location
-from transactions.models import SowTransaction, PigletsTransaction
+from transactions.models import SowTransaction
 from transactions import serializers
 from sows import serializers as sows_serializers
-from piglets import serializers as piglets_serializers
+# from piglets import serializers as piglets_serializers
 
 
 class SowTransactionsViewSet(viewsets.ModelViewSet):
@@ -123,33 +123,33 @@ class WorkShopOneTwoSowTransactionViewSet(WorkShopSowTransactionViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class NomadPigletsGroupTransactionsViewSet(viewsets.ModelViewSet):
-    queryset = PigletsTransaction.objects.all()
-    serializer_class = serializers.NomadPigletsTransactionSerializer
+# class NomadPigletsGroupTransactionsViewSet(viewsets.ModelViewSet):
+#     queryset = PigletsTransaction.objects.all()
+#     serializer_class = serializers.NomadPigletsTransactionSerializer
 
 
-class WorkShopNomadPigletsTransactionViewSet(viewsets.ModelViewSet):
-    queryset = NomadPigletsGroup.objects.all()
-    serializer_class = piglets_serializers.NomadPigletsGroupPkSerializer
-    # permission_classes = (TotalOrderPermissions,)
+# class WorkShopNomadPigletsTransactionViewSet(viewsets.ModelViewSet):
+#     queryset = NomadPigletsGroup.objects.all()
+#     serializer_class = piglets_serializers.NomadPigletsGroupPkSerializer
+#     # permission_classes = (TotalOrderPermissions,)
     
-    # def get_serializer_class(self):
-    #     pass
+#     # def get_serializer_class(self):
+#     #     pass
 
-    # делает сотрудник 3 цеха
-    @action(methods=['post'], detail=False)
-    def move_to_workshop_four(self, request):
-        serializer = serializers.NomadPigletsGroupPkSerializer(data=request.data)
-        if serializer.is_valid():
-            # initiator = request.user.workshopemployee    
-            nomad_piglets_group, transaction = \
-                NomadPigletsGroup.objects.move_to(
-                    serializer.validated_data['pk'],
-                    WorkShop.objects.get(number=4))
-            # sow.change_status_to("waiting delivery in workshop three")
-            return Response(
-                {"transaction": serializers.NomadPigletsTransactionSerializer(transaction).data,
-                 "nomad_piglets_group": sows_serializers.NomadPigletsGroupSerializer(nomad_piglets_group).data, },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#     # делает сотрудник 3 цеха
+#     @action(methods=['post'], detail=False)
+#     def move_to_workshop_four(self, request):
+#         serializer = serializers.NomadPigletsGroupPkSerializer(data=request.data)
+#         if serializer.is_valid():
+#             # initiator = request.user.workshopemployee    
+#             nomad_piglets_group, transaction = \
+#                 NomadPigletsGroup.objects.move_to(
+#                     serializer.validated_data['pk'],
+#                     WorkShop.objects.get(number=4))
+#             # sow.change_status_to("waiting delivery in workshop three")
+#             return Response(
+#                 {"transaction": serializers.NomadPigletsTransactionSerializer(transaction).data,
+#                  "nomad_piglets_group": sows_serializers.NomadPigletsGroupSerializer(nomad_piglets_group).data, },
+#                 status=status.HTTP_200_OK)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

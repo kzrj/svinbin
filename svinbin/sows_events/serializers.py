@@ -3,7 +3,7 @@ from rest_framework import serializers, status
 
 from sows.models import Sow
 from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow
-from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger
+# from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger
 from tours.models import Tour
 
 from sows.serializers import SowSerializer

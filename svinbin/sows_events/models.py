@@ -6,7 +6,7 @@ from django.db import connection
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import Event, CoreModel, CoreModelManager
-from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
+# from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
 from tours.models import Tour
 from locations.models import WorkShop, Location
 # from sows.models import Sow
@@ -165,31 +165,31 @@ class SowFarrowManager(CoreModelManager):
 
         sow.change_status_to('Опоросилась')
 
-        # check is it first sow_farrow in current tour
-        previous_farrow_in_tour = SowFarrow.objects.filter(sow=sow, tour=tour).first()
-        if previous_farrow_in_tour:
-            new_born_piglets_group = previous_farrow_in_tour.new_born_piglets_group
-            new_born_piglets_group.add_piglets(alive_quantity)
-        else:
-            new_born_piglets_group = NewBornPigletsGroup.objects.create(
-                location=sow.location,
-                start_quantity=alive_quantity,
-                quantity=alive_quantity,
-                tour=tour
-                )
+        # # check is it first sow_farrow in current tour
+        # previous_farrow_in_tour = SowFarrow.objects.filter(sow=sow, tour=tour).first()
+        # if previous_farrow_in_tour:
+        #     new_born_piglets_group = previous_farrow_in_tour.new_born_piglets_group
+        #     new_born_piglets_group.add_piglets(alive_quantity)
+        # else:
+        #     new_born_piglets_group = NewBornPigletsGroup.objects.create(
+        #         location=sow.location,
+        #         start_quantity=alive_quantity,
+        #         quantity=alive_quantity,
+        #         tour=tour
+        #         )
 
-        farrow = self.create(sow=sow, tour=tour, initiator=initiator,
-                date=timezone.now(), alive_quantity=alive_quantity,
-                dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
-                new_born_piglets_group=new_born_piglets_group
-                )
+        # farrow = self.create(sow=sow, tour=tour, initiator=initiator,
+        #         date=timezone.now(), alive_quantity=alive_quantity,
+        #         dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
+        #         new_born_piglets_group=new_born_piglets_group
+        #         )
         
-        return farrow
+        # return farrow
 
 
 class SowFarrow(SowEvent):
-    new_born_piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.SET_NULL,
-     null=True, related_name='farrows')
+    # new_born_piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.SET_NULL,
+    #  null=True, related_name='farrows')
     alive_quantity = models.IntegerField(default=0)
     dead_quantity = models.IntegerField(default=0)
     mummy_quantity = models.IntegerField(default=0)

@@ -3,11 +3,9 @@ import random
 
 from locations.models import Location, SowSingleCell, SowGroupCell, Section, WorkShop, \
     SowAndPigletsCell, PigletsGroupCell
-from transactions.models import PigletsTransaction
 from sows.models import Sow, SowStatus, Gilt, Boar
-from piglets.models import NewBornPigletsGroup
 from sows_events.models import Semination, SowFarrow
-from piglets_events.models import NewBornPigletsMerger
+
 
 FARM_ID_COUNT = 100000
 

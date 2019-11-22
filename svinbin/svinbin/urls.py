@@ -41,7 +41,7 @@ router.register(r'sows_events/farrows', sows_events_views.SowFarrowViewSet, base
 router.register(r'sows_events/spec_uboi', sows_events_views.CullingSowViewSet, basename='spec_uboi')
 
 # cells
-router.register(r'pigletsgroupcells', locations_views.PigletsGroupCellViewSet, basename='pigletsgroupcell')
+# router.register(r'pigletsgroupcells', locations_views.PigletsGroupCellViewSet, basename='pigletsgroupcell')
 
 # by workshops
 # workshop one two
@@ -49,8 +49,8 @@ router.register(r'workshoponetwo/sows', workshoponetwo_views.WorkShopOneTwoSowVi
  basename='workshoponetwo-sows')
 
 # workshop three
-router.register(r'workshopthree/newbornpiglets', workshopthree_views.WorkShopThreeNewBornPigletsViewSet, \
- basename='workshopthree-piglets')
+# router.register(r'workshopthree/newbornpiglets', workshopthree_views.WorkShopThreeNewBornPigletsViewSet, \
+ # basename='workshopthree-piglets')
 router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsViewSet, \
  basename='workshopthree-sows')
 router.register(r'workshopthree/wsinfo', workshopthree_views.WorkshopInfo, \
@@ -75,12 +75,12 @@ router.register(r'users', staff_views.UsersViewSet, \
  basename='users')
 
 # nomad piglets
-router.register(r'nomadpiglets', piglets_views.WorkShopNomadPigletsViewSet, \
- basename='nomadpiglets')
+# router.register(r'nomadpiglets', piglets_views.WorkShopNomadPigletsViewSet, \
+#  basename='nomadpiglets')
 
 # inits
-router.register(r'inits', piglets_views.WorkShopNomadPigletsViewSet, \
- basename='piglets')
+# router.register(r'inits', piglets_views.WorkShopNomadPigletsViewSet, \
+ # basename='piglets')
 
 schema_view = get_swagger_view(title='API Docs')
 
