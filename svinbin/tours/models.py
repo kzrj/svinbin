@@ -7,17 +7,10 @@ from core.models import CoreModel, CoreModelManager
 from sows_events import models as events_models
 from sows import models as sows_models
 from piglets import models as piglets_models
-from piglets_events import models as piglets_events_models
 
 
 class TourQuerySet(models.QuerySet):
-    def get_recounts_balance_data(self):
-        data = list()
-        for tour in self.prefetch_related('new_born_piglets'):
-            # data[str(tour)] = tour.get_recount_balance_info
-            data.append(tour.get_recount_balance_info)
-        return data
-
+    pass
 
 class TourManager(CoreModelManager):
     def get_queryset(self):
@@ -40,16 +33,6 @@ class TourManager(CoreModelManager):
             .values_list('tour', flat=True))
         tours_list = list(set(tours_list))
         return self.get_queryset().filter(pk__in=tours_list).prefetch_related('sows')
-
-    # move to workshop or create analog
-    def get_tours_in_workshop_by_sows_and_piglets(self, workshop):
-        sows_tours_list = list(sows_models.Sow.objects.get_all_sows_in_workshop(workshop) \
-            .values_list('tour', flat=True))
-        piglets_tours_list = list(piglets_models.NewBornPigletsGroup.objects.all() \
-            .get_all_in_workshop(workshop) \
-            .values_list('tour', flat=True))
-        tours_list = list(set(sows_tours_list + piglets_tours_list))
-        return self.get_queryset().filter(pk__in=tours_list)
 
     def create_or_return_by_raw(self, raw_tour):
         week_number = int(raw_tour[2:])
@@ -87,43 +70,9 @@ class Tour(CoreModel):
         ultrasounds = events_models.Ultrasound.objects.filter(tour=self, result=False)
         return sows_models.Sow.objects.filter(ultrasound__in=ultrasounds)
 
-    @property
-    def get_positive_recounts_balance(self):
-        return piglets_events_models.NewBornPigletsGroupRecount.objects \
-            .get_recounts_with_positive_balance(self.new_born_piglets.all()) \
-            .get_sum_balance()
-
-    @property
-    def get_negative_recounts_balance(self):
-        return piglets_events_models.NewBornPigletsGroupRecount.objects \
-            .get_recounts_with_negative_balance(self.new_born_piglets.all()) \
-            .get_sum_balance()
-
-    @property
-    def get_recount_balance_info(self):
-        negative, positive = self.get_negative_recounts_balance, self.get_positive_recounts_balance
-        return {
-            'title': str(self),
-            'negative': negative,
-            'positive': positive,
-            'balance': negative + positive,
-            'count_newborn_piglets': self.new_born_piglets.all().aggregate(models.Sum('quantity'))\
-                ['quantity__sum']
-        }
-
 
 class MetaTourManager(CoreModelManager):
-    def create_metatour(self):
-        pass
-
-    def create_metatour_from_farrow(self, farrow):
-        pass
-
-    def create_metatour_from_merge(self, merge):
-        pass
-
-    def create_metatour_from_split(self, split):
-        pass
+    pass
 
 
 class MetaTour(CoreModel):
@@ -135,7 +84,18 @@ class MetaTour(CoreModel):
         return 'Piglets {} MetaTour {}'.format(self.piglets, self.pk)
 
 
+class MetaTourRecordQuerySet(models.QuerySet):
+    def sum_quantity_by_tour(self, tour):
+        return self.filter(tour=tour).aggregate(models.Sum('quantity'))['quantity__sum']
+
+    def get_set_of_tours(self):
+        return Tour.objects.filter(metatourrecords__in=self).distinct()
+
+
 class MetaTourRecordManager(CoreModelManager):
+    def get_queryset(self):
+        return MetaTourRecordQuerySet(self.model, using=self._db)
+
     def create_record(self, metatour, tour, quantity, total_quantity):
         percentage = (quantity * 100) / total_quantity
         return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage)
@@ -148,6 +108,9 @@ class MetaTourRecord(CoreModel):
     percentage = models.FloatField()
 
     objects = MetaTourRecordManager()
+
+    class Meta:
+        ordering = ['tour', ]
 
     def __str__(self):
         return 'MetaTourRecord {}'.format(self.pk)

@@ -4,9 +4,9 @@ from django.core.exceptions import ValidationError
 
 # import sows.models as sows_models
 import piglets.models as piglets_models
+import tours.models as tours_models
 # import piglets_events.models as piglets_events_models
-# import tours.models as tours_models
-# import locations.models as locations_models
+import locations.models as locations_models
 
 import locations.testing_utils as locations_testing
 # import sows.testing_utils as sows_testing
@@ -19,7 +19,17 @@ class PigletsModelManagerQuerysetTest(TestCase):
         # sows_testing.create_statuses()
 
     def test_groups_with_gilts(self):
-        print('hello')
+        tour = tours_models.Tour.objects.get_or_create_by_week_in_current_year(1)
+        location = locations_models.Location.objects.get(section__number=1, section__workshop__number=3)
+        piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(tour, location, 10)
+
+        record = piglets.metatour.records.first()
+
+        print(record)
+        print(record.tour)
+        print(record.quantity)
+        print(record.percentage)
+        
         # new_born_group1 = piglets_testing.create_new_born_group(cell_number=5)
 #         sow1 = new_born_group1.farrows.first().sow
 #         gilt1 = sows_models.Gilt.objects.create_gilt(1, new_born_group1)

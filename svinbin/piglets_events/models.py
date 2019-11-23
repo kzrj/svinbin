@@ -1,166 +1,60 @@
 # -*- coding: utf-8 -*-
-# from django.db import models
-# from django.utils import timezone
-# from django.core.exceptions import ValidationError as DjangoValidationError
+from django.db import models
+from django.utils import timezone
+from django.core.exceptions import ValidationError as DjangoValidationError
 
-# from core.models import Event, CoreModel, CoreModelManager
-# from piglets.models import NewBornPigletsGroup, NomadPigletsGroup, PigletsStatus
-# from locations.models import Location, SowAndPigletsCell
-
-
-# class PigletsEvent(Event):
-#     class Meta:
-#         abstract = True
+from core.models import Event, CoreModel, CoreModelManager
+from piglets.models import Piglets, PigletsStatus
+from locations.models import Location
+from tours.models import MetaTour, MetaTourRecord, Tour
 
 
-# class PigletsMerger(PigletsEvent):
-#     class Meta:
-#         abstract = True
+class PigletsEvent(Event):
+    class Meta:
+        abstract = True
 
 
-# class PigletsMergerManager(CoreModelManager):
-#     pass
+class PigletsMergerManager(CoreModelManager):
+    def create_merger_return_group(self, parent_piglets, new_location, initiator=None,
+         date=timezone.now()):
+        if isinstance(parent_piglets, list):
+            pks = [group.pk for group in new_born_piglets_groups]
+            parent_piglets = Piglets.objects.filter(pk__in=pks)
+
+        # create child piglets
+        total_quantity = parent_piglets.get_total_quantity()
+        gilts_quantity = parent_piglets.get_total_gilts_quantity()
+
+        piglets = Piglets.objects.create(location=new_location, status=None, start_quantity=total_quantity,
+            quantity=total_quantity, gilts_quantity=gilts_quantity)
+
+        # create metatour
+        metatour = MetaTour.objects.create(piglets=piglets)
+
+        # get all relative metatour records of parent piglets
+        parent_records = MetaTourRecord.objects.filter(metatour__piglets__in=parent_piglets)
+
+        # get set of tours from records then create records for each tour
+        for tour in parent_records.get_set_of_tours():
+            tour.metatourrecords.create_record(metatour, tour, parent_records.sum_quantity_by_tour(tour),
+             total_quantity)
+
+        # create merger
+        merger = self.create(created_piglets=piglets, initiator=initiator, date=timezone.now())
+
+        # deactivate and update piglets 
+        parent_piglets.update(active=False, merger_as_parent=merger)
+
+        return piglets
 
 
-# class NewBornPigletsMergerManager(PigletsMergerManager):
-#     def create_merger_without_groups(self, initiator=None):
-#         new_born_merger = self.create(initiator=initiator, date=timezone.now())
-#         return new_born_merger
+class PigletsMerger(PigletsEvent):
+    created_piglets = models.OneToOneField(Piglets, on_delete=models.SET_NULL, null=True,
+     related_name='merger_as_child')
 
-#     def create_merger(self, new_born_piglets_groups, part_number=None, initiator=None):
-#         new_born_merger = self.create(initiator=initiator, date=timezone.now(),
-#             part_number=part_number)
-#         if isinstance(new_born_piglets_groups, list):
-#             pks = [group.pk for group in new_born_piglets_groups]
-#             new_born_piglets_groups = NewBornPigletsGroup.objects.filter(pk__in=pks)
-        
-#         new_born_piglets_groups.update(merger=new_born_merger)
-#         return new_born_merger
-
-#     def create_merger_and_return_nomad_piglets_group(self, new_born_piglets_groups, 
-#             part_number=None, initiator=None):
-#         new_born_merger = self.create_merger(new_born_piglets_groups, initiator=initiator,
-#             part_number=part_number)
-#         return new_born_merger, new_born_merger.create_nomad_group()
+    objects = PigletsMergerManager()
 
 
-# class NewBornPigletsMerger(PigletsMerger):
-#     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
-#      related_name='creating_new_born_merger')
-#     part_number = models.IntegerField(null=True)
-
-#     objects = NewBornPigletsMergerManager()
-
-#     def add_piglets_group(self, new_born_piglets_group):
-#         new_born_piglets_group.update(merger=self)
-
-#     def get_first_tour(self):
-#         return self.piglets_groups.all().first().tour
-
-#     def get_next_tour(self, existing_tours):
-#         group = self.piglets_groups.exclude(tour__in=existing_tours).first()
-#         if group:
-#             return group.tour
-#         return group
-
-#     def get_piglets_groups_by_tour(self, tour):
-#         return self.piglets_groups.filter(tour=tour)
-
-#     def count_all_piglets(self):
-#         return self.piglets_groups.aggregate(models.Sum('quantity'))['quantity__sum']
-
-#     def count_quantity_by_tour(self, tour):
-#         piglets_groups = self.get_piglets_groups_by_tour(tour)
-#         return piglets_groups.aggregate(models.Sum('quantity'))['quantity__sum']
-
-#     def get_percentage_by_tour(self, tour):
-#         count_piglets_by_tour = self.count_quantity_by_tour(tour)
-#         count_all_piglets = self.count_all_piglets()
-
-#         return (count_piglets_by_tour * 100) / count_all_piglets
-
-#     def get_percentage_by_tour_less_queries(self, count_piglets_by_tour, count_all_piglets):
-#         return (count_piglets_by_tour * 100) / count_all_piglets
-
-#     def count_quantity_and_percentage_by_tours(self):
-#         tour = self.get_first_tour()
-#         tours = [tour]
-#         quantity_by_tours = list()
-#         quantity_all_piglets = self.count_all_piglets()
-        
-#         while tour:
-#             count_quantity_by_tour = self.count_quantity_by_tour(tour)
-
-#             quantity_by_tours.append(
-#                 (
-#                     tour, 
-#                     count_quantity_by_tour,
-#                     self.get_percentage_by_tour_less_queries(count_quantity_by_tour, quantity_all_piglets)
-#                 )
-#             )
-
-#             tour = self.get_next_tour(tours)
-#             tours.append(tour)
-
-#         return quantity_by_tours
-
-#     def create_records(self):
-#         return NewBornMergerRecord.objects.create_records(self)
-
-#     def create_nomad_group(self):
-#         location = Location.objects.get(workshop__number=3)
-#         # self.create_records()
-#         NewBornMergerRecord.objects.create_records(self)
-#         nomad_group = NomadPigletsGroup.objects.create(location=location,
-#          start_quantity=self.count_all_piglets(), quantity=self.count_all_piglets(),
-#          status=PigletsStatus.objects.get(title='Готовы ко взвешиванию')
-#          )
-#         self.nomad_group = nomad_group
-#         self.save()
-#         self.piglets_groups.reset_quantity_and_deactivate()
-
-#         return nomad_group
-
-#     def add_new_born_group(self, new_born_group):
-#         new_born_group.merger = self
-#         new_born_group.save()
-
-#     @property
-#     def cells(self):
-#         groups = NewBornPigletsGroup.objects.get_with_inactive().filter(merger=self)
-#         locations = groups.values_list('location', flat=True)
-#         cells = SowAndPigletsCell.objects. \
-#             filter(location__id__in=locations).values_list('number', flat=True)
-#         return cells
-
-
-# class MergerRecord(CoreModel):
-#     class Meta:
-#         abstract = True
-
-
-# class MergerRecordManager(CoreModelManager):
-#     pass
-
-
-# class NewBornMergerRecordManager(MergerRecordManager):
-#     def create_records(self, merger):
-#         # create records for each tour
-#         if not merger.records.all().first():
-#             for init_data in merger.count_quantity_and_percentage_by_tours():
-#                 self.create(merger=merger, tour=init_data[0], quantity=init_data[1],
-#                  percentage=init_data[2])
-
-#         return merger.records.all()
-
-
-# class NewBornMergerRecord(MergerRecord):
-#     merger = models.ForeignKey(NewBornPigletsMerger, on_delete=models.CASCADE, related_name="records")
-#     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
-#     quantity = models.IntegerField()
-#     percentage = models.FloatField()
-
-#     objects = NewBornMergerRecordManager()
 
 
 # class SplitPigletsGroup(PigletsEvent):
@@ -215,77 +109,6 @@
 #         related_name='split_event')
 
 #     objects = SplitNomadPigletsGroupManager()
-
-
-# class NomadPigletsGroupMergerManager(PigletsMergerManager):
-#     def create_nomad_merger(self, nomad_groups, new_location, initiator=None):
-#         nomad_groups_merger = self.create(date=timezone.now(), new_location=new_location,
-#          initiator=initiator)
-
-#         if isinstance(nomad_groups, list):
-#             pks = [group.pk for group in nomad_groups]
-#             nomad_groups = NomadPigletsGroup.objects.filter(pk__in=pks)
-
-#         nomad_groups.update(groups_merger=nomad_groups_merger,
-#             status=PigletsStatus.objects.get(title='Объединены с другой группой'))
-
-#         return nomad_groups_merger
-
-#     def create_merger_and_return_nomad_piglets_group(self, nomad_groups, new_location, initiator=None):
-#         nomad_merger = self.create_nomad_merger(nomad_groups=nomad_groups, new_location=new_location,
-#          initiator=initiator)
-#         nomad_merger.create_records()
-#         return nomad_merger.create_nomad_group()
-
-
-# class NomadPigletsGroupMerger(PigletsMerger):
-#     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
-#      related_name='creating_nomad_merger')
-#     new_location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL, null=True,
-#      related_name='creating_nomad_merger')
-
-#     objects = NomadPigletsGroupMergerManager()
-
-#     def count_all_piglets(self):
-#         return self.groups_merger.aggregate(models.Sum('quantity'))['quantity__sum']
-
-#     def count_all_gilts(self):
-#         return self.groups_merger.aggregate(models.Sum('gilts_quantity'))['gilts_quantity__sum']
-
-#     def create_records(self):
-#         return NomadMergerRecord.objects.create_records(self)
-
-#     def create_nomad_group(self):
-#         quantity = self.count_all_piglets()
-#         gilts_quantity = self.count_all_gilts()
-#         nomad_group = NomadPigletsGroup.objects.create(start_quantity=quantity,
-#             quantity=quantity, location=self.new_location, gilts_quantity=gilts_quantity)
-#         self.nomad_group = nomad_group
-#         self.save()
-#         self.groups_merger.reset_quantity_and_deactivate()
-#         return nomad_group
-
-
-# class NomadMergerRecordManager(MergerRecordManager):
-#     def create_records(self, merger):
-#         if not merger.records.all().first():
-#             for merge_nomad_group in merger.groups_merger.all():
-#                 percentage = (merge_nomad_group.quantity * 100) / merger.count_all_piglets()
-#                 self.create(merger=merger, quantity=merge_nomad_group.quantity,
-#                  nomad_group=merge_nomad_group,
-#                  percentage=percentage)
-
-#         return merger.records.all()
-
-
-# class NomadMergerRecord(MergerRecord):
-#     merger = models.ForeignKey(NomadPigletsGroupMerger, on_delete=models.CASCADE,
-#      related_name="records")
-#     nomad_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True)
-#     quantity = models.IntegerField()
-#     percentage = models.FloatField()
-
-#     objects = NomadMergerRecordManager()
 
 
 # class RecountQuerySet(models.QuerySet):

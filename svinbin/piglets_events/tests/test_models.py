@@ -2,44 +2,136 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 
-# import piglets_events.models as piglets_events_models
-import piglets.models as piglets_models
-# import locations.models as locations_models
+from piglets.models import Piglets
+from piglets_events.models import PigletsMerger
+from tours.models import Tour
+from locations.models import Location
 
 import locations.testing_utils as locations_testing
-# import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
 
-class NewBornMergerModelTest(TestCase):
+class PigletsMergerModelTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         # sows_testing.create_statuses()
-        piglets_testing.create_piglets_statuses()
+        piglets_testing.create_piglets_statuses()       
 
-        self.piglets_group1 = piglets_testing.create_new_group(
-            section_number=1,
-            cell_number=4,
-            week=1,
-            quantity=10)
-        
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.tour3 = Tour.objects.get_or_create_by_week_in_current_year(week_number=3)
+        self.tour4 = Tour.objects.get_or_create_by_week_in_current_year(week_number=4)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
 
-        # self.piglets_groups_same_tour = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
-        #     [self.piglets_group4.pk, self.piglets_group5.pk])
-        # self.piglets_groups_two_tours = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
-        #     [self.piglets_group1.pk, self.piglets_group2.pk, self.piglets_group3.pk])
+    def test_create_merger_return_group_v1(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 10)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3, 10)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3, 10)
 
-        # self.new_born_merger_same_tour = piglets_events_models.NewBornPigletsMerger.objects \
-        #     .create_merger(self.piglets_groups_same_tour)
-        # self.new_born_merger_two_tours = piglets_events_models.NewBornPigletsMerger.objects \
-        #     .create_merger(self.piglets_groups_two_tours)
+        piglets_qs = Piglets.objects.all()
 
-        # self.tour1 = self.new_born_merger_two_tours.get_first_tour()
+        piglets = PigletsMerger.objects.create_merger_return_group(parent_piglets=piglets_qs,
+            new_location=self.loc_ws3)
 
-    def test_first(self):
-        print('hello!')
-        pass
+        mtTourRecords = piglets.metatour.records.all()
 
+        self.assertEqual(mtTourRecords.count(), 2)
+
+        self.assertEqual(mtTourRecords[0].tour, self.tour1)
+        self.assertEqual(mtTourRecords[0].quantity, 10)
+        self.assertEqual(round(mtTourRecords[0].percentage), 33)
+       
+        self.assertEqual(mtTourRecords[1].tour, self.tour2)
+        self.assertEqual(mtTourRecords[1].quantity, 20)
+        self.assertEqual(round(mtTourRecords[1].percentage), 67)
+
+        piglets1.refresh_from_db()
+        self.assertEqual(piglets1.active, False)
+
+    def test_create_merger_return_group_v1(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 10)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3, 10)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3, 10)
+        piglets_qs1 = Piglets.objects.filter(pk__in=[piglets1.pk, piglets2.pk, piglets3.pk])
+        child_piglets1 = PigletsMerger.objects.create_merger_return_group(parent_piglets=piglets_qs1,
+            new_location=self.loc_ws3)
+
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour3,
+            self.loc_ws3, 10)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour4,
+            self.loc_ws3, 10)
+        piglets_qs2 = Piglets.objects.filter(pk__in=[piglets4.pk, piglets5.pk])
+        child_piglets2 = PigletsMerger.objects.create_merger_return_group(parent_piglets=piglets_qs2,
+            new_location=self.loc_ws3)
+
+        piglets_qs3 = Piglets.objects.filter(pk__in=[child_piglets1.pk, child_piglets2.pk])
+        child_piglets3 = PigletsMerger.objects.create_merger_return_group(parent_piglets=piglets_qs3,
+            new_location=self.loc_ws3)
+
+        mtTourRecords = child_piglets3.metatour.records.all()
+
+        self.assertEqual(mtTourRecords.count(), 4)
+
+        self.assertEqual(mtTourRecords[0].tour, self.tour1)
+        self.assertEqual(mtTourRecords[0].quantity, 10)
+        self.assertEqual(round(mtTourRecords[0].percentage), 20)
+       
+        self.assertEqual(mtTourRecords[1].tour, self.tour2)
+        self.assertEqual(mtTourRecords[1].quantity, 20)
+        self.assertEqual(round(mtTourRecords[1].percentage), 40)
+
+        self.assertEqual(mtTourRecords[2].tour, self.tour3)
+        self.assertEqual(mtTourRecords[2].quantity, 10)
+        self.assertEqual(round(mtTourRecords[2].percentage), 20)
+       
+        self.assertEqual(mtTourRecords[3].tour, self.tour4)
+        self.assertEqual(mtTourRecords[3].quantity, 10)
+        self.assertEqual(round(mtTourRecords[3].percentage), 20)
+
+        piglets1.refresh_from_db()
+        self.assertEqual(piglets1.active, False)
+
+
+    # def test_create_merger_return_group_v2(self):
+    #     piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+    #         self.loc_ws3, 10)
+    #     piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+    #         self.loc_ws3, 10)
+    #     piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+    #         self.loc_ws3, 10)
+    #     piglets_qs = Piglets.objects.all()
+    #     child_piglets1, childmetatour = PigletsMerger.objects.create_merger_return_group(parent_piglets=piglets_qs,
+    #         new_location=self.loc_ws3)
+
+
+    #     piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+    #         self.loc_ws3, 10)
+    #     piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+    #         self.loc_ws3, 10)
+    #     piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+    #         self.loc_ws3, 10)
+    #     piglets_qs2 = Piglets.objects.all()
+    #     piglets, metatour = PigletsMerger.objects.create_merger_return_group(parent_piglets=piglets_qs,
+    #         new_location=self.loc_ws3)
+
+    #     self.assertEqual(metatour.records.all().count(), 2)
+
+    #     self.assertEqual(metatour.records.all()[0].tour, self.tour1)
+    #     self.assertEqual(metatour.records.all()[0].quantity, 10)
+    #     self.assertEqual(round(metatour.records.all()[0].percentage), 33)
+       
+    #     self.assertEqual(metatour.records.all()[1].tour, self.tour2)
+    #     self.assertEqual(metatour.records.all()[1].quantity, 20)
+    #     self.assertEqual(round(metatour.records.all()[1].percentage), 67)
+
+    #     piglets1.refresh_from_db()
+    #     self.assertEqual(piglets1.active, False)
 
 #     def test_get_next_tour(self):
 #         next_tour = self.new_born_merger_two_tours.get_next_tour([self.tour1])
