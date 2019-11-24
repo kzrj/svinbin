@@ -60,9 +60,9 @@ class Piglets(CoreModel):
     #     self.quantity = self.quantity - quantity
     #     self.save()
 
-    # def change_status_to(self, status_title):
-    #     self.status = PigletsStatus.objects.get(title=status_title)
-    #     self.save()
+    def change_status_to(self, status_title):
+        self.status = PigletsStatus.objects.get(title=status_title)
+        self.save()
 
     # def add_gilts(self, quantity):
     #     self.gilts_quantity += quantity

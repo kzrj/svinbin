@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from piglets.models import Piglets
-from piglets_events.models import PigletsMerger, PigletsSplit
+from piglets_events.models import PigletsMerger, PigletsSplit, WeighingPiglets
 from tours.models import Tour
 from locations.models import Location
 
@@ -134,23 +134,37 @@ class PigletsMergerModelTest(TestCase):
         self.assertEqual(child_piglets2.metatour.records.all()[1].quantity, 67)
         self.assertEqual(child_piglets2.metatour.records.all()[1].percentage, 67.0)
 
+    def test_split_validate(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 100)
+        piglets_qs = Piglets.objects.all()
+        piglets = PigletsMerger.objects.create_merger_return_group(parent_piglets=piglets_qs,
+            new_location=self.loc_ws3)
 
-# class WeighingPigletsTest(TestCase):
-#     def setUp(self):
-#         locations_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
+        with self.assertRaises(ValidationError):
+            child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
+                parent_piglets=piglets, new_amount=100)
 
-#     def test_create_weighing(self):
-#         piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
-#         weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
-#             piglets_group=piglets_group, total_weight=670, place='3/4'
-#             )
-#         self.assertEqual(weighing_record.piglets_group, piglets_group)
-#         self.assertEqual(weighing_record.total_weight, 670)
-#         self.assertEqual(weighing_record.average_weight, 670/piglets_group.quantity)
-#         self.assertEqual(weighing_record.piglets_quantity, piglets_group.quantity)
-#         self.assertEqual(weighing_record.place, '3/4')
+
+class WeighingPigletsTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        piglets_testing.create_piglets_statuses()
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+
+    def test_create_weighing(self):
+        piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 101)
+
+        weighing_record = WeighingPiglets.objects.create_weighing(
+            piglets_group=piglets, total_weight=670, place='3/4'
+            )
+        self.assertEqual(weighing_record.piglets_group, piglets)
+        self.assertEqual(weighing_record.total_weight, 670)
+        self.assertEqual(weighing_record.average_weight, round((670 / piglets.quantity), 2))
+        self.assertEqual(weighing_record.piglets_quantity, piglets.quantity)
+        self.assertEqual(weighing_record.place, '3/4')
 
 
 # class CullingPigletsTest(TestCase):

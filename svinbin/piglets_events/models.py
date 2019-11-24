@@ -117,6 +117,71 @@ class PigletsSplit(PigletsEvent):
         return 'PigletsSplit {}'.format(self.pk)
 
 
+class WeighingPigletsManager(CoreModelManager):
+    def create_weighing(self, piglets_group, total_weight, place, initiator=None):
+        weighing_record = self.create(
+            piglets_group=piglets_group,
+            total_weight=total_weight,
+            average_weight=round((total_weight / piglets_group.quantity), 2),
+            place=place,
+            piglets_quantity=piglets_group.quantity,
+            initiator=initiator,
+            date=timezone.now())
+
+        piglets_group.change_status_to('Взвешены, готовы к заселению')
+        return weighing_record
+
+
+class WeighingPiglets(PigletsEvent):
+    WEIGHING_PLACES = [('3/4', '3/4'), ('4/8', '4/8'), ('8/5', '8/5'), ('8/6', '8/6'),
+        ('8/7', '8/7')]
+
+    piglets_group = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name="weighing_records")
+    total_weight = models.FloatField()
+    average_weight = models.FloatField()
+    piglets_quantity = models.IntegerField()
+    place = models.CharField(max_length=10, choices=WEIGHING_PLACES)
+
+    objects = WeighingPigletsManager()
+
+
+# class CullingPigletsManager(CoreModelManager):
+#     def create_culling_piglets(self, piglets_group, culling_type, quantity=1, reason=None, initiator=None):
+#         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
+#             date=timezone.now(), initiator=initiator, quantity=1)
+#         piglets_group.remove_piglets(quantity)
+#         return culling
+
+#     def create_culling_gilt(self, piglets_group, culling_type, quantity=1, reason=None, initiator=None):
+#         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
+#             date=timezone.now(), initiator=initiator, quantity=1, is_it_gilt=True)
+#         piglets_group.remove_gilts(quantity)
+#         return culling      
+
+
+# class CullingPiglets(PigletsEvent):
+#     CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka')]
+#     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
+#     quantity = models.IntegerField(default=1)
+#     reason = models.CharField(max_length=200, null=True)
+
+#     is_it_gilt = models.BooleanField(default=False)
+
+#     class Meta:
+#         abstract = True
+
+
+# class CullingNewBornPiglets(CullingPiglets):
+#     piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.CASCADE)
+
+#     objects = CullingPigletsManager()
+
+
+# class CullingNomadPiglets(CullingPiglets):
+#     piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE)
+
+#     objects = CullingPigletsManager()
+
 
 # class RecountQuerySet(models.QuerySet):
 #     def get_sum_balance(self):
@@ -165,66 +230,3 @@ class PigletsSplit(PigletsEvent):
 # class NomadPigletsGroupRecount(Recount):
 #     piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE,
 #         related_name="recounts")
-
-
-# class CullingPigletsManager(CoreModelManager):
-#     def create_culling_piglets(self, piglets_group, culling_type, quantity=1, reason=None, initiator=None):
-#         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
-#             date=timezone.now(), initiator=initiator, quantity=1)
-#         piglets_group.remove_piglets(quantity)
-#         return culling
-
-#     def create_culling_gilt(self, piglets_group, culling_type, quantity=1, reason=None, initiator=None):
-#         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
-#             date=timezone.now(), initiator=initiator, quantity=1, is_it_gilt=True)
-#         piglets_group.remove_gilts(quantity)
-#         return culling      
-
-
-# class CullingPiglets(PigletsEvent):
-#     CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka')]
-#     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
-#     quantity = models.IntegerField(default=1)
-#     reason = models.CharField(max_length=200, null=True)
-
-#     is_it_gilt = models.BooleanField(default=False)
-
-#     class Meta:
-#         abstract = True
-
-
-# class CullingNewBornPiglets(CullingPiglets):
-#     piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.CASCADE)
-
-#     objects = CullingPigletsManager()
-
-
-# class CullingNomadPiglets(CullingPiglets):
-#     piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE)
-
-#     objects = CullingPigletsManager()
-
-
-# class WeighingPigletsManager(CoreModelManager):
-#     def create_weighing(self, piglets_group, total_weight, place, initiator=None):
-#         weighing_record = self.create(piglets_group=piglets_group, total_weight=total_weight,
-#             average_weight=(total_weight / piglets_group.quantity), place=place,
-#             piglets_quantity=piglets_group.quantity,
-#             initiator=initiator, date=timezone.now())
-#         piglets_group.change_status_to('Взвешены, готовы к заселению')
-#         return weighing_record
-
-
-# class WeighingPiglets(PigletsEvent):
-#     WEIGHING_PLACES = [('3/4', '3/4'), ('4/8', '4/8'), ('8/5', '8/5'), ('8/6', '8/6'),
-#         ('8/7', '8/7')]
-
-#     piglets_group = models.ForeignKey(NomadPigletsGroup, on_delete=models.CASCADE,
-#      related_name="weighing_records")
-#     total_weight = models.FloatField()
-#     average_weight = models.FloatField()
-#     piglets_quantity = models.IntegerField()
-#     place = models.CharField(max_length=10, choices=WEIGHING_PLACES)
-
-#     objects = WeighingPigletsManager()
-
