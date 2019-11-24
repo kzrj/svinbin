@@ -36,8 +36,9 @@ class PigletsMergerManager(CoreModelManager):
 
         # get set of tours from records then create records for each tour
         for tour in parent_records.get_set_of_tours():
-            tour.metatourrecords.create_record(metatour, tour, parent_records.sum_quantity_by_tour(tour),
-             total_quantity)
+            tour.metatourrecords.create_record(metatour=metatour, tour=tour,
+             quantity=parent_records.sum_quantity_by_tour(tour),
+             total_quantity=total_quantity)
 
         # create merger
         merger = self.create(created_piglets=piglets, initiator=initiator, date=timezone.now())
@@ -55,60 +56,66 @@ class PigletsMerger(PigletsEvent):
     objects = PigletsMergerManager()
 
 
+class PigletsSplitManager(CoreModelManager):
+    def split_return_groups(self, parent_piglets, new_amount, new_gilts_amount=0, initiator=None,
+         date=timezone.now()):
+        if isinstance(parent_piglets, list):
+            pks = [group.pk for group in new_born_piglets_groups]
+            parent_piglets = Piglets.objects.filter(pk__in=pks)
 
+        # validate
+        if new_amount >= parent_piglets.quantity:
+            raise DjangoValidationError(message='new_amount >= parent_piglets.quantity')
 
-# class SplitPigletsGroup(PigletsEvent):
-#     class Meta:
-#         abstract = True
+        # create split record
+        split_record = self.create(parent_piglets=parent_piglets)
 
+        # create two groups with metatours
+        piglets1 = Piglets.objects.create(location=parent_piglets.location,
+            status=None,
+            start_quantity=(parent_piglets.quantity - new_amount),
+            quantity=(parent_piglets.quantity - new_amount),
+            gilts_quantity=(parent_piglets.gilts_quantity - new_gilts_amount),
+            split_as_child=split_record)
+        metatour1 = MetaTour.objects.create(piglets=piglets1)
 
-# class SplitNomadPigletsGroupManager(CoreModelManager):
-#     def _create_split_group(self, split_event, quantity, initiator=None, gilts_quantity=0):
-#         parent_nomad_group = split_event.parent_group
-#         return NomadPigletsGroup.objects.create(location=parent_nomad_group.location,
-#             start_quantity=quantity,
-#             quantity=quantity,
-#             split_record=split_event,
-#             status=parent_nomad_group.status,
-#             gilts_quantity=gilts_quantity
-#             )
-
-#     def validate(sefl, **kwargs):        
-#         if kwargs.get('new_group_piglets_amount') >= kwargs.get('parent_nomad_group').quantity:
-#             raise DjangoValidationError(message=\
-#                 'new_group_piglets_amount >= parent_nomad_group.quantity')
+        piglets2 = Piglets.objects.create(location=parent_piglets.location,
+            status=None,
+            start_quantity=new_amount,
+            quantity=new_amount,
+            gilts_quantity=new_gilts_amount,
+            split_as_child=split_record)
+        metatour2 = MetaTour.objects.create(piglets=piglets2)
         
-#     def split_group(self, parent_nomad_group, new_group_piglets_amount, initiator=None,
-#             new_group_gilts_quantity=0):
-#         self.validate(
-#             parent_nomad_group=parent_nomad_group,
-#             new_group_piglets_amount=new_group_piglets_amount,
-#             initiator=initiator,
-#             new_group_gilts_quantity=new_group_gilts_quantity
-#             )
+        # create metarecodrs
+        for parent_record in parent_piglets.metatour.records.all():
+            # notice how quantity is calculated
+            MetaTourRecord.objects.create_record(
+                metatour=metatour1,
+                tour=parent_record.tour,
+                quantity=round(parent_record.percentage * new_amount / 100),
+                total_quantity=new_amount)
 
-#         split_event = self.create(date=timezone.now(), initiator=initiator,
-#             parent_group=parent_nomad_group)
-        
-#         first_group = self._create_split_group(
-#             split_event,
-#             (parent_nomad_group.quantity - new_group_piglets_amount), 
-#             initiator,
-#             (parent_nomad_group.gilts_quantity - new_group_gilts_quantity))
+            MetaTourRecord.objects.create_record(
+                metatour=metatour2,
+                tour=parent_record.tour,
+                quantity=round(parent_record.percentage * new_amount / 100),
+                total_quantity=new_amount)
 
-#         second_group = self._create_split_group(split_event, new_group_piglets_amount, initiator,
-#             new_group_gilts_quantity)
+        parent_piglets.deactivate()
 
-#         parent_nomad_group.reset_quantity_and_deactivate()
+        return piglets1, piglets2
 
-#         return first_group, second_group
-       
 
-# class SplitNomadPigletsGroup(SplitPigletsGroup):
-#     parent_group = models.OneToOneField(NomadPigletsGroup, on_delete=models.SET_NULL, null=True,
-#         related_name='split_event')
+class PigletsSplit(PigletsEvent):
+    parent_piglets = models.OneToOneField(Piglets, on_delete=models.SET_NULL, null=True,
+     related_name='piglets_split')
 
-#     objects = SplitNomadPigletsGroupManager()
+    objects = PigletsSplitManager()
+
+    def __str__(self):
+        return 'PigletsSplit {}'.format(self.pk)
+
 
 
 # class RecountQuerySet(models.QuerySet):

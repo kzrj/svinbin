@@ -35,11 +35,11 @@ class Piglets(CoreModel):
     quantity = models.IntegerField()
     gilts_quantity = models.IntegerField(default=0)
 
-    # merger as parent
     merger_as_parent = models.ForeignKey('piglets_events.PigletsMerger', on_delete=models.SET_NULL,
         null=True, related_name='piglets_as_parents')
-    
-    # split as child
+
+    split_as_child = models.ForeignKey('piglets_events.PigletsSplit', on_delete=models.SET_NULL,
+        null=True, related_name='piglets_as_child')
 
     active = models.BooleanField(default=True)  
 
@@ -48,7 +48,11 @@ class Piglets(CoreModel):
     def __str__(self):
         return 'Piglets {}'.format(self.pk)
 
-    # def add_piglets(self, quantity):
+    def deactivate(self):
+        self.active = False
+        self.save()
+    
+        # def add_piglets(self, quantity):
     #     self.quantity = self.quantity + quantity
     #     self.save()
 
