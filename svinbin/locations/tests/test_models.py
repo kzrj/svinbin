@@ -60,50 +60,15 @@ from transactions.models import PigletsTransaction
 #         self.assertEqual(PigletsGroupCell.objects.filter(section=section1).count(), 6)
 
 
-# class SowAndPigletsCellTest(TestCase):
-#     def setUp(self):
-#         locations_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
-
-#     def test_get_newborn_groups(self):
-#         new_born_piglets = piglets_testing.create_new_born_group(
-#             section_number=1, cell_number=4, week=2)
-#         cell = new_born_piglets.location.get_location
-#         cell.get_newborn_groups()
-
 class LocationModelManagerQuerysetTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
-    def test_get_cells_data(self):
-        section = Section.objects.filter(workshop__number=3).first()
-        section_cells = Location.objects.get_sowandpiglets_cells_by_section(section)
-
-        cells_data = Location.objects.get_sowandpiglets_cells_by_section(section).get_cells_data()
-        self.assertEqual(cells_data,
-            {'empty':45, 'not_empty': 0, 'with_piglets': 0, 'sow_only': 0})
-
-        # one sow in cell 1
-        sows_testing.create_sow_and_put_in_workshop_three()
-        cells_data = Location.objects.get_sowandpiglets_cells_by_section(section).get_cells_data()
-        self.assertEqual(cells_data,
-            {'empty':44, 'not_empty': 1, 'with_piglets': 0, 'sow_only': 1})
-
-        # sow in cell 1, sow and piglets in cell 2
-        piglets_testing.create_new_born_group(cell_number=2)
-        cells_data = Location.objects.get_sowandpiglets_cells_by_section(section).get_cells_data()
-        self.assertEqual(cells_data,
-            {'empty': 43, 'not_empty': 2, 'with_piglets': 1, 'sow_only': 1})
 
 class WorkshopModelTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
-
-    def test_get_info_data_ws3(self):
-        workshop = WorkShop.objects.get(number=3)
-        workshop.get_info_data_ws3()

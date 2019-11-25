@@ -67,25 +67,10 @@ class SowGroupCell(Cell):
     sows = models.ManyToManyField('sows.Sow', related_name='sows_in_cell')
     sows_quantity = models.IntegerField(default=0)
 
-    def get_locations_with_residents(self):
-        return self.locations.get_with_active_new_born_group()
-
-    def get_list_of_residents(self):
-        residents = list()
-        for location in self.locations.get_with_active_nomad_group():
-            residents.append(location.newbornpigletsgroup)
-        return residents
-
-    def get_first_piglets_group(self):
-        return self.get_locations_with_residents().first().newbornpigletsgroup
-
-
+    
 class PigletsGroupCell(Cell):
     def __str__(self):
         return 'Групповая клетка № {}, {}'.format(self.number, str(self.section))
-
-    def get_all_locations(self):
-        return self.locations.all()
 
     def get_locations_with_residents(self):
         return self.locations.get_with_active_nomad_group()
@@ -110,20 +95,7 @@ class SowAndPigletsCell(Cell):
     
 
 class LocationQuerySet(models.QuerySet):
-    def get_cells_data(self):
-        empty, not_empty, with_piglets, sow_only = 0, 0, 0, 0
-        for location in self.prefetch_related('sow_set', 'newbornpigletsgroup_set',
-            'nomadpigletsgroup_set', 'gilt_set'):
-            if location.is_empty:
-                empty += 1
-            else:
-                not_empty += 1
-                if location.get_located_active_new_born_groups():
-                    with_piglets += 1
-                else:
-                    sow_only += 1
-
-        return {'empty':empty, 'not_empty': not_empty, 'with_piglets': with_piglets, 'sow_only': sow_only}
+    pass
         
 
 class LocationManager(CoreModelManager):
@@ -213,15 +185,9 @@ class Location(CoreModel):
 
     def __str__(self):
         return str(self.get_location)
-        # return 'location {}'.format(self.pk)
 
     def get_located_active_piglets(self):
         return self.piglets_set.all()
-
-    def is_piglets_cell_empty(self):
-        if self.get_located_active_piglets():
-            return False
-        return True
 
     @property
     def is_empty(self):
@@ -239,9 +205,8 @@ class Location(CoreModel):
 
     @property
     def is_piglets_empty(self):
-        if not self.get_located_active_nomad_groups() and \
-            not self.get_located_active_new_born_groups():
-                return True
+        if not self.get_located_active_piglets() :
+            return True
         return False
 
     @property

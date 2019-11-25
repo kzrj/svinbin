@@ -161,7 +161,7 @@ class SowFarrowManager(CoreModelManager):
         if not sow.tour:
             raise DjangoValidationError(message='У свиньи нет тура.')
 
-        if sow.location.section.workshop.number != 3:
+        if not sow.location.section or sow.location.section.workshop.number != 3:
             raise DjangoValidationError(message='Свинья не в секции 3-го цеха.')            
 
         sow.change_status_to('Опоросилась')
@@ -218,7 +218,8 @@ class CullingSowManager(CoreModelManager):
 
 
 class CullingSow(SowEvent):
-    CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka')]
+    CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka'),
+     ('vinuzhd', 'vinuzhdennii uboi')]
     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
     reason = models.CharField(max_length=300, null=True)
 
@@ -231,7 +232,6 @@ class WeaningSowManager(CoreModelManager):
          initiator=initiator, date=timezone.now())
         sow.tour = None
         sow.change_status_to(status_title='Отъем')
-        # sow.save()
         return weaning
 
 
