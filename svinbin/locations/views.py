@@ -23,6 +23,7 @@ class CreateWorkshopsView(APIView):
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
         staff_testing.create_test_users()
+        staff_testing.create_svinbin_users()
         sows_testing.create_boars()
         sows_events_testing.create_types()
 
