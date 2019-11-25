@@ -2,138 +2,52 @@
 from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
-# import sows.models as sows_models
-import piglets.models as piglets_models
-import tours.models as tours_models
-# import piglets_events.models as piglets_events_models
-import locations.models as locations_models
+from piglets.models import Piglets
+from tours.models import Tour
+from locations.models import Location
 
 import locations.testing_utils as locations_testing
-# import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
 
-class PigletsModelManagerQuerysetTest(TestCase):
+class PigletsModelTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
-        # sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
-    def test_groups_with_gilts(self):
-        tour = tours_models.Tour.objects.get_or_create_by_week_in_current_year(1)
-        location = locations_models.Location.objects.get(section__number=1, section__workshop__number=3)
-        piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(tour, location, 10)
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 101)
+        self.piglets.gilts_quantity = 10
+        self.piglets.save()
 
-        record = piglets.metatour.records.first()
+        self.piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3, 232)
 
-        print(record)
-        print(record.tour)
-        print(record.quantity)
-        print(record.percentage)
-        
-        # new_born_group1 = piglets_testing.create_new_born_group(cell_number=5)
-#         sow1 = new_born_group1.farrows.first().sow
-#         gilt1 = sows_models.Gilt.objects.create_gilt(1, new_born_group1)
-#         new_born_group1.refresh_from_db()
-        
-#         new_born_group2 = piglets_testing.create_new_born_group(cell_number=6)
-#         sow2 = new_born_group2.farrows.first().sow
-#         gilt2 = sows_models.Gilt.objects.create_gilt(2, new_born_group2)
+    def test_deactivate(self):
+        self.piglets.deactivate()
+        self.assertEqual(self.piglets.active, False)
 
-#         new_born_group3 = piglets_testing.create_new_born_group(cell_number=4)
+    def test_remove_piglets(self):
+        self.piglets.remove_piglets(1)
+        self.assertEqual(self.piglets.quantity, 100)
 
-#         self.assertEqual(piglets_models.NewBornPigletsGroup.objects.groups_with_gilts().count(), 2)
-#         self.assertEqual(piglets_models.NewBornPigletsGroup.objects.all().count(), 3)
+    def test_remove_gilts(self):
+        self.piglets.remove_gilts(1)
+        self.assertEqual(self.piglets.quantity, 100)
+        self.assertEqual(self.piglets.gilts_quantity, 9)
 
-#     def test_create_new_born_group(self):
-#         sow = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=1)
-#         tour = tours_models.Tour.objects.get_or_create_by_week_in_current_year(45)
-#         piglets = piglets_models.NewBornPigletsGroup.objects.create_new_born_group(sow.location, tour)
-#         self.assertEqual(piglets.tour, tour)
-#         self.assertEqual(piglets.location, sow.location)
-#         self.assertRaises(ValidationError, piglets_models.NewBornPigletsGroup.objects\
-#             .create_new_born_group, sow.location, tour)
+    def test_change_status_to(self):
+        self.piglets.change_status_to('Родились, кормятся')
+        self.assertEqual(self.piglets.status.title, 'Родились, кормятся')
 
-#     def test_get_all_in_workshop(self):
-#         piglets_testing.create_new_born_group(section_number=1, cell_number=1)
-        
-#         nbp2 = piglets_testing.create_new_born_group(section_number=1, cell_number=2)
-#         nbp2.location = locations_models.Location.objects.get(workshop__number=3)
-#         nbp2.save()
+    def test_manager_get_total_quantity(self):
+        total = Piglets.objects.all().get_total_quantity()
+        self.assertEqual(total, 333)
 
-#         nbp3 = piglets_testing.create_new_born_group(section_number=1, cell_number=3)
-#         nbp3.location = locations_models.Location.objects.get(workshop__number=2)
-#         nbp3.save()
-
-#         workshop = locations_models.WorkShop.objects.filter(number=3).first()
-#         piglets_qs = piglets_models.NewBornPigletsGroup.objects.all().get_all_in_workshop(workshop)
-#         self.assertEqual(piglets_qs.count(), 2)
-
-
-# class NomadPigletsModelManagerTest(TransactionTestCase):
-#     def setUp(self):
-#         locations_testing.create_workshops_sections_and_cells()
-#         piglets_testing.create_piglets_statuses()
-#         sows_testing.create_statuses()
-
-#         self.piglets_group1 = piglets_testing.create_new_born_group(1, 1, 1, 10)
-#         self.piglets_group2 = piglets_testing.create_new_born_group(1, 2, 1, 12)
-#         self.piglets_group3 = piglets_testing.create_new_born_group(1, 3, 2, 15)
-
-#         self.piglets_group4 = piglets_testing.create_new_born_group(
-#             section_number=1,
-#             cell_number=4,
-#             week=1,
-#             quantity=10)
-#         self.piglets_group5 = piglets_testing.create_new_born_group(1, 5, 1, 12)
-        
-#         piglets_groups_same_tour = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
-#             [self.piglets_group4.pk, self.piglets_group5.pk])
-#         piglets_groups_two_tours = piglets_models.NewBornPigletsGroup.objects.filter(pk__in=
-#             [self.piglets_group1.pk, self.piglets_group2.pk, self.piglets_group3.pk])
-
-#         self.new_born_merger_same_tour = piglets_events_models.NewBornPigletsMerger.objects \
-#             .create_merger_and_return_nomad_piglets_group(piglets_groups_same_tour, 
-#                 part_number=1)[0]
-#         self.new_born_merger_two_tours = piglets_events_models.NewBornPigletsMerger.objects \
-#             .create_merger_and_return_nomad_piglets_group(piglets_groups_two_tours, 
-#                 part_number=2)[0]
-
-#     def test_merger_part_number(self):
-#         nomad_group1 = self.new_born_merger_same_tour.nomad_group
-#         nomad_group2 = self.new_born_merger_two_tours.nomad_group
-#         self.assertEqual(nomad_group1.merger_part_number, 1)
-#         self.assertEqual(nomad_group2.merger_part_number, 2)
-
-#     def test_cells_numbers_from_merger(self):
-#         nomad_group1 = self.new_born_merger_same_tour.nomad_group
-#         nomad_group2 = self.new_born_merger_two_tours.nomad_group
-#         self.assertEqual(list(nomad_group1.cells_numbers_from_merger), 
-#             list(self.new_born_merger_same_tour.cells))
-#         self.assertEqual(list(nomad_group2.cells_numbers_from_merger), 
-#             list(self.new_born_merger_two_tours.cells))
-
-#     def test_piglets_without_weighing_record(self):
-#         nomad_group1 = self.new_born_merger_same_tour.nomad_group
-#         nomad_group2 = self.new_born_merger_two_tours.nomad_group
-
-#         piglets_events_models.WeighingPiglets.objects.create_weighing(nomad_group1, 100, '3/4')
-
-#         self.assertEqual(piglets_models.NomadPigletsGroup.objects\
-#                 .piglets_without_weighing_record('3/4').count(), 1)
-#         self.assertEqual(piglets_models.NomadPigletsGroup.objects\
-#                 .piglets_without_weighing_record('3/4').first().pk, nomad_group2.pk)
-#         self.assertEqual(piglets_models.NomadPigletsGroup.objects\
-#             .piglets_without_weighing_record('4/8').count(), 2)
-
-#     def test_piglets_with_weighing_record(self):
-#         nomad_group1 = self.new_born_merger_same_tour.nomad_group
-#         nomad_group2 = self.new_born_merger_two_tours.nomad_group
-
-#         piglets_events_models.WeighingPiglets.objects.create_weighing(nomad_group1, 100, '3/4')
-
-#         self.assertEqual(piglets_models.NomadPigletsGroup.objects\
-#                 .piglets_with_weighing_record('3/4').count(), 1)
-#         self.assertEqual(piglets_models.NomadPigletsGroup.objects\
-#                 .piglets_with_weighing_record('3/4').first().pk, nomad_group1.pk)
-#         self.assertEqual(piglets_models.NomadPigletsGroup.objects\
-#             .piglets_with_weighing_record('4/8').count(), 0)
+    def test_manager_get_total_gilts_quantity(self):
+        total_gilts = Piglets.objects.all().get_total_gilts_quantity()
+        self.assertEqual(total_gilts, 10)
+   

@@ -51,18 +51,24 @@ class Piglets(CoreModel):
     def deactivate(self):
         self.active = False
         self.save()
-    
-        # def add_piglets(self, quantity):
-    #     self.quantity = self.quantity + quantity
-    #     self.save()
 
-    # def remove_piglets(self, quantity):
-    #     self.quantity = self.quantity - quantity
-    #     self.save()
+    def remove_piglets(self, quantity):
+        self.quantity = self.quantity - quantity
+        self.save()
+
+    def remove_gilts(self, quantity):
+        if self.gilts_quantity > 0:
+            self.quantity -= quantity
+            self.gilts_quantity -= quantity
+            self.save()
 
     def change_status_to(self, status_title):
         self.status = PigletsStatus.objects.get(title=status_title)
         self.save()
+
+    # def add_piglets(self, quantity):
+    #     self.quantity = self.quantity + quantity
+    #     self.save()
 
     # def add_gilts(self, quantity):
     #     self.gilts_quantity += quantity
@@ -72,12 +78,6 @@ class Piglets(CoreModel):
     #     self.quantity += quantity
     #     self.gilts_quantity += quantity
     #     self.save()
-
-    # def remove_gilts(self, quantity):
-    #     if self.gilts_quantity > 0:
-    #         self.quantity -= quantity
-    #         self.gilts_quantity -= quantity
-    #         self.save()
 
 
 # class NewBornPigletsQuerySet(models.QuerySet):

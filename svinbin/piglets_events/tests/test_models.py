@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from piglets.models import Piglets
-from piglets_events.models import PigletsMerger, PigletsSplit, WeighingPiglets
+from piglets_events.models import PigletsMerger, PigletsSplit, WeighingPiglets, CullingPiglets
 from tours.models import Tour
 from locations.models import Location
 
@@ -167,38 +167,27 @@ class WeighingPigletsTest(TestCase):
         self.assertEqual(weighing_record.place, '3/4')
 
 
-# class CullingPigletsTest(TestCase):
-#     def setUp(self):
-#         locations_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
+class CullingPigletsTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        piglets_testing.create_piglets_statuses()
 
-#     def test_create_culling_piglets(self):
-#         new_born_group = piglets_testing.create_new_born_group()
-#         self.assertEqual(new_born_group.quantity, 10)
-#         culling_new_born = piglets_events_models.CullingNewBornPiglets.objects.create_culling_piglets(
-#             piglets_group=new_born_group, culling_type='padej', reason='xz'
-#             )
-#         new_born_group.refresh_from_db()
-#         self.assertEqual(new_born_group.quantity, 9)
-#         self.assertEqual(culling_new_born.quantity, 1)
-#         self.assertEqual(culling_new_born.is_it_gilt, False)
-#         self.assertEqual(culling_new_born.culling_type, 'padej')
-#         self.assertEqual(culling_new_born.reason, 'xz')
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 101)
 
-#         piglets_group = piglets_testing.create_nomad_group_from_three_new_born()
-#         piglets_group.add_gilts_increase_quantity(1)
-#         self.assertEqual(piglets_group.quantity, 38)
-#         culling_nomad = piglets_events_models.CullingNomadPiglets.objects.create_culling_gilt(
-#             piglets_group=piglets_group, culling_type='padej', reason='xz'
-#             )
-#         piglets_group.refresh_from_db()
-#         self.assertEqual(piglets_group.quantity, 37)
-#         self.assertEqual(culling_nomad.quantity, 1)
-#         self.assertEqual(piglets_group.gilts_quantity, 0)
-#         self.assertEqual(culling_nomad.is_it_gilt, True)
-#         self.assertEqual(culling_nomad.culling_type, 'padej')
-#         self.assertEqual(culling_nomad.reason, 'xz')
+    def test_create_culling_piglets(self):
+        culling = CullingPiglets.objects.create_culling_piglets(
+            piglets_group=self.piglets, culling_type='padej', reason='xz'
+            )
+
+        self.piglets.refresh_from_db()
+        self.assertEqual(self.piglets.quantity, 100)
+        self.assertEqual(culling.piglets_group, self.piglets)
+        self.assertEqual(culling.culling_type, 'padej')
+        self.assertEqual(culling.reason, 'xz')
+        
 
 
 # class RecountManagerTest(TestCase):
