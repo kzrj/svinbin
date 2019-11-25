@@ -5,7 +5,7 @@ from core.utils import CustomValidation
 
 import transactions.serializers as transactions_serializers
 import sows.serializers as sows_serializers
-# import piglets.serializers as piglets_serializers
+import piglets.serializers as piglets_serializers
 # import piglets_events.serializers as piglets_events_serializers
 
 from locations.models import PigletsGroupCell, SowAndPigletsCell, Location, WorkShop, Section
@@ -32,19 +32,6 @@ class SowAndPigletsCellSerializer(serializers.ModelSerializer):
         exclude = ['created_at', 'modified_at' ]
 
 
-# class PigletsGroupCellSerializer(serializers.ModelSerializer):
-#     workshop = serializers.StringRelatedField()
-#     section = serializers.StringRelatedField()
-
-#     class Meta:
-#         model = PigletsGroupCell
-#         exclude = ['created_at', 'modified_at' ]
-
-
-# class PigletsGroupCellPkSerializer(serializers.Serializer):
-#     cell = serializers.PrimaryKeyRelatedField(queryset=PigletsGroupCell.objects.all())
-
-
 class LocationPKSerializer(serializers.Serializer):
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
 
@@ -69,10 +56,7 @@ class LocationSerializer(serializers.ModelSerializer):
     # pigletsGroupCell = PigletsGroupCellSerializer(read_only=True)
 
     sow_set = sows_serializers.SowSimpleSerializer(many=True, read_only=True)
-    # newbornpigletsgroup_set = piglets_serializers.NewBornPigletsGroupSerializer(many=True,
-    #     read_only=True)
-    # nomadpigletsgroup_set = piglets_serializers.NomadPigletsGroupSerializer(many=True,
-    #     read_only=True)
+    piglets = piglets_serializers.PigletsSerializer(many=True, read_only=True)
 
     is_empty = serializers.ReadOnlyField()
     is_sow_empty = serializers.ReadOnlyField()

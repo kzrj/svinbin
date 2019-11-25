@@ -1,12 +1,13 @@
-# # -*- coding: utf-8 -*-
-# from rest_framework import serializers, status
+# -*- coding: utf-8 -*-
+from rest_framework import serializers, status
 
-# from core.utils import CustomValidation
-# from sows.models import Sow, Gilt
-# from piglets.models import NomadPigletsGroup, NewBornPigletsGroup
-# from piglets_events.models import NewBornPigletsMerger
-# from piglets_events.serializers import WeighingPigletsSerializer
-# from locations.models import Location
+from piglets.models import Piglets
+from locations.models import Location
+
+class PigletsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Piglets
+        fields = '__all__'
 
 
 # class NomadPigletsGroupPkSerializer(serializers.ModelSerializer):
@@ -44,23 +45,17 @@
 #     new_born_group = serializers.IntegerField()
 
 
-# class MoveFromCellToCellSerializer(serializers.Serializer):
-#     from_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-#     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-#     quantity = serializers.IntegerField()
-#     gilts_quantity = serializers.IntegerField(default=0)
+class MoveFromCellToCellSerializer(serializers.Serializer):
+    from_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    quantity = serializers.IntegerField()
+    gilts_quantity = serializers.IntegerField(default=0)
 
 
-# class MoveToSerializer(serializers.Serializer):
-#     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-#     quantity = serializers.IntegerField()
-#     gilts_quantity = serializers.IntegerField(default=0)
-
-
-# # class MoveOneToCellSerializer(serializers.Serializer):
-# #     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-# #     quantity = serializers.IntegerField()
-# #     gilts_quantity = serializers.IntegerField(default=0)
+class MoveToSerializer(serializers.Serializer):
+    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    quantity = serializers.IntegerField()
+    gilts_quantity = serializers.IntegerField(default=0)
 
 
 # class NewBornGroupsToMerge(serializers.ModelSerializer):

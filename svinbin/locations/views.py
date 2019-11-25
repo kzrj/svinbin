@@ -29,14 +29,8 @@ class CreateWorkshopsView(APIView):
         return Response({'msg': 'success'})
 
 
-# class PigletsGroupCellViewSet(viewsets.ModelViewSet):
-#     queryset = PigletsGroupCell.objects.all()
-#     serializer_class = serializers.PigletsGroupCellSerializer
-
-
 class LocationViewSet(viewsets.ModelViewSet):
-    queryset = Location.objects.prefetch_related('sow_set', 'newbornpigletsgroup_set',
-        'nomadpigletsgroup_set', 'gilt_set').all()
+    queryset = Location.objects.prefetch_related('sow_set', 'piglets', 'gilt_set').all()
     serializer_class = serializers.LocationSerializer
     filter_class = LocationFilter
 
