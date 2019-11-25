@@ -215,21 +215,17 @@ class Location(CoreModel):
         return str(self.get_location)
         # return 'location {}'.format(self.pk)
 
-    def get_located_active_new_born_groups(self):
-        return self.newbornpigletsgroup_set.all()
+    def get_located_active_piglets(self):
+        return self.piglets_set.all()
 
-    def get_located_active_nomad_groups(self):
-        return self.nomadpigletsgroup_set.all()
-
-    def is_nomad_piglet_group_cell_empty(self):
-        if self.get_located_active_nomad_groups():
+    def is_piglets_cell_empty(self):
+        if self.get_located_active_piglets():
             return False
         return True
 
     @property
     def is_empty(self):
-        if not self.get_located_active_nomad_groups() and \
-            not self.get_located_active_new_born_groups() and \
+        if not self.get_located_active_piglets() and \
             not self.sow_set.all() and \
             not self.gilt_set.all():
                 return True

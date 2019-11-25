@@ -20,10 +20,22 @@ class PigletsQuerySet(models.QuerySet):
     def get_total_gilts_quantity(self):
         return self.aggregate(models.Sum('gilts_quantity'))['gilts_quantity__sum']
 
+    def active(self):
+        return self.filter(active=True)
+
+    def inactive(self):
+        return self.filter(active=True)
+
+    # def with_farrows(self, tour):
+        # self.filter()
+
 
 class PigletsManager(CoreModelManager):
     def get_queryset(self):
-        return PigletsQuerySet(self.model, using=self._db).select_related('metatour')
+        return PigletsQuerySet(self.model, using=self._db).select_related('metatour').active()
+
+    def get_inactive(self):
+        return PigletsQuerySet(self.model, using=self._db).select_related('metatour').inactive()
 
 
 class Piglets(CoreModel):
@@ -66,9 +78,9 @@ class Piglets(CoreModel):
         self.status = PigletsStatus.objects.get(title=status_title)
         self.save()
 
-    # def add_piglets(self, quantity):
-    #     self.quantity = self.quantity + quantity
-    #     self.save()
+    def add_piglets(self, quantity):
+        self.quantity = self.quantity + quantity
+        self.save()
 
     # def add_gilts(self, quantity):
     #     self.gilts_quantity += quantity

@@ -4,7 +4,7 @@ import random
 from locations.models import Location, SowSingleCell, SowGroupCell, Section, WorkShop, \
     SowAndPigletsCell, PigletsGroupCell
 from sows.models import Sow, SowStatus, Gilt, Boar
-from sows_events.models import Semination, SowFarrow
+from sows_events.models import Semination, SowFarrow, Ultrasound
 
 
 FARM_ID_COUNT = 100000
@@ -58,10 +58,24 @@ def create_sow_and_put_in_workshop_three(section_number=1, cell_number=1):
     sow = Sow.objects.create(farm_id=random.randint(1, FARM_ID_COUNT), location=location)
     return sow
 
+def create_sow_and_put_in_workshop_three_section(section_number=1, cell_number=1):
+    section = Section.objects.get(workshop__number=3, number=section_number)
+    location = Location.objects.get(section=section)
+    sow = Sow.objects.create(farm_id=random.randint(1, FARM_ID_COUNT), location=location)
+    return sow
+
 def create_sow_with_semination_and_put_in_workshop_three(week=1, section_number=1, cell_number=1):
     sow = create_sow_and_put_in_workshop_three(section_number, cell_number)
     Semination.objects.create_semination(sow=sow, week=week,
      initiator=None, semination_employee=None)
+    return sow
+
+def create_sow_seminated_usouded_ws3_section(week=1, section_number=1):
+    sow = create_sow_and_put_in_workshop_three_section(section_number)
+    Semination.objects.create_semination(sow=sow, week=week,
+     initiator=None, semination_employee=None)
+    Ultrasound.objects.create_ultrasound(sow=sow, days=30, result=True)
+    Ultrasound.objects.create_ultrasound(sow=sow, days=60, result=True)
     return sow
     
 def create_sow_with_location(location, farm_id=None):

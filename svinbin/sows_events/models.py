@@ -2,14 +2,11 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from django.db import connection
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import Event, CoreModel, CoreModelManager
-# from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
-from tours.models import Tour
-from locations.models import WorkShop, Location
-# from sows.models import Sow
+from piglets.models import Piglets, PigletsStatus
+from tours.models import Tour, MetaTour, MetaTourRecord
 
 
 class SowEvent(Event):
@@ -145,8 +142,8 @@ class Ultrasound(SowEvent):
 
 
 class SowFarrowQuerySet(models.QuerySet):
-    def update_status_related_sows(self):
-        print(self.values('sow'))
+    def get_by_tour_and_sow_location(self, tour, sow_location):
+        return self.filter(sow__location=sow_location, tour=tour)
 
 
 class SowFarrowManager(CoreModelManager):
@@ -157,39 +154,50 @@ class SowFarrowManager(CoreModelManager):
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
         tour = sow.tour
         
+        # validate
         if self.get_queryset().filter(sow=sow, tour=tour).first():
             raise DjangoValidationError(message='Свинья уже опоросилась в этом туре.')
 
         if not sow.tour:
             raise DjangoValidationError(message='У свиньи нет тура.')
 
+        if sow.location.section.workshop.number != 3:
+            raise DjangoValidationError(message='Свинья не в секции 3-го цеха.')            
+
         sow.change_status_to('Опоросилась')
 
-        # # check is it first sow_farrow in current tour
-        # previous_farrow_in_tour = SowFarrow.objects.filter(sow=sow, tour=tour).first()
-        # if previous_farrow_in_tour:
-        #     new_born_piglets_group = previous_farrow_in_tour.new_born_piglets_group
-        #     new_born_piglets_group.add_piglets(alive_quantity)
-        # else:
-        #     new_born_piglets_group = NewBornPigletsGroup.objects.create(
-        #         location=sow.location,
-        #         start_quantity=alive_quantity,
-        #         quantity=alive_quantity,
-        #         tour=tour
-        #         )
+        # find or create piglets in section with farrows in self.tour
+        # I assume if there are farrow in section it means there are piglets 
+        # with these farrow in section
+        farrow_in_tour_in_section = self.get_queryset() \
+            .get_by_tour_and_sow_location(sow_location=sow.location, tour=tour).first()
 
-        # farrow = self.create(sow=sow, tour=tour, initiator=initiator,
-        #         date=timezone.now(), alive_quantity=alive_quantity,
-        #         dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
-        #         new_born_piglets_group=new_born_piglets_group
-        #         )
+        if farrow_in_tour_in_section:
+            piglets = farrow_in_tour_in_section.piglets_group
+            piglets.add_piglets(alive_quantity)
+            piglets.metatour.records.all().first().increase_quantity(alive_quantity)
+        else:
+            piglets = Piglets.objects.create(
+                location=sow.location,
+                status=PigletsStatus.objects.get(title='Родились, кормятся'),
+                start_quantity=alive_quantity,
+                quantity=alive_quantity,
+            )
+            metatour = MetaTour.objects.create(piglets=piglets)
+            MetaTourRecord.objects.create_record(metatour, sow.tour, alive_quantity, alive_quantity)
+
+        farrow = self.create(sow=sow, tour=tour, initiator=initiator,
+                date=timezone.now(), alive_quantity=alive_quantity,
+                dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
+                piglets_group=piglets
+                )
         
-        # return farrow
+        return farrow
 
 
 class SowFarrow(SowEvent):
-    # new_born_piglets_group = models.ForeignKey(NewBornPigletsGroup, on_delete=models.SET_NULL,
-    #  null=True, related_name='farrows')
+    piglets_group = models.ForeignKey('piglets.Piglets', on_delete=models.SET_NULL,
+     null=True, related_name='farrows')
     alive_quantity = models.IntegerField(default=0)
     dead_quantity = models.IntegerField(default=0)
     mummy_quantity = models.IntegerField(default=0)

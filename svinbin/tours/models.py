@@ -83,6 +83,9 @@ class MetaTour(CoreModel):
     def __str__(self):
         return 'Piglets {} MetaTour {}'.format(self.piglets, self.pk)
 
+    # def create_record(self, tour, quantity, total_quantity):
+    #     MetaTourRecord.objects.create_record(self, tour, quantity, total_quantity)
+
 
 class MetaTourRecordQuerySet(models.QuerySet):
     def sum_quantity_by_tour(self, tour):
@@ -100,8 +103,6 @@ class MetaTourRecordManager(CoreModelManager):
         percentage = (quantity * 100) / total_quantity
         return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage)
 
-    # def creat
-
 
 class MetaTourRecord(CoreModel):
     metatour = models.ForeignKey(MetaTour, on_delete=models.CASCADE, related_name='records')
@@ -116,3 +117,7 @@ class MetaTourRecord(CoreModel):
 
     def __str__(self):
         return 'MetaTourRecord {}'.format(self.pk)
+
+    def increase_quantity(self, amount):
+        self.quantity += amount
+        self.save()
