@@ -27,6 +27,9 @@ class SowFilter(filters.FilterSet):
     by_workshop_number = filters.NumberFilter(field_name='location',
         method='filter_by_workshop_number')
 
+    by_section = filters.NumberFilter(field_name='location',
+        method='filter_by_section')
+
     farm_id_starts = filters.NumberFilter(field_name='farm_id', lookup_expr='startswith')
     farm_id_contains = filters.NumberFilter(field_name='farm_id', lookup_expr='contains')
     farm_id_isnull = filters.BooleanFilter(field_name='farm_id', lookup_expr='isnull')
@@ -51,6 +54,9 @@ class SowFilter(filters.FilterSet):
         method='filter_all_in_workshop_number')
 
     # created_at_gt = filters.Da
+
+    def filter_by_section(self, queryset, name, value):
+        return queryset.filter(location__section__pk=value)
 
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
