@@ -47,7 +47,7 @@ class Section(CoreModel):
     number = models.IntegerField()
 
     def __str__(self):
-        return 'Секция ' + str(self.number)
+        return 'Секция {} {}'.format(self.number, self.workshop)
 
 
 class Cell(CoreModel):
