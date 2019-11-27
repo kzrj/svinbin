@@ -18,8 +18,8 @@ class WokrshopSerializer(serializers.ModelSerializer):
 
 
 class SectionSerializer(serializers.ModelSerializer):
-    location = serializers.PrimaryKeyRelatedField(source='*')
-    
+    location = serializers.PrimaryKeyRelatedField(source='*', read_only=True)
+
     class Meta:
         model = Section
         exclude = ['created_at', 'modified_at' ]
