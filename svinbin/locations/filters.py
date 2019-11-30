@@ -18,6 +18,9 @@ class LocationFilter(filters.FilterSet):
 
     by_section = filters.NumberFilter(field_name='section', method='filter_by_section')
 
+    sections_by_workshop_number = filters.NumberFilter(field_name='section',
+         method='filter_by_sections_by_workshop_number')
+
     def filter_by_workshop(self, queryset, name, value):
         return queryset.filter(Q(
             Q(workshop__pk=value) |
@@ -32,6 +35,9 @@ class LocationFilter(filters.FilterSet):
             Q(sowAndPigletsCell__section__pk=value) |
             Q(pigletsGroupCell__section__pk=value)
             ))
+
+    def filter_by_sections_by_workshop_number(self, queryset, name, value):
+        return queryset.filter(section__workshop__number=value)
 
     class Meta:
         model = Location

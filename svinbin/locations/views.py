@@ -31,12 +31,17 @@ class CreateWorkshopsView(APIView):
 
 
 class LocationViewSet(viewsets.ModelViewSet):
-    queryset = Location.objects.prefetch_related('sow_set', 'piglets', 'gilt_set').all()
+    queryset = Location.objects \
+        .select_related('section', 'workshop', 'sowAndPigletsCell') \
+        .prefetch_related('sow_set', 'piglets', 'gilt_set').all()
     serializer_class = serializers.LocationSerializer
     filter_class = LocationFilter
 
+    # mb it is useful to separete locations by actions - sections, workshop, cells.
+    # def sections
+
 
 class SectionViewSet(viewsets.ModelViewSet):
-    queryset = Section.objects.all()
+    queryset = Section.objects.all().select_related('location')
     serializer_class = serializers.SectionSerializer
     filter_class = SectionFilter

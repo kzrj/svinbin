@@ -6,8 +6,8 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location
-
 from sows_events.models import Semination
+from tours.models import Tour
 
 
 class SowStatus(CoreModel):
@@ -67,7 +67,7 @@ class SowsQuerySet(models.QuerySet):
                 models.Q(location__sowAndPigletsCell__workshop=workshop)
                 )
             )
-        
+
 
 class SowManager(CoreModelManager):
     def get_queryset(self):
@@ -142,6 +142,29 @@ class SowManager(CoreModelManager):
             return self.create_new_and_put_in_workshop_one(farm_id), True
 
         return sow, False
+
+    def get_tours_with_count_sows_by_location(self, location):
+        # https://medium.com/@hansonkd/the-dramatic-benefits-of-django-subqueries-and-annotations-4195e0dafb16
+        sows_query = self.get_queryset() \
+            .filter(
+                location=location,
+                tour=models.OuterRef('id')
+                ) \
+            .values('tour_id') \
+            .annotate(cnt=models.Count('*')) \
+            .values('cnt')[:1]
+
+        tours_ids = self.get_queryset().filter(location=location).values('tour')
+
+        tours = Tour.objects.filter(id__in=tours_ids) \
+            .annotate(
+                count_sows=models.Subquery(
+                   sows_query, 
+                   output_field=models.IntegerField()
+                )
+            ).values('week_number', 'count_sows')
+
+        return tours
 
 
 class Sow(Pig):

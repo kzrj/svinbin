@@ -49,6 +49,13 @@ class Section(CoreModel):
     def __str__(self):
         return 'Секция {} {}'.format(self.number, self.workshop)
 
+    # def get_sows_by_tour_ws3(self):
+    #     # only work for ws3
+    #     if self.workshop.number != 3:
+    #         return None
+
+    #     return self.location.sow_set.get_count_by_tours_ws3_by_section(self.number)
+
 
 class Cell(CoreModel):
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
@@ -224,3 +231,10 @@ class Location(CoreModel):
             return self.sowGroupCell.number
 
         return None
+
+    @property
+    def sows_count_by_tour(self):
+        if self.section and self.section.workshop.number != 3:
+            return None
+
+        return self.sow_set.get_tours_with_count_sows_by_location(self)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from mixer.backend.django import mixer
 
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.db import models
 from django.db.models import Q
 from django.db import connection
@@ -11,17 +11,18 @@ import sows.testing_utils as sows_testings
 import sows_events.utils as sows_events_testings
 import piglets.testing_utils as piglets_testing
 
-from locations.models import Location
+from locations.models import Location, Section
 from sows.models import Sow, Gilt, Boar
 from sows_events.models import SowFarrow, Ultrasound, Semination
 from tours.models import Tour
 
 
-class SowModelManagerTest(TestCase):
+class SowModelManagerTest(TransactionTestCase):
     def setUp(self):
         locaions_testing.create_workshops_sections_and_cells()
         sows_testings.create_statuses()
         sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
 
     def test_get_or_create_by_farm_id(self):
         location = Location.objects.get(workshop__number=1)
@@ -87,6 +88,8 @@ class SowModelManagerTest(TestCase):
         self.assertEqual(sow.get_seminations_by_tour(tour).count(), 2)
         Ultrasound.objects.create_ultrasound(sow, None, True)
         self.assertEqual(sow.get_ultrasounds1_by_tour(tour).count(), 1)
+        sow.location = Location.objects.get(section__number=1, section__workshop__number=3)
+        sow.save()
         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
         self.assertEqual(sow.get_farrows_by_tour(tour).count(), 1)
 
@@ -99,6 +102,8 @@ class SowModelManagerTest(TestCase):
         Semination.objects.create_semination(sow=sow, week=1, initiator=None,
          semination_employee=None)
         Ultrasound.objects.create_ultrasound(sow, None, True)
+        sow.location = Location.objects.get(section__number=1, section__workshop__number=3)
+        sow.save()
         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
 
         # tour 2
@@ -124,6 +129,9 @@ class SowModelManagerTest(TestCase):
         Semination.objects.create_semination(sow=sow, week=1, initiator=None,
          semination_employee=None)
         Ultrasound.objects.create_ultrasound(sow, None, True)
+        # first section ws3
+        sow.location = Location.objects.get(section__number=1, section__workshop__number=3)
+        sow.save()
         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
         
         self.assertEqual(sow.is_farrow_in_current_tour, True)
@@ -157,6 +165,9 @@ class SowModelManagerTest(TestCase):
         # not seminated
         sow.refresh_from_db()
         self.assertEqual(sow.does_once_seminate_in_tour, False)
+
+        sow.location = Location.objects.get(section__number=1, section__workshop__number=3)
+        sow.save()
 
         # 1 semination in another tour
         Semination.objects.create_semination(sow=sow, week=2, initiator=None,
@@ -259,18 +270,47 @@ class SowModelManagerTest(TestCase):
         self.assertEqual(sow.farm_id, 123)
         self.assertEqual(created, False)
 
-class GiltModelManagerTest(TestCase):
-    def setUp(self):
-        locaions_testing.create_workshops_sections_and_cells()
-        sows_testings.create_statuses()
+    def test_get_count_by_tours(self):
+        sows_testings.create_sow_seminated_usouded_ws3_section(1, 1)
+        sows_testings.create_sow_seminated_usouded_ws3_section(1, 1)
+        sows_testings.create_sow_seminated_usouded_ws3_section(1, 2)
+        sows_testings.create_sow_seminated_usouded_ws3_section(2, 1)
+        sows_testings.create_sow_seminated_usouded_ws3_section(2, 2)
+        sows_testings.create_sow_seminated_usouded_ws3_section(3, 1)
+        sows_testings.create_sow_seminated_usouded_ws3_section(3, 1)
+        sows_testings.create_sow_seminated_usouded_ws3_section(3, 1)
 
-    def test_create_gilt(self):
-        new_born_group = piglets_testing.create_new_born_group()
-        farrow = new_born_group.farrows.all().first()
-        gilt = Gilt.objects.create_gilt(birth_id=1, new_born_group=new_born_group)
+        tour5 = Tour.objects.get_or_create_by_week_in_current_year(week_number=5)
 
-        new_born_group.refresh_from_db()
-        self.assertEqual(new_born_group.gilts_quantity, 1)
-        self.assertEqual(gilt.new_born_group, new_born_group)
-        self.assertEqual(gilt.mother_sow, farrow.sow)
-        self.assertEqual(gilt.location, new_born_group.location)
+        location = Location.objects.filter(section__number=1, section__workshop__number=3).first()
+        data = Sow.objects.get_tours_with_count_sows_by_location(location)
+        print(data)
+        self.assertEqual(data[0]['count_sows'], 2)
+        self.assertEqual(data[1]['count_sows'], 1)
+        self.assertEqual(data[2]['count_sows'], 3)
+
+        location = Location.objects.filter(section__number=2, section__workshop__number=3).first()
+        data = Sow.objects.get_tours_with_count_sows_by_location(location)
+        self.assertEqual(data[0]['count_sows'], 1)
+        self.assertEqual(data[1]['count_sows'], 1)
+        
+        with self.assertNumQueries(1):
+            data = Sow.objects.get_tours_with_count_sows_by_location(location)
+            print(data)
+
+
+# class GiltModelManagerTest(TestCase):
+#     def setUp(self):
+#         locaions_testing.create_workshops_sections_and_cells()
+#         sows_testings.create_statuses()
+
+#     def test_create_gilt(self):
+#         new_born_group = piglets_testing.create_new_born_group()
+#         farrow = new_born_group.farrows.all().first()
+#         gilt = Gilt.objects.create_gilt(birth_id=1, new_born_group=new_born_group)
+
+#         new_born_group.refresh_from_db()
+#         self.assertEqual(new_born_group.gilts_quantity, 1)
+#         self.assertEqual(gilt.new_born_group, new_born_group)
+#         self.assertEqual(gilt.mother_sow, farrow.sow)
+#         self.assertEqual(gilt.location, new_born_group.location)
