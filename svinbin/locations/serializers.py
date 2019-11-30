@@ -19,6 +19,7 @@ class WokrshopSerializer(serializers.ModelSerializer):
 
 class SectionSerializer(serializers.ModelSerializer):
     location = serializers.PrimaryKeyRelatedField(source='*', read_only=True)
+    sows_count_by_tour = serializers.ReadOnlyField()
 
     class Meta:
         model = Section
@@ -60,7 +61,7 @@ class LocationSerializer(serializers.ModelSerializer):
     sow_set = sows_serializers.SowSimpleSerializer(many=True, read_only=True)
     piglets = piglets_serializers.PigletsSerializer(many=True, read_only=True)
 
-    sows_count_by_tour = serializers.ReadOnlyField()
+    # sows_count_by_tour = serializers.ReadOnlyField()
 
     is_empty = serializers.ReadOnlyField()
     is_sow_empty = serializers.ReadOnlyField()
