@@ -54,7 +54,7 @@ class Section(CoreModel):
         if self.workshop.number != 3:
             return None
 
-        return self.location.sows_count_by_tour(self.location)
+        return self.location.sows_count_by_tour
 
 
 class Cell(CoreModel):
