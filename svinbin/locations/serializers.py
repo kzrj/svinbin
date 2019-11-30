@@ -18,7 +18,7 @@ class WokrshopSerializer(serializers.ModelSerializer):
 
 
 class SectionSerializer(serializers.ModelSerializer):
-    location = serializers.PrimaryKeyRelatedField(source='*', read_only=True)
+    location = serializers.PrimaryKeyRelatedField(read_only=True)
     sows_count_by_tour = serializers.ReadOnlyField()
 
     class Meta:
