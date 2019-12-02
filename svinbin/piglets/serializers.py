@@ -6,7 +6,7 @@ from locations.models import Location
 
 
 class PigletsSerializer(serializers.ModelSerializer):
-    metatour = serializers.ReadOnlyField(source='metatour_repr')
+    metatour_repr = serializers.ReadOnlyField()
 
     class Meta:
         model = Piglets

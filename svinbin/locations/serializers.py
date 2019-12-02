@@ -47,7 +47,7 @@ class LocationsFromToSerializer(serializers.Serializer):
 class LocationSerializer(serializers.ModelSerializer):
     workshop = serializers.StringRelatedField()
     section = serializers.StringRelatedField()
-    sowAndPigletsCell = SowAndPigletsCellSerializer(read_only=True)
+    # sowAndPigletsCell = SowAndPigletsCellSerializer(read_only=True)
     # pigletsGroupCell = PigletsGroupCellSerializer(read_only=True)
 
     sow_set = sows_serializers.SowSimpleSerializer(many=True, read_only=True)
