@@ -32,12 +32,12 @@ class CreateWorkshopsView(APIView):
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects \
-        .select_related('section', 'workshop', 'sowAndPigletsCell') \
-        .prefetch_related('sow_set', 'piglets', 'gilt_set').all()
+        .select_related('section', 'workshop', 'pigletsGroupCell') \
+        .prefetch_related('sow_set', 'piglets__metatour__records__tour').all()
     serializer_class = serializers.LocationSerializer
     filter_class = LocationFilter
 
-    # mb it is useful to separete locations by actions - sections, workshop, cells.
+    # mb it is useful to separate locations by actions - sections, workshop, cells.
     # def sections
 
 

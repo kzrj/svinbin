@@ -87,3 +87,7 @@ class Piglets(CoreModel):
     #     self.quantity += quantity
     #     self.gilts_quantity += quantity
     #     self.save()
+
+    @property
+    def metatour_repr(self):
+        return self.metatour.records_repr()    

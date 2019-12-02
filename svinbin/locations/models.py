@@ -155,20 +155,17 @@ class Location(CoreModel):
         if self.section:
             return self.section
 
-        if self.sowSingleCell:
-            return self.sowSingleCell
+        # if self.sowSingleCell:
+        #     return self.sowSingleCell
 
         if self.pigletsGroupCell:
             return self.pigletsGroupCell
 
-        if self.sowAndPigletsCell:
-            return self.sowAndPigletsCell
+        # if self.sowAndPigletsCell:
+        #     return self.sowAndPigletsCell
 
-        if self.sowGroupCell:
-            return self.sowGroupCell
-
-        if self.weighingCell:
-            return self.weighingCell
+        # if self.sowGroupCell:
+        #     return self.sowGroupCell
 
     @property
     def get_workshop(self):
@@ -191,7 +188,8 @@ class Location(CoreModel):
             return self.sowGroupCell.section.workshop
 
     def __str__(self):
-        return str(self.get_location)
+        # return str(self.get_location)
+        return str(self.pk)
 
     def get_located_active_piglets(self):
         return self.piglets_set.all()

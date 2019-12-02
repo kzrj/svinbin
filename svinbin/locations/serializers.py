@@ -44,14 +44,6 @@ class LocationsFromToSerializer(serializers.Serializer):
     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
 
 
-# class LocationPigletsGrouspCellSerializer(serializers.ModelSerializer):
-#     pigletsGroupCell = serializers.StringRelatedField()
-
-#     class Meta:
-#         model = Location
-#         fields = ['id', 'pigletsGroupCell']
-
-
 class LocationSerializer(serializers.ModelSerializer):
     workshop = serializers.StringRelatedField()
     section = serializers.StringRelatedField()

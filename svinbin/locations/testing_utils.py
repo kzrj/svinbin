@@ -50,14 +50,14 @@ def create_sections_and_cell_for_workshop_two():
         [Location(section=section) for section in Section.objects.filter(workshop=workshop_two)]
         )
 
-    for section in Section.objects.filter(workshop=workshop_two):
-        SowGroupCell.objects.bulk_create([
-            SowGroupCell(workshop=workshop_two, section=section, number=cellNumber) for cellNumber in range(1, 7)]
-            )
-        Location.objects.bulk_create(
-            [Location(sowGroupCell=cell) for cell in SowGroupCell.objects.filter(workshop=workshop_two,
-                section=section)]
-            )
+    # for section in Section.objects.filter(workshop=workshop_two):
+    #     SowGroupCell.objects.bulk_create([
+    #         SowGroupCell(workshop=workshop_two, section=section, number=cellNumber) for cellNumber in range(1, 7)]
+    #         )
+    #     Location.objects.bulk_create(
+    #         [Location(sowGroupCell=cell) for cell in SowGroupCell.objects.filter(workshop=workshop_two,
+    #             section=section)]
+    #         )
 
 def create_sections_and_cell_for_workshop_three():
     workshop_three = WorkShop.objects.get(number=3)
@@ -74,14 +74,14 @@ def create_sections_and_cell_for_workshop_three():
         [Location(section=section) for section in Section.objects.filter(workshop=workshop_three)]
         )
 
-    for section in Section.objects.filter(workshop=workshop_three):
-        SowAndPigletsCell.objects.bulk_create([
-            SowAndPigletsCell(workshop=workshop_three, section=section, number=cellNumber) for cellNumber in range(1, 46)
-            ])
-        Location.objects.bulk_create(
-            [Location(sowAndPigletsCell=cell) for cell in SowAndPigletsCell.objects.filter(workshop=workshop_three,
-                section=section)]
-            )
+    # for section in Section.objects.filter(workshop=workshop_three):
+    #     SowAndPigletsCell.objects.bulk_create([
+    #         SowAndPigletsCell(workshop=workshop_three, section=section, number=cellNumber) for cellNumber in range(1, 46)
+    #         ])
+    #     Location.objects.bulk_create(
+    #         [Location(sowAndPigletsCell=cell) for cell in SowAndPigletsCell.objects.filter(workshop=workshop_three,
+    #             section=section)]
+    #         )
 
 def create_sections_and_cell_for_workshop_with_group_cells(workshop_number):
     workshop = WorkShop.objects.get(number=workshop_number)

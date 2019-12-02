@@ -83,8 +83,10 @@ class MetaTour(CoreModel):
     def __str__(self):
         return 'Piglets {} MetaTour {}'.format(self.piglets, self.pk)
 
-    # def create_record(self, tour, quantity, total_quantity):
-    #     MetaTourRecord.objects.create_record(self, tour, quantity, total_quantity)
+    def records_repr(self):
+        # analog qs.values()
+        return [{'tour': record.tour.week_number, 'percentage': record.percentage} 
+            for record in self.records.all()]
 
 
 class MetaTourRecordQuerySet(models.QuerySet):
