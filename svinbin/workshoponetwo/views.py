@@ -86,19 +86,6 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True)
-    def put_in_semination_row(self, request, pk=None):
-        sow = self.get_object()        
-        transaction = transactions_models.SowTransaction.objects.create_transaction(
-            sow, locations_models.Location.objects.get(section__name="Ряд осеменения"),
-            request.user)
-        return Response(
-            {
-                "transaction": transactions_serializers.SowTransactionSerializer(transaction).data,
-                "sow": sows_serializers.SowSerializer(sow).data, 
-            },
-            status=status.HTTP_200_OK)
-
-    @action(methods=['post'], detail=True)
     def semination(self, request, pk=None):
         sow = self.get_object() 
         serializer = sows_events_serializers.CreateSeminationSerializer(data=request.data)

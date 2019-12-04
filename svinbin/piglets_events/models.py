@@ -113,10 +113,10 @@ class PigletsMergerManager(CoreModelManager):
         parent_piglets_ids = list()
         for merging_record in merging_list:
             if not merging_record['changed']:
-                parent_piglets_ids.append(merging_record['id'])
+                parent_piglets_ids.append(merging_record['piglets_id'])
             else:
                 # split piglets return group id with quantity
-                piglets = Piglets.objects.get(id=merging_record['id'])
+                piglets = Piglets.objects.get(id=merging_record['piglets_id'])
                 not_merging_piglets, merging_piglets = \
                     PigletsSplit.objects.split_return_groups(piglets, merging_record['quantity'],
                      0, initiator, date)

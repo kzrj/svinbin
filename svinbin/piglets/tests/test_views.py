@@ -14,13 +14,12 @@ import piglets.testing_utils as piglets_testing
 import staff.testing_utils as staff_testing
 
 from piglets.models import Piglets
-# from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger, \
-#     CullingNewBornPiglets, WeighingPiglets
 from locations.models import Location
+from tours.models import Tour
 # from transactions.models import PigletsTransaction, SowTransaction
 
 
-class WorkShopNomadPigletsViewsTest(APITestCase):
+class PigletsViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
         locations_testing.create_workshops_sections_and_cells()
@@ -29,10 +28,27 @@ class WorkShopNomadPigletsViewsTest(APITestCase):
         self.user = staff_testing.create_employee()
         self.client.force_authenticate(user=self.user)
 
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.tour3 = Tour.objects.get_or_create_by_week_in_current_year(week_number=3)
+        self.tour4 = Tour.objects.get_or_create_by_week_in_current_year(week_number=4)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.loc_ws3_sec1 = Location.objects.get(section__workshop__number=3, section__number=1)
+        self.loc_ws3_sec2 = Location.objects.get(section__workshop__number=3, section__number=2)
 
-    def test_first(self):
-        response = self.client.get('/api/piglets/')
-        print(response.data)
+    def test_create_from_merging_list(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+
+        response = self.client.post('/api/piglets/create_from_merging_list_and_move_to_ws4/', \
+            [{'piglets_id': piglets1.pk, 'quantity': piglets1.quantity, 'changed': False},
+             {'piglets_id': piglets2.pk, 'quantity': piglets2.quantity, 'changed': False}],
+            format='json')
+        self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
 
 
     # def test_weighing_piglets(self):

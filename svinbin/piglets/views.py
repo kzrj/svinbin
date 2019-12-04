@@ -3,21 +3,17 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
-# import sows.serializers as sows_serializers
-# import sows_events.serializers as sows_events_serializers
 import piglets.serializers as piglets_serializers
 # import piglets_events.serializers as piglets_events_serializers
 # import transactions.serializers as transactions_serializers
 # import locations.serializers as locations_serializers
 
-# import sows.models as sows_models
-# import sows_events.models as sows_events_models
 import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
-# import transactions.models as transactions_models
+import transactions.models as transactions_models
 import locations.models as locations_models
 
-# from piglets.filters import NomadPigletsGroupFilter
+# from piglets.filters import PigletsFilter
 
 
 class PigletsViewSet(viewsets.ModelViewSet):
@@ -25,8 +21,84 @@ class PigletsViewSet(viewsets.ModelViewSet):
     serializer_class = piglets_serializers.PigletsSerializer
     # filter_class = NomadPigletsGroupFilter
 
+    @action(methods=['post'], detail=False)
+    def create_from_merging_list_and_move_to_ws4(self, request):
+        serializer = piglets_serializers.MergeFromListRecordSerializer(data=request.data, many=True)
+        if serializer.is_valid():
+            new_location = locations_models.Location.objects.get(workshop__number=3)
+            merged_piglets = piglets_events_models.PigletsMerger.objects.create_from_merging_list(
+                merging_list=serializer.validated_data, new_location=new_location, initiator=request.user)
+            
+            to_location = locations_models.Location.objects.get(workshop__number=4)
+            transaction = transactions_models.PigletsTransaction.objects.create_transaction(
+                to_location=to_location, piglets_group=merged_piglets, initiator=request.user)
+            return Response(
+                {
+                  "message": 'Партия создана и перемещена в Цех4.',
+                 },
+                 
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # class WorkShopNomadPigletsViewSet(NomadPigletsGroupViewSet):
+#     @action(methods=['post'], detail=True)
+#     def create_gilt(self, request, pk=None):
+#         serializer = serializers.NewGiltBirthIdSerializer(data=request.data)
+#         if serializer.is_valid():
+#             new_born_group = self.get_object()
+#             gilt = Gilt.objects.create_gilt(
+#                     birth_id=serializer.validated_data['birth_id'],
+#                     new_born_group=new_born_group,
+#                 )
+#             return Response(
+#                 {"piglets_group": piglets_serializers. \
+#                     NewBornPigletsGroupSerializer(new_born_group).data,
+#                  "message": 'Ремонтная свинка пронумерована.',
+#                  "gilt": sows_serializers.GiltSerializer(gilt).data,
+#                  },
+#                 status=status.HTTP_200_OK)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     @action(methods=['post'], detail=True)
+#     def recount(self, request, pk=None):
+#         serializer = serializers.CreateRecountSerializer(data=request.data)
+#         if serializer.is_valid():
+#             new_born_group = self.get_object()
+#             recount = piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(
+#                     piglets_group=new_born_group,
+#                     quantity=serializer.validated_data['quantity'],
+#                     initiator=request.user
+#                 )
+#             return Response(
+#                 {"piglets_group": piglets_serializers. \
+#                     NewBornPigletsGroupSerializer(new_born_group).data,
+#                  "message": 'ok',
+#                  "recount": piglets_events_serializers. \
+#                     NewBornPigletsGroupRecountSerializer(recount).data,
+#                  },
+#                 status=status.HTTP_200_OK)
+#         else:
+#             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 #     @action(methods=['post'], detail=True)
 #     def weighing_piglets(self, request, pk=None):        
 #         serializer = piglets_events_serializers.WeighingPigletsCreateSerializer(data=request.data)
