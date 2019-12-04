@@ -32,7 +32,10 @@ class PigletsQuerySet(models.QuerySet):
 
 class PigletsManager(CoreModelManager):
     def get_queryset(self):
-        return PigletsQuerySet(self.model, using=self._db).select_related('metatour')
+        return PigletsQuerySet(self.model, using=self._db).select_related('metatour').active()
+
+    def get_all(self):
+        return PigletsQuerySet(self.model, using=self._db)
 
     def get_active(self):
         return self.get_queryset().active()
