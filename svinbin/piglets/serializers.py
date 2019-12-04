@@ -14,7 +14,8 @@ class PigletsSerializer(serializers.ModelSerializer):
 
 
 class MergeFromListRecordSerializer(serializers.Serializer):
-    piglets_id = serializers.PrimaryKeyRelatedField(queryset=Piglets.objects.all())
+    # piglets_id = serializers.PrimaryKeyRelatedField(queryset=Piglets.objects.all())
+    piglets_id = serializers.IntegerField()
     quantity = serializers.IntegerField()
     changed = serializers.BooleanField()
 
