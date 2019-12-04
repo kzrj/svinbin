@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.test import TestCase, TransactionTestCase
+from django.test import TestCase
 from django.core.exceptions import ValidationError
 
 from piglets.models import Piglets

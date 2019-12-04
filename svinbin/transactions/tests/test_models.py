@@ -8,10 +8,10 @@ import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 
-from locations.models import Location, WorkShop, Section, SowSingleCell, PigletsGroupCell, \
- SowGroupCell, SowAndPigletsCell
+from locations.models import Location
 from sows.models import Sow
-from piglets.models import NomadPigletsGroup
+from piglets.models import Piglets
+from tours.models import Tour
 from transactions.models import SowTransaction, PigletsTransaction
 
 
@@ -34,14 +34,14 @@ class SowTransactionManagerTest(TestCase):
          Location.objects.get(workshop__number=1))
         self.assertEqual(transaction.to_location, to_location)
 
-    def test_create_transaction_to_not_empty_cell(self):
-        sow1 = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=1)
-        sow2 = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=2)
-        with self.assertRaises(ValidationError):
-            transaction = SowTransaction.objects.create_transaction(
-                to_location=sow2.location,
-                sow=sow1
-                )
+    # def test_create_transaction_to_not_empty_cell(self):
+    #     sow1 = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=1)
+    #     sow2 = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=2)
+    #     with self.assertRaises(ValidationError):
+    #         transaction = SowTransaction.objects.create_transaction(
+    #             to_location=sow2.location,
+    #             sow=sow1
+    #             )
 
     def test_create_many_transaction(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
@@ -51,83 +51,7 @@ class SowTransactionManagerTest(TestCase):
         transactions = SowTransaction.objects.create_many_transactions([sow1, sow2],
             to_location)
         self.assertEqual(transactions, [1,2])
-
-
-class LocationModelManagerTest(TestCase):
-    def test_create_location(self):
-        workshop = WorkShop.objects.create(number=1)
-        location = Location.objects.create_location(workshop)
-        self.assertEqual(location.workshop.number, 1)
-
-        section = Section.objects.create(workshop=workshop, number=1)
-        location = Location.objects.create_location(section)
-        self.assertEqual(location.section.number, 1)
-        
-        location = Location.objects.create_location(
-            SowSingleCell.objects.create(workshop=workshop, section=section, number='1'))
-        self.assertEqual(location.sowSingleCell.number, '1')
-       
-
-class LocationModelTest(TestCase):
-    def setUp(self):
-        locations_testing.create_workshops_sections_and_cells()
-        sows_testing.create_statuses()
-
-    def test_get_location(self):
-        workshop = WorkShop.objects.get(number=1)
-        location = Location.objects.get(workshop=workshop)
-        self.assertEqual(location.get_location, workshop)
-
-        section = Section.objects.get(workshop__number=1, number=1)
-        location = Location.objects.get(section=section)
-        self.assertEqual(location.get_location, section)
-        
-        # cell = SowSingleCell.objects.get(number='1')
-        # location = Location.objects.get(sowSingleCell=cell)
-        # self.assertEqual(location.get_location, cell)
-
-        cell = SowGroupCell.objects.first()
-        location = Location.objects.get(sowGroupCell=cell)
-        self.assertEqual(location.get_location, cell)
-
-        cell = PigletsGroupCell.objects.first()
-        location = Location.objects.get(pigletsGroupCell=cell)
-        self.assertEqual(location.get_location, cell)
-
-        cell = SowAndPigletsCell.objects.first()
-        location = Location.objects.get(sowAndPigletsCell=cell)
-        self.assertEqual(location.get_location, cell)
-
-    def test_get_workshop(self):
-        workshop = WorkShop.objects.get(number=1)
-        location = Location.objects.get(workshop=workshop)
-        self.assertEqual(location.get_workshop, workshop)
-
-        section = Section.objects.get(workshop__number=1, number=1)
-        location = Location.objects.get(section=section)
-        self.assertEqual(location.get_workshop, workshop)
-        
-        # cell = SowSingleCell.objects.get(number='1')
-        # location = Location.objects.get(sowSingleCell=cell)
-        # self.assertEqual(location.get_workshop, workshop)
-
-        cell = SowGroupCell.objects.first()
-        location = Location.objects.get(sowGroupCell=cell)
-        self.assertEqual(location.get_workshop, cell.section.workshop)
-
-        cell = PigletsGroupCell.objects.first()
-        location = Location.objects.get(pigletsGroupCell=cell)
-        self.assertEqual(location.get_workshop, cell.section.workshop)
-
-        cell = SowAndPigletsCell.objects.first()
-        location = Location.objects.get(sowAndPigletsCell=cell)
-        self.assertEqual(location.get_workshop, cell.section.workshop)
-
-    def test_get_located_active_new_born_groups(self):
-        new_born_group = piglets_testing.create_new_born_group()
-        location = new_born_group.location
-        print(location.get_located_active_new_born_groups())
-       
+           
 
 class PigletsTransactionManagerTest(TestCase):
     def setUp(self):
@@ -135,16 +59,24 @@ class PigletsTransactionManagerTest(TestCase):
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
 
-    def test_create_transaction(self):
-        nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
-        self.assertEqual(nomad_group.location.workshop.number, 3)
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
 
-        to_location = Location.objects.get(workshop__number=4)
-        transaction = PigletsTransaction.objects.create_transaction(to_location, nomad_group)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.loc_ws3_sec1 = Location.objects.get(section__workshop__number=3, section__number=1)
+        self.loc_ws3_sec2 = Location.objects.get(section__workshop__number=3, section__number=2)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+
+    def test_create_transaction(self):
+        piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 10)
+
+        transaction = PigletsTransaction.objects.create_transaction(self.loc_ws4, piglets)
 
         self.assertEqual(transaction.from_location.workshop.number, 3)
         self.assertEqual(transaction.to_location.workshop.number, 4)
-        self.assertEqual(transaction.piglets_group, nomad_group)
+        self.assertEqual(transaction.piglets_group, piglets)
 
-        nomad_group.refresh_from_db()
-        self.assertEqual(nomad_group.location.workshop.number, 4)
+        piglets.refresh_from_db()
+        self.assertEqual(piglets.location, self.loc_ws4)

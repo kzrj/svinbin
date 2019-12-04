@@ -156,7 +156,7 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
     def mark_as_nurse(self, request, pk=None):
         serializer = serializers.MarkSowAsNurseSerializer(data=request.data)
         if serializer.is_valid():
-            message = 'Свинья почемена как кормилица.'
+            message = 'Свинья помечена как кормилица.'
             sow = self.get_object()
             if serializer.validated_data.get('piglets_tour'):
                 NewBornPigletsGroup.objects.create_new_born_group(sow.location, \

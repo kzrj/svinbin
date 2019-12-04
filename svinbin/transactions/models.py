@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from core.models import CoreModel, CoreModelManager, Event
 from sows_events.models import WeaningSow
 from locations.models import SowAndPigletsCell
+from piglets.models import Piglets
 
 
 class Transaction(Event):
@@ -56,33 +57,27 @@ class SowTransaction(Transaction):
     objects = SowTransactionManager()
 
 
-# class PigletsTransactionManager(CoreModelManager):
-#     def create_transaction(self, to_location, piglets_group, initiator=None):
-#         transaction = PigletsTransaction.objects.create(
-#                 date=timezone.now(),
-#                 initiator=initiator,
-#                 from_location=piglets_group.location,
-#                 to_location=to_location,
-#                 piglets_group=piglets_group
-#                 )
+class PigletsTransactionManager(CoreModelManager):
+    def create_transaction(self, to_location, piglets_group, initiator=None):
+        transaction = PigletsTransaction.objects.create(
+                date=timezone.now(),
+                initiator=initiator,
+                from_location=piglets_group.location,
+                to_location=to_location,
+                piglets_group=piglets_group
+                )
 
-#         piglets_group.change_current_location(to_location)
+        piglets_group.change_location(to_location)
 
-#         return transaction
+        return transaction
 
 
-# class PigletsTransaction(Transaction):
-#     from_location = models.ForeignKey('locations.Location', on_delete=models.CASCADE,
-#      related_name="piglets_transaction_from")
-#     to_location = models.ForeignKey('locations.Location', on_delete=models.CASCADE,
-#      related_name="piglets_transaction_to")
-#     piglets_group = models.ForeignKey('piglets.NomadPigletsGroup',
-#      on_delete=models.CASCADE, related_name="transactions")
+class PigletsTransaction(Transaction):
+    from_location = models.ForeignKey('locations.Location', on_delete=models.CASCADE,
+     related_name="piglets_transaction_from")
+    to_location = models.ForeignKey('locations.Location', on_delete=models.CASCADE,
+     related_name="piglets_transaction_to")
+    piglets_group = models.ForeignKey('piglets.Piglets', on_delete=models.CASCADE,
+     related_name="transactions")
 
-#     objects = PigletsTransactionManager()
-
-    
-# class GiltTransaction(Transaction):
-#     from_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_from_location")
-#     to_location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name="gilt_to_location")
-#     gilt = models.ForeignKey('sows.Gilt', on_delete=models.CASCADE)
+    objects = PigletsTransactionManager()

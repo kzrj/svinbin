@@ -14,12 +14,72 @@ class PigletsEvent(Event):
         abstract = True
 
 
+class PigletsSplitManager(CoreModelManager):
+    def split_return_groups(self, parent_piglets, new_amount, new_gilts_amount=0, initiator=None,
+         date=timezone.now()):
+        # validate
+        if new_amount >= parent_piglets.quantity:
+            raise DjangoValidationError(message='new_amount >= parent_piglets.quantity')
+
+        # create split record
+        split_record = self.create(parent_piglets=parent_piglets)
+
+        # create two groups with metatours
+        piglets1 = Piglets.objects.create(location=parent_piglets.location,
+            status=None,
+            start_quantity=(parent_piglets.quantity - new_amount),
+            quantity=(parent_piglets.quantity - new_amount),
+            gilts_quantity=(parent_piglets.gilts_quantity - new_gilts_amount),
+            split_as_child=split_record)
+        metatour1 = MetaTour.objects.create(piglets=piglets1)
+
+        piglets2_new_amount = Piglets.objects.create(location=parent_piglets.location,
+            status=None,
+            start_quantity=new_amount,
+            quantity=new_amount,
+            gilts_quantity=new_gilts_amount,
+            split_as_child=split_record)
+        metatour2 = MetaTour.objects.create(piglets=piglets2_new_amount)
+        
+        # create metarecodrs
+        for parent_record in parent_piglets.metatour.records.all():
+            # notice how quantity is calculated
+            MetaTourRecord.objects.create_record(
+                metatour=metatour1,
+                tour=parent_record.tour,
+                quantity=round(parent_record.percentage * new_amount / 100),
+                total_quantity=new_amount)
+
+            MetaTourRecord.objects.create_record(
+                metatour=metatour2,
+                tour=parent_record.tour,
+                quantity=round(parent_record.percentage * new_amount / 100),
+                total_quantity=new_amount)
+
+        parent_piglets.deactivate()
+
+        return piglets1, piglets2_new_amount
+
+
+class PigletsSplit(PigletsEvent):
+    parent_piglets = models.OneToOneField(Piglets, on_delete=models.SET_NULL, null=True,
+     related_name='split_as_parent')
+
+    objects = PigletsSplitManager()
+
+    def __str__(self):
+        return 'PigletsSplit {}'.format(self.pk)
+
+
 class PigletsMergerManager(CoreModelManager):
     def create_merger_return_group(self, parent_piglets, new_location, initiator=None,
          date=timezone.now()):
         if isinstance(parent_piglets, list):
-            pks = [group.pk for group in new_born_piglets_groups]
-            parent_piglets = Piglets.objects.filter(pk__in=pks)
+            if isinstance(parent_piglets[0], int):
+                parent_piglets = Piglets.objects.filter(pk__in=parent_piglets)
+            else:
+                pks = [group.pk for group in parent_piglets]
+                parent_piglets = Piglets.objects.filter(pk__in=pks)
 
         # create child piglets
         total_quantity = parent_piglets.get_total_quantity()
@@ -48,73 +108,28 @@ class PigletsMergerManager(CoreModelManager):
 
         return piglets
 
+    def create_from_merging_list(self, merging_list, new_location, initiator=None, date=timezone.now()):
+        # parse and parentpiglets
+        parent_piglets_ids = list()
+        for merging_record in merging_list:
+            if not merging_record['changed']:
+                parent_piglets_ids.append(merging_record['id'])
+            else:
+                # split piglets return group id with quantity
+                piglets = Piglets.objects.get(id=merging_record['id'])
+                not_merging_piglets, merging_piglets = \
+                    PigletsSplit.objects.split_return_groups(piglets, merging_record['quantity'],
+                     0, initiator, date)
+                parent_piglets_ids.append(merging_piglets.id)
+
+        return self.create_merger_return_group(parent_piglets_ids, new_location, initiator, date)
+                
 
 class PigletsMerger(PigletsEvent):
     created_piglets = models.OneToOneField(Piglets, on_delete=models.SET_NULL, null=True,
      related_name='merger_as_child')
 
     objects = PigletsMergerManager()
-
-
-class PigletsSplitManager(CoreModelManager):
-    def split_return_groups(self, parent_piglets, new_amount, new_gilts_amount=0, initiator=None,
-         date=timezone.now()):
-        if isinstance(parent_piglets, list):
-            pks = [group.pk for group in new_born_piglets_groups]
-            parent_piglets = Piglets.objects.filter(pk__in=pks)
-
-        # validate
-        if new_amount >= parent_piglets.quantity:
-            raise DjangoValidationError(message='new_amount >= parent_piglets.quantity')
-
-        # create split record
-        split_record = self.create(parent_piglets=parent_piglets)
-
-        # create two groups with metatours
-        piglets1 = Piglets.objects.create(location=parent_piglets.location,
-            status=None,
-            start_quantity=(parent_piglets.quantity - new_amount),
-            quantity=(parent_piglets.quantity - new_amount),
-            gilts_quantity=(parent_piglets.gilts_quantity - new_gilts_amount),
-            split_as_child=split_record)
-        metatour1 = MetaTour.objects.create(piglets=piglets1)
-
-        piglets2 = Piglets.objects.create(location=parent_piglets.location,
-            status=None,
-            start_quantity=new_amount,
-            quantity=new_amount,
-            gilts_quantity=new_gilts_amount,
-            split_as_child=split_record)
-        metatour2 = MetaTour.objects.create(piglets=piglets2)
-        
-        # create metarecodrs
-        for parent_record in parent_piglets.metatour.records.all():
-            # notice how quantity is calculated
-            MetaTourRecord.objects.create_record(
-                metatour=metatour1,
-                tour=parent_record.tour,
-                quantity=round(parent_record.percentage * new_amount / 100),
-                total_quantity=new_amount)
-
-            MetaTourRecord.objects.create_record(
-                metatour=metatour2,
-                tour=parent_record.tour,
-                quantity=round(parent_record.percentage * new_amount / 100),
-                total_quantity=new_amount)
-
-        parent_piglets.deactivate()
-
-        return piglets1, piglets2
-
-
-class PigletsSplit(PigletsEvent):
-    parent_piglets = models.OneToOneField(Piglets, on_delete=models.SET_NULL, null=True,
-     related_name='piglets_split')
-
-    objects = PigletsSplitManager()
-
-    def __str__(self):
-        return 'PigletsSplit {}'.format(self.pk)
 
 
 class WeighingPigletsManager(CoreModelManager):

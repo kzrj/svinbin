@@ -1,30 +1,29 @@
 # # -*- coding: utf-8 -*-
-# from rest_framework import status, viewsets
-# from rest_framework.response import Response
-# from rest_framework.decorators import action
+from rest_framework import status, viewsets
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
 # import sows.serializers as sows_serializers
 # import sows_events.serializers as sows_events_serializers
-# import piglets.serializers as piglets_serializers
+import piglets.serializers as piglets_serializers
 # import piglets_events.serializers as piglets_events_serializers
 # import transactions.serializers as transactions_serializers
 # import locations.serializers as locations_serializers
 
 # import sows.models as sows_models
 # import sows_events.models as sows_events_models
-# import piglets.models as piglets_models
-# import piglets_events.models as piglets_events_models
+import piglets.models as piglets_models
+import piglets_events.models as piglets_events_models
 # import transactions.models as transactions_models
-# import locations.models as locations_models
+import locations.models as locations_models
 
 # from piglets.filters import NomadPigletsGroupFilter
 
 
-# class NomadPigletsGroupViewSet(viewsets.ModelViewSet):
-#     queryset = piglets_models.NomadPigletsGroup.objects. \
-#         select_related('creating_new_born_merger').all()
-#     serializer_class = piglets_serializers.NomadPigletsGroupSerializer
-#     filter_class = NomadPigletsGroupFilter
+class PigletsViewSet(viewsets.ModelViewSet):
+    queryset = piglets_models.Piglets.objects.all()
+    serializer_class = piglets_serializers.PigletsSerializer
+    # filter_class = NomadPigletsGroupFilter
 
 
 # class WorkShopNomadPigletsViewSet(NomadPigletsGroupViewSet):

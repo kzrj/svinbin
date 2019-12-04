@@ -24,15 +24,24 @@ class PigletsQuerySet(models.QuerySet):
         return self.filter(active=True)
 
     def inactive(self):
-        return self.filter(active=True)
+        return self.filter(active=False)
+
+    def active_and_inactive(self):
+        return self.filter(Q(active=False) | Q(active=True))
 
 
 class PigletsManager(CoreModelManager):
     def get_queryset(self):
-        return PigletsQuerySet(self.model, using=self._db).select_related('metatour').active()
+        return PigletsQuerySet(self.model, using=self._db).select_related('metatour')
+
+    def get_active(self):
+        return self.get_queryset().active()
 
     def get_inactive(self):
-        return PigletsQuerySet(self.model, using=self._db).select_related('metatour').inactive()
+        return self.get_queryset().inactive()
+
+    def get_active_and_inactive(self):
+        return self.get_queryset().active_and_inactive()
 
 
 class Piglets(CoreModel):
@@ -53,6 +62,9 @@ class Piglets(CoreModel):
     active = models.BooleanField(default=True)  
 
     objects = PigletsManager()
+
+    class Meta:
+        ordering = ['pk',]
 
     def __str__(self):
         return 'Piglets {}'.format(self.pk)
@@ -90,4 +102,8 @@ class Piglets(CoreModel):
 
     @property
     def metatour_repr(self):
-        return self.metatour.records_repr()    
+        return self.metatour.records_repr()
+
+    def change_location(self, location):
+        self.location = location
+        self.save()
