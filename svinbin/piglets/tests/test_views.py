@@ -50,6 +50,15 @@ class PigletsViewSetTest(APITestCase):
             format='json')
         self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
 
+    def test_culling(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+
+        response = self.client.post('/api/piglets/%s/culling/' % piglets1.pk, \
+            {'culling_type': 'padej', 'reason': 'xz'})
+
+        self.assertEqual(response.data['message'], 'Выбраковка прошла успешно.')
+
 
     # def test_weighing_piglets(self):
     #     nomad_piglets_group = piglets_testing.create_nomad_group_from_three_new_born()

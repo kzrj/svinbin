@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 import piglets.serializers as piglets_serializers
-# import piglets_events.serializers as piglets_events_serializers
+import piglets_events.serializers as piglets_events_serializers
 # import transactions.serializers as transactions_serializers
 # import locations.serializers as locations_serializers
 
@@ -41,22 +41,24 @@ class PigletsViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    @action(methods=['post'], detail=True)
+    def culling(self, request, pk=None):
+        serializer = piglets_events_serializers.CullingPigletsSerializer(data=request.data)
+        if serializer.is_valid():
+            piglets_events_models.CullingPiglets.objects.create_culling_piglets(
+                piglets_group=self.get_object(),
+                culling_type=serializer.validated_data['culling_type'],
+                reason=serializer.validated_data['reason'],
+                initiator=request.user
+                )
+            return Response(
+                {
+                  "message": 'Выбраковка прошла успешно.',
+                 },
+                 
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # class WorkShopNomadPigletsViewSet(NomadPigletsGroupViewSet):
