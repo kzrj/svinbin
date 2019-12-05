@@ -180,7 +180,7 @@ class CullingPiglets(PigletsEvent):
 
     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
     reason = models.CharField(max_length=200, null=True)
-    piglets_group = models.OneToOneField(Piglets, on_delete=models.CASCADE, related_name="culling")
+    piglets_group = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name="cullings")
     is_it_gilt = models.BooleanField(default=False)
 
     objects = CullingPigletsManager()
