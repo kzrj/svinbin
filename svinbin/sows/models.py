@@ -17,13 +17,6 @@ class SowStatus(CoreModel):
         return self.title
 
 
-class GiltStatus(CoreModel):
-    title = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.title
-
-
 class Pig(CoreModel):
     birth_id = models.CharField(max_length=10, unique=True, null=True)
     location = models.ForeignKey("locations.Location", on_delete=models.SET_NULL, null=True)
@@ -269,32 +262,23 @@ class Sow(Pig):
 
 
 class GiltManager(CoreModelManager):
-    def create_gilt(self, birth_id, new_born_group, cell=None):
+    def create_gilt(self, birth_id, mother_sow):
+        if not mother_sow.tour:
+            raise DjangoValidationError(message='У свиноматки не текущего тура.')
+
         gilt = self.create(
             birth_id=birth_id,
-            mother_sow=new_born_group.farrows.all().first().sow,
-            location=new_born_group.location,
-            new_born_group=new_born_group, tour=new_born_group.tour
+            mother_sow=mother_sow,
+            tour=mother_sow.tour,
+            farrow=mother_sow.get_last_farrow().first()
          )
-        new_born_group.add_gilts(1)
-
         return gilt
-
-    def from_list_to_queryset(self, gilts_list): # test + in gilt merger
-        pks = [gilt.pk for gilt in gilts_list]
-        return self.get_queryset().filter(pk__in=pks)
 
 
 class Gilt(Pig):
     mother_sow = models.ForeignKey(Sow, on_delete=models.SET_NULL, null=True)
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
-    status = models.ForeignKey(GiltStatus, on_delete=models.SET_NULL, null=True)
-    # new_born_group = models.ForeignKey('piglets.NewBornPigletsGroup', on_delete=models.SET_NULL,
-    #  null=True, related_name='gilts')
-    # merger = models.ForeignKey('gilts_events.GiltMerger', on_delete=models.SET_NULL, null=True,
-    #     related_name='gilts')
-    # casting_list_to_seven_five = models.ForeignKey('gilts_events.CastingListToSevenFiveEvent',
-    #  on_delete=models.SET_NULL, null=True, related_name='gilts')
+    farrow = models.ForeignKey('sows_events.SowFarrow', on_delete=models.SET_NULL, null=True)
 
     objects = GiltManager()
 

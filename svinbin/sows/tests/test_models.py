@@ -5,8 +5,9 @@ from django.test import TestCase, TransactionTestCase
 from django.db import models
 from django.db.models import Q
 from django.db import connection
+from django.core.exceptions import ValidationError
 
-import locations.testing_utils as locaions_testing
+import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testings
 import sows_events.utils as sows_events_testings
 import piglets.testing_utils as piglets_testing
@@ -19,7 +20,7 @@ from tours.models import Tour
 
 class SowModelManagerTest(TransactionTestCase):
     def setUp(self):
-        locaions_testing.create_workshops_sections_and_cells()
+        locations_testing.create_workshops_sections_and_cells()
         sows_testings.create_statuses()
         sows_events_testings.create_types()
         piglets_testing.create_piglets_statuses()
@@ -284,7 +285,6 @@ class SowModelManagerTest(TransactionTestCase):
 
         location = Location.objects.filter(section__number=1, section__workshop__number=3).first()
         data = Sow.objects.get_tours_with_count_sows_by_location(location)
-        print(data)
         self.assertEqual(data[0]['count_sows'], 2)
         self.assertEqual(data[1]['count_sows'], 1)
         self.assertEqual(data[2]['count_sows'], 3)
@@ -299,18 +299,27 @@ class SowModelManagerTest(TransactionTestCase):
             print(data)
 
 
-# class GiltModelManagerTest(TestCase):
-#     def setUp(self):
-#         locaions_testing.create_workshops_sections_and_cells()
-#         sows_testings.create_statuses()
+class GiltModelManagerTest(TestCase):
+    def setUp(self):
+        locaions_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
 
-#     def test_create_gilt(self):
-#         new_born_group = piglets_testing.create_new_born_group()
-#         farrow = new_born_group.farrows.all().first()
-#         gilt = Gilt.objects.create_gilt(birth_id=1, new_born_group=new_born_group)
+    def test_create_gilt(self):
+        sow = sows_testings.create_sow_seminated_usouded_ws3_section(1, 1)
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+        
+        gilt = Gilt.objects.create_gilt(birth_id=1, mother_sow=sow)
 
-#         new_born_group.refresh_from_db()
-#         self.assertEqual(new_born_group.gilts_quantity, 1)
-#         self.assertEqual(gilt.new_born_group, new_born_group)
-#         self.assertEqual(gilt.mother_sow, farrow.sow)
-#         self.assertEqual(gilt.location, new_born_group.location)
+        self.assertEqual(gilt.mother_sow, sow)
+        self.assertEqual(gilt.tour.week_number, 1)
+        self.assertEqual(gilt.farrow, sow.get_last_farrow().first())
+        
+        with self.assertRaises(ValidationError):
+            # not unique birthId
+            gilt2 = Gilt.objects.create_gilt(birth_id=1, mother_sow=sow)
+
+        sow2 = sows_testings.create_sow_with_location(Location.objects.get(workshop__number=3))
+        with self.assertRaises(ValidationError):
+            gilt3 = Gilt.objects.create_gilt(birth_id=12, mother_sow=sow2)

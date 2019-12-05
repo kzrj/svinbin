@@ -7,7 +7,7 @@ from workshopthree import serializers
 from sows import serializers as sows_serializers
 from sows_events import serializers as sows_events_serializers
 
-from sows.models import Sow
+from sows.models import Sow, Gilt
 from sows_events import models as sows_events_models
 
 from sows.views import WorkShopSowViewSet
@@ -39,14 +39,26 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
     def mark_as_nurse(self, request, pk=None):
         serializer = serializers.MarkSowAsNurseSerializer(data=request.data)
         if serializer.is_valid():
-            message = 'Свинья помечена как кормилица.'
             sow = self.get_object()
             sow.mark_as_nurse
             
             return Response(
                 {
                  "sow": sows_serializers.SowSerializer(sow).data,
-                 "message": message,
+                 "message": 'Свинья помечена как кормилица.',
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def create_gilt(self, request, pk=None):
+        serializer = serializers.NewGiltBirthIdSerializer(data=request.data)
+        if serializer.is_valid():
+            Gilt.objects.create_gilt(serializer.validated_data['birth_id'], self.get_object())
+            return Response(
+                {
+                 "message": 'Ремонтная свинка успешно создана.',
                 },
                 status=status.HTTP_200_OK)
         else:
