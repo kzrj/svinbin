@@ -78,6 +78,8 @@ class Piglets(CoreModel):
 
     def remove_piglets(self, quantity):
         self.quantity = self.quantity - quantity
+        if self.quantity <= 0:
+            self.active = False
         self.save()
 
     def remove_gilts(self, quantity):
