@@ -33,7 +33,8 @@ class PigletsMergerModelTest(TransactionTestCase):
         piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
             self.loc_ws3, 10)
 
-        piglets_qs = Piglets.objects.all()
+        # piglets_qs = Piglets.objects.all() !!!!!!!!!!!!!!!!!!!!!!!!! WRONG DANGER
+        piglets_qs = [piglets1, piglets2, piglets3]
 
         piglets = PigletsMerger.objects.create_merger_return_group(parent_piglets=piglets_qs,
             new_location=self.loc_ws3)
@@ -50,8 +51,18 @@ class PigletsMergerModelTest(TransactionTestCase):
         self.assertEqual(mtTourRecords[1].quantity, 20)
         self.assertEqual(round(mtTourRecords[1].percentage), 67)
 
+        piglets.refresh_from_db()
+        self.assertEqual(piglets.active, True)
+        self.assertEqual(Piglets.objects.all().count(), 1)
+
         piglets1.refresh_from_db()
         self.assertEqual(piglets1.active, False)
+
+        piglets2.refresh_from_db()
+        self.assertEqual(piglets2.active, False)
+
+        piglets3.refresh_from_db()
+        self.assertEqual(piglets3.active, False)
 
     def test_create_merger_return_group_v2(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -109,8 +120,8 @@ class PigletsMergerModelTest(TransactionTestCase):
             self.loc_ws3_sec1, 10)
 
         merging_list = [
-            {'id': piglets1.pk, 'quantity': 10, 'changed': False},
-            {'id': piglets2.pk, 'quantity': 10, 'changed': False}
+            {'piglets_id': piglets1.pk, 'quantity': 10, 'changed': False},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False}
         ]
 
         nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
@@ -121,7 +132,9 @@ class PigletsMergerModelTest(TransactionTestCase):
         piglets2.refresh_from_db()
         self.assertEqual(nomad_piglets.merger_as_child, piglets1.merger_as_parent)
         self.assertEqual(nomad_piglets.merger_as_child, piglets2.merger_as_parent)
-        self.assertEqual(nomad_piglets.merger_as_child.piglets_as_parents.get_inactive().count(), 2)
+
+        self.assertEqual(Piglets.objects.get_all(). \
+            filter(merger_as_parent=nomad_piglets.merger_as_child).count(), 2)
 
     def test_create_from_merging_list_v2(self):
         # with change quantity
@@ -131,8 +144,8 @@ class PigletsMergerModelTest(TransactionTestCase):
             self.loc_ws3_sec1, 10)
 
         merging_list = [
-            {'id': piglets1.pk, 'quantity': 7, 'changed': True},
-            {'id': piglets2.pk, 'quantity': 10, 'changed': False}
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False}
         ]
 
         nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
@@ -143,18 +156,28 @@ class PigletsMergerModelTest(TransactionTestCase):
         piglets2.refresh_from_db()
 
         # should be 5 piglets
-        self.assertEqual(Piglets.objects.get_active_and_inactive().count(), 5)
+        self.assertEqual(Piglets.objects.get_all().count(), 5)
+
         #  should be 2 childs from split
         split_record = piglets1.split_as_parent
         self.assertEqual(split_record.parent_piglets, piglets1)
         self.assertEqual(split_record.parent_piglets.active, False)
 
         # children from split
-        self.assertEqual(split_record.piglets_as_child.get_active().count(), 1)
-        self.assertEqual(split_record.piglets_as_child.get_active()[0].quantity, 3)
-        self.assertEqual(split_record.piglets_as_child.get_active()[0].active, True)
-        self.assertEqual(split_record.piglets_as_child.get_inactive()[0].quantity, 7)
-        self.assertEqual(split_record.piglets_as_child.get_inactive()[0].active, False)
+        self.assertEqual(Piglets.objects.get_all(). \
+            filter(split_as_child=split_record, active=True).count(), 1)
+
+        self.assertEqual(Piglets.objects.get_all(). \
+            filter(split_as_child=split_record, active=True).first().quantity, 3)
+
+        self.assertEqual(Piglets.objects.get_all(). \
+            filter(split_as_child=split_record, active=True).first().active, True)
+
+        self.assertEqual(Piglets.objects.get_all(). \
+            filter(split_as_child=split_record, active=False).first().quantity, 7)
+
+        self.assertEqual(Piglets.objects.get_all(). \
+            filter(split_as_child=split_record, active=False).first().active, False)
 
         self.assertEqual(piglets1.active, False)
         self.assertEqual(piglets2.active, False)
@@ -218,8 +241,14 @@ class PigletsSplitModelTest(TestCase):
         # test piglets manager
         split_record = piglets.split_as_parent
         self.assertEqual(split_record.piglets_as_child.all().count(), 2)
-        self.assertEqual(split_record.piglets_as_child.get_inactive().count(), 0)
-        self.assertEqual(split_record.piglets_as_child.get_active_and_inactive().count(), 2)
+        self.assertEqual(Piglets.objects.get_all(). \
+            filter(split_as_child=split_record, active=False).count(), 0)
+
+        # self.assertEqual(split_record.piglets_as_child.get_inactive().count(), 0)
+
+        self.assertEqual(Piglets.objects.get_all(). \
+            filter(split_as_child=split_record).count(), 2)
+        # self.assertEqual(split_record.piglets_as_child.get_active_and_inactive().count(), 2)
         
     def test_split_validate(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -277,75 +306,75 @@ class CullingPigletsTest(TestCase):
         
 
 
-# class RecountManagerTest(TestCase):
-#     def setUp(self):
-#         locations_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
+# # class RecountManagerTest(TestCase):
+# #     def setUp(self):
+# #         locations_testing.create_workshops_sections_and_cells()
+# #         sows_testing.create_statuses()
+# #         piglets_testing.create_piglets_statuses()
 
-#     def test_create_recount_nomad_group(self):
-#         # quantity 37
-#         nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
-#         recount = piglets_events_models.NomadPigletsGroupRecount.objects. \
-#             create_recount(nomad_group, 35)
-#         self.assertEqual(recount.quantity_before, 37)
-#         self.assertEqual(recount.quantity_after, 35)
-#         self.assertEqual(recount.balance, -2)
+# #     def test_create_recount_nomad_group(self):
+# #         # quantity 37
+# #         nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
+# #         recount = piglets_events_models.NomadPigletsGroupRecount.objects. \
+# #             create_recount(nomad_group, 35)
+# #         self.assertEqual(recount.quantity_before, 37)
+# #         self.assertEqual(recount.quantity_after, 35)
+# #         self.assertEqual(recount.balance, -2)
 
-#     def test_create_recount_nomad_group2(self):
-#         # quantity 37
-#         nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
-#         recount = piglets_events_models.NomadPigletsGroupRecount.objects. \
-#             create_recount(nomad_group, 39)
-#         self.assertEqual(recount.quantity_before, 37)
-#         self.assertEqual(recount.quantity_after, 39)
-#         self.assertEqual(recount.balance, 2)
+# #     def test_create_recount_nomad_group2(self):
+# #         # quantity 37
+# #         nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
+# #         recount = piglets_events_models.NomadPigletsGroupRecount.objects. \
+# #             create_recount(nomad_group, 39)
+# #         self.assertEqual(recount.quantity_before, 37)
+# #         self.assertEqual(recount.quantity_after, 39)
+# #         self.assertEqual(recount.balance, 2)
 
-#     def test_create_recount_new_born_group(self):
-#         # quantity 10
-#         new_born_group = piglets_testing.create_new_born_group()
-#         recount = piglets_events_models.NewBornPigletsGroupRecount.objects. \
-#             create_recount(new_born_group, 8)
-#         self.assertEqual(recount.quantity_before, 10)
-#         self.assertEqual(recount.quantity_after, 8)
-#         self.assertEqual(recount.balance, -2)
+# #     def test_create_recount_new_born_group(self):
+# #         # quantity 10
+# #         new_born_group = piglets_testing.create_new_born_group()
+# #         recount = piglets_events_models.NewBornPigletsGroupRecount.objects. \
+# #             create_recount(new_born_group, 8)
+# #         self.assertEqual(recount.quantity_before, 10)
+# #         self.assertEqual(recount.quantity_after, 8)
+# #         self.assertEqual(recount.balance, -2)
 
-#     def test_create_recount_new_born_group2(self):
-#         # quantity 10
-#         new_born_group = piglets_testing.create_new_born_group()
-#         recount = piglets_events_models.NewBornPigletsGroupRecount.objects. \
-#             create_recount(new_born_group, 12)
-#         self.assertEqual(recount.quantity_before, 10)
-#         self.assertEqual(recount.quantity_after, 12)
-#         self.assertEqual(recount.balance, 2)
+# #     def test_create_recount_new_born_group2(self):
+# #         # quantity 10
+# #         new_born_group = piglets_testing.create_new_born_group()
+# #         recount = piglets_events_models.NewBornPigletsGroupRecount.objects. \
+# #             create_recount(new_born_group, 12)
+# #         self.assertEqual(recount.quantity_before, 10)
+# #         self.assertEqual(recount.quantity_after, 12)
+# #         self.assertEqual(recount.balance, 2)
 
-#     def test_get_recounts(self):
-#         # create newborngroups tour=1, qnty=10
-#         for cell_number in range(1, 11):
-#             piglets_testing.create_new_born_group(section_number=1, cell_number=cell_number,
-#                 week=1, quantity=10)
+# #     def test_get_recounts(self):
+# #         # create newborngroups tour=1, qnty=10
+# #         for cell_number in range(1, 11):
+# #             piglets_testing.create_new_born_group(section_number=1, cell_number=cell_number,
+# #                 week=1, quantity=10)
 
-#         piglets_group_qs = piglets_models.NewBornPigletsGroup.objects.all()
+# #         piglets_group_qs = piglets_models.NewBornPigletsGroup.objects.all()
 
-#         # get 1 piglet from every group. recount -1. negative recount
-#         for nbgroup in piglets_group_qs:
-#             piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 9)
+# #         # get 1 piglet from every group. recount -1. negative recount
+# #         for nbgroup in piglets_group_qs:
+# #             piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 9)
 
-#         # add 1 piglet to every group. recount +1. positive recount
-#         for nbgroup in piglets_group_qs:
-#             piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 10)
+# #         # add 1 piglet to every group. recount +1. positive recount
+# #         for nbgroup in piglets_group_qs:
+# #             piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 10)
 
-#         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-#                 .get_recounts_from_groups(piglets_group_qs).count(), 20)
+# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
+# #                 .get_recounts_from_groups(piglets_group_qs).count(), 20)
 
-#         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-#                 .get_recounts_with_negative_balance(piglets_group_qs).count(), 10)
+# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
+# #                 .get_recounts_with_negative_balance(piglets_group_qs).count(), 10)
 
-#         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-#                 .get_recounts_with_positive_balance(piglets_group_qs).count(), 10)
+# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
+# #                 .get_recounts_with_positive_balance(piglets_group_qs).count(), 10)
 
-#         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-#                 .get_recounts_with_negative_balance(piglets_group_qs).get_sum_balance(), -10)
+# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
+# #                 .get_recounts_with_negative_balance(piglets_group_qs).get_sum_balance(), -10)
 
-#         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-#                 .get_recounts_with_positive_balance(piglets_group_qs).get_sum_balance(), 10)
+# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
+# #                 .get_recounts_with_positive_balance(piglets_group_qs).get_sum_balance(), 10)

@@ -6,8 +6,9 @@ from django.core.exceptions import ValidationError
 
 from core.models import CoreModel, CoreModelManager, Event
 from sows_events.models import WeaningSow
-from locations.models import SowAndPigletsCell
+from locations.models import SowAndPigletsCell, Location
 from piglets.models import Piglets
+from piglets_events.models import PigletsMerger, PigletsSplit
 
 
 class Transaction(Event):
@@ -70,6 +71,27 @@ class PigletsTransactionManager(CoreModelManager):
         piglets_group.change_location(to_location)
 
         return transaction
+
+    def transaction_with_split_and_merge(self, piglets, to_location, new_amount=None, merge=False,
+         initiator=None):
+        split_event = None
+        merge_event = None
+
+        if new_amount:
+            piglets1, piglets2_new_amount = PigletsSplit.objects.split_return_groups( \
+                parent_piglets=piglets, new_amount=new_amount, initiator=initiator)
+            piglets = piglets2_new_amount
+
+        transaction = self.create_transaction(to_location, piglets, initiator)
+
+        if merge:
+            in_cell_piglets = to_location.piglets.all()
+            if in_cell_piglets.count() > 1:
+                piglets = PigletsMerger.objects.create_merger_return_group(
+                    parent_piglets=in_cell_piglets, new_location=to_location,
+                    initiator=initiator)
+
+        return transaction, piglets, split_event, merge_event
 
 
 class PigletsTransaction(Transaction):

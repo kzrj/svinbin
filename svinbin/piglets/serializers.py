@@ -2,7 +2,7 @@
 from rest_framework import serializers
 
 from piglets.models import Piglets
-# from locations.models import Location
+from locations.models import Location
 
 
 class PigletsSerializer(serializers.ModelSerializer):
@@ -19,14 +19,7 @@ class MergeFromListRecordSerializer(serializers.Serializer):
     changed = serializers.BooleanField()
 
 
-# class MoveFromCellToCellSerializer(serializers.Serializer):
-#     from_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-#     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-#     quantity = serializers.IntegerField()
-#     gilts_quantity = serializers.IntegerField(default=0)
-
-
-# class MoveToSerializer(serializers.Serializer):
-#     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-#     quantity = serializers.IntegerField()
-#     gilts_quantity = serializers.IntegerField(default=0)
+class MovePigletsSerializer(serializers.Serializer):
+    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    new_amount = serializers.IntegerField(required=False)
+    merge = serializers.BooleanField(default=False)

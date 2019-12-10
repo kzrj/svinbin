@@ -2,6 +2,7 @@
 from rest_framework import serializers
 
 from transactions.models import SowTransaction, PigletsTransaction
+from locations.models import Location
 
 
 class SowTransactionSerializer(serializers.ModelSerializer):

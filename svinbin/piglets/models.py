@@ -37,15 +37,6 @@ class PigletsManager(CoreModelManager):
     def get_all(self):
         return PigletsQuerySet(self.model, using=self._db)
 
-    def get_active(self):
-        return self.get_queryset().active()
-
-    def get_inactive(self):
-        return self.get_queryset().inactive()
-
-    def get_active_and_inactive(self):
-        return self.get_queryset().active_and_inactive()
-
 
 class Piglets(CoreModel):
     location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL,
@@ -95,15 +86,6 @@ class Piglets(CoreModel):
     def add_piglets(self, quantity):
         self.quantity = self.quantity + quantity
         self.save()
-
-    # def add_gilts(self, quantity):
-    #     self.gilts_quantity += quantity
-    #     self.save()
-
-    # def add_gilts_increase_quantity(self, quantity):
-    #     self.quantity += quantity
-    #     self.gilts_quantity += quantity
-    #     self.save()
 
     @property
     def metatour_repr(self):

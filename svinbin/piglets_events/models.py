@@ -104,7 +104,8 @@ class PigletsMergerManager(CoreModelManager):
         merger = self.create(created_piglets=piglets, initiator=initiator, date=timezone.now())
 
         # deactivate and update piglets 
-        parent_piglets.update(active=False, merger_as_parent=merger)
+        # !!! when input parent_piglets is queryset it can include created piglets, qs is lazy.
+        parent_piglets.exclude(pk=piglets.pk).update(active=False, merger_as_parent=merger)
 
         return piglets
 
