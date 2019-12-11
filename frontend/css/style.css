@@ -166,6 +166,7 @@
 .btn-inc-dec{
 	font-weight: bold !important;
 	font-size: 25px !important;
+	margin-right: 10px !important;
 }
 
 .bottom-buttons-block{
@@ -179,7 +180,8 @@
 .newborn-group-table{
 	text-align: center; 
     vertical-align: middle;
-	background: #313131 !important;
+	border-top: 1px solid #313131 !important;
+	/* background: #313131 !important; */
 	
 }
 
@@ -214,7 +216,7 @@
 .farrow-button-block{
 	margin-bottom: 10px;
 	padding-bottom: 10px;
-	border-bottom: 1px solid #525252;
+	
 }
 
 .info-table-head{
@@ -322,4 +324,33 @@ hr {
 
 .gilts-quantity{
 	font-size: 15px;
+}
+
+.btn-weaning{
+	
+}
+
+.section-ws3-button{
+	border: 1px solid #525252;
+	min-height: 100px !important;
+	margin-left: 10px !important;
+	margin-right: 10px !important;
+	margin-bottom: 10px !important;
+}
+
+.section-ws3-active{
+	background-color: #525252;
+	color: white !important;
+}
+
+.section-name{
+	font-weight: bold;
+}
+
+.table-piglets-weaning table, td {
+	border: 1px solid !important;
+}
+
+.weaning-cell {
+	border: 1px solid !important;
 }
