@@ -26,7 +26,7 @@ class PigletsSplitManager(CoreModelManager):
 
         # create two groups with metatours
         piglets1 = Piglets.objects.create(location=parent_piglets.location,
-            status=None,
+            status=parent_piglets.status,
             start_quantity=(parent_piglets.quantity - new_amount),
             quantity=(parent_piglets.quantity - new_amount),
             gilts_quantity=(parent_piglets.gilts_quantity - new_gilts_amount),
@@ -34,7 +34,7 @@ class PigletsSplitManager(CoreModelManager):
         metatour1 = MetaTour.objects.create(piglets=piglets1)
 
         piglets2_new_amount = Piglets.objects.create(location=parent_piglets.location,
-            status=None,
+            status=parent_piglets.status,
             start_quantity=new_amount,
             quantity=new_amount,
             gilts_quantity=new_gilts_amount,
