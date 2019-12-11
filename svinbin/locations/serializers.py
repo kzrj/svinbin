@@ -38,7 +38,7 @@ class SowAndPigletsCellSerializer(serializers.ModelSerializer):
 class PigletsGroupCellSerializer(serializers.ModelSerializer):
     class Meta:
         model = PigletsGroupCell
-        exclude = ['number', 'section' ]    
+        fields = ['number', 'section' ]    
 
 
 class LocationPKSerializer(serializers.Serializer):
