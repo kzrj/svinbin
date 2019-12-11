@@ -11,13 +11,13 @@ import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
 
-# from piglets.filters import PigletsFilter
+from piglets.filters import PigletsFilter
 
 
 class PigletsViewSet(viewsets.ModelViewSet):
     queryset = piglets_models.Piglets.objects.all()
     serializer_class = piglets_serializers.PigletsSerializer
-    # filter_class = NomadPigletsGroupFilter
+    filter_class = PigletsFilter
 
     @action(methods=['post'], detail=False)
     def create_from_merging_list_and_move_to_ws4(self, request):

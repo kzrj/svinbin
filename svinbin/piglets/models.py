@@ -26,8 +26,15 @@ class PigletsQuerySet(models.QuerySet):
     def inactive(self):
         return self.filter(active=False)
 
-    def active_and_inactive(self):
-        return self.filter(Q(active=False) | Q(active=True))
+    def piglets_with_weighing_record(self, place):
+        return self.prefetch_related('weighing_records') \
+                    .filter(weighing_records__place=place) \
+                    .distinct()
+
+    def piglets_without_weighing_record(self, place):
+        return self.prefetch_related('weighing_records') \
+                    .filter(~Q(weighing_records__place=place)) \
+                    .distinct()
 
 
 class PigletsManager(CoreModelManager):
