@@ -35,6 +35,12 @@ class SowAndPigletsCellSerializer(serializers.ModelSerializer):
         exclude = ['created_at', 'modified_at' ]
 
 
+class PigletsGroupCellSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PigletsGroupCell
+        exclude = ['number', 'section' ]    
+
+
 class LocationPKSerializer(serializers.Serializer):
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
 
@@ -48,7 +54,7 @@ class LocationSerializer(serializers.ModelSerializer):
     workshop = serializers.StringRelatedField()
     section = serializers.StringRelatedField()
     # sowAndPigletsCell = SowAndPigletsCellSerializer(read_only=True)
-    # pigletsGroupCell = PigletsGroupCellSerializer(read_only=True)
+    pigletsGroupCell = PigletsGroupCellSerializer(read_only=True)
 
     sow_set = sows_serializers.SowSimpleSerializer(many=True, read_only=True)
     piglets = piglets_serializers.PigletsSerializer(many=True, read_only=True)

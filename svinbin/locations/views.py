@@ -32,7 +32,7 @@ class CreateWorkshopsView(APIView):
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects \
-        .select_related('section', 'workshop', 'pigletsGroupCell') \
+        .select_related('section', 'workshop', 'pigletsGroupCell___section') \
         .prefetch_related('sow_set', 'piglets__metatour__records__tour').all()
     serializer_class = serializers.LocationSerializer
     filter_class = LocationFilter
