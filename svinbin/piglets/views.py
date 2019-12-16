@@ -98,3 +98,14 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def mark_as_gilts(self, request, pk=None):        
+        piglets = self.get_object()
+        piglets.mark_as_gilts        
+        return Response(
+            {
+             "message": 'Группа помечена как ремонтная.',
+             },
+            status=status.HTTP_200_OK)
+        
