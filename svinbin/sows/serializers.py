@@ -24,7 +24,8 @@ class SowSerializer(serializers.ModelSerializer):
 
 
 class SowManySerializer(serializers.ModelSerializer):
-    location = serializers.StringRelatedField()
+    # location = serializers.StringRelatedField()
+    location = serializers.ReadOnlyField(source='repr_location')
     status = serializers.StringRelatedField()
     tour = serializers.StringRelatedField()
     status = serializers.StringRelatedField()

@@ -260,6 +260,10 @@ class Sow(Pig):
         self.tour = None
         self.change_status_to('Кормилица')
 
+    @property
+    def repr_location(self):
+        return str(self.location.get_location)
+
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow):

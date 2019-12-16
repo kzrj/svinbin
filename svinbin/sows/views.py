@@ -60,7 +60,7 @@ class SowViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.filter_queryset(
-            self.get_queryset().prefetch_related(
+            self.get_queryset().select_related('location').prefetch_related(
                 Prefetch(
                     'semination_set',
                     queryset=sows_events_models.Semination.objects.filter(tour=F('tour'))
