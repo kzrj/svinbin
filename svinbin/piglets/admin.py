@@ -1,13 +1,8 @@
-# from django.contrib import admin
+from django.contrib import admin
 
-# from piglets.models import NewBornPigletsGroup, NomadPigletsGroup
-
-
-# @admin.register(NewBornPigletsGroup)
-# class NewBornPigletsGroupAdmin(admin.ModelAdmin):
-#     list_display = [f.name for f in NewBornPigletsGroup._meta.fields]
+from piglets.models import Piglets
 
 
-# @admin.register(NomadPigletsGroup)
-# class NomadPigletsGroupAdmin(admin.ModelAdmin):
-#     list_display = [f.name for f in NomadPigletsGroup._meta.fields]
+@admin.register(Piglets)
+class PigletsAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in Piglets._meta.fields]
