@@ -62,7 +62,7 @@ class PigletsSplitManager(CoreModelManager):
 
 
 class PigletsSplit(PigletsEvent):
-    parent_piglets = models.OneToOneField(Piglets, on_delete=models.SET_NULL, null=True,
+    parent_piglets = models.ForeignKey(Piglets, on_delete=models.SET_NULL, null=True,
      related_name='split_as_parent')
 
     objects = PigletsSplitManager()

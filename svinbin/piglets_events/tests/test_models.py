@@ -159,7 +159,7 @@ class PigletsMergerModelTest(TransactionTestCase):
         self.assertEqual(Piglets.objects.get_all().count(), 5)
 
         #  should be 2 childs from split
-        split_record = piglets1.split_as_parent
+        split_record = piglets1.split_as_parent.all().first()
         self.assertEqual(split_record.parent_piglets, piglets1)
         self.assertEqual(split_record.parent_piglets.active, False)
 
@@ -239,7 +239,7 @@ class PigletsSplitModelTest(TestCase):
         self.assertEqual(child_piglets2.metatour.records.all()[1].percentage, 67.0)
 
         # test piglets manager
-        split_record = piglets.split_as_parent
+        split_record = piglets.split_as_parent.all().first()
         self.assertEqual(split_record.piglets_as_child.all().count(), 2)
         self.assertEqual(Piglets.objects.get_all(). \
             filter(split_as_child=split_record, active=False).count(), 0)
