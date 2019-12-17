@@ -72,42 +72,25 @@ class PigletsTransactionManager(CoreModelManager):
 
         return transaction
 
-    # def split_then_move_first(self, piglets, to_location, new_amount=None, initiator=None):
-    #     # stayed = new_amount
-    #     moved_piglets, stayed_piglets = PigletsSplit.objects.split_return_groups( \
-    #             parent_piglets=piglets, new_amount=new_amount, initiator=initiator)
-
-    #     transaction = self.create_transaction(to_location, moved_piglets, initiator)
-
-    #     return transaction, moved_piglets, stayed_piglets
-
-    # def split_then_move_second(self, piglets, to_location, new_amount=None, initiator=None):
-    #     # moved = new_amount
-    #     stayed_piglets, moved_piglets = PigletsSplit.objects.split_return_groups( \
-    #             parent_piglets=piglets, new_amount=new_amount, initiator=initiator)
-        
-    #     transaction = self.create_transaction(to_location, moved_piglets, initiator)
-
-    #     return transaction, moved_piglets, stayed_piglets
-
-
     def transaction_with_split_and_merge(self, piglets, to_location, new_amount=None, reverse=False,
             merge=False, initiator=None):
         # move second piglets from split, new_amount piglets
 
         split_event = None
         merge_event = None
+        stayed_piglets = None
+        moved_piglets = piglets
 
         if new_amount:
             piglets1, piglets2_new_amount = PigletsSplit.objects.split_return_groups( \
                 parent_piglets=piglets, new_amount=new_amount, initiator=initiator)
             
+            moved_piglets = piglets2_new_amount
+            stayed_piglets = piglets1
+            
             if reverse:
                 moved_piglets = piglets1
                 stayed_piglets = piglets2_new_amount
-            else:
-                moved_piglets = piglets2_new_amount
-                stayed_piglets = piglets1
 
         transaction = self.create_transaction(to_location, moved_piglets, initiator)
 
@@ -120,29 +103,6 @@ class PigletsTransactionManager(CoreModelManager):
                     initiator=initiator)
 
         return transaction, moved_piglets, stayed_piglets, split_event, merge_event
-
-    # def transaction_with_split_and_merge_v2(self, piglets, to_location, new_amount=None, merge=False,
-    #      initiator=None):
-    #     # move first piglets from split, not new_amount piglets
-
-    #     split_event = None
-    #     merge_event = None
-
-    #     if new_amount:
-    #         piglets1, piglets2_new_amount = PigletsSplit.objects.split_return_groups( \
-    #             parent_piglets=piglets, new_amount=new_amount, initiator=initiator)
-    #         piglets = piglets1
-
-    #     transaction = self.create_transaction(to_location, piglets, initiator)
-
-    #     if merge:
-    #         in_cell_piglets = to_location.piglets.all()
-    #         if in_cell_piglets.count() > 1:
-    #             piglets = PigletsMerger.objects.create_merger_return_group(
-    #                 parent_piglets=in_cell_piglets, new_location=to_location,
-    #                 initiator=initiator)
-
-    #     return transaction, piglets, split_event, merge_event
 
 
 class PigletsTransaction(Transaction):

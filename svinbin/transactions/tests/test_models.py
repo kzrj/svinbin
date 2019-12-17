@@ -90,7 +90,7 @@ class PigletsTransactionManagerTest(TestCase):
         piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3, 10)
 
-        transaction, piglets2, split_event, merge_event = PigletsTransaction.objects \
+        transaction, piglets2, stayed_piglets, split_event, merge_event = PigletsTransaction.objects \
             .transaction_with_split_and_merge(piglets, self.loc_ws4_cell1)
 
         self.assertEqual(transaction.from_location.workshop.number, 3)
@@ -100,12 +100,32 @@ class PigletsTransactionManagerTest(TestCase):
         piglets2.refresh_from_db()
         self.assertEqual(piglets2.location, self.loc_ws4_cell1)
 
+    def test_transaction_with_split_and_merge_v1_reverse(self):
+        # simple transaction
+        piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 10)
+
+        transaction, moved_piglets, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
+            transaction_with_split_and_merge(piglets=piglets, to_location=self.loc_ws4, new_amount=4,
+                reverse=True)
+
+        self.assertEqual(transaction.from_location.workshop.number, 3)
+        self.assertEqual(transaction.to_location, self.loc_ws4)
+        self.assertEqual(transaction.piglets_group, moved_piglets)
+
+        moved_piglets.refresh_from_db()
+        self.assertEqual(moved_piglets.location, self.loc_ws4)
+        self.assertEqual(moved_piglets.quantity, 6)
+
+        self.assertEqual(stayed_piglets.location, self.loc_ws3)
+        self.assertEqual(stayed_piglets.quantity, 4)
+
     def test_transaction_with_split_and_merge_v2(self):
         # transaction with split
         piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3, 10)
 
-        transaction, piglets2, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, piglets2, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=piglets, to_location=self.loc_ws4, new_amount=4)
 
         self.assertEqual(Piglets.objects.all().count(), 2)
@@ -133,7 +153,7 @@ class PigletsTransactionManagerTest(TestCase):
         piglets_in_cell = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws4_cell1, 10)
 
-        transaction, piglets2, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, piglets2, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=piglets, to_location=self.loc_ws4_cell1, merge=True)
 
         piglets.refresh_from_db()
@@ -166,7 +186,7 @@ class PigletsTransactionManagerTest(TestCase):
         piglets_in_cell = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws4_cell1, 10)
 
-        transaction, piglets2, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, piglets2, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=piglets, to_location=self.loc_ws4_cell1, \
                 new_amount=4, merge=True)
 
@@ -205,7 +225,7 @@ class PigletsTransactionManagerTest(TestCase):
             self.loc_ws4_cell1, 10)
 
         # split piglets = 6 and 4. thane merge 4 with piglets_in_cell, return merged piglets 14
-        transaction, piglets2, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, piglets2, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=piglets, to_location=self.loc_ws4_cell1, \
                 new_amount=4, merge=True)
 
@@ -246,7 +266,7 @@ class PigletsTransactionManagerTest(TestCase):
             self.loc_ws4_cell1, 10)
 
         # split piglets1 = 6 and 4. thane merge 4 with piglets_in_cell, return merged piglets 14
-        transaction, final_in_cell_piglets1, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, final_in_cell_piglets1, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=piglets1, to_location=self.loc_ws4_cell1, \
                 new_amount=4, merge=True)
 
@@ -259,7 +279,7 @@ class PigletsTransactionManagerTest(TestCase):
             self.loc_ws3, 10)
 
         # second transaction in same cell
-        transaction, final_in_cell_piglets2, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, final_in_cell_piglets2, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=piglets2, to_location=self.loc_ws4_cell1, \
                 new_amount=2, merge=True)
 
@@ -271,7 +291,7 @@ class PigletsTransactionManagerTest(TestCase):
             self.loc_ws3, 10)
 
         # third transaction in same cell
-        transaction, final_in_cell_piglets3, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, final_in_cell_piglets3, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=piglets3, to_location=self.loc_ws4_cell1, \
                 new_amount=1, merge=True)
 
@@ -282,7 +302,7 @@ class PigletsTransactionManagerTest(TestCase):
             self.loc_ws3, 100)
 
         # four transaction in same cell
-        transaction, final_in_cell_piglets4, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, final_in_cell_piglets4, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=piglets4, to_location=self.loc_ws4_cell1, \
                 new_amount=86, merge=True)
 
@@ -293,7 +313,7 @@ class PigletsTransactionManagerTest(TestCase):
             self.loc_ws3, 100)
 
         # five transaction in same cell, tour3
-        transaction, final_in_cell_piglets5, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, final_in_cell_piglets5, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=piglets5, to_location=self.loc_ws4_cell1, \
                 new_amount=75, merge=True)
 
@@ -321,39 +341,15 @@ class PigletsTransactionManagerTest(TestCase):
         self.assertEqual(final_in_cell_piglets1.location, self.loc_ws4_cell1)
         print(final_in_cell_piglets1.metatour.records_repr())
 
-        transaction, final_in_cell_piglets2, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, final_in_cell_piglets2, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=final_in_cell_piglets1, to_location=self.loc_ws4_cell2, \
                 new_amount=1, merge=True)
 
         print(final_in_cell_piglets2.metatour.records_repr())
 
-        transaction, final_in_cell_piglets3, split_event, merge_event = PigletsTransaction.objects. \
+        transaction, final_in_cell_piglets3, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
             transaction_with_split_and_merge(piglets=final_in_cell_piglets1, to_location=self.loc_ws4_cell2, \
                 new_amount=9, merge=True)
 
         print(final_in_cell_piglets3.metatour.records_repr())
-
-    def test_split_then_move_first(self):
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws4, 50)
-
-        transaction, moved_piglets, stayed_piglets = PigletsTransaction.objects.split_then_move_first(piglets1,
-            self.loc_ws3, new_amount=30)
-
-        self.assertEqual(moved_piglets.quantity, 20)
-        self.assertEqual(moved_piglets.location, self.loc_ws3)
-        self.assertEqual(stayed_piglets.quantity, 30)
-        self.assertEqual(stayed_piglets.location, self.loc_ws4)
-
-    def test_split_then_move_second(self):
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws4, 50)
-
-        transaction, moved_piglets, stayed_piglets = PigletsTransaction.objects.split_then_move_second(piglets1,
-            self.loc_ws3, new_amount=30)
-
-        self.assertEqual(moved_piglets.quantity, 30)
-        self.assertEqual(moved_piglets.location, self.loc_ws3)
-        self.assertEqual(stayed_piglets.quantity, 20)
-        self.assertEqual(stayed_piglets.location, self.loc_ws4)
 
