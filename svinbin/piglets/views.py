@@ -88,10 +88,21 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = piglets_events_serializers.WeighingPigletsCreateSerializer(data=request.data)
         if serializer.is_valid():
             piglets_group = self.get_object()
-            # check if split
-            # if serializer.validated_data.get('quantity', None):
+            message = "Взвешивание прошло успешно"
+            
+            if serializer.validated_data.get('quantity', None):
                 # split
-                
+                transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
+                    PigletsTransaction.objects.transaction_with_split_and_merge(
+                        piglets=piglets_group,
+                        to_location=serializer.validated_data['to_location'],
+                        new_amount=None,
+                        reverse=True,
+                        merge=False,
+                        initiator=request.user
+                    )
+                message = "Взвешивание прошло успешно. Возврат поросят прошел успешно."
+
                 # return via transaction
 
             # weight
@@ -106,7 +117,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                  "weighing_record": piglets_events_serializers.WeighingPigletsSerializer(weighing_record).data,
-                 "message": 'Взвешивание прошло успешно.',
+                 "message": message,
                  },
                 status=status.HTTP_200_OK)
         else:
