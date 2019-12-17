@@ -21,11 +21,15 @@ class PigletsViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=False)
     def create_from_merging_list_and_move_to_ws4(self, request):
-        serializer = piglets_serializers.MergeFromListRecordSerializer(data=request.data, many=True)
+        serializer = piglets_serializers.MergeFromListSerializer(data=request.data)
         if serializer.is_valid():
             new_location = locations_models.Location.objects.get(workshop__number=3)
             merged_piglets = piglets_events_models.PigletsMerger.objects.create_from_merging_list(
-                merging_list=serializer.validated_data, new_location=new_location, initiator=request.user)
+                merging_list=serializer.validated_data['records'], new_location=new_location,
+                initiator=request.user)
+            
+            if serializer.validated_data['is_gilts_part']:
+                merged_piglets.mark_as_gilts
             
             to_location = locations_models.Location.objects.get(workshop__number=4)
             transaction = transactions_models.PigletsTransaction.objects.create_transaction(

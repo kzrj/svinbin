@@ -50,8 +50,12 @@ class PigletsViewSetTest(APITestCase):
             self.loc_ws3_sec1, 10)
 
         response = self.client.post('/api/piglets/create_from_merging_list_and_move_to_ws4/', \
-            [{'piglets_id': piglets1.pk, 'quantity': piglets1.quantity, 'changed': False},
-             {'piglets_id': piglets2.pk, 'quantity': piglets2.quantity, 'changed': False}],
+            {'records': [
+                {'piglets_id': piglets1.pk, 'quantity': piglets1.quantity, 'changed': False},
+                {'piglets_id': piglets2.pk, 'quantity': piglets2.quantity, 'changed': False}
+                ],
+             'is_gilts_part': True
+            },
             format='json')
         self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
 
