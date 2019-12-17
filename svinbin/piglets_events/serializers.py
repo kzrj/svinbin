@@ -11,6 +11,8 @@ class CullingPigletsSerializer(serializers.ModelSerializer):
 
 
 class WeighingPigletsCreateSerializer(serializers.ModelSerializer):
+	# quantity = serializers.InregerField(required=False)
+
     class Meta:
         model = models.WeighingPiglets
         fields = ['total_weight', 'place']

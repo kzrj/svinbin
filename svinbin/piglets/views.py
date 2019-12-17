@@ -27,7 +27,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
             merged_piglets = piglets_events_models.PigletsMerger.objects.create_from_merging_list(
                 merging_list=serializer.validated_data['records'], new_location=new_location,
                 initiator=request.user)
-            
+
             if serializer.validated_data['is_gilts_part']:
                 merged_piglets.mark_as_gilts
             
@@ -67,6 +67,35 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = piglets_events_serializers.WeighingPigletsCreateSerializer(data=request.data)
         if serializer.is_valid():
             piglets_group = self.get_object()
+            weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
+                piglets_group=piglets_group,
+                total_weight=serializer.validated_data['total_weight'],
+                place=serializer.validated_data['place'],
+                initiator=request.user
+                )
+
+            return Response(
+                {
+                 "weighing_record": piglets_events_serializers.WeighingPigletsSerializer(weighing_record).data,
+                 "message": 'Взвешивание прошло успешно.',
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def weighing_piglets_split_return(self, request, pk=None):        
+        serializer = piglets_events_serializers.WeighingPigletsCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            piglets_group = self.get_object()
+            # check if split
+            # if serializer.validated_data.get('quantity', None):
+                # split
+                
+                # return via transaction
+
+            # weight
+
             weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
                 piglets_group=piglets_group,
                 total_weight=serializer.validated_data['total_weight'],
