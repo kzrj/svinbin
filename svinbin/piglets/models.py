@@ -56,10 +56,10 @@ class Piglets(CoreModel):
     is_it_gilts_group = models.BooleanField(default=False)
 
     merger_as_parent = models.ForeignKey('piglets_events.PigletsMerger', on_delete=models.SET_NULL,
-        null=True, related_name='piglets_as_parents')
+        null=True, blank=True, related_name='piglets_as_parents')
 
     split_as_child = models.ForeignKey('piglets_events.PigletsSplit', on_delete=models.SET_NULL,
-        null=True, related_name='piglets_as_child')
+        null=True, blank=True, related_name='piglets_as_child')
 
     active = models.BooleanField(default=True)  
 
