@@ -126,7 +126,43 @@ class PigletsViewSetTest(APITestCase):
         response = self.client.post('/api/piglets/%s/move_piglets/' %
           piglets1.pk, {'to_location': self.loc_ws4.pk, 'merge': True, 'new_amount': 3 })
 
-        self.assertEqual(response.data['message'], 'Перевод прошел успешно.')   
+        self.assertEqual(response.data['message'], 'Перевод прошел успешно.')
+
+    def test_weighing_piglets_split_return(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 10)
+
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 10)
+
+        response = self.client.post('/api/piglets/%s/weighing_piglets_split_return/' %
+          piglets2.pk, {'to_location': self.loc_ws3.pk, 'new_amount': 8, 'total_weight': 80,
+           'place': '3/4' })
+
+        self.assertEqual(response.data['message'],
+             'Взвешивание прошло успешно. Возврат поросят прошел успешно.')
+
+
+class PigletsFilterTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+        self.user = staff_testing.create_employee()
+        self.client.force_authenticate(user=self.user)
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.tour3 = Tour.objects.get_or_create_by_week_in_current_year(week_number=3)
+        self.tour4 = Tour.objects.get_or_create_by_week_in_current_year(week_number=4)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.loc_ws3_sec1 = Location.objects.get(section__workshop__number=3, section__number=1)
+        self.loc_ws3_sec2 = Location.objects.get(section__workshop__number=3, section__number=2)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_ws4_cell1 = Location.objects.filter(pigletsGroupCell__isnull=False)[0]
+        self.loc_ws4_cell2 = Location.objects.filter(pigletsGroupCell__isnull=False)[1]
 
     def test_filter_piglets_without_weighing_record(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -144,3 +180,5 @@ class PigletsViewSetTest(APITestCase):
         response = self.client.get('/api/piglets/?piglets_with_weighing_record=3/4')
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(response.data['results'][0]['id'], piglets1.pk)
+
+

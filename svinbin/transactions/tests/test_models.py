@@ -101,7 +101,7 @@ class PigletsTransactionManagerTest(TestCase):
         self.assertEqual(piglets2.location, self.loc_ws4_cell1)
 
     def test_transaction_with_split_and_merge_v1_reverse(self):
-        # simple transaction
+        # simple transaction reverse
         piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3, 10)
 

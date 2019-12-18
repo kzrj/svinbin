@@ -85,30 +85,26 @@ class PigletsViewSet(viewsets.ModelViewSet):
 
     @action(methods=['post'], detail=True)
     def weighing_piglets_split_return(self, request, pk=None):        
-        serializer = piglets_events_serializers.WeighingPigletsCreateSerializer(data=request.data)
+        serializer = piglets_events_serializers.WeighingReturnPigletsCreateSerializer(data=request.data)
         if serializer.is_valid():
             piglets_group = self.get_object()
+            piglets_to_weight = self.get_object()
             message = "Взвешивание прошло успешно"
             
-            if serializer.validated_data.get('quantity', None):
-                # split
-                transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
-                    PigletsTransaction.objects.transaction_with_split_and_merge(
+            if serializer.validated_data.get('new_amount', None):
+                transaction, moved_piglets, piglets_to_weight, split_event, merge_event = \
+                    transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
                         piglets=piglets_group,
                         to_location=serializer.validated_data['to_location'],
-                        new_amount=None,
+                        new_amount=serializer.validated_data['new_amount'],
                         reverse=True,
                         merge=False,
                         initiator=request.user
                     )
                 message = "Взвешивание прошло успешно. Возврат поросят прошел успешно."
 
-                # return via transaction
-
-            # weight
-
             weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
-                piglets_group=piglets_group,
+                piglets_group=piglets_to_weight,
                 total_weight=serializer.validated_data['total_weight'],
                 place=serializer.validated_data['place'],
                 initiator=request.user
@@ -127,7 +123,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
     def move_piglets(self, request, pk=None):        
         serializer = piglets_serializers.MovePigletsSerializer(data=request.data)
         if serializer.is_valid():
-            transaction, piglets, split_event, merge_event = \
+            transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
                 transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
                     piglets= self.get_object(),
                     to_location=serializer.validated_data['to_location'],
