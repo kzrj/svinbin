@@ -154,16 +154,16 @@ class SowFarrowManager(CoreModelManager):
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
         
         # validate
-        if self.get_queryset().filter(sow=sow, tour=tour).first():
-            raise DjangoValidationError(message='Свинья уже опоросилась в этом туре.')
-
         if not sow.tour:
             raise DjangoValidationError(message='У свиньи нет тура.')
+
+        if self.get_queryset().filter(sow=sow, tour=sow.tour).first():
+            raise DjangoValidationError(message='Свинья уже опоросилась в этом туре.')
 
         if not sow.location.sowAndPigletsCell:
             raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.')            
 
-        if not location.is_piglets_empty:
+        if not sow.location.is_piglets_empty:
             raise DjangoValidationError(message='В клетке есть другие поросята.')            
 
         # We assume that sow has one farrow per tour. Sow there are no piglets in cell
@@ -173,8 +173,8 @@ class SowFarrowManager(CoreModelManager):
                 start_quantity=alive_quantity,
                 quantity=alive_quantity,
             )
-            metatour = MetaTour.objects.create(piglets=piglets)
-            MetaTourRecord.objects.create_record(metatour, sow.tour, alive_quantity, alive_quantity)
+        metatour = MetaTour.objects.create(piglets=piglets)
+        MetaTourRecord.objects.create_record(metatour, sow.tour, alive_quantity, alive_quantity)
 
         farrow = self.create(sow=sow, tour=sow.tour, initiator=initiator,
                 date=timezone.now(), alive_quantity=alive_quantity,

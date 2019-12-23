@@ -206,7 +206,7 @@ class Location(CoreModel):
 
     @property
     def is_piglets_empty(self):
-        if not self.piglets_set.all():
+        if not self.piglets.all():
             return True
         return False
 

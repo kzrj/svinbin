@@ -90,6 +90,13 @@ def create_sow_with_semination(location, week=1):
     Semination.objects.create_semination(sow=sow, week=week)
     return sow
 
+def create_sow_with_semination_usound(location, week=1):
+    sow = create_sow_with_location(location)
+    Semination.objects.create_semination(sow=sow, week=week)
+    Ultrasound.objects.create_ultrasound(sow=sow, days=30, result=True)
+    Ultrasound.objects.create_ultrasound(sow=sow, days=60, result=True)
+    return sow
+
 def create_gilt(birth_id):
     sow = create_sow_and_put_in_workshop_three(week=1)
     SowFarrow.objects.create_sow_farrow_by_sow_object(sow=sow, week=1, alive_quantity=10)
