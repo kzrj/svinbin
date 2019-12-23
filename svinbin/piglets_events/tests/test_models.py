@@ -249,7 +249,24 @@ class PigletsSplitModelTest(TestCase):
         self.assertEqual(Piglets.objects.get_all(). \
             filter(split_as_child=split_record).count(), 2)
         # self.assertEqual(split_record.piglets_as_child.get_active_and_inactive().count(), 2)
-        
+
+    def test_split_with_gilts(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 100)
+        piglets1.add_gilts_without_increase_quantity(10)
+
+        self.assertEqual(piglets1.gilts_quantity, 10)
+        self.assertEqual(piglets1.quantity, 100)
+
+        child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
+            parent_piglets=piglets1, new_amount=50, gilts_to_new=True)
+
+        self.assertEqual(child_piglets1.gilts_quantity, 0)
+        self.assertEqual(child_piglets1.quantity, 50)
+
+        self.assertEqual(child_piglets2.gilts_quantity, 10)
+        self.assertEqual(child_piglets2.quantity, 50)
+       
     def test_split_validate(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3, 100)
@@ -260,6 +277,15 @@ class PigletsSplitModelTest(TestCase):
         with self.assertRaises(ValidationError):
             child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
                 parent_piglets=piglets, new_amount=100)
+
+    def test_split_with_gilts_validate(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 100)
+        piglets1.add_gilts_without_increase_quantity(10)
+
+        with self.assertRaises(ValidationError):
+            child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
+                parent_piglets=piglets1, new_amount=9, gilts_to_new=True)
 
 
 class WeighingPigletsTest(TestCase):

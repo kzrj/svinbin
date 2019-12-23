@@ -87,6 +87,14 @@ class Piglets(CoreModel):
             self.gilts_quantity -= quantity
             self.save()
 
+    def remove_gilts_without_decrease_quantity(self, quantity):
+        self.gilts_quantity -= quantity
+        self.save()
+
+    def add_gilts_without_increase_quantity(self, quantity):
+        self.gilts_quantity += quantity
+        self.save()
+
     def change_status_to(self, status_title):
         self.status = PigletsStatus.objects.get(title=status_title)
         self.save()

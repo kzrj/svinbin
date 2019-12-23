@@ -15,21 +15,35 @@ class PigletsEvent(Event):
 
 
 class PigletsSplitManager(CoreModelManager):
-    def split_return_groups(self, parent_piglets, new_amount, new_gilts_amount=0, initiator=None,
+    def split_return_groups(self, parent_piglets, new_amount, gilts_to_new=False, initiator=None,
          date=timezone.now()):
+        
         # validate
         if new_amount >= parent_piglets.quantity:
             raise DjangoValidationError(message='new_amount >= parent_piglets.quantity')
 
+        # if gilts to new. Check parent gilts quantity should be less or equal new amount
+        if gilts_to_new and parent_piglets.gilts_quantity > new_amount:
+            raise DjangoValidationError(message='new_amount должно быть больше количества ремонток \
+                в родительской группе')            
+
         # create split record
         split_record = self.create(parent_piglets=parent_piglets)
+
+        # gilts
+        piglets1_group_gilts_quantity = parent_piglets.gilts_quantity
+        piglets2_new_group_gilts_quantity = 0
+        
+        if gilts_to_new:
+            piglets1_group_gilts_quantity = 0
+            piglets2_new_group_gilts_quantity = parent_piglets.gilts_quantity
 
         # create two groups with metatours
         piglets1 = Piglets.objects.create(location=parent_piglets.location,
             status=parent_piglets.status,
             start_quantity=(parent_piglets.quantity - new_amount),
             quantity=(parent_piglets.quantity - new_amount),
-            gilts_quantity=(parent_piglets.gilts_quantity - new_gilts_amount),
+            gilts_quantity=piglets1_group_gilts_quantity,
             split_as_child=split_record)
         metatour1 = MetaTour.objects.create(piglets=piglets1)
 
@@ -37,7 +51,7 @@ class PigletsSplitManager(CoreModelManager):
             status=parent_piglets.status,
             start_quantity=new_amount,
             quantity=new_amount,
-            gilts_quantity=new_gilts_amount,
+            gilts_quantity=piglets2_new_group_gilts_quantity,
             split_as_child=split_record)
         metatour2 = MetaTour.objects.create(piglets=piglets2_new_amount)
         
@@ -118,6 +132,8 @@ class PigletsMergerManager(CoreModelManager):
             else:
                 # split piglets return group id with quantity
                 piglets = Piglets.objects.get(id=merging_record['piglets_id'])
+                # if merging_record[gilts_contains]
+
                 not_merging_piglets, merging_piglets = \
                     PigletsSplit.objects.split_return_groups(piglets, merging_record['quantity'],
                      0, initiator, date)
