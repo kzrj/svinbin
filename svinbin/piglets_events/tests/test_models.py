@@ -120,8 +120,8 @@ class PigletsMergerModelTest(TransactionTestCase):
             self.loc_ws3_sec1, 10)
 
         merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 10, 'changed': False},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False}
+            {'piglets_id': piglets1.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
         ]
 
         nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
@@ -144,8 +144,8 @@ class PigletsMergerModelTest(TransactionTestCase):
             self.loc_ws3_sec1, 10)
 
         merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False}
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True, 'gilts_contains': False},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
         ]
 
         nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
@@ -187,6 +187,61 @@ class PigletsMergerModelTest(TransactionTestCase):
 
         # with self.assertNumQueries(1):
         #     print('split active ', split_record.piglets_as_child.all().active())
+
+    def test_create_from_merging_list_v3(self):
+        # with gilts
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets1.add_gilts_without_increase_quantity(3)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3_sec1, 10)
+        piglets2.add_gilts_without_increase_quantity(2)
+
+        merging_list = [
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True, 'gilts_contains': True},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
+        ]
+
+        nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
+        self.assertEqual(nomad_piglets.location, self.loc_ws3)
+        self.assertEqual(nomad_piglets.quantity, 17)
+        self.assertEqual(nomad_piglets.gilts_quantity, 5)
+
+    def test_create_from_merging_list_v4(self):
+        # without gilts
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets1.add_gilts_without_increase_quantity(3)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3_sec1, 10)
+        piglets2.add_gilts_without_increase_quantity(2)
+
+        merging_list = [
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True, 'gilts_contains': False},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
+        ]
+
+        nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
+        self.assertEqual(nomad_piglets.location, self.loc_ws3)
+        self.assertEqual(nomad_piglets.quantity, 17)
+        self.assertEqual(nomad_piglets.gilts_quantity, 2)
+
+    def test_create_from_merging_list_v5_validate(self):
+        # without gilts
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets1.add_gilts_without_increase_quantity(3)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3_sec1, 10)
+        piglets2.add_gilts_without_increase_quantity(2)
+
+        merging_list = [
+            {'piglets_id': piglets1.pk, 'quantity': 8, 'changed': True, 'gilts_contains': False},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
+        ]
+
+        with self.assertRaises(ValidationError):
+            nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
        
 
 class PigletsSplitModelTest(TestCase):
@@ -286,6 +341,16 @@ class PigletsSplitModelTest(TestCase):
         with self.assertRaises(ValidationError):
             child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
                 parent_piglets=piglets1, new_amount=9, gilts_to_new=True)
+
+
+    def test_split_with_gilts_validate(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 100)
+        piglets1.add_gilts_without_increase_quantity(10)
+
+        with self.assertRaises(ValidationError):
+            child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
+                parent_piglets=piglets1, new_amount=91, gilts_to_new=False)
 
 
 class WeighingPigletsTest(TestCase):

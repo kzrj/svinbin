@@ -28,9 +28,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 merging_list=serializer.validated_data['records'], new_location=new_location,
                 initiator=request.user)
 
-            if serializer.validated_data['is_gilts_part']:
-                merged_piglets.mark_as_gilts
-            
             to_location = locations_models.Location.objects.get(workshop__number=4)
             transaction = transactions_models.PigletsTransaction.objects.create_transaction(
                 to_location=to_location, piglets_group=merged_piglets, initiator=request.user)

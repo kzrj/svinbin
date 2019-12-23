@@ -25,7 +25,11 @@ class PigletsSplitManager(CoreModelManager):
         # if gilts to new. Check parent gilts quantity should be less or equal new amount
         if gilts_to_new and parent_piglets.gilts_quantity > new_amount:
             raise DjangoValidationError(message='new_amount должно быть больше количества ремонток \
-                в родительской группе')            
+                в родительской группе')
+
+        if not gilts_to_new and (new_amount + parent_piglets.gilts_quantity) > parent_piglets.quantity:
+            raise DjangoValidationError(message='количество в родительской группе меньше чем \
+             new_amount + количество ремонток')
 
         # create split record
         split_record = self.create(parent_piglets=parent_piglets)
@@ -132,11 +136,14 @@ class PigletsMergerManager(CoreModelManager):
             else:
                 # split piglets return group id with quantity
                 piglets = Piglets.objects.get(id=merging_record['piglets_id'])
-                # if merging_record[gilts_contains]
 
                 not_merging_piglets, merging_piglets = \
-                    PigletsSplit.objects.split_return_groups(piglets, merging_record['quantity'],
-                     0, initiator, date)
+                    PigletsSplit.objects.split_return_groups(parent_piglets=piglets,
+                    new_amount=merging_record['quantity'],
+                    gilts_to_new=merging_record['gilts_contains'],
+                    initiator=initiator,
+                    date=date)
+
                 parent_piglets_ids.append(merging_piglets.id)
 
         return self.create_merger_return_group(parent_piglets_ids, new_location, initiator, date)
