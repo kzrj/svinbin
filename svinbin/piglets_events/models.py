@@ -130,11 +130,15 @@ class PigletsMergerManager(CoreModelManager):
     def merge_piglets_in_location(self, location, initiator=None, date=timezone.now()):
         piglets = location.piglets.all()
 
-        if len(piglets) <= 1:
-            raise DjangoValidationError(message='в локации меньше 2 групп поросят.')
+        if len(piglets) == 0:
+            raise DjangoValidationError(message=f'в локации {location.pk} нет поросят.')
 
-        return self.create_merger_return_group(parent_piglets=piglets, new_location=location,
-                    initiator=initiator)
+        if len(piglets) == 1:
+            return piglets.first()
+
+        if len(piglets) > 1:
+            return self.create_merger_return_group(parent_piglets=piglets, new_location=location,
+                        initiator=initiator)
 
 
     def create_from_merging_list(self, merging_list, new_location, initiator=None, date=timezone.now()):
