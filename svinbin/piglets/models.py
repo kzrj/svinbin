@@ -53,7 +53,6 @@ class Piglets(CoreModel):
     start_quantity = models.IntegerField()
     quantity = models.IntegerField()
     gilts_quantity = models.IntegerField(default=0)
-    is_it_gilts_group = models.BooleanField(default=False)
 
     merger_as_parent = models.ForeignKey('piglets_events.PigletsMerger', on_delete=models.SET_NULL,
         null=True, blank=True, related_name='piglets_as_parents')
@@ -112,6 +111,8 @@ class Piglets(CoreModel):
         self.save()
 
     @property
-    def mark_as_gilts(self):
-        self.is_it_gilts_group = True
-        self.save()
+    def is_it_gilts_group(self):
+        if self.gilts_quantity > 0:
+            return True
+        return False
+
