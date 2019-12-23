@@ -18,8 +18,6 @@ class Transaction(Event):
 
 class SowTransactionManager(CoreModelManager):
     def create_transaction(self, sow, to_location,  initiator=None):
-        # need to refractor to atomic transactions.
-
         if isinstance(to_location.get_location, SowAndPigletsCell) and not to_location.is_sow_empty:
             raise ValidationError(message='Клетка №{} не пустая'. \
                 format(to_location.sowAndPigletsCell.number))
@@ -31,10 +29,6 @@ class SowTransactionManager(CoreModelManager):
                 to_location=to_location,
                 sow=sow
                 )
-
-        if sow.is_farrow_in_current_tour:
-            WeaningSow.objects.create_weaning(sow=sow, transaction=transaction,
-                initiator=initiator)
 
         sow.change_sow_current_location(to_location)
 

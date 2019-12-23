@@ -12,15 +12,11 @@ from rest_framework.pagination import LimitOffsetPagination
 
 import sows.serializers as sows_serializers
 import sows_events.serializers as sows_events_serializers
-# import piglets.serializers as piglets_serializers
-# import piglets_events.serializers as piglets_events_serializers
 import transactions.serializers as transactions_serializers
 import locations.serializers as locations_serializers
 
 import sows.models as sows_models
 import sows_events.models as sows_events_models
-# import piglets.models as piglets_models
-# import piglets_events.models as piglets_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
 import tours.models as tours_models
@@ -32,7 +28,6 @@ class SowViewSet(viewsets.ModelViewSet):
     queryset = sows_models.Sow.objects.all()
     serializer_class = sows_serializers.SowSerializer
     filter_class = SowFilter
-    # pagination_class = LimitOffsetPagination
 
     def retrieve(self, request, pk=None):
         sow = self.get_object()

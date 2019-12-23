@@ -188,11 +188,7 @@ class Location(CoreModel):
             return self.sowGroupCell.section.workshop
 
     def __str__(self):
-        # return str(self.get_location)
         return str(self.pk)
-
-    def get_located_active_piglets(self):
-        return self.piglets_set.all()
 
     @property
     def is_empty(self):
@@ -210,7 +206,7 @@ class Location(CoreModel):
 
     @property
     def is_piglets_empty(self):
-        if not self.get_located_active_piglets() :
+        if not self.piglets_set.all():
             return True
         return False
 
@@ -232,7 +228,4 @@ class Location(CoreModel):
 
     @property
     def sows_count_by_tour(self):
-        # if self.section and self.section.workshop.number != 3:
-        #     return None
-
         return self.sow_set.get_tours_with_count_sows_by_location(self)

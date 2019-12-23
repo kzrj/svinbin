@@ -152,7 +152,6 @@ class SowFarrowManager(CoreModelManager):
 
     def create_sow_farrow(self, sow, initiator=None,
         alive_quantity=0, dead_quantity=0, mummy_quantity=0):
-        tour = sow.tour
         
         # validate
         if self.get_queryset().filter(sow=sow, tour=tour).first():
@@ -161,23 +160,14 @@ class SowFarrowManager(CoreModelManager):
         if not sow.tour:
             raise DjangoValidationError(message='У свиньи нет тура.')
 
-        if not sow.location.section or sow.location.section.workshop.number != 3:
-            raise DjangoValidationError(message='Свинья не в секции 3-го цеха.')            
+        if not sow.location.sowAndPigletsCell:
+            raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.')            
 
-        sow.change_status_to('Опоросилась')
+        if not location.is_piglets_empty:
+            raise DjangoValidationError(message='В клетке есть другие поросята.')            
 
-        # find or create piglets in section with farrows in self.tour
-        # I assume if there are farrow in section it means there are piglets 
-        # with these farrow in section
-        farrow_in_tour_in_section = self.get_queryset() \
-            .get_by_tour_and_sow_location(sow_location=sow.location, tour=tour).first()
-
-        if farrow_in_tour_in_section:
-            piglets = farrow_in_tour_in_section.piglets_group
-            piglets.add_piglets(alive_quantity)
-            piglets.metatour.records.all().first().increase_quantity(alive_quantity)
-        else:
-            piglets = Piglets.objects.create(
+        # We assume that sow has one farrow per tour. Sow there are no piglets in cell
+        piglets = Piglets.objects.create(
                 location=sow.location,
                 status=PigletsStatus.objects.get(title='Родились, кормятся'),
                 start_quantity=alive_quantity,
@@ -186,12 +176,14 @@ class SowFarrowManager(CoreModelManager):
             metatour = MetaTour.objects.create(piglets=piglets)
             MetaTourRecord.objects.create_record(metatour, sow.tour, alive_quantity, alive_quantity)
 
-        farrow = self.create(sow=sow, tour=tour, initiator=initiator,
+        farrow = self.create(sow=sow, tour=sow.tour, initiator=initiator,
                 date=timezone.now(), alive_quantity=alive_quantity,
                 dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
                 piglets_group=piglets
                 )
-        
+
+        sow.change_status_to('Опоросилась')
+       
         return farrow
 
 
