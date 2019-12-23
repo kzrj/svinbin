@@ -127,6 +127,16 @@ class PigletsMergerManager(CoreModelManager):
 
         return piglets
 
+    def merge_piglets_in_location(self, location, initiator=None, date=timezone.now()):
+        piglets = location.piglets.all()
+
+        if len(piglets) <= 1:
+            raise DjangoValidationError(message='в локации меньше 2 групп поросят.')
+
+        return self.create_merger_return_group(parent_piglets=piglets, new_location=location,
+                    initiator=initiator)
+
+
     def create_from_merging_list(self, merging_list, new_location, initiator=None, date=timezone.now()):
         # parse and parentpiglets
         parent_piglets_ids = list()

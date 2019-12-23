@@ -24,6 +24,10 @@ class PigletsMergerModelTest(TransactionTestCase):
         self.loc_ws3 = Location.objects.get(workshop__number=3)
         self.loc_ws3_sec1 = Location.objects.get(section__workshop__number=3, section__number=1)
         self.loc_ws3_sec2 = Location.objects.get(section__workshop__number=3, section__number=2)
+        self.loc_ws3_sec1_cell1 = Location.objects.get(sowAndPigletsCell__number=1, 
+             sowAndPigletsCell__section__number=1)
+        self.loc_ws3_sec1_cell2 = Location.objects.get(sowAndPigletsCell__number=2, 
+             sowAndPigletsCell__section__number=1)
 
     def test_create_merger_return_group_v1(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -243,6 +247,21 @@ class PigletsMergerModelTest(TransactionTestCase):
         with self.assertRaises(ValidationError):
             nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
        
+    def test_merge_piglets_in_location(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1_cell1, 10)
+        piglets1.add_gilts_without_increase_quantity(3)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3_sec1_cell1, 10)
+        piglets2.add_gilts_without_increase_quantity(2)
+
+        merged_piglets = PigletsMerger.objects.merge_piglets_in_location(self.loc_ws3_sec1_cell1)
+        self.assertEqual(merged_piglets.quantity, 20)
+        self.assertEqual(merged_piglets.gilts_quantity, 5)
+
+        piglets1.refresh_from_db()
+        piglets2.refresh_from_db()
+        self.assertEqual(piglets1.active, False)
 
 class PigletsSplitModelTest(TestCase):
     def setUp(self):
