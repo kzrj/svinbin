@@ -184,8 +184,9 @@ class Sow(Pig):
         self.location = to_location
         self.save()
 
+    @property
     def get_last_farrow(self):
-        return self.sowfarrow_set.all().order_by('-created_at')
+        return self.sowfarrow_set.all().order_by('-created_at').first()
 
     @property
     def is_farrow_in_current_tour(self):
@@ -268,14 +269,21 @@ class Sow(Pig):
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow):
         if not mother_sow.tour:
-            raise DjangoValidationError(message='У свиноматки не текущего тура.')
+            raise DjangoValidationError(message=f'У свиноматки {mother_sow.farm_id} не текущего тура.')
+
+        if mother_sow.get_last_farrow.piglets_group.active == False:
+            raise DjangoValidationError(message=f'Рожденная группа поросят {mother_sow.piglets_group.pk} \
+                неактивна')            
 
         gilt = self.create(
             birth_id=birth_id,
             mother_sow=mother_sow,
             tour=mother_sow.tour,
-            farrow=mother_sow.get_last_farrow().first()
+            farrow=mother_sow.get_last_farrow
          )
+
+        mother_sow.get_last_farrow.piglets_group.add_gilts_without_increase_quantity(1)
+
         return gilt
 
 

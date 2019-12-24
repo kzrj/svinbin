@@ -51,10 +51,34 @@ class PigletsViewSetTest(APITestCase):
 
         response = self.client.post('/api/piglets/create_from_merging_list_and_move_to_ws4/', \
             {'records': [
-                {'piglets_id': piglets1.pk, 'quantity': piglets1.quantity, 'changed': False},
-                {'piglets_id': piglets2.pk, 'quantity': piglets2.quantity, 'changed': False}
+                {'piglets_id': piglets1.pk, 'quantity': piglets1.quantity, 'changed': False, 
+                    'gilts_contains': False},
+                {'piglets_id': piglets2.pk, 'quantity': piglets2.quantity, 'changed': False, 
+                    'gilts_contains': False}
                 ],
-             'is_gilts_part': True
+            },
+            format='json')
+        self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
+
+    def test_create_from_merging_list_v2(self):
+        # with gilts
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets1.add_gilts_without_increase_quantity(2)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets2.add_gilts_without_increase_quantity(2)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets3.add_gilts_without_increase_quantity(2)
+
+        response = self.client.post('/api/piglets/create_from_merging_list_and_move_to_ws4/', \
+            {'records': [
+                {'piglets_id': piglets1.pk, 'quantity': 8, 'changed': True, 
+                    'gilts_contains': True},
+                {'piglets_id': piglets2.pk, 'quantity': piglets2.quantity, 'changed': False, 
+                    'gilts_contains': False}
+                ],
             },
             format='json')
         self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
@@ -125,6 +149,26 @@ class PigletsViewSetTest(APITestCase):
 
         response = self.client.post('/api/piglets/%s/move_piglets/' %
           piglets1.pk, {'to_location': self.loc_ws4.pk, 'merge': True, 'new_amount': 3 })
+
+        self.assertEqual(response.data['message'], 'Перевод прошел успешно.')
+
+    def test_move_piglets_v5(self):
+        # transaction with  split + gilts
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 10)
+        piglets1.add_gilts_without_increase_quantity(2)
+
+        # piglets_in_cell = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+        #     self.loc_ws4_cell1, 10)
+        # piglets2.add_gilts_without_increase_quantity(2)
+
+        response = self.client.post('/api/piglets/%s/move_piglets/' %
+          piglets1.pk, {'to_location': self.loc_ws4.pk, 'merge': True, 'new_amount': 3,
+           'gilts_contains': True })
+
+        piglets1.refresh_from_db()
+        self.assertEqual(piglets1.active, False)
+        piglets1.split_as_parent
 
         self.assertEqual(response.data['message'], 'Перевод прошел успешно.')
 

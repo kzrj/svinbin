@@ -135,7 +135,7 @@ class PigletsTransactionManagerTest(TestCase):
         self.assertEqual(piglets2.metatour.records.all().first().percentage, 100)
         self.assertEqual(piglets2.metatour.records.all().count(), 1)
 
-        piglets1 = piglets.split_as_parent.all().first().piglets_as_child.all().first()
+        piglets1 = piglets.split_as_parent.piglets_as_child.all().first()
         self.assertEqual(piglets1.location, self.loc_ws3)
         self.assertEqual(piglets1.metatour.records.all().first().percentage, 100)
         self.assertEqual(piglets1.metatour.records.all().count(), 1)
@@ -202,9 +202,9 @@ class PigletsTransactionManagerTest(TestCase):
         self.assertEqual(piglets2.location, self.loc_ws4_cell1)
 
         child_split_piglets1 = Piglets.objects.get_all() \
-            .filter(split_as_child__in=piglets.split_as_parent.all(), quantity=6).first()
+            .filter(split_as_child=piglets.split_as_parent, quantity=6).first()
         child_split_piglets2 = Piglets.objects.get_all() \
-            .filter(split_as_child__in= piglets.split_as_parent.all(), quantity=4).first()
+            .filter(split_as_child= piglets.split_as_parent, quantity=4).first()
 
         self.assertEqual(child_split_piglets1.active, True)
         self.assertEqual(child_split_piglets1.location, self.loc_ws3)
@@ -243,9 +243,9 @@ class PigletsTransactionManagerTest(TestCase):
         self.assertEqual(round(piglets2.metatour.records_repr()[1]['percentage'], 2), 71.43)
 
         child_split_piglets1 = Piglets.objects.get_all() \
-            .filter(split_as_child__in= piglets.split_as_parent.all(), quantity=6).first()
+            .filter(split_as_child=piglets.split_as_parent, quantity=6).first()
         child_split_piglets2 = Piglets.objects.get_all() \
-            .filter(split_as_child__in= piglets.split_as_parent.all(), quantity=4).first()
+            .filter(split_as_child=piglets.split_as_parent, quantity=4).first()
 
         self.assertEqual(child_split_piglets1.active, True)
         self.assertEqual(child_split_piglets1.location, self.loc_ws3)
@@ -352,4 +352,30 @@ class PigletsTransactionManagerTest(TestCase):
                 new_amount=9, merge=True)
 
         print(final_in_cell_piglets3.metatour.records_repr())
+
+
+    def test_transaction_with_split_and_merge_v6(self):
+        # transaction from cell to cell
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 50)
+
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3, 75)
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour3,
+            self.loc_ws3, 100)
+
+        piglets_qs = [piglets1, piglets2, piglets3]
+
+        final_in_cell_piglets1 = PigletsMerger.objects.create_merger_return_group(parent_piglets=piglets_qs,
+            new_location=self.loc_ws4_cell1)
+
+        self.assertEqual(final_in_cell_piglets1.location, self.loc_ws4_cell1)
+
+        transaction, final_in_cell_piglets2, stayed_piglets, split_event, merge_event = PigletsTransaction.objects. \
+            transaction_with_split_and_merge(piglets=final_in_cell_piglets1, to_location=self.loc_ws4_cell2, \
+                new_amount=1, merge=True)
+
+        self.assertEqual(final_in_cell_piglets2.quantity, 1)
+        self.assertEqual(final_in_cell_piglets2.location, self.loc_ws4_cell2)
 

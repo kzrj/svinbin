@@ -5,7 +5,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 
 from core.models import CoreModel, CoreModelManager, Event
-from sows_events.models import WeaningSow
 from locations.models import SowAndPigletsCell, Location
 from piglets.models import Piglets
 from piglets_events.models import PigletsMerger, PigletsSplit

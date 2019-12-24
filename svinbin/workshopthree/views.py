@@ -55,10 +55,13 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
     def create_gilt(self, request, pk=None):
         serializer = serializers.NewGiltBirthIdSerializer(data=request.data)
         if serializer.is_valid():
-            Gilt.objects.create_gilt(serializer.validated_data['birth_id'], self.get_object())
+            sow = self.get_object()
+            Gilt.objects.create_gilt(serializer.validated_data['birth_id'], sow)
+
             return Response(
                 {
-                 "message": 'Ремонтная свинка успешно создана.',
+                 "message": f'Ремонтная свинка с номером {serializer.validated_data["birth_id"]} \
+                        успешно создана.',
                 },
                 status=status.HTTP_200_OK)
         else:

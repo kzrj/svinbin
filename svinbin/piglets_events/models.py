@@ -20,16 +20,17 @@ class PigletsSplitManager(CoreModelManager):
         
         # validate
         if new_amount >= parent_piglets.quantity:
-            raise DjangoValidationError(message='new_amount >= parent_piglets.quantity')
+            raise DjangoValidationError(message=f'new_amount >= parent_piglets.quantity.\
+                Группа {parent_piglets.pk}')
 
         # if gilts to new. Check parent gilts quantity should be less or equal new amount
         if gilts_to_new and parent_piglets.gilts_quantity > new_amount:
-            raise DjangoValidationError(message='new_amount должно быть больше количества ремонток \
-                в родительской группе')
+            raise DjangoValidationError(message=f'new_amount должно быть больше количества ремонток \
+                в родительской группе {parent_piglets.pk}')
 
         if not gilts_to_new and (new_amount + parent_piglets.gilts_quantity) > parent_piglets.quantity:
-            raise DjangoValidationError(message='количество в родительской группе меньше чем \
-             new_amount + количество ремонток')
+            raise DjangoValidationError(message=f'количество в родительской группе {parent_piglets.pk} \
+                меньше чем new_amount + количество ремонток')
 
         # create split record
         split_record = self.create(parent_piglets=parent_piglets)
@@ -80,7 +81,7 @@ class PigletsSplitManager(CoreModelManager):
 
 
 class PigletsSplit(PigletsEvent):
-    parent_piglets = models.ForeignKey(Piglets, on_delete=models.SET_NULL, null=True,
+    parent_piglets = models.OneToOneField(Piglets, on_delete=models.SET_NULL, null=True,
      related_name='split_as_parent')
 
     objects = PigletsSplitManager()
@@ -145,11 +146,19 @@ class PigletsMergerManager(CoreModelManager):
         # parse and parentpiglets
         parent_piglets_ids = list()
         for merging_record in merging_list:
+            piglets = Piglets.objects.get(id=merging_record['piglets_id'])
+            # sow = piglets.farrow.sow
+
             if not merging_record['changed']:
                 parent_piglets_ids.append(merging_record['piglets_id'])
+
+                # sow weaning
+                # piglets.farrow.sow. parent_piglets_quantity
+                # sow.weaningSow_set.create_weaning(sow=sow, piglets=piglets, initiator=initiator,
+                #  date=date)
+
             else:
                 # split piglets return group id with quantity
-                piglets = Piglets.objects.get(id=merging_record['piglets_id'])
 
                 not_merging_piglets, merging_piglets = \
                     PigletsSplit.objects.split_return_groups(parent_piglets=piglets,
@@ -157,6 +166,11 @@ class PigletsMergerManager(CoreModelManager):
                     gilts_to_new=merging_record['gilts_contains'],
                     initiator=initiator,
                     date=date)
+
+                # sow weaning
+                # piglets.farrow.sow. merging_piglets.quantity
+                # sow.weaningSow_set.create_weaning(sow=sow, piglets=merging_piglets, initiator=initiator,
+                #  date=date)
 
                 parent_piglets_ids.append(merging_piglets.id)
 

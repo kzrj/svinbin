@@ -188,8 +188,8 @@ class SowFarrowManager(CoreModelManager):
 
 
 class SowFarrow(SowEvent):
-    piglets_group = models.ForeignKey('piglets.Piglets', on_delete=models.SET_NULL,
-     null=True, related_name='farrows')
+    piglets_group = models.OneToOneField('piglets.Piglets', on_delete=models.SET_NULL,
+     null=True, related_name='farrow')
     alive_quantity = models.IntegerField(default=0)
     dead_quantity = models.IntegerField(default=0)
     mummy_quantity = models.IntegerField(default=0)
@@ -219,17 +219,27 @@ class CullingSow(SowEvent):
 
 
 class WeaningSowManager(CoreModelManager):
-    def create_weaning(self, sow, transaction, initiator=None):
-        weaning = self.create(sow=sow, tour=sow.tour, transaction=transaction,
-         initiator=initiator, date=timezone.now())
+    def create_weaning(self, sow, piglets, initiator=None, date=timezone.now()):
+        # validate
+        if not sow.tour:
+            raise DjangoValidationError(message='У свиньи нет тура.')
+
+        if not sow.location.sowAndPigletsCell:
+            raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.') 
+            
+        weaning = self.create(sow=sow, tour=sow.tour, piglets=piglets, quantity=piglets.quantity,
+         initiator=initiator, date=date)
+
+        # when set tour to None
         sow.tour = None
         sow.change_status_to(status_title='Отъем')
         return weaning
 
 
 class WeaningSow(SowEvent):
-    transaction = models.ForeignKey('transactions.SowTransaction', 
-        on_delete=models.SET_NULL, null=True)
+    piglets = models.OneToOneField('piglets.Piglets', on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField()
+
     objects = WeaningSowManager()
 
 
