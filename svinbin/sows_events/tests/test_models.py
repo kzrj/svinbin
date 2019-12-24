@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from sows_events.models import (
     Semination, Ultrasound, SowFarrow, CullingSow,
-    UltrasoundType, AbortionSow, WeaningSow)
+    UltrasoundType, AbortionSow)
 from sows.models import Sow, Boar
 from piglets.models import Piglets
 from locations.models import Location
@@ -229,34 +229,34 @@ class CullingSowManagerTest(TestCase):
         self.assertEqual(culling.reason, 'prichina')
 
 
-class WeaningSowTest(TestCase):
-    def setUp(self):
-        locations_testing.create_workshops_sections_and_cells()
-        sows_testing.create_statuses()
-        sows_events_testing.create_types()
-        piglets_testing.create_piglets_statuses()
+# class WeaningSowTest(TestCase):
+#     def setUp(self):
+#         locations_testing.create_workshops_sections_and_cells()
+#         sows_testing.create_statuses()
+#         sows_events_testing.create_types()
+#         piglets_testing.create_piglets_statuses()
 
-    def test_create_weaning(self):
-        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
-        sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=1)
+#     def test_create_weaning(self):
+#         location = Location.objects.filter(sowAndPigletsCell__number=1).first()
+#         sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=1)
 
-        # first sow farrow in tour in section
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow1,
-            alive_quantity=10,
-            dead_quantity=1
-            )
+#         # first sow farrow in tour in section
+#         farrow = SowFarrow.objects.create_sow_farrow(
+#             sow=sow1,
+#             alive_quantity=10,
+#             dead_quantity=1
+#             )
 
-        piglets = farrow.piglets_group
+#         piglets = farrow.piglets_group
 
-        weaning1 = sow1.weaningsow_set.create_weaning(sow=sow1, piglets=piglets)
+#         weaning1 = sow1.weaningsow_set.create_weaning(sow=sow1, piglets=piglets)
         
-        self.assertEqual(weaning1.piglets, piglets)
-        self.assertEqual(weaning1.sow, sow1)
-        self.assertEqual(weaning1.quantity, piglets.quantity)
+#         self.assertEqual(weaning1.piglets, piglets)
+#         self.assertEqual(weaning1.sow, sow1)
+#         self.assertEqual(weaning1.quantity, piglets.quantity)
 
-        sow1.refresh_from_db()
-        self.assertEqual(sow1.tour, None)
+#         sow1.refresh_from_db()
+#         self.assertEqual(sow1.tour, None)
 
 
 class AbortionSowTest(TestCase):
