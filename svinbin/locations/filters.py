@@ -31,7 +31,6 @@ class LocationFilter(filters.FilterSet):
 
     def filter_by_section(self, queryset, name, value):
         return queryset.filter(Q(
-            Q(section__pk=value) |
             Q(sowAndPigletsCell__section__pk=value) |
             Q(pigletsGroupCell__section__pk=value)
             ))
