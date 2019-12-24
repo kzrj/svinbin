@@ -31,9 +31,9 @@ class LocationsViewSetTest(APITestCase):
         self.piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3, 101)
 
-    # def test_location(self):
-    #     response = self.client.get('/api/locations/')
-    #     self.assertEqual(response.data['results'][2]['piglets'][0]['id'], self.piglets.pk)
+    def test_location(self):
+        response = self.client.get('/api/locations/')
+        # self.assertEqual(response.data['results'][2]['piglets'][0]['id'], self.piglets.pk)
 
     # def test_filter_sections_by_workshop_number(self):
     #     sows_testing.create_sow_seminated_usouded_ws3_section(1, 1)
@@ -51,9 +51,15 @@ class LocationsViewSetTest(APITestCase):
             # location_section.se
 
     def test_locations_piglets(self):
-        sow1 = sows_testing.create_sow_seminated_usouded_ws3_section(1, 1)
-        sow2 = sows_testing.create_sow_seminated_usouded_ws3_section(1, 1)
-        sow3 = sows_testing.create_sow_seminated_usouded_ws3_section(2, 1)
+        location1 = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        sow1 = sows_testing.create_sow_with_semination_usound(location=location1, week=1)
+
+        location2 = Location.objects.filter(sowAndPigletsCell__number=2).first()
+        sow2 = sows_testing.create_sow_with_semination_usound(location=location2, week=1)
+
+        location3 = Location.objects.filter(sowAndPigletsCell__number=3).first()
+        sow3 = sows_testing.create_sow_with_semination_usound(location=location3, week=1)
+
         SowFarrow.objects.create_sow_farrow(sow=sow1, alive_quantity=10)
         SowFarrow.objects.create_sow_farrow(sow=sow2, alive_quantity=10)
         SowFarrow.objects.create_sow_farrow(sow=sow3, alive_quantity=10)

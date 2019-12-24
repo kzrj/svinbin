@@ -38,7 +38,20 @@ class LocationViewSet(viewsets.ModelViewSet):
     filter_class = LocationFilter
 
     # mb it is useful to separate locations by actions - sections, workshop, cells.
-    # def sections
+    def list(self, request):
+        queryset = self.filter_queryset(
+            self.get_queryset() \
+            .select_related('section', 'workshop', 'pigletsGroupCell') \
+            .prefetch_related('sow_set', 'piglets__metatour__records__tour').all()
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = serializers.LocationSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = serializers.LocationSerializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class SectionViewSet(viewsets.ModelViewSet):
