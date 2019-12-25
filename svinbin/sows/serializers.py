@@ -66,7 +66,7 @@ class SowSimpleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Sow
-        fields = ['status', 'tour', 'farm_id', 'birth_id', 'id']
+        fields = ['status', 'tour', 'farm_id', 'id']
 
 
 class SowsToMoveSerializer(serializers.Serializer):

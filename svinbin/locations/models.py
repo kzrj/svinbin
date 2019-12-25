@@ -213,18 +213,24 @@ class Location(CoreModel):
     @property
     def get_cell_number(self):
         if self.sowSingleCell:
-            return self.sowSingleCell.number
+            return str(self.sowSingleCell.number) + '-' + str(self.sowSingleCell.section.number)
 
         if self.pigletsGroupCell:
-            return self.pigletsGroupCell.number
+            return str(self.pigletsGroupCell.number) + '-' + str(self.pigletsGroupCell.section.number)
 
         if self.sowAndPigletsCell:
-            return self.sowAndPigletsCell.number
+            return str(self.sowAndPigletsCell.number) + '-' + str(self.sowAndPigletsCell.section.number)
 
         if self.sowGroupCell:
-            return self.sowGroupCell.number
+            return str(self.sowGroupCell.number) + '-' + str(self.sowGroupCell.section.number)
 
         return None
+
+    # @property
+    # def get_section_number(self):
+    #     if self.section:
+    #         return str(self.section.number)
+    #     return None
 
     @property
     def sows_count_by_tour(self):

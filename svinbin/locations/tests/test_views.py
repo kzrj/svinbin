@@ -31,26 +31,6 @@ class LocationsViewSetTest(APITestCase):
         self.piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3, 101)
 
-    def test_location(self):
-        response = self.client.get('/api/locations/')
-        # self.assertEqual(response.data['results'][2]['piglets'][0]['id'], self.piglets.pk)
-
-    # def test_filter_sections_by_workshop_number(self):
-    #     sows_testing.create_sow_seminated_usouded_ws3_section(1, 1)
-    #     sows_testing.create_sow_seminated_usouded_ws3_section(1, 1)
-    #     sows_testing.create_sow_seminated_usouded_ws3_section(1, 2)
-    #     sows_testing.create_sow_seminated_usouded_ws3_section(2, 1)
-    #     sows_testing.create_sow_seminated_usouded_ws3_section(2, 2)
-    #     sows_testing.create_sow_seminated_usouded_ws3_section(3, 1)
-    #     sows_testing.create_sow_seminated_usouded_ws3_section(3, 1)
-    #     sows_testing.create_sow_seminated_usouded_ws3_section(3, 1)
-
-    #     response = self.client.get('/api/locations/?sections_by_workshop_number=3')
-        # print(response.data)
-        # for location_section in response.data['results']:
-            # location_section.se
-
-    def test_locations_piglets(self):
         location1 = Location.objects.filter(sowAndPigletsCell__number=1).first()
         sow1 = sows_testing.create_sow_with_semination_usound(location=location1, week=1)
 
@@ -64,28 +44,19 @@ class LocationsViewSetTest(APITestCase):
         SowFarrow.objects.create_sow_farrow(sow=sow2, alive_quantity=10)
         SowFarrow.objects.create_sow_farrow(sow=sow3, alive_quantity=10)
 
-        response = self.client.get('/api/locations/?sections_by_workshop_number=3')
+    def test_common_list_locations(self):
+        response = self.client.get('/api/locations/')
+        location = response.data['results'][0]
+        self.assertNotEqual(location.get('workshop', False), False)
+
+    def test_cells_list_locations(self):
+        section = Location.objects.filter(section__number=1, section__workshop__number=3).first()
+        response = self.client.get(f'/api/locations/?by_section={section.section.pk}&cells=true')
+        location = response.data['results'][0]
+        self.assertEqual(location['cell'], '1-1')
+
+    def test_sections_list_locations(self):
+        workshop = Location.objects.filter(workshop__number=3).first()
+        response = self.client.get(f'/api/locations/?sections_by_workshop_number={workshop.workshop.number}&sections=true')
+        location = response.data['results'][0]
         print(response.data)
-
-
-        
-        
-
-# class SectionsViewSetTest(APITestCase):
-#     def setUp(self):
-#         self.client = APIClient()
-#         locations_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
-#         self.user = staff_testing.create_employee()
-#         self.client.force_authenticate(user=self.user)
-
-#         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
-#         self.loc_ws3 = Location.objects.get(workshop__number=3)
-#         self.piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-#             self.loc_ws3, 101)
-
-#     def test_sections(self):
-#         response = self.client.get('/api/sections/?sections_by_workshop_number=3')
-#         print(response.data)
-        # self.assertEqual(response.data['results'][2]['piglets'][0]['id'], self.piglets.pk)

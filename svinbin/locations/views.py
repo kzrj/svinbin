@@ -31,26 +31,43 @@ class CreateWorkshopsView(APIView):
 
 
 class LocationViewSet(viewsets.ModelViewSet):
-    queryset = Location.objects \
-        .select_related('section', 'workshop', 'pigletsGroupCell') \
-        .prefetch_related('sow_set', 'piglets__metatour__records__tour').all()
+    queryset = Location.objects.all()
     serializer_class = serializers.LocationSerializer
     filter_class = LocationFilter
 
-    # mb it is useful to separate locations by actions - sections, workshop, cells.
     def list(self, request):
-        queryset = self.filter_queryset(
-            self.get_queryset() \
-            .select_related('section', 'workshop', 'pigletsGroupCell') \
-            .prefetch_related('sow_set', 'piglets__metatour__records__tour').all()
-        )
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = self.serializer_class
+
+        if request.GET.get('cells'):
+            serializer = serializers.LocationCellSerializer
+            queryset = self.filter_queryset(
+                self.get_queryset() \
+                    .select_related(
+                        'pigletsGroupCell__section',
+                        'sowAndPigletsCell__section',
+                        'sowSingleCell__section',
+                        'sowGroupCell__section',
+                        ) \
+                    .prefetch_related(
+                        'sow_set__tour',
+                        'sow_set__status',
+                        'piglets__metatour__records__tour',)
+            )
+
+        if request.GET.get('sections'):
+            serializer = serializers.LocationSectionSerializer
+            queryset = self.filter_queryset(
+                self.get_queryset()\
+                    .select_related('section__workshop')
+            )
 
         page = self.paginate_queryset(queryset)
         if page is not None:
-            serializer = serializers.LocationSerializer(page, many=True)
+            serializer = serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
-        serializer = serializers.LocationSerializer(queryset, many=True)
+        serializer = serializer(queryset, many=True)
         return Response(serializer.data)
 
 

@@ -13,6 +13,14 @@ class PigletsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class PigletsSimpleSerializer(serializers.ModelSerializer):
+    metatour_repr = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Piglets
+        fields = ['id', 'quantity', 'gilts_quantity', 'metatour_repr']
+
+
 class MergeFromListRecordSerializer(serializers.Serializer):
     piglets_id = serializers.IntegerField()
     quantity = serializers.IntegerField()
