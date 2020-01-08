@@ -9,12 +9,15 @@ from locations.models import Location
 
 import locations.testing_utils as locations_testing
 import piglets.testing_utils as piglets_testing
+import sows.testing_utils as sows_testing
+import sows_events.utils as sows_events_testing
 
 
 class PigletsMergerModelTest(TransactionTestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
-        # sows_testing.create_statuses()
+        sows_testing.create_statuses()
+        sows_events_testing.create_types()
         piglets_testing.create_piglets_statuses()       
 
         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
@@ -27,6 +30,8 @@ class PigletsMergerModelTest(TransactionTestCase):
         self.loc_ws3_sec1_cell1 = Location.objects.get(sowAndPigletsCell__number=1, 
              sowAndPigletsCell__section__number=1)
         self.loc_ws3_sec1_cell2 = Location.objects.get(sowAndPigletsCell__number=2, 
+             sowAndPigletsCell__section__number=1)
+        self.loc_ws3_sec1_cell3 = Location.objects.get(sowAndPigletsCell__number=3, 
              sowAndPigletsCell__section__number=1)
 
     def test_create_merger_return_group_v1(self):
@@ -116,12 +121,9 @@ class PigletsMergerModelTest(TransactionTestCase):
 
     def test_create_from_merging_list_v1(self):
         # without change quantity
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws3_sec1, 10)
-        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws3_sec1, 10)
-        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour3,
-            self.loc_ws3_sec1, 10)
+        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1, self.loc_ws3_sec1_cell1, 10)
+        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2, self.loc_ws3_sec1_cell2, 10)
+        piglets3 = piglets_testing.create_from_sow_farrow(self.tour3, self.loc_ws3_sec1_cell3, 10)
 
         merging_list = [
             {'piglets_id': piglets1.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False},
@@ -142,10 +144,9 @@ class PigletsMergerModelTest(TransactionTestCase):
 
     def test_create_from_merging_list_v2(self):
         # with change quantity
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws3_sec1, 10)
-        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws3_sec1, 10)
+        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1, self.loc_ws3_sec1_cell1, 10)
+        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2, self.loc_ws3_sec1_cell2, 10)
+        piglets3 = piglets_testing.create_from_sow_farrow(self.tour3, self.loc_ws3_sec1_cell3, 10)
 
         merging_list = [
             {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True, 'gilts_contains': False},
@@ -160,7 +161,7 @@ class PigletsMergerModelTest(TransactionTestCase):
         piglets2.refresh_from_db()
 
         # should be 5 piglets
-        self.assertEqual(Piglets.objects.get_all().count(), 5)
+        self.assertEqual(Piglets.objects.get_all().count(), 6)
 
         #  should be 2 childs from split
         split_record = piglets1.split_as_parent
@@ -192,13 +193,67 @@ class PigletsMergerModelTest(TransactionTestCase):
         # with self.assertNumQueries(1):
         #     print('split active ', split_record.piglets_as_child.all().active())
 
+    def test_create_from_merging_list_sow_weaning(self):
+        # with change quantity
+        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1, self.loc_ws3_sec1_cell1, 10)
+        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2, self.loc_ws3_sec1_cell2, 10)
+        piglets3 = piglets_testing.create_from_sow_farrow(self.tour3, self.loc_ws3_sec1_cell3, 10)
+
+        merging_list = [
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True, 'gilts_contains': False},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
+        ]
+
+        nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
+
+        sow1 = piglets1.farrow.sow
+        sow2 = piglets2.farrow.sow
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+
+        self.assertEqual(sow1.tour, None)
+        self.assertEqual(sow2.tour, None)
+        self.assertEqual(sow1.status.title, 'Отъем')
+        self.assertEqual(sow2.status.title, 'Отъем')
+
+        self.assertEqual(sow1.weaningsow_set.all().count(), 1)
+        self.assertEqual(sow2.weaningsow_set.all().count(), 1)
+
+        self.assertEqual(sow1.weaningsow_set.all().first().quantity, 7)
+        self.assertEqual(sow2.weaningsow_set.all().first().quantity, 10)
+
+    def test_create_from_merging_list_sow_weaning_v2(self):
+        # with change quantity
+        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1, self.loc_ws3_sec1_cell1, 10)
+        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2, self.loc_ws3_sec1_cell2, 10)
+        sow2 = piglets2.farrow.sow
+        sow2.mark_as_nurse
+
+        merging_list = [
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True, 'gilts_contains': False},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
+        ]
+
+        nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
+
+        sow1 = piglets1.farrow.sow
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+
+        self.assertEqual(sow1.tour, None)
+        self.assertEqual(sow2.tour, None)
+        self.assertEqual(sow1.status.title, 'Отъем')
+        self.assertEqual(sow2.status.title, 'Кормилица')
+
+        self.assertEqual(sow1.weaningsow_set.all().count(), 1)
+        self.assertEqual(sow2.weaningsow_set.all().count(), 0)
+
     def test_create_from_merging_list_v3(self):
         # with gilts
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws3_sec1, 10)
+        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1, self.loc_ws3_sec1_cell1, 10)
+        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2, self.loc_ws3_sec1_cell2, 10)
+
         piglets1.add_gilts_without_increase_quantity(3)
-        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws3_sec1, 10)
         piglets2.add_gilts_without_increase_quantity(2)
 
         merging_list = [
@@ -213,11 +268,10 @@ class PigletsMergerModelTest(TransactionTestCase):
 
     def test_create_from_merging_list_v4(self):
         # without gilts
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws3_sec1, 10)
+        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1, self.loc_ws3_sec1_cell1, 10)
+        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2, self.loc_ws3_sec1_cell2, 10)
+        
         piglets1.add_gilts_without_increase_quantity(3)
-        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws3_sec1, 10)
         piglets2.add_gilts_without_increase_quantity(2)
 
         merging_list = [
@@ -232,11 +286,10 @@ class PigletsMergerModelTest(TransactionTestCase):
 
     def test_create_from_merging_list_v5_validate(self):
         # without gilts
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws3_sec1, 10)
+        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1, self.loc_ws3_sec1_cell1, 10)
+        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2, self.loc_ws3_sec1_cell2, 10)
+        
         piglets1.add_gilts_without_increase_quantity(3)
-        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws3_sec1, 10)
         piglets2.add_gilts_without_increase_quantity(2)
 
         merging_list = [

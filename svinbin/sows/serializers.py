@@ -25,21 +25,18 @@ class SowSerializer(serializers.ModelSerializer):
 
 class SowManySerializer(serializers.ModelSerializer):
     # location = serializers.StringRelatedField()
-    location = serializers.ReadOnlyField(source='repr_location')
+    # location = serializers.ReadOnlyField(source='repr_location')
     status = serializers.StringRelatedField()
     tour = serializers.StringRelatedField()
-    status = serializers.StringRelatedField()
 
     seminations_current_tour = serializers.ReadOnlyField(
         source='get_seminations_by_current_tour_values_list')
 
-    ultrasound_30_current_tour = serializers.ReadOnlyField(
-        source='get_ultrasound_30_by_current_tour_values_list')
+    # ultrasound_30_current_tour = serializers.ReadOnlyField(
+    #     source='get_ultrasound_30_by_current_tour_values_list')
 
-    ultrasound_60_current_tour = serializers.ReadOnlyField(
-        source='get_ultrasound_60_by_current_tour_values_list')
-
-    # ultrasounds in current tour
+    # ultrasound_60_current_tour = serializers.ReadOnlyField(
+    #     source='get_ultrasound_60_by_current_tour_values_list')
 
     class Meta:
         model = Sow

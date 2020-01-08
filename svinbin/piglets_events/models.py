@@ -147,32 +147,26 @@ class PigletsMergerManager(CoreModelManager):
         parent_piglets_ids = list()
         for merging_record in merging_list:
             piglets = Piglets.objects.get(id=merging_record['piglets_id'])
-            # sow = piglets.farrow.sow
+            weaning_piglets = piglets
 
             if not merging_record['changed']:
                 parent_piglets_ids.append(merging_record['piglets_id'])
 
-                # sow weaning
-                # piglets.farrow.sow. parent_piglets_quantity
-                # sow.weaningSow_set.create_weaning(sow=sow, piglets=piglets, initiator=initiator,
-                #  date=date)
-
             else:
                 # split piglets return group id with quantity
-
                 not_merging_piglets, merging_piglets = \
                     PigletsSplit.objects.split_return_groups(parent_piglets=piglets,
                     new_amount=merging_record['quantity'],
                     gilts_to_new=merging_record['gilts_contains'],
                     initiator=initiator,
                     date=date)
-
-                # sow weaning
-                # piglets.farrow.sow. merging_piglets.quantity
-                # sow.weaningSow_set.create_weaning(sow=sow, piglets=merging_piglets, initiator=initiator,
-                #  date=date)
-
+                weaning_piglets = merging_piglets
                 parent_piglets_ids.append(merging_piglets.id)
+
+            sow = piglets.farrow.sow
+            if sow.status.title == 'Опоросилась':
+                sow.weaningsow_set.create_weaning(sow=sow, piglets=weaning_piglets, initiator=initiator,
+                    date=date)
 
         return self.create_merger_return_group(parent_piglets_ids, new_location, initiator, date)
                 

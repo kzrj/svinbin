@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 from piglets.models import PigletsStatus, Piglets
 from tours.models import Tour, MetaTour, MetaTourRecord
+from sows_events.models import SowFarrow
+import sows.testing_utils as sows_testing
 
 
 def create_piglets_statuses():
@@ -24,3 +26,12 @@ def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_q
     return piglets
 
 
+def create_from_sow_farrow(tour, location, quantity, gilts_quantity=0, status=None):
+    sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=tour.week_number)
+    farrow = SowFarrow.objects.create_sow_farrow(
+        sow=sow1,
+        alive_quantity=10,
+        dead_quantity=1
+        )
+
+    return farrow.piglets_group

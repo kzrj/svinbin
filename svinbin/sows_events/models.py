@@ -218,29 +218,29 @@ class CullingSow(SowEvent):
     objects = CullingSowManager()
 
 
-# class WeaningSowManager(CoreModelManager):
-#     def create_weaning(self, sow, piglets, initiator=None, date=timezone.now()):
-#         # validate
-#         if not sow.tour:
-#             raise DjangoValidationError(message='У свиньи нет тура.')
+class WeaningSowManager(CoreModelManager):
+    def create_weaning(self, sow, piglets, initiator=None, date=timezone.now()):
+        # validate
+        if not sow.tour:
+            raise DjangoValidationError(message='У свиньи нет тура.')
 
-#         if not sow.location.sowAndPigletsCell:
-#             raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.') 
+        if not sow.location.sowAndPigletsCell:
+            raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.') 
             
-#         weaning = self.create(sow=sow, tour=sow.tour, piglets=piglets, quantity=piglets.quantity,
-#          initiator=initiator, date=date)
+        weaning = self.create(sow=sow, tour=sow.tour, piglets=piglets, quantity=piglets.quantity,
+         initiator=initiator, date=date)
 
-#         # when set tour to None
-#         sow.tour = None
-#         sow.change_status_to(status_title='Отъем')
-#         return weaning
+        # when set tour to None
+        sow.tour = None
+        sow.change_status_to(status_title='Отъем')
+        return weaning
 
 
-# class WeaningSow(SowEvent):
-#     piglets = models.OneToOneField('piglets.Piglets', on_delete=models.SET_NULL, null=True)
-#     quantity = models.IntegerField()
+class WeaningSow(SowEvent):
+    piglets = models.OneToOneField('piglets.Piglets', on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField()
 
-#     objects = WeaningSowManager()
+    objects = WeaningSowManager()
 
 
 class AbortionSowManager(CoreModelManager):
