@@ -26,7 +26,7 @@ class PigletsSplitManager(CoreModelManager):
         # if gilts to new. Check parent gilts quantity should be less or equal new amount
         if gilts_to_new and parent_piglets.gilts_quantity > new_amount:
             raise DjangoValidationError(message=f'new_amount должно быть больше количества ремонток \
-                в родительской группе {parent_piglets.pk}')
+                в родительской группе {parent_piglets.pk}. Клетка {parent_piglets.location.get_location}')
 
         if not gilts_to_new and (new_amount + parent_piglets.gilts_quantity) > parent_piglets.quantity:
             raise DjangoValidationError(message=f'количество в родительской группе {parent_piglets.pk} \
@@ -163,6 +163,7 @@ class PigletsMergerManager(CoreModelManager):
                 weaning_piglets = merging_piglets
                 parent_piglets_ids.append(merging_piglets.id)
 
+            # sow weaning
             sow = piglets.farrow.sow
             if sow.status.title == 'Опоросилась':
                 sow.weaningsow_set.create_weaning(sow=sow, piglets=weaning_piglets, initiator=initiator,

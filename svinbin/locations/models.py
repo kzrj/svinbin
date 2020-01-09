@@ -161,8 +161,8 @@ class Location(CoreModel):
         if self.pigletsGroupCell:
             return self.pigletsGroupCell
 
-        # if self.sowAndPigletsCell:
-        #     return self.sowAndPigletsCell
+        if self.sowAndPigletsCell:
+            return self.sowAndPigletsCell
 
         # if self.sowGroupCell:
         #     return self.sowGroupCell
