@@ -6,7 +6,7 @@ from locations.models import Location
 
 
 class CullingPigletsSerializer(serializers.ModelSerializer):
-    is_it_gilt = serializers.BooleanField(default=True)
+    is_it_gilt = serializers.BooleanField(default=False)
 
     class Meta:
         model = CullingPiglets
