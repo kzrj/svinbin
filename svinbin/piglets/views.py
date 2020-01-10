@@ -100,6 +100,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                         merge=False,
                         initiator=request.user
                     )
+                moved_piglets.change_status_to('Взвешены, готовы к заселению')
                 message = "Взвешивание прошло успешно. Возврат поросят прошел успешно."
 
             weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
