@@ -213,7 +213,7 @@ class Sow(Pig):
 
     @property
     def get_seminations_by_current_tour_values_list(self):
-        return list( (date.date.strftime('%d-%m-%Y'), date.tour.week_number)
+        return list( date.strftime('%d-%m-%Y')
                 for date in
                     self.semination_set.filter(tour=self.tour).values_list('date', flat=True)
                 )
