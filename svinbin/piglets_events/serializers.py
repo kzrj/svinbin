@@ -21,7 +21,7 @@ class WeighingPigletsCreateSerializer(serializers.ModelSerializer):
 
 class WeighingReturnPigletsCreateSerializer(serializers.ModelSerializer):
     new_amount = serializers.IntegerField(required=False)
-    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all(), required=False)
 
     class Meta:
         model = WeighingPiglets

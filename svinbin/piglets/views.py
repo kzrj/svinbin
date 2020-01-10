@@ -89,6 +89,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
             piglets_to_weight = self.get_object()
             message = "Взвешивание прошло успешно"
             
+            # mb to model
             if serializer.validated_data.get('new_amount', None):
                 transaction, moved_piglets, piglets_to_weight, split_event, merge_event = \
                     transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
