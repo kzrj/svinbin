@@ -48,6 +48,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 piglets_group=self.get_object(),
                 culling_type=serializer.validated_data['culling_type'],
                 reason=serializer.validated_data['reason'],
+                is_it_gilt=serializer.validated_data['is_it_gilt'],
                 initiator=request.user
                 )
             return Response(
@@ -135,14 +136,3 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # @action(methods=['post'], detail=True)
-    # def mark_as_gilts(self, request, pk=None):        
-    #     piglets = self.get_object()
-    #     piglets.mark_as_gilts        
-    #     return Response(
-    #         {
-    #          "message": 'Группа помечена как ремонтная.',
-    #          },
-    #         status=status.HTTP_200_OK)
-        

@@ -208,10 +208,16 @@ class WeighingPiglets(PigletsEvent):
 
 
 class CullingPigletsManager(CoreModelManager):
-    def create_culling_piglets(self, piglets_group, culling_type, reason=None, initiator=None):
+    def create_culling_piglets(self, piglets_group, culling_type, is_it_gilt=False, reason=None,
+         initiator=None):
+        if is_it_gilt:
+            piglets_group.remove_gilts(1)
+        else:
+            piglets_group.remove_piglets(1)
+            
         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
-            date=timezone.now(), initiator=initiator)
-        piglets_group.remove_piglets(1)
+            date=timezone.now(), initiator=initiator, is_it_gilt=is_it_gilt)
+
         return culling
 
     def create_culling_gilt(self, piglets_group, culling_type, reason=None, initiator=None):

@@ -6,9 +6,11 @@ from locations.models import Location
 
 
 class CullingPigletsSerializer(serializers.ModelSerializer):
+    is_it_gilt = serializers.BooleanField(default=True)
+
     class Meta:
         model = CullingPiglets
-        fields = ['culling_type', 'reason']
+        fields = ['culling_type', 'reason', 'is_it_gilt']
 
 
 class WeighingPigletsCreateSerializer(serializers.ModelSerializer):
