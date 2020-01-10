@@ -98,6 +98,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                         new_amount=serializer.validated_data['new_amount'],
                         reverse=True,
                         merge=False,
+                        gilts_contains=True
                         initiator=request.user
                     )
                 moved_piglets.change_status_to('Взвешены, готовы к заселению')
