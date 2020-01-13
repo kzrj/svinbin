@@ -60,6 +60,8 @@ class Piglets(CoreModel):
     split_as_child = models.ForeignKey('piglets_events.PigletsSplit', on_delete=models.SET_NULL,
         null=True, blank=True, related_name='piglets_as_child')
 
+    transfer_part_number = models.IntegerField(null=True, blank=True)
+
     active = models.BooleanField(default=True)  
 
     objects = PigletsManager()
@@ -108,6 +110,10 @@ class Piglets(CoreModel):
 
     def change_location(self, location):
         self.location = location
+        self.save()
+
+    def assign_transfer_part_number(self, number):
+        self.transfer_part_number = number
         self.save()
 
     @property

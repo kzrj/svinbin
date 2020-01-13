@@ -28,6 +28,9 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 merging_list=serializer.validated_data['records'], new_location=new_location,
                 initiator=request.user)
 
+            if serializer.validated_data.get('transfer_part_number', None):
+                merged_piglets.assign_transfer_part_number(serializer.validated_data['transfer_part_number'])
+
             to_location = locations_models.Location.objects.get(workshop__number=4)
             transaction = transactions_models.PigletsTransaction.objects.create_transaction(
                 to_location=to_location, piglets_group=merged_piglets, initiator=request.user)

@@ -83,6 +83,25 @@ class PigletsViewSetTest(APITestCase):
             format='json')
         self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
 
+    def test_create_from_merging_list_transfer_part_number(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+
+        response = self.client.post('/api/piglets/create_from_merging_list_and_move_to_ws4/', \
+            {'records': [
+                {'piglets_id': piglets1.pk, 'quantity': piglets1.quantity, 'changed': False, 
+                    'gilts_contains': False},
+                {'piglets_id': piglets2.pk, 'quantity': piglets2.quantity, 'changed': False, 
+                    'gilts_contains': False}
+                ],
+             'transfer_part_number': 1
+            },
+            format='json')
+
+        self.assertNotEqual(Piglets.objects.filter(transfer_part_number=1).first(), None)
+
     def test_culling(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3_sec1, 10)
