@@ -99,7 +99,10 @@ def custom_exception_handler(exc, context):
 
     if isinstance(exc, DjangoValidationError):
         if hasattr(exc, 'message_dict'):
-            exc = DRFValidationError(detail=exc.message_dict)
+            field = list(exc.detail.keys())[0]
+            response.data['message'] = field + ' ' + exc.detail[field]
+            exc = DRFValidationError(detail={'message': field + ' ' + exc.detail[field]})
+            # exc = DRFValidationError(detail=exc.message_dict)
         else:
             exc = DRFValidationError(detail={'message': exc.message})
 
