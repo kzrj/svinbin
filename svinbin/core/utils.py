@@ -91,18 +91,19 @@ class CustomValidation(exceptions.APIException):
 
 
 def custom_exception_handler(exc, context):
-    response = drf_exception_handler(exc, context)
+    # response = drf_exception_handler(exc, context)
     if isinstance(exc, CustomValidation):
         field = list(exc.detail.keys())[0]
-        response.data['message'] = field + ' ' + exc.detail[field]
-        return response
+        # response.data['message'] = field + ' ' + exc.detail[field]
+        exc = DRFValidationError(detail={'message': field + ' ' + exc.detail[field]})
+        # return response
 
     if isinstance(exc, DjangoValidationError):
         if hasattr(exc, 'message_dict'):
+            # TODO: handle many fields
             field = list(exc.detail.keys())[0]
-            response.data['message'] = field + ' ' + exc.detail[field]
+            
             exc = DRFValidationError(detail={'message': field + ' ' + exc.detail[field]})
-            # exc = DRFValidationError(detail=exc.message_dict)
         else:
             exc = DRFValidationError(detail={'message': exc.message})
 
@@ -110,13 +111,13 @@ def custom_exception_handler(exc, context):
         print(exc)
         exc = DRFValidationError(detail={'message': str(exc)})
 
-    # elif isinstance(exc, DRFValidationError):
-    #     try:
-    #         key = next(iter(exc.detail))
-    #         value = exc.detail.get(key, '0')[0]
-    #         response.data['errMessage'] = key + ' ' + value
-    #     except:
-    #         response.data['errMessage'] = 'ValidationError.'
+    elif isinstance(exc, DRFValidationError):
+        try:
+            key = next(iter(exc.detail))
+            value = exc.detail.get(key, '0')[0]
+            exc = DRFValidationError(detail={'message': key + ' ' + value})
+        except:
+            response.data['errMessage'] = 'ValidationError.'
 
     return drf_exception_handler(exc, context)
 
