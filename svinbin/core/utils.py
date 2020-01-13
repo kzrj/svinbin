@@ -113,11 +113,13 @@ def custom_exception_handler(exc, context):
 
     elif isinstance(exc, DRFValidationError):
         try:
+            print('DRFValidationError')
             key = next(iter(exc.detail))
             value = exc.detail.get(key, '0')[0]
             exc = DRFValidationError(detail={'message': key + ' ' + value})
+            print(exc)
         except:
-            response.data['errMessage'] = 'ValidationError.'
+            exc = DRFValidationError(detail={'message': 'ValidationError'})
 
     return drf_exception_handler(exc, context)
 
