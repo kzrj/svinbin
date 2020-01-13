@@ -29,7 +29,7 @@ class MergeFromListRecordSerializer(serializers.Serializer):
 
 
 class MergeFromListSerializer(serializers.Serializer):
-    transfer_part_number = serializers.IntegerField(required=False)
+    transfer_part_number = serializers.IntegerField(required=False, allow_null=True)
     records = MergeFromListRecordSerializer(many=True)
 
 
