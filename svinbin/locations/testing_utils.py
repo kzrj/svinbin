@@ -98,7 +98,7 @@ def create_sections_and_cell_for_workshop_with_group_cells(workshop_number):
 
     for section in Section.objects.filter(workshop=workshop):
         PigletsGroupCell.objects.bulk_create([
-            PigletsGroupCell(workshop=section.workshop, section=section, number=cellNumber) for cellNumber in range(1, 7)
+            PigletsGroupCell(workshop=section.workshop, section=section, number=cellNumber) for cellNumber in range(1, 10)
             ])
         Location.objects.bulk_create(
             [Location(pigletsGroupCell=cell) for cell in PigletsGroupCell.objects.filter(workshop=workshop,
