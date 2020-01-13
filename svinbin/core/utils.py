@@ -108,10 +108,10 @@ def custom_exception_handler(exc, context):
             exc = DRFValidationError(detail={'message': exc.message})
 
     if isinstance(exc, DjangoIntegrityError):
-        print(exc)
         exc = DRFValidationError(detail={'message': str(exc)})
 
-    elif isinstance(exc, DRFValidationError):
+    if isinstance(exc, DRFValidationError):
+        print('DRFValidationError!!!!')
         try:
             print('DRFValidationError')
             key = next(iter(exc.detail))
