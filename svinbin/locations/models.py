@@ -98,7 +98,7 @@ class PigletsGroupCell(Cell):
 
 class SowAndPigletsCell(Cell):
     def __str__(self):
-        return 'section {}, cell {}'.format(str(self.section.number), self.number)
+        return 'секция {}, клетка {}'.format(str(self.section.number), self.number)
     
 
 class LocationQuerySet(models.QuerySet):
