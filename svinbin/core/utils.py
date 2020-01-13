@@ -92,6 +92,7 @@ class CustomValidation(exceptions.APIException):
 
 def custom_exception_handler(exc, context):
     # response = drf_exception_handler(exc, context)
+    print('ERROR HANDLER!!!!!!!!!')
     if isinstance(exc, CustomValidation):
         field = list(exc.detail.keys())[0]
         # response.data['message'] = field + ' ' + exc.detail[field]
