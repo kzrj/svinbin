@@ -92,7 +92,9 @@ class CustomValidation(exceptions.APIException):
 
 def custom_exception_handler(exc, context):
     # response = drf_exception_handler(exc, context)
+    # response = drf_exception_handler(exc, context)
     print('ERROR HANDLER!!!!!!!!!')
+    print(exc)
     if isinstance(exc, CustomValidation):
         field = list(exc.detail.keys())[0]
         # response.data['message'] = field + ' ' + exc.detail[field]
@@ -100,6 +102,7 @@ def custom_exception_handler(exc, context):
         # return response
 
     if isinstance(exc, DjangoValidationError):
+        print('HUISOS')
         if hasattr(exc, 'message_dict'):
             # TODO: handle many fields
             field = list(exc.detail.keys())[0]
@@ -111,16 +114,17 @@ def custom_exception_handler(exc, context):
     if isinstance(exc, DjangoIntegrityError):
         exc = DRFValidationError(detail={'message': str(exc)})
 
+    # it runs when put wrong data in view, error described in django model. And raises djangoValidationError
     if isinstance(exc, DRFValidationError):
-        print('DRFValidationError!!!!')
         try:
-            print('DRFValidationError')
             key = next(iter(exc.detail))
             value = exc.detail.get(key, '0')[0]
             exc = DRFValidationError(detail={'message': key + ' ' + value})
             print(exc)
         except:
             exc = DRFValidationError(detail={'message': 'ValidationError'})
+
+    # response = drf_exception_handler(exc, context)
 
     return drf_exception_handler(exc, context)
 

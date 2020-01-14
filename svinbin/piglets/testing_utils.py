@@ -26,11 +26,16 @@ def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_q
     return piglets
 
 
-def create_from_sow_farrow(tour, location, quantity, gilts_quantity=0, status=None):
+def create_from_sow_farrow(tour, location, quantity=0, gilts_quantity=0, status=None):
     sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=tour.week_number)
+    alive_quantity = 10
+
+    if quantity > 0:
+        alive_quantity = quantity
+
     farrow = SowFarrow.objects.create_sow_farrow(
         sow=sow1,
-        alive_quantity=10,
+        alive_quantity=alive_quantity,
         dead_quantity=1
         )
 

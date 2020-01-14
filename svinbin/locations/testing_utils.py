@@ -6,16 +6,16 @@ from locations.models import WorkShop, Section, SowSingleCell, \
 
 def create_workshops():
     WorkShop.objects.bulk_create([
-        WorkShop(number=1, title='Цех 1 Осеменение'),
-        WorkShop(number=2, title='Цех 2 Ожидание родов'),
-        WorkShop(number=3, title='Цех 3 Маточник'),
-        WorkShop(number=4, title='Цех 4 Доращивание 4'),
-        WorkShop(number=8, title='Цех 8 Доращивание 8'),
-        WorkShop(number=5, title='Цех 5 Откорм 5'),
-        WorkShop(number=6, title='Цех 6 Откорм 6'),
-        WorkShop(number=7, title='Цех 7 Откорм 7'),
-        WorkShop(number=9, title='Цех 9 Убойный цех'),
-        WorkShop(number=10, title='Цех 10 Крематорий'),
+        WorkShop(number=1, title='Цех 1 Осеменение'), # pk1
+        WorkShop(number=2, title='Цех 2 Ожидание родов'), # pk2
+        WorkShop(number=3, title='Цех 3 Маточник'), # pk 3
+        WorkShop(number=4, title='Цех 4 Доращивание 4'), # pk4
+        WorkShop(number=5, title='Цех 5 Откорм 5'), # pk 5
+        WorkShop(number=6, title='Цех 6 Откорм 6'), # pk 6
+        WorkShop(number=7, title='Цех 7 Откорм 7'), # pk 7
+        WorkShop(number=8, title='Цех 8 Доращивание 8'), # pk 8
+        WorkShop(number=9, title='Цех 9 Убойный цех'), # pk 9
+        WorkShop(number=10, title='Цех 10 Крематорий'), # pk 10
         ])
     Location.objects.bulk_create(
         [Location(workshop=workshop) for workshop in WorkShop.objects.all()]
