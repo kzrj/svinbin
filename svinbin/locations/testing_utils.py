@@ -16,6 +16,7 @@ def create_workshops():
         WorkShop(number=8, title='Цех 8 Доращивание 8'), # pk 8
         WorkShop(number=9, title='Цех 9 Убойный цех'), # pk 9
         WorkShop(number=10, title='Цех 10 Крематорий'), # pk 10
+        WorkShop(number=11, title='Цех 7-5 Ремонтные'), # pk 10
         ])
     Location.objects.bulk_create(
         [Location(workshop=workshop) for workshop in WorkShop.objects.all()]
@@ -83,27 +84,76 @@ def create_sections_and_cell_for_workshop_three():
                 section=section)]
             )
 
-def create_sections_and_cell_for_workshop_with_group_cells(workshop_number):
-    workshop = WorkShop.objects.get(number=workshop_number)
-
-    Section.objects.bulk_create([Section(workshop=workshop, name='Секция %s-1' % workshop_number, number=1),
-     Section(workshop=workshop, name='Секция %s-2' % workshop_number, number=2),
-     Section(workshop=workshop, name='Секция %s-3' % workshop_number, number=3),
-     Section(workshop=workshop, name='Секция %s-4' % workshop_number, number=4),
-     Section(workshop=workshop, name='Секция %s-5' % workshop_number, number=5),
+def init_sections(workshop, quantity):
+    Section.objects.bulk_create([
+        Section(workshop=workshop, name=f'Секция {workshop.number}-1', number=i),
+        for i in range(1, quantity + 1)
      ])
     Location.objects.bulk_create(
         [Location(section=section) for section in Section.objects.filter(workshop=workshop)]
         )
 
+def init_piglets_cells(section, quantity):
+    PigletsGroupCell.objects.bulk_create([
+        PigletsGroupCell(workshop=section.workshop, section=section, number=cellNumber) 
+            for cellNumber in range(1, quantity + 1)
+        ])
+    Location.objects.bulk_create(
+        [Location(pigletsGroupCell=cell) for cell in PigletsGroupCell.objects.filter(section=section)]
+        )
+
+def init_ws_4():
+    workshop = WorkShop.objects.get(number=4)
+    init_sections(workshop, 10)
+
     for section in Section.objects.filter(workshop=workshop):
-        PigletsGroupCell.objects.bulk_create([
-            PigletsGroupCell(workshop=section.workshop, section=section, number=cellNumber) for cellNumber in range(1, 10)
-            ])
-        Location.objects.bulk_create(
-            [Location(pigletsGroupCell=cell) for cell in PigletsGroupCell.objects.filter(workshop=workshop,
-                section=section)]
-            )
+        if section.number != 10:
+            init_piglets_cells(section, 4)
+        else:
+            init_piglets_cells(section, 2)
+
+def init_ws_8():
+    workshop = WorkShop.objects.get(number=8)
+    init_sections(workshop, 4)
+
+    for section in Section.objects.filter(workshop=workshop):
+            init_piglets_cells(section, 4)
+
+def init_ws_567():
+    for workshop in WorkShop.objects.filter(number__in=[5, 6, 7])
+        init_sections(workshop, 4)
+
+        for section in Section.objects.filter(workshop=workshop):
+                init_piglets_cells(section, 4)
+
+def init_ws_75():
+    workshop = WorkShop.objects.get(number=11)
+    init_sections(workshop, 1)
+
+    for section in Section.objects.filter(workshop=workshop):
+            init_piglets_cells(section, 4)
+
+# def create_sections_and_cell_for_workshop_with_group_cells(workshop_number):
+#     workshop = WorkShop.objects.get(number=workshop_number)
+
+#     Section.objects.bulk_create([Section(workshop=workshop, name='Секция %s-1' % workshop_number, number=1),
+#      Section(workshop=workshop, name='Секция %s-2' % workshop_number, number=2),
+#      Section(workshop=workshop, name='Секция %s-3' % workshop_number, number=3),
+#      Section(workshop=workshop, name='Секция %s-4' % workshop_number, number=4),
+#      Section(workshop=workshop, name='Секция %s-5' % workshop_number, number=5),
+#      ])
+#     Location.objects.bulk_create(
+#         [Location(section=section) for section in Section.objects.filter(workshop=workshop)]
+#         )
+
+#     for section in Section.objects.filter(workshop=workshop):
+#         PigletsGroupCell.objects.bulk_create([
+#             PigletsGroupCell(workshop=section.workshop, section=section, number=cellNumber) for cellNumber in range(1, 10)
+#             ])
+#         Location.objects.bulk_create(
+#             [Location(pigletsGroupCell=cell) for cell in PigletsGroupCell.objects.filter(workshop=workshop,
+#                 section=section)]
+#             )
 
 def create_workshops_sections_and_cells():
     if WorkShop.objects.all().count() < 1:
@@ -111,6 +161,11 @@ def create_workshops_sections_and_cells():
         create_sections_and_cell_for_workshop_one()
         create_sections_and_cell_for_workshop_two()
         create_sections_and_cell_for_workshop_three()
+
+        init_ws_4()
+        init_ws_8()
+        init_ws_567()
+        init_ws_75()
         
-        for workshop_number in range(4, 9):
-            create_sections_and_cell_for_workshop_with_group_cells(workshop_number)
+        # for workshop_number in range(4, 9):
+        #     create_sections_and_cell_for_workshop_with_group_cells(workshop_number)
