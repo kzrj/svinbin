@@ -120,7 +120,7 @@ def init_ws_8():
             init_piglets_cells(section, 4)
 
 def init_ws_567():
-    for workshop in WorkShop.objects.filter(number__in=[5, 6, 7])
+    for workshop in WorkShop.objects.filter(number__in=[5, 6, 7]):
         init_sections(workshop, 4)
 
         for section in Section.objects.filter(workshop=workshop):
