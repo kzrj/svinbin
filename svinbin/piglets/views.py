@@ -127,6 +127,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
     def move_piglets(self, request, pk=None):        
         serializer = piglets_serializers.MovePigletsSerializer(data=request.data)
         if serializer.is_valid():
+            print(serializer.validated_data.get('gilts_contains', 'HUILA!!!!!!!'))
             transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
                 transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
                     piglets= self.get_object(),

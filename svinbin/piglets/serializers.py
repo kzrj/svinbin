@@ -35,6 +35,6 @@ class MergeFromListSerializer(serializers.Serializer):
 
 class MovePigletsSerializer(serializers.Serializer):
     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-    new_amount = serializers.IntegerField(required=False)
-    gilts_contains = serializers.BooleanField(default=False)
+    new_amount = serializers.IntegerField(required=False, required=False, allow_null=True)
+    gilts_contains = serializers.BooleanField(default=False, required=False, allow_null=True)
     merge = serializers.BooleanField(default=False)
