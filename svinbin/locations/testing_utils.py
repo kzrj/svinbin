@@ -86,7 +86,7 @@ def create_sections_and_cell_for_workshop_three():
 
 def init_sections(workshop, quantity):
     Section.objects.bulk_create([
-        Section(workshop=workshop, name=f'Секция {workshop.number}-1', number=i)
+        Section(workshop=workshop, name=f'Секция {workshop.number}-{i}', number=i)
         for i in range(1, quantity + 1)
      ])
     Location.objects.bulk_create(
