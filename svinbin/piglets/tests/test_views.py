@@ -17,6 +17,7 @@ from piglets.models import Piglets
 from locations.models import Location
 from tours.models import Tour
 from piglets_events.models import WeighingPiglets
+from sows.models import Sow
 # from transactions.models import PigletsTransaction, SowTransaction
 
 
@@ -204,6 +205,27 @@ class PigletsViewSetTest(APITestCase):
 
         self.assertEqual(response.data['message'],
              'Взвешивание прошло успешно. Возврат поросят прошел успешно.')
+
+    def test_move_gilts_to_ws1(self):
+        gilts_piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 10)
+        loc1 = Location.objects.get(workshop__number=1)
+
+        response = self.client.post('/api/piglets/%s/move_gilts_to_ws1/' % gilts_piglets.pk, 
+            {'to_location': loc1.pk})
+
+        gilts_piglets.refresh_from_db()
+        self.assertEqual(gilts_piglets.active, False)
+        self.assertEqual(Sow.objects.filter(farm_id__isnull=True).count(), 10)
+
+        gilts_piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 10)
+        response = self.client.post('/api/piglets/%s/move_gilts_to_ws1/' % gilts_piglets2.pk, 
+            {'to_location': loc1.pk, 'new_amount': 5})
+
+        gilts_piglets2.refresh_from_db()
+        self.assertEqual(gilts_piglets2.active, False)
+        self.assertEqual(Sow.objects.filter(farm_id__isnull=True).count(), 15)
 
 
 class PigletsFilterTest(APITestCase):

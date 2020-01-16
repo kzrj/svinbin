@@ -114,6 +114,7 @@ class SowManager(CoreModelManager):
             location=workshop.location
             )
 
+    # for init at ws2
     def split_free_and_exist_farm_ids(self, farm_ids):
         exist_farm_ids = list(
             self.get_queryset().filter(farm_id__in=farm_ids).values_list('farm_id', flat=True)
@@ -158,6 +159,12 @@ class SowManager(CoreModelManager):
             ).values('week_number', 'count_sows')
 
         return tours
+
+    def create_from_gilts_group(self, piglets):
+        # if gilt birth id = sow.farm_id
+        for i in range(0, piglets.quantity):
+            self.create_new_from_gilt_without_farm_id()
+        
 
 
 class Sow(Pig):
