@@ -65,8 +65,8 @@ class PigletsSplitManager(CoreModelManager):
             MetaTourRecord.objects.create_record(
                 metatour=metatour1,
                 tour=parent_record.tour,
-                quantity=round(parent_record.percentage * new_amount / 100),
-                total_quantity=new_amount)
+                quantity=round(parent_record.percentage * (parent_piglets.quantity - new_amount) / 100),
+                total_quantity=(parent_piglets.quantity - new_amount))
 
             MetaTourRecord.objects.create_record(
                 metatour=metatour2,

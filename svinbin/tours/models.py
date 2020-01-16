@@ -2,6 +2,7 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from django.apps import apps
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
 from sows_events import models as events_models
@@ -105,7 +106,12 @@ class MetaTourRecordManager(CoreModelManager):
         return MetaTourRecordQuerySet(self.model, using=self._db)
 
     def create_record(self, metatour, tour, quantity, total_quantity):
+        # total quantity is quantity by all metatour records
         percentage = (quantity * 100) / total_quantity
+        # validate
+        if percentage > 100:
+            raise DjangoValidationError(message=f'Неверно подсчитались проценты {percentage}')
+
         return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage)
 
 

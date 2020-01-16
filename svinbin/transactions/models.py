@@ -81,6 +81,7 @@ class PigletsTransactionManager(CoreModelManager):
             
             moved_piglets = piglets2_new_amount
             stayed_piglets = piglets1
+            split_event = piglets.split_as_parent
             
             if reverse:
                 moved_piglets = piglets1
@@ -91,6 +92,8 @@ class PigletsTransactionManager(CoreModelManager):
         if merge:            
             moved_piglets = PigletsMerger.objects.merge_piglets_in_location(
                 location=to_location, initiator=initiator)
+            if hasattr(moved_piglets, 'merger_as_child'):
+                merge_event = moved_piglets.merger_as_child
 
         return transaction, moved_piglets, stayed_piglets, split_event, merge_event
 
