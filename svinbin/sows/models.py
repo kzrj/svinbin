@@ -166,7 +166,6 @@ class SowManager(CoreModelManager):
             self.create_new_from_gilt_without_farm_id()
         
 
-
 class Sow(Pig):
     farm_id = models.IntegerField(null=True, unique=True)
     status = models.ForeignKey(SowStatus, on_delete=models.SET_NULL, null=True)
@@ -219,27 +218,24 @@ class Sow(Pig):
         return False
 
     @property
-    def get_seminations_by_current_tour_values_list(self):
-        return list( date.strftime('%d-%m-%Y')
-                for date in
-                    self.semination_set.filter(tour=self.tour).values_list('date', flat=True)
-                )
+    def get_seminations_by_current_tour_values_list(self):  
+        return list( 
+            semination.date.strftime('%d-%m-%Y') 
+            for semination in self.semination_set.all() if semination.tour == self.tour) 
     
     @property
     def get_ultrasound_30_by_current_tour_values_list(self):
-        return list( date.strftime('%d-%m-%Y')
-                for date in
-                    self.ultrasound_set.filter(tour=self.tour, u_type__days=30)
-                        .values_list('date', flat=True)
-                )
+        return list( 
+            ultrasound.date.strftime('%d-%m-%Y')
+            for ultrasound in self.ultrasound_set.all() 
+                if ultrasound.tour == self.tour and ultrasound.u_type.days == 30)
 
     @property
     def get_ultrasound_60_by_current_tour_values_list(self):
-        return list( date.strftime('%d-%m-%Y')
-                for date in
-                    self.ultrasound_set.filter(tour=self.tour, u_type__days=60)
-                        .values_list('date', flat=True)
-                )
+        return list( 
+            ultrasound.date.strftime('%d-%m-%Y')
+            for ultrasound in self.ultrasound_set.all() 
+                if ultrasound.tour == self.tour and ultrasound.u_type.days == 60)
 
     def get_ultrasounds1_by_tour(self, tour):
         return self.ultrasound_set.filter(tour=tour)
@@ -255,9 +251,9 @@ class Sow(Pig):
 
     def update_info_after_semination(self, tour):
         self.tour = tour
-        if len(self.get_seminations_by_current_tour_values_list) == 1:
+        if len(self.semination_set.filter(tour=self.tour)) == 1:
             self.change_status_without_save('Осеменена 1')
-        if len(self.get_seminations_by_current_tour_values_list) > 1:
+        if len(self.semination_set.filter(tour=self.tour)) > 1:
             self.change_status_without_save('Осеменена 2')
         self.save()
 
@@ -271,6 +267,10 @@ class Sow(Pig):
     @property
     def repr_location(self):
         return str(self.location.get_location)
+
+    @property
+    def get_cell(self):
+        return str(self.location.sowAndPigletsCell)
 
 
 class GiltManager(CoreModelManager):

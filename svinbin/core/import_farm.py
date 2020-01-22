@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from xlrd import open_workbook, xldate_as_tuple
 import re
 import datetime
@@ -73,9 +74,17 @@ def create_semination_lists(rows, request_user):
             boar1=boar1, semination_employee1=semination_employee1,
             boar2=boar2, semination_employee2=semination_employee2,                    
             )
+
         if seminated:
             seminated_list.append(sow)
         else:
             already_seminated_in_tour.append(sow)
 
     return seminated_list, already_seminated_in_tour, sows_in_another_tour
+
+# берем только более позднее
+# какие больше 35 с момента осеменения, делаем узи +35 дней осеменение
+# отфильтровать по тур.
+
+# def import_from_json_to_ws3(data, initiator):
+    

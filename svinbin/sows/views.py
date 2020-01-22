@@ -55,17 +55,14 @@ class SowViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.filter_queryset(
-            self.get_queryset().select_related('location').prefetch_related(
-                Prefetch(
-                    'semination_set',
-                    queryset=sows_events_models.Semination.objects.filter(tour=F('tour'))
+            self.get_queryset().select_related('location__sowAndPigletsCell__section', 'status', 'tour') \
+                .prefetch_related('semination_set__tour') \
+                .prefetch_related(
+                    Prefetch(
+                        'ultrasound_set',
+                        queryset=sows_events_models.Ultrasound.objects.all().select_related('u_type', 'tour'),
+                    )
                 )
-            ).prefetch_related(
-                Prefetch(
-                    'ultrasound_set',
-                    queryset=sows_events_models.Ultrasound.objects.filter(tour=F('tour'))
-                )
-            )
         )
 
         page = self.paginate_queryset(queryset)
