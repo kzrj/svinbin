@@ -100,12 +100,15 @@ class UltrasoundType(CoreModel):
 
 
 class UltrasoundManager(CoreModelManager):
-    def create_ultrasound(self, sow, initiator=None, result=False, days=None):
+    def create_ultrasound(self, sow, initiator=None, result=False, days=None, date=None):
         u_type = None
+        if not date:
+            date=timezone.now()
+
         if days:
             u_type = UltrasoundType.objects.get(days=days)
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
-         date=timezone.now(), result=result, u_type=u_type)
+         date=date, result=result, u_type=u_type)
         if result:
             if days == 30:
                 sow.change_status_to('Супорос 28')

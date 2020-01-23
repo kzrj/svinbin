@@ -110,8 +110,10 @@ def import_from_json_to_ws3(initiator=None):
             )
 
         # usound
-        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True, days=30)
-        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True, days=60)
+        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
+         days=30, date=date + datetime.timedelta(days=21))
+        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
+         days=60, date=date + datetime.timedelta(days=35))
 
         sow.location = Location.objects.filter(workshop__number=3).first()
         sow.save()
@@ -139,8 +141,10 @@ def import_from_json_to_ws2(initiator=None):
             )
 
         # usound
-        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True, days=30)
-        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True, days=60)
+        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
+         days=30, date=date + datetime.timedelta(days=21))
+        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
+         days=60, date=date + datetime.timedelta(days=35))
 
         sow.location = Location.objects.filter(workshop__number=2).first()
         sow.save()

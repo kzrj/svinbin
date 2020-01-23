@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import datetime
+
 from django.test import TestCase
 from django.utils import timezone
 
@@ -111,6 +113,7 @@ class FarmImportJsonTest(TestCase):
         self.assertNotEqual(semination.tour, None)
         self.assertNotEqual(ultrasound, None)
         self.assertEqual(ultrasound.result, True)
+        self.assertEqual(ultrasound.date, semination.date + datetime.timedelta(days=21))
 
     def test_init_ceh2(self):
         import_farm.import_from_json_to_ws2()
@@ -128,3 +131,4 @@ class FarmImportJsonTest(TestCase):
         self.assertNotEqual(semination.tour, None)
         self.assertNotEqual(ultrasound, None)
         self.assertEqual(ultrasound.result, True)
+        self.assertEqual(ultrasound.date, semination.date + datetime.timedelta(days=21))
