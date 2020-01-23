@@ -55,7 +55,9 @@ class SowViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = self.filter_queryset(
-            self.get_queryset().select_related('location__sowAndPigletsCell__section', 'status', 'tour') \
+            self.get_queryset() \
+                .select_related('location__workshop') \
+                .select_related('location__sowAndPigletsCell__section', 'status', 'tour') \
                 .prefetch_related('semination_set__tour') \
                 .prefetch_related(
                     Prefetch(
