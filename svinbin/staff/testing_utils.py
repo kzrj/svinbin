@@ -36,20 +36,20 @@ def create_workshop_user(username, password, ws_number, farm_name, is_seminator=
 
 
 def create_svinbin_users():
-    User.objects.create_superuser(username='kaizerj',email='kzrster@gmail.com', password='svinbin123')
+    User.objects.create_superuser(username='kaizerj',email='kzrster@gmail.com', password='jikozfree')
     create_workshop_user('test_admin', 'svinbin123', 1, 'АДМ', True, True)
     create_workshop_user('test_officer', 'svinbin123', 1, 'ОФИЦЕР', True, True)
 
-    create_workshop_user('shmigina', 'svinbin123', 1, 'ШМЫГИ', True)
-    create_workshop_user('borisov', 'svinbin123', 1, 'БОРИС', True)
-    create_workshop_user('semenova', 'svinbin123', 1, 'СЕМЕН', True)
-    create_workshop_user('gary', 'svinbin123', 1, 'ГАРИ', True, True)
-    create_workshop_user('ivanov', 'svinbin123', 1, 'ИВАНО', True)
+    create_workshop_user('shmigina', '123', 1, 'ШМЫГИ', True)
+    create_workshop_user('borisov', '123', 1, 'БОРИС', True)
+    create_workshop_user('semenova', '123', 1, 'СЕМЕН', True)
+    create_workshop_user('gary', '123', 1, 'ГАРИ', True, True)
+    create_workshop_user('ivanov', '123', 1, 'ИВАНО', True)
 
-    create_workshop_user('ws2user', 'svinbin123', 2, 'ИВАНО')
-    create_workshop_user('ws3user', 'svinbin123', 2, 'ИВАНО')
-    create_workshop_user('ws4user', 'svinbin123', 2, 'ИВАНО')
-    create_workshop_user('ws5user', 'svinbin123', 2, 'ИВАНО')
-    create_workshop_user('ws6user', 'svinbin123', 2, 'ИВАНО')
-    create_workshop_user('ws7user', 'svinbin123', 2, 'ИВАНО')
-    create_workshop_user('ws8user', 'svinbin123', 2, 'ИВАНО')
+    create_workshop_user('brigadir1', '123', 2, 'ИВАНО')
+    create_workshop_user('brigadir2', '123', 2, 'ИВАНО')
+    create_workshop_user('brigadir3', '123', 2, 'ИВАНО')
+    create_workshop_user('brigadir4', '123', 2, 'ИВАНО')
+    create_workshop_user('brigadir5', '123', 2, 'ИВАНО')
+    create_workshop_user('brigadir6', '123', 2, 'ИВАНО')
+    create_workshop_user('brigadir7', '123', 2, 'ИВАНО')
