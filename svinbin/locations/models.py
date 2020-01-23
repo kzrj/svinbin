@@ -168,6 +168,23 @@ class Location(CoreModel):
         #     return self.sowGroupCell
 
     @property
+    def get_sow_location(self):
+        if self.workshop:
+            return self.workshop
+
+        if self.section:
+            return self.section
+
+        # if self.sowSingleCell:
+        #     return self.sowSingleCell
+
+        if self.sowAndPigletsCell:
+            return self.sowAndPigletsCell
+
+        # if self.sowGroupCell:
+        #     return self.sowGroupCell
+
+    @property
     def get_workshop(self):
         if self.workshop:
             return self.workshop

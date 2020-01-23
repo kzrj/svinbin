@@ -346,7 +346,9 @@ class SowQueryTest(TransactionTestCase):
 
         location7 = Location.objects.filter(sowAndPigletsCell__number=6).first()
         sow7 = sows_testings.create_sow_with_semination_usound(location=location7, week=5)
-        # Semination.objects.create_semination()
+
+        location8 = Location.objects.filter(workshop__number=2).first()
+        sow8 = sows_testings.create_sow_with_semination_usound(location=location8, week=5)
 
         sows_qs = Sow.objects.filter(pk__in=[sow1.pk, sow2.pk, sow3.pk, sow4.pk, sow5.pk, sow6.pk, sow7.pk])
 
@@ -354,7 +356,9 @@ class SowQueryTest(TransactionTestCase):
         #  initiator=None, semination_employee=None)
 
         with self.assertNumQueries(4):
-            data = Sow.objects.all().select_related('location__sowAndPigletsCell__section', 'status', 'tour') \
+            data = Sow.objects.all() \
+                .select_related('location__workshop') \
+                .select_related('location__sowAndPigletsCell__section', 'status', 'tour') \
                 .prefetch_related('semination_set__tour') \
                 .prefetch_related(
                     Prefetch(
