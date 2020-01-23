@@ -86,10 +86,10 @@ class MetaTour(CoreModel):
 
     def records_repr(self):
         # analog qs.values()
-        return [{'tour': record.tour.week_number, 
-        # 'percentage': round(record.percentage, 2)
-        'percentage': round(record.percentage, 2)
-        } 
+        return [{
+                    'tour': record.tour.week_number, 
+                    'percentage': round(record.percentage, 2)
+                } 
             for record in self.records.all()]
 
 

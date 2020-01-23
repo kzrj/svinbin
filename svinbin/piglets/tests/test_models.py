@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
 from piglets.models import Piglets
 from tours.models import Tour
 from locations.models import Location
 
+from piglets.serializers import PigletsSerializer
+
 import locations.testing_utils as locations_testing
 import piglets.testing_utils as piglets_testing
+import sows.testing_utils as sows_testings
+import sows_events.utils as sows_events_testings
 
 
 class PigletsModelTest(TestCase):
@@ -67,4 +71,30 @@ class PigletsModelmanagerTest(TestCase):
     def test_manager_get_total_gilts_quantity(self):
         total_gilts = Piglets.objects.all().get_total_gilts_quantity()
         self.assertEqual(total_gilts, 10)
-   
+
+
+class PigletsQueryTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_queryset_serializer(self):
+        location_cell1 = Location.objects.filter(sowAndPigletsCell__section__number=1)[0]
+        piglets1 = piglets_testing.create_from_sow_farrow_by_week(location=location_cell1,
+            week=1)
+
+        location_cell2 = Location.objects.filter(sowAndPigletsCell__section__number=1)[1]
+        piglets1 = piglets_testing.create_from_sow_farrow_by_week(location=location_cell2,
+            week=1)
+
+        location_cell3 = Location.objects.filter(sowAndPigletsCell__section__number=1)[2]
+        piglets1 = piglets_testing.create_from_sow_farrow_by_week(location=location_cell3,
+            week=2)
+
+        with self.assertNumQueries(3):
+            data = Piglets.objects.all() \
+                .prefetch_related('metatour__records__tour') 
+            serializer = PigletsSerializer(data, many=True)
+            print(serializer.data)

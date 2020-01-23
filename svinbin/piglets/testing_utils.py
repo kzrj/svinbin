@@ -40,3 +40,9 @@ def create_from_sow_farrow(tour, location, quantity=0, gilts_quantity=0, status=
         )
 
     return farrow.piglets_group
+
+def create_from_sow_farrow_by_week(**kwargs):
+    tour = Tour.objects.get_or_create_by_week_in_current_year(kwargs['week'])
+    kwargs['tour'] = tour
+    kwargs.pop('week', None)
+    return create_from_sow_farrow(**kwargs)

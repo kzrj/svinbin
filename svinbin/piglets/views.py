@@ -20,6 +20,20 @@ class PigletsViewSet(viewsets.ModelViewSet):
     serializer_class = piglets_serializers.PigletsSerializer
     filter_class = PigletsFilter
 
+    def list(self, request):
+        queryset = self.filter_queryset(
+            self.get_queryset() \
+                .prefetch_related('metatour__records__tour')
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = piglets_serializers.PigletsSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = piglets_serializers.PigletsSerializer(queryset, many=True)
+        return Response(serializer.data)
+
     @action(methods=['post'], detail=False)
     def create_from_merging_list_and_move_to_ws4(self, request):
         serializer = piglets_serializers.MergeFromListSerializer(data=request.data)

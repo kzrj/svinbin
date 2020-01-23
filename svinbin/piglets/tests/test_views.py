@@ -265,5 +265,3 @@ class PigletsFilterTest(APITestCase):
         response = self.client.get('/api/piglets/?piglets_with_weighing_record=3/4')
         self.assertEqual(response.data['count'], 1)
         self.assertEqual(response.data['results'][0]['id'], piglets1.pk)
-
-
