@@ -379,3 +379,11 @@ hr {
 .message {
 	font-weight: bold;
 }
+
+.ws-home{
+	min-height: 70px !important;
+	text-align: center;
+	vertical-align: middle;
+	border: 1px solid black;
+	margin: 5px;
+}
