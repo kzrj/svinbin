@@ -243,12 +243,6 @@ class Location(CoreModel):
 
         return None
 
-    # @property
-    # def get_section_number(self):
-    #     if self.section:
-    #         return str(self.section.number)
-    #     return None
-
     @property
     def sows_count_by_tour(self):
         return self.sow_set.get_tours_with_count_sows_by_location(self)
