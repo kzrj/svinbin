@@ -12,7 +12,7 @@ class SowsIdsSerializer(serializers.Serializer):
 
 
 class NewGiltBirthIdSerializer(serializers.Serializer):
-    birth_id = serializers.IntegerField()
+    birth_id = serializers.CharField()
 
 
 class CreateRecountSerializer(serializers.Serializer):
