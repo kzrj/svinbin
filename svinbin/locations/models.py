@@ -230,16 +230,16 @@ class Location(CoreModel):
     @property
     def get_cell_number(self):
         if self.sowSingleCell:
-            return str(self.sowSingleCell.number) + '-' + str(self.sowSingleCell.section.number)
+            return f'{self.sowSingleCell.section.number}/{self.sowSingleCell.number}'
 
         if self.pigletsGroupCell:
-            return str(self.pigletsGroupCell.number) + '-' + str(self.pigletsGroupCell.section.number)
+            return f'{self.pigletsGroupCell.section.number}/{self.pigletsGroupCell.number}'
 
         if self.sowAndPigletsCell:
-            return str(self.sowAndPigletsCell.number) + '-' + str(self.sowAndPigletsCell.section.number)
+            return f'{self.sowAndPigletsCell.section.number}/{self.sowAndPigletsCell.number}'
 
         if self.sowGroupCell:
-            return str(self.sowGroupCell.number) + '-' + str(self.sowGroupCell.section.number)
+            return f'{self.sowGroupCell.section.number}/{self.sowGroupCell.number}'
 
         return None
 
