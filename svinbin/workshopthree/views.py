@@ -68,29 +68,22 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-    # @action(methods=['post'], detail=False)
-    # def import_from_farm_json(self, request):
-    #     serializer = serializers.ImportJsonFile(data=request.data)
-    #     if serializer.is_valid():
-    #         wb = import_farm.init_wb(serializer.validated_data['file'])
-    #         rows = import_farm.get_semenation_rows(wb)
-    #         seminated_list, already_seminated_in_tour, sows_in_another_tour = \
-    #             import_farm.create_semination_lists(rows, request.user)
+    @action(methods=['post'], detail=False)
+    def import_from_farm_json(self, request):
+        serializer = serializers.ImportJsonFile(data=request.data)
+        if serializer.is_valid():
+            sows_created, sows_passed = \
+                import_farm.import_from_json_to_ws2_3(serializer.validated_data['file'], 3, request.user)
 
-    #         return Response(
-    #         {
-    #             "seminated_list_count": len(seminated_list),
-    #             "seminated_list_farm_ids": [sow.farm_id for sow in seminated_list],
-    #             "already_seminated_in_tour_count": len(already_seminated_in_tour),
-    #             # "sows_in_another_tour_farm_ids": [sow.farm_id for sow in sows_in_another_tour], 
-    #             "sows_in_another_tour": sows_serializers.SowSerializer(sows_in_another_tour, \
-    #                  many=True).data,
-    #             "sows_in_another_tour_count": len(sows_in_another_tour),  
-    #             "message": "Файл загружен и обработан."
-    #         },
-    #         status=status.HTTP_200_OK)
+            return Response(
+            {
+                "sows_created": len(sows_created),
+                "sows_passed": len(sows_passed),
+                "message": "Файл загружен и обработан."
+            },
+            status=status.HTTP_200_OK)
 
-    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class WorkshopInfo(viewsets.ViewSet):
