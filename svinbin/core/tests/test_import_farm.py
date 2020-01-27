@@ -113,7 +113,7 @@ class FarmImportJsonTest(TestCase):
         self.assertNotEqual(semination.tour, None)
         self.assertNotEqual(ultrasound, None)
         self.assertEqual(ultrasound.result, True)
-        self.assertEqual(ultrasound.date, semination.date + datetime.timedelta(days=21))
+        self.assertEqual(ultrasound.date, semination.date + datetime.timedelta(days=28))
 
     def test_init_ceh2(self):
         import_farm.import_from_json_to_ws2()
@@ -131,7 +131,7 @@ class FarmImportJsonTest(TestCase):
         self.assertNotEqual(semination.tour, None)
         self.assertNotEqual(ultrasound, None)
         self.assertEqual(ultrasound.result, True)
-        self.assertEqual(ultrasound.date, semination.date + datetime.timedelta(days=21))
+        self.assertEqual(ultrasound.date, semination.date + datetime.timedelta(days=28))
 
 
     def test_import_from_json_to_ws2_3(self):
