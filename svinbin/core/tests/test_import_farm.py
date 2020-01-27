@@ -132,3 +132,10 @@ class FarmImportJsonTest(TestCase):
         self.assertNotEqual(ultrasound, None)
         self.assertEqual(ultrasound.result, True)
         self.assertEqual(ultrasound.date, semination.date + datetime.timedelta(days=21))
+
+
+    def test_import_from_json_to_ws2_3(self):
+        json_file = open('../data/ceh03.json', 'r')
+        sows_created, sows_passed = import_farm.import_from_json_to_ws2_3(json_file, 3)
+        print(sows_created)
+        print(sows_passed)

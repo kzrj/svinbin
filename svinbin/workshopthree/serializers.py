@@ -21,3 +21,7 @@ class CreateRecountSerializer(serializers.Serializer):
 
 class MarkSowAsNurseSerializer(serializers.Serializer):
     piglets_tour = serializers.PrimaryKeyRelatedField(queryset=Tour.objects.all(), required=False)
+
+
+class ImportJsonFile(serializers.Serializer):
+    file = serializers.FileField(max_length=None, use_url=False)

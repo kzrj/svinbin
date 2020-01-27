@@ -94,6 +94,10 @@ def import_from_json_to_ws3(initiator=None):
 
     for key in data.keys():
         sow, created = Sow.objects.create_or_return(data[key]['farm_id'])
+        
+        if not created:
+            continue
+
         cycle = data[key]['Cicles'][0]
         tour = Tour.objects.create_or_return_by_raw(cycle['week'])
 
@@ -125,6 +129,10 @@ def import_from_json_to_ws2(initiator=None):
 
     for key in data.keys():
         sow, created = Sow.objects.create_or_return(data[key]['farm_id'])
+
+        if not created:
+            continue
+
         cycle = data[key]['Cicles'][0]
         tour = Tour.objects.create_or_return_by_raw(cycle['week'])
 
@@ -148,3 +156,49 @@ def import_from_json_to_ws2(initiator=None):
 
         sow.location = Location.objects.filter(workshop__number=2).first()
         sow.save()
+
+
+def init_sow_cycle(sow, cycle, ws_number, initiator=None):
+    tour = Tour.objects.create_or_return_by_raw(cycle['week'])
+
+    boar1 = Boar.objects.get_or_create_boar(cycle['boar1'])
+    boar2 = Boar.objects.get_or_create_boar(cycle['boar2'])
+    semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(cycle['insr1'])
+    semination_employee2 = WorkShopEmployee.objects.get_seminator_by_farm_name(cycle['insr2'])
+    date = datetime.datetime.strptime(cycle['insemdate'], '%Y-%m-%d')
+
+    sow, seminated = Semination.objects.double_semination_or_not(
+        sow=sow, tour=tour, date=date, initiator=None,
+        boar1=boar1, semination_employee1=semination_employee1,
+        boar2=boar2, semination_employee2=semination_employee2,                    
+        )
+
+    # usound
+    Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
+     days=30, date=date + datetime.timedelta(days=28))
+    Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
+     days=60, date=date + datetime.timedelta(days=35))
+
+    sow.location = Location.objects.filter(workshop__number=ws_number).first()
+    sow.save()
+
+    return sow
+    
+
+def import_from_json_to_ws2_3(file, ws_number, initiator=None):
+    data = json.load(file)
+    sows_created = list()
+    sows_passed = list()
+
+    for key in data.keys():
+        sow, created = Sow.objects.create_or_return(data[key]['farm_id'])
+
+        if not created:
+            sows_passed.append(sow)
+            continue
+
+        cycle = data[key]['Cicles'][0]
+        sow = init_sow_cycle(sow, cycle, ws_number, initiator)
+        sows_created.append(sow)
+
+    return sows_created, sows_passed
