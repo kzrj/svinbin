@@ -398,81 +398,6 @@ CREATE TABLE django_session (
 ALTER TABLE django_session OWNER TO postgres;
 
 --
--- Name: gilts_events_castinglisttosevenfiveevent; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE gilts_events_castinglisttosevenfiveevent (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    date timestamp with time zone,
-    initiator_id integer
-);
-
-
-ALTER TABLE gilts_events_castinglisttosevenfiveevent OWNER TO postgres;
-
---
--- Name: gilts_events_castinglisttosevenfiveevent_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE gilts_events_castinglisttosevenfiveevent_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE gilts_events_castinglisttosevenfiveevent_id_seq OWNER TO postgres;
-
---
--- Name: gilts_events_castinglisttosevenfiveevent_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE gilts_events_castinglisttosevenfiveevent_id_seq OWNED BY gilts_events_castinglisttosevenfiveevent.id;
-
-
---
--- Name: gilts_events_giltmerger; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE gilts_events_giltmerger (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    date timestamp with time zone,
-    initiator_id integer,
-    nomad_group_id integer
-);
-
-
-ALTER TABLE gilts_events_giltmerger OWNER TO postgres;
-
---
--- Name: gilts_events_giltmerger_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE gilts_events_giltmerger_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE gilts_events_giltmerger_id_seq OWNER TO postgres;
-
---
--- Name: gilts_events_giltmerger_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE gilts_events_giltmerger_id_seq OWNED BY gilts_events_giltmerger.id;
-
-
---
 -- Name: locations_location; Type: TABLE; Schema: public; Owner: postgres
 --
 
@@ -777,16 +702,15 @@ ALTER SEQUENCE locations_workshop_id_seq OWNED BY locations_workshop.id;
 
 
 --
--- Name: piglets_events_cullingnewbornpiglets; Type: TABLE; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE piglets_events_cullingnewbornpiglets (
+CREATE TABLE piglets_events_cullingpiglets (
     id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
     modified_at timestamp with time zone NOT NULL,
     date timestamp with time zone,
     culling_type character varying(50) NOT NULL,
-    quantity integer NOT NULL,
     reason character varying(200),
     is_it_gilt boolean NOT NULL,
     initiator_id integer,
@@ -794,13 +718,13 @@ CREATE TABLE piglets_events_cullingnewbornpiglets (
 );
 
 
-ALTER TABLE piglets_events_cullingnewbornpiglets OWNER TO postgres;
+ALTER TABLE piglets_events_cullingpiglets OWNER TO postgres;
 
 --
--- Name: piglets_events_cullingnewbornpiglets_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE piglets_events_cullingnewbornpiglets_id_seq
+CREATE SEQUENCE piglets_events_cullingpiglets_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -809,40 +733,36 @@ CREATE SEQUENCE piglets_events_cullingnewbornpiglets_id_seq
     CACHE 1;
 
 
-ALTER TABLE piglets_events_cullingnewbornpiglets_id_seq OWNER TO postgres;
+ALTER TABLE piglets_events_cullingpiglets_id_seq OWNER TO postgres;
 
 --
--- Name: piglets_events_cullingnewbornpiglets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE piglets_events_cullingnewbornpiglets_id_seq OWNED BY piglets_events_cullingnewbornpiglets.id;
+ALTER SEQUENCE piglets_events_cullingpiglets_id_seq OWNED BY piglets_events_cullingpiglets.id;
 
 
 --
--- Name: piglets_events_cullingnomadpiglets; Type: TABLE; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE piglets_events_cullingnomadpiglets (
+CREATE TABLE piglets_events_pigletsmerger (
     id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
     modified_at timestamp with time zone NOT NULL,
     date timestamp with time zone,
-    culling_type character varying(50) NOT NULL,
-    quantity integer NOT NULL,
-    reason character varying(200),
-    is_it_gilt boolean NOT NULL,
-    initiator_id integer,
-    piglets_group_id integer NOT NULL
+    created_piglets_id integer,
+    initiator_id integer
 );
 
 
-ALTER TABLE piglets_events_cullingnomadpiglets OWNER TO postgres;
+ALTER TABLE piglets_events_pigletsmerger OWNER TO postgres;
 
 --
--- Name: piglets_events_cullingnomadpiglets_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE piglets_events_cullingnomadpiglets_id_seq
+CREATE SEQUENCE piglets_events_pigletsmerger_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -851,195 +771,36 @@ CREATE SEQUENCE piglets_events_cullingnomadpiglets_id_seq
     CACHE 1;
 
 
-ALTER TABLE piglets_events_cullingnomadpiglets_id_seq OWNER TO postgres;
+ALTER TABLE piglets_events_pigletsmerger_id_seq OWNER TO postgres;
 
 --
--- Name: piglets_events_cullingnomadpiglets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE piglets_events_cullingnomadpiglets_id_seq OWNED BY piglets_events_cullingnomadpiglets.id;
-
-
---
--- Name: piglets_events_newbornmergerrecord; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE piglets_events_newbornmergerrecord (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    quantity integer NOT NULL,
-    percentage double precision NOT NULL,
-    merger_id integer NOT NULL,
-    tour_id integer
-);
-
-
-ALTER TABLE piglets_events_newbornmergerrecord OWNER TO postgres;
-
---
--- Name: piglets_events_newbornmergerrecord_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE piglets_events_newbornmergerrecord_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE piglets_events_newbornmergerrecord_id_seq OWNER TO postgres;
-
---
--- Name: piglets_events_newbornmergerrecord_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE piglets_events_newbornmergerrecord_id_seq OWNED BY piglets_events_newbornmergerrecord.id;
+ALTER SEQUENCE piglets_events_pigletsmerger_id_seq OWNED BY piglets_events_pigletsmerger.id;
 
 
 --
--- Name: piglets_events_newbornpigletsgrouprecount; Type: TABLE; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE piglets_events_newbornpigletsgrouprecount (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    date timestamp with time zone,
-    quantity_before integer NOT NULL,
-    quantity_after integer NOT NULL,
-    balance integer NOT NULL,
-    initiator_id integer,
-    piglets_group_id integer NOT NULL
-);
-
-
-ALTER TABLE piglets_events_newbornpigletsgrouprecount OWNER TO postgres;
-
---
--- Name: piglets_events_newbornpigletsgrouprecount_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE piglets_events_newbornpigletsgrouprecount_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE piglets_events_newbornpigletsgrouprecount_id_seq OWNER TO postgres;
-
---
--- Name: piglets_events_newbornpigletsgrouprecount_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE piglets_events_newbornpigletsgrouprecount_id_seq OWNED BY piglets_events_newbornpigletsgrouprecount.id;
-
-
---
--- Name: piglets_events_newbornpigletsmerger; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE piglets_events_newbornpigletsmerger (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    date timestamp with time zone,
-    part_number integer,
-    initiator_id integer,
-    nomad_group_id integer
-);
-
-
-ALTER TABLE piglets_events_newbornpigletsmerger OWNER TO postgres;
-
---
--- Name: piglets_events_newbornpigletsmerger_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE piglets_events_newbornpigletsmerger_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE piglets_events_newbornpigletsmerger_id_seq OWNER TO postgres;
-
---
--- Name: piglets_events_newbornpigletsmerger_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE piglets_events_newbornpigletsmerger_id_seq OWNED BY piglets_events_newbornpigletsmerger.id;
-
-
---
--- Name: piglets_events_nomadmergerrecord; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE piglets_events_nomadmergerrecord (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    quantity integer NOT NULL,
-    percentage double precision NOT NULL,
-    merger_id integer NOT NULL,
-    nomad_group_id integer
-);
-
-
-ALTER TABLE piglets_events_nomadmergerrecord OWNER TO postgres;
-
---
--- Name: piglets_events_nomadmergerrecord_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE piglets_events_nomadmergerrecord_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE piglets_events_nomadmergerrecord_id_seq OWNER TO postgres;
-
---
--- Name: piglets_events_nomadmergerrecord_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE piglets_events_nomadmergerrecord_id_seq OWNED BY piglets_events_nomadmergerrecord.id;
-
-
---
--- Name: piglets_events_nomadpigletsgroupmerger; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE piglets_events_nomadpigletsgroupmerger (
+CREATE TABLE piglets_events_pigletssplit (
     id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
     modified_at timestamp with time zone NOT NULL,
     date timestamp with time zone,
     initiator_id integer,
-    new_location_id integer,
-    nomad_group_id integer
+    parent_piglets_id integer
 );
 
 
-ALTER TABLE piglets_events_nomadpigletsgroupmerger OWNER TO postgres;
+ALTER TABLE piglets_events_pigletssplit OWNER TO postgres;
 
 --
--- Name: piglets_events_nomadpigletsgroupmerger_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE piglets_events_nomadpigletsgroupmerger_id_seq
+CREATE SEQUENCE piglets_events_pigletssplit_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1048,92 +809,13 @@ CREATE SEQUENCE piglets_events_nomadpigletsgroupmerger_id_seq
     CACHE 1;
 
 
-ALTER TABLE piglets_events_nomadpigletsgroupmerger_id_seq OWNER TO postgres;
+ALTER TABLE piglets_events_pigletssplit_id_seq OWNER TO postgres;
 
 --
--- Name: piglets_events_nomadpigletsgroupmerger_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE piglets_events_nomadpigletsgroupmerger_id_seq OWNED BY piglets_events_nomadpigletsgroupmerger.id;
-
-
---
--- Name: piglets_events_nomadpigletsgrouprecount; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE piglets_events_nomadpigletsgrouprecount (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    date timestamp with time zone,
-    quantity_before integer NOT NULL,
-    quantity_after integer NOT NULL,
-    balance integer NOT NULL,
-    initiator_id integer,
-    piglets_group_id integer NOT NULL
-);
-
-
-ALTER TABLE piglets_events_nomadpigletsgrouprecount OWNER TO postgres;
-
---
--- Name: piglets_events_nomadpigletsgrouprecount_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE piglets_events_nomadpigletsgrouprecount_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE piglets_events_nomadpigletsgrouprecount_id_seq OWNER TO postgres;
-
---
--- Name: piglets_events_nomadpigletsgrouprecount_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE piglets_events_nomadpigletsgrouprecount_id_seq OWNED BY piglets_events_nomadpigletsgrouprecount.id;
-
-
---
--- Name: piglets_events_splitnomadpigletsgroup; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE piglets_events_splitnomadpigletsgroup (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    date timestamp with time zone,
-    initiator_id integer,
-    parent_group_id integer
-);
-
-
-ALTER TABLE piglets_events_splitnomadpigletsgroup OWNER TO postgres;
-
---
--- Name: piglets_events_splitnomadpigletsgroup_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE piglets_events_splitnomadpigletsgroup_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE piglets_events_splitnomadpigletsgroup_id_seq OWNER TO postgres;
-
---
--- Name: piglets_events_splitnomadpigletsgroup_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE piglets_events_splitnomadpigletsgroup_id_seq OWNED BY piglets_events_splitnomadpigletsgroup.id;
+ALTER SEQUENCE piglets_events_pigletssplit_id_seq OWNED BY piglets_events_pigletssplit.id;
 
 
 --
@@ -1179,77 +861,32 @@ ALTER SEQUENCE piglets_events_weighingpiglets_id_seq OWNED BY piglets_events_wei
 
 
 --
--- Name: piglets_newbornpigletsgroup; Type: TABLE; Schema: public; Owner: postgres
+-- Name: piglets_piglets; Type: TABLE; Schema: public; Owner: postgres
 --
 
-CREATE TABLE piglets_newbornpigletsgroup (
+CREATE TABLE piglets_piglets (
     id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
     modified_at timestamp with time zone NOT NULL,
     start_quantity integer NOT NULL,
     quantity integer NOT NULL,
-    active boolean NOT NULL,
-    transfer_label boolean NOT NULL,
     gilts_quantity integer NOT NULL,
-    size_label character varying(1),
-    location_id integer,
-    merger_id integer,
-    status_id integer,
-    tour_id integer
-);
-
-
-ALTER TABLE piglets_newbornpigletsgroup OWNER TO postgres;
-
---
--- Name: piglets_newbornpigletsgroup_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE piglets_newbornpigletsgroup_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE piglets_newbornpigletsgroup_id_seq OWNER TO postgres;
-
---
--- Name: piglets_newbornpigletsgroup_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE piglets_newbornpigletsgroup_id_seq OWNED BY piglets_newbornpigletsgroup.id;
-
-
---
--- Name: piglets_nomadpigletsgroup; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE piglets_nomadpigletsgroup (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    start_quantity integer NOT NULL,
-    quantity integer NOT NULL,
+    transfer_part_number integer,
     active boolean NOT NULL,
-    transfer_label boolean NOT NULL,
-    gilts_quantity integer NOT NULL,
-    groups_merger_id integer,
     location_id integer,
-    split_record_id integer,
+    merger_as_parent_id integer,
+    split_as_child_id integer,
     status_id integer
 );
 
 
-ALTER TABLE piglets_nomadpigletsgroup OWNER TO postgres;
+ALTER TABLE piglets_piglets OWNER TO postgres;
 
 --
--- Name: piglets_nomadpigletsgroup_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+-- Name: piglets_piglets_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
 --
 
-CREATE SEQUENCE piglets_nomadpigletsgroup_id_seq
+CREATE SEQUENCE piglets_piglets_id_seq
     AS integer
     START WITH 1
     INCREMENT BY 1
@@ -1258,13 +895,13 @@ CREATE SEQUENCE piglets_nomadpigletsgroup_id_seq
     CACHE 1;
 
 
-ALTER TABLE piglets_nomadpigletsgroup_id_seq OWNER TO postgres;
+ALTER TABLE piglets_piglets_id_seq OWNER TO postgres;
 
 --
--- Name: piglets_nomadpigletsgroup_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+-- Name: piglets_piglets_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
 --
 
-ALTER SEQUENCE piglets_nomadpigletsgroup_id_seq OWNED BY piglets_nomadpigletsgroup.id;
+ALTER SEQUENCE piglets_piglets_id_seq OWNED BY piglets_piglets.id;
 
 
 --
@@ -1474,7 +1111,7 @@ CREATE TABLE sows_events_sowfarrow (
     dead_quantity integer NOT NULL,
     mummy_quantity integer NOT NULL,
     initiator_id integer,
-    new_born_piglets_group_id integer,
+    piglets_group_id integer,
     sow_id integer NOT NULL,
     tour_id integer
 );
@@ -1592,10 +1229,11 @@ CREATE TABLE sows_events_weaningsow (
     created_at timestamp with time zone NOT NULL,
     modified_at timestamp with time zone NOT NULL,
     date timestamp with time zone,
+    quantity integer NOT NULL,
     initiator_id integer,
+    piglets_id integer,
     sow_id integer NOT NULL,
-    tour_id integer,
-    transaction_id integer
+    tour_id integer
 );
 
 
@@ -1632,12 +1270,9 @@ CREATE TABLE sows_gilt (
     created_at timestamp with time zone NOT NULL,
     modified_at timestamp with time zone NOT NULL,
     birth_id character varying(10),
-    casting_list_to_seven_five_id integer,
+    farrow_id integer,
     location_id integer,
-    merger_id integer,
     mother_sow_id integer,
-    new_born_group_id integer,
-    status_id integer,
     tour_id integer
 );
 
@@ -1664,42 +1299,6 @@ ALTER TABLE sows_gilt_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE sows_gilt_id_seq OWNED BY sows_gilt.id;
-
-
---
--- Name: sows_giltstatus; Type: TABLE; Schema: public; Owner: postgres
---
-
-CREATE TABLE sows_giltstatus (
-    id integer NOT NULL,
-    created_at timestamp with time zone NOT NULL,
-    modified_at timestamp with time zone NOT NULL,
-    title character varying(100) NOT NULL
-);
-
-
-ALTER TABLE sows_giltstatus OWNER TO postgres;
-
---
--- Name: sows_giltstatus_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
---
-
-CREATE SEQUENCE sows_giltstatus_id_seq
-    AS integer
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE sows_giltstatus_id_seq OWNER TO postgres;
-
---
--- Name: sows_giltstatus_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
---
-
-ALTER SEQUENCE sows_giltstatus_id_seq OWNED BY sows_giltstatus.id;
 
 
 --
@@ -1787,11 +1386,11 @@ CREATE TABLE staff_workshopemployee (
     id integer NOT NULL,
     created_at timestamp with time zone NOT NULL,
     modified_at timestamp with time zone NOT NULL,
+    farm_name character varying(20) NOT NULL,
     is_officer boolean NOT NULL,
     is_seminator boolean NOT NULL,
     user_id integer NOT NULL,
-    workshop_id integer,
-    farm_name character varying(20) NOT NULL
+    workshop_id integer
 );
 
 
@@ -1817,6 +1416,81 @@ ALTER TABLE staff_workshopemployee_id_seq OWNER TO postgres;
 --
 
 ALTER SEQUENCE staff_workshopemployee_id_seq OWNED BY staff_workshopemployee.id;
+
+
+--
+-- Name: tours_metatour; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE tours_metatour (
+    id integer NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    modified_at timestamp with time zone NOT NULL,
+    piglets_id integer NOT NULL
+);
+
+
+ALTER TABLE tours_metatour OWNER TO postgres;
+
+--
+-- Name: tours_metatour_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE tours_metatour_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE tours_metatour_id_seq OWNER TO postgres;
+
+--
+-- Name: tours_metatour_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE tours_metatour_id_seq OWNED BY tours_metatour.id;
+
+
+--
+-- Name: tours_metatourrecord; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE tours_metatourrecord (
+    id integer NOT NULL,
+    created_at timestamp with time zone NOT NULL,
+    modified_at timestamp with time zone NOT NULL,
+    quantity integer NOT NULL,
+    percentage double precision NOT NULL,
+    metatour_id integer NOT NULL,
+    tour_id integer NOT NULL
+);
+
+
+ALTER TABLE tours_metatourrecord OWNER TO postgres;
+
+--
+-- Name: tours_metatourrecord_id_seq; Type: SEQUENCE; Schema: public; Owner: postgres
+--
+
+CREATE SEQUENCE tours_metatourrecord_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE tours_metatourrecord_id_seq OWNER TO postgres;
+
+--
+-- Name: tours_metatourrecord_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: postgres
+--
+
+ALTER SEQUENCE tours_metatourrecord_id_seq OWNED BY tours_metatourrecord.id;
 
 
 --
@@ -2001,20 +1675,6 @@ ALTER TABLE ONLY django_migrations ALTER COLUMN id SET DEFAULT nextval('django_m
 
 
 --
--- Name: gilts_events_castinglisttosevenfiveevent id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY gilts_events_castinglisttosevenfiveevent ALTER COLUMN id SET DEFAULT nextval('gilts_events_castinglisttosevenfiveevent_id_seq'::regclass);
-
-
---
--- Name: gilts_events_giltmerger id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY gilts_events_giltmerger ALTER COLUMN id SET DEFAULT nextval('gilts_events_giltmerger_id_seq'::regclass);
-
-
---
 -- Name: locations_location id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -2071,66 +1731,24 @@ ALTER TABLE ONLY locations_workshop ALTER COLUMN id SET DEFAULT nextval('locatio
 
 
 --
--- Name: piglets_events_cullingnewbornpiglets id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_cullingnewbornpiglets ALTER COLUMN id SET DEFAULT nextval('piglets_events_cullingnewbornpiglets_id_seq'::regclass);
-
-
---
--- Name: piglets_events_cullingnomadpiglets id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_cullingnomadpiglets ALTER COLUMN id SET DEFAULT nextval('piglets_events_cullingnomadpiglets_id_seq'::regclass);
+ALTER TABLE ONLY piglets_events_cullingpiglets ALTER COLUMN id SET DEFAULT nextval('piglets_events_cullingpiglets_id_seq'::regclass);
 
 
 --
--- Name: piglets_events_newbornmergerrecord id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_newbornmergerrecord ALTER COLUMN id SET DEFAULT nextval('piglets_events_newbornmergerrecord_id_seq'::regclass);
-
-
---
--- Name: piglets_events_newbornpigletsgrouprecount id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_newbornpigletsgrouprecount ALTER COLUMN id SET DEFAULT nextval('piglets_events_newbornpigletsgrouprecount_id_seq'::regclass);
+ALTER TABLE ONLY piglets_events_pigletsmerger ALTER COLUMN id SET DEFAULT nextval('piglets_events_pigletsmerger_id_seq'::regclass);
 
 
 --
--- Name: piglets_events_newbornpigletsmerger id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_newbornpigletsmerger ALTER COLUMN id SET DEFAULT nextval('piglets_events_newbornpigletsmerger_id_seq'::regclass);
-
-
---
--- Name: piglets_events_nomadmergerrecord id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadmergerrecord ALTER COLUMN id SET DEFAULT nextval('piglets_events_nomadmergerrecord_id_seq'::regclass);
-
-
---
--- Name: piglets_events_nomadpigletsgroupmerger id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadpigletsgroupmerger ALTER COLUMN id SET DEFAULT nextval('piglets_events_nomadpigletsgroupmerger_id_seq'::regclass);
-
-
---
--- Name: piglets_events_nomadpigletsgrouprecount id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadpigletsgrouprecount ALTER COLUMN id SET DEFAULT nextval('piglets_events_nomadpigletsgrouprecount_id_seq'::regclass);
-
-
---
--- Name: piglets_events_splitnomadpigletsgroup id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_splitnomadpigletsgroup ALTER COLUMN id SET DEFAULT nextval('piglets_events_splitnomadpigletsgroup_id_seq'::regclass);
+ALTER TABLE ONLY piglets_events_pigletssplit ALTER COLUMN id SET DEFAULT nextval('piglets_events_pigletssplit_id_seq'::regclass);
 
 
 --
@@ -2141,17 +1759,10 @@ ALTER TABLE ONLY piglets_events_weighingpiglets ALTER COLUMN id SET DEFAULT next
 
 
 --
--- Name: piglets_newbornpigletsgroup id; Type: DEFAULT; Schema: public; Owner: postgres
+-- Name: piglets_piglets id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_newbornpigletsgroup ALTER COLUMN id SET DEFAULT nextval('piglets_newbornpigletsgroup_id_seq'::regclass);
-
-
---
--- Name: piglets_nomadpigletsgroup id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_nomadpigletsgroup ALTER COLUMN id SET DEFAULT nextval('piglets_nomadpigletsgroup_id_seq'::regclass);
+ALTER TABLE ONLY piglets_piglets ALTER COLUMN id SET DEFAULT nextval('piglets_piglets_id_seq'::regclass);
 
 
 --
@@ -2225,13 +1836,6 @@ ALTER TABLE ONLY sows_gilt ALTER COLUMN id SET DEFAULT nextval('sows_gilt_id_seq
 
 
 --
--- Name: sows_giltstatus id; Type: DEFAULT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY sows_giltstatus ALTER COLUMN id SET DEFAULT nextval('sows_giltstatus_id_seq'::regclass);
-
-
---
 -- Name: sows_sow id; Type: DEFAULT; Schema: public; Owner: postgres
 --
 
@@ -2250,6 +1854,20 @@ ALTER TABLE ONLY sows_sowstatus ALTER COLUMN id SET DEFAULT nextval('sows_sowsta
 --
 
 ALTER TABLE ONLY staff_workshopemployee ALTER COLUMN id SET DEFAULT nextval('staff_workshopemployee_id_seq'::regclass);
+
+
+--
+-- Name: tours_metatour id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY tours_metatour ALTER COLUMN id SET DEFAULT nextval('tours_metatour_id_seq'::regclass);
+
+
+--
+-- Name: tours_metatourrecord id; Type: DEFAULT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY tours_metatourrecord ALTER COLUMN id SET DEFAULT nextval('tours_metatourrecord_id_seq'::regclass);
 
 
 --
@@ -2346,134 +1964,102 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 50	Can change sow group cell	13	change_sowgroupcell
 51	Can delete sow group cell	13	delete_sowgroupcell
 52	Can view sow group cell	13	view_sowgroupcell
-53	Can add gilt status	14	add_giltstatus
-54	Can change gilt status	14	change_giltstatus
-55	Can delete gilt status	14	delete_giltstatus
-56	Can view gilt status	14	view_giltstatus
-57	Can add sow status	15	add_sowstatus
-58	Can change sow status	15	change_sowstatus
-59	Can delete sow status	15	delete_sowstatus
-60	Can view sow status	15	view_sowstatus
-61	Can add sow	16	add_sow
-62	Can change sow	16	change_sow
-63	Can delete sow	16	delete_sow
-64	Can view sow	16	view_sow
-65	Can add gilt	17	add_gilt
-66	Can change gilt	17	change_gilt
-67	Can delete gilt	17	delete_gilt
-68	Can view gilt	17	view_gilt
-69	Can add boar	18	add_boar
-70	Can change boar	18	change_boar
-71	Can delete boar	18	delete_boar
-72	Can view boar	18	view_boar
-73	Can add new born piglets group	19	add_newbornpigletsgroup
-74	Can change new born piglets group	19	change_newbornpigletsgroup
-75	Can delete new born piglets group	19	delete_newbornpigletsgroup
-76	Can view new born piglets group	19	view_newbornpigletsgroup
-77	Can add nomad piglets group	20	add_nomadpigletsgroup
-78	Can change nomad piglets group	20	change_nomadpigletsgroup
-79	Can delete nomad piglets group	20	delete_nomadpigletsgroup
-80	Can view nomad piglets group	20	view_nomadpigletsgroup
-81	Can add piglets status	21	add_pigletsstatus
-82	Can change piglets status	21	change_pigletsstatus
-83	Can delete piglets status	21	delete_pigletsstatus
-84	Can view piglets status	21	view_pigletsstatus
-85	Can add ultrasound type	22	add_ultrasoundtype
-86	Can change ultrasound type	22	change_ultrasoundtype
-87	Can delete ultrasound type	22	delete_ultrasoundtype
-88	Can view ultrasound type	22	view_ultrasoundtype
-89	Can add weaning sow	23	add_weaningsow
-90	Can change weaning sow	23	change_weaningsow
-91	Can delete weaning sow	23	delete_weaningsow
-92	Can view weaning sow	23	view_weaningsow
-93	Can add ultrasound	24	add_ultrasound
-94	Can change ultrasound	24	change_ultrasound
-95	Can delete ultrasound	24	delete_ultrasound
-96	Can view ultrasound	24	view_ultrasound
-97	Can add sow farrow	25	add_sowfarrow
-98	Can change sow farrow	25	change_sowfarrow
-99	Can delete sow farrow	25	delete_sowfarrow
-100	Can view sow farrow	25	view_sowfarrow
-101	Can add semination	26	add_semination
-102	Can change semination	26	change_semination
-103	Can delete semination	26	delete_semination
-104	Can view semination	26	view_semination
-105	Can add culling sow	27	add_cullingsow
-106	Can change culling sow	27	change_cullingsow
-107	Can delete culling sow	27	delete_cullingsow
-108	Can view culling sow	27	view_cullingsow
-109	Can add abortion sow	28	add_abortionsow
-110	Can change abortion sow	28	change_abortionsow
-111	Can delete abortion sow	28	delete_abortionsow
-112	Can view abortion sow	28	view_abortionsow
-113	Can add weighing piglets	29	add_weighingpiglets
-114	Can change weighing piglets	29	change_weighingpiglets
-115	Can delete weighing piglets	29	delete_weighingpiglets
-116	Can view weighing piglets	29	view_weighingpiglets
-117	Can add split nomad piglets group	30	add_splitnomadpigletsgroup
-118	Can change split nomad piglets group	30	change_splitnomadpigletsgroup
-119	Can delete split nomad piglets group	30	delete_splitnomadpigletsgroup
-120	Can view split nomad piglets group	30	view_splitnomadpigletsgroup
-121	Can add nomad piglets group recount	31	add_nomadpigletsgrouprecount
-122	Can change nomad piglets group recount	31	change_nomadpigletsgrouprecount
-123	Can delete nomad piglets group recount	31	delete_nomadpigletsgrouprecount
-124	Can view nomad piglets group recount	31	view_nomadpigletsgrouprecount
-125	Can add nomad piglets group merger	32	add_nomadpigletsgroupmerger
-126	Can change nomad piglets group merger	32	change_nomadpigletsgroupmerger
-127	Can delete nomad piglets group merger	32	delete_nomadpigletsgroupmerger
-128	Can view nomad piglets group merger	32	view_nomadpigletsgroupmerger
-129	Can add nomad merger record	33	add_nomadmergerrecord
-130	Can change nomad merger record	33	change_nomadmergerrecord
-131	Can delete nomad merger record	33	delete_nomadmergerrecord
-132	Can view nomad merger record	33	view_nomadmergerrecord
-133	Can add new born piglets merger	34	add_newbornpigletsmerger
-134	Can change new born piglets merger	34	change_newbornpigletsmerger
-135	Can delete new born piglets merger	34	delete_newbornpigletsmerger
-136	Can view new born piglets merger	34	view_newbornpigletsmerger
-137	Can add new born piglets group recount	35	add_newbornpigletsgrouprecount
-138	Can change new born piglets group recount	35	change_newbornpigletsgrouprecount
-139	Can delete new born piglets group recount	35	delete_newbornpigletsgrouprecount
-140	Can view new born piglets group recount	35	view_newbornpigletsgrouprecount
-141	Can add new born merger record	36	add_newbornmergerrecord
-142	Can change new born merger record	36	change_newbornmergerrecord
-143	Can delete new born merger record	36	delete_newbornmergerrecord
-144	Can view new born merger record	36	view_newbornmergerrecord
-145	Can add culling nomad piglets	37	add_cullingnomadpiglets
-146	Can change culling nomad piglets	37	change_cullingnomadpiglets
-147	Can delete culling nomad piglets	37	delete_cullingnomadpiglets
-148	Can view culling nomad piglets	37	view_cullingnomadpiglets
-149	Can add culling new born piglets	38	add_cullingnewbornpiglets
-150	Can change culling new born piglets	38	change_cullingnewbornpiglets
-151	Can delete culling new born piglets	38	delete_cullingnewbornpiglets
-152	Can view culling new born piglets	38	view_cullingnewbornpiglets
-153	Can add casting list to seven five event	39	add_castinglisttosevenfiveevent
-154	Can change casting list to seven five event	39	change_castinglisttosevenfiveevent
-155	Can delete casting list to seven five event	39	delete_castinglisttosevenfiveevent
-156	Can view casting list to seven five event	39	view_castinglisttosevenfiveevent
-157	Can add gilt merger	40	add_giltmerger
-158	Can change gilt merger	40	change_giltmerger
-159	Can delete gilt merger	40	delete_giltmerger
-160	Can view gilt merger	40	view_giltmerger
-161	Can add sow transaction	41	add_sowtransaction
-162	Can change sow transaction	41	change_sowtransaction
-163	Can delete sow transaction	41	delete_sowtransaction
-164	Can view sow transaction	41	view_sowtransaction
-165	Can add piglets transaction	42	add_pigletstransaction
-166	Can change piglets transaction	42	change_pigletstransaction
-167	Can delete piglets transaction	42	delete_pigletstransaction
-168	Can view piglets transaction	42	view_pigletstransaction
-169	Can add tour	43	add_tour
-170	Can change tour	43	change_tour
-171	Can delete tour	43	delete_tour
-172	Can view tour	43	view_tour
-173	Can add work shop employee	44	add_workshopemployee
-174	Can change work shop employee	44	change_workshopemployee
-175	Can delete work shop employee	44	delete_workshopemployee
-176	Can view work shop employee	44	view_workshopemployee
-177	Can add Token	45	add_token
-178	Can change Token	45	change_token
-179	Can delete Token	45	delete_token
-180	Can view Token	45	view_token
+53	Can add boar	14	add_boar
+54	Can change boar	14	change_boar
+55	Can delete boar	14	delete_boar
+56	Can view boar	14	view_boar
+57	Can add gilt	15	add_gilt
+58	Can change gilt	15	change_gilt
+59	Can delete gilt	15	delete_gilt
+60	Can view gilt	15	view_gilt
+61	Can add sow status	16	add_sowstatus
+62	Can change sow status	16	change_sowstatus
+63	Can delete sow status	16	delete_sowstatus
+64	Can view sow status	16	view_sowstatus
+65	Can add sow	17	add_sow
+66	Can change sow	17	change_sow
+67	Can delete sow	17	delete_sow
+68	Can view sow	17	view_sow
+69	Can add piglets status	18	add_pigletsstatus
+70	Can change piglets status	18	change_pigletsstatus
+71	Can delete piglets status	18	delete_pigletsstatus
+72	Can view piglets status	18	view_pigletsstatus
+73	Can add piglets	19	add_piglets
+74	Can change piglets	19	change_piglets
+75	Can delete piglets	19	delete_piglets
+76	Can view piglets	19	view_piglets
+77	Can add ultrasound type	20	add_ultrasoundtype
+78	Can change ultrasound type	20	change_ultrasoundtype
+79	Can delete ultrasound type	20	delete_ultrasoundtype
+80	Can view ultrasound type	20	view_ultrasoundtype
+81	Can add weaning sow	21	add_weaningsow
+82	Can change weaning sow	21	change_weaningsow
+83	Can delete weaning sow	21	delete_weaningsow
+84	Can view weaning sow	21	view_weaningsow
+85	Can add ultrasound	22	add_ultrasound
+86	Can change ultrasound	22	change_ultrasound
+87	Can delete ultrasound	22	delete_ultrasound
+88	Can view ultrasound	22	view_ultrasound
+89	Can add sow farrow	23	add_sowfarrow
+90	Can change sow farrow	23	change_sowfarrow
+91	Can delete sow farrow	23	delete_sowfarrow
+92	Can view sow farrow	23	view_sowfarrow
+93	Can add semination	24	add_semination
+94	Can change semination	24	change_semination
+95	Can delete semination	24	delete_semination
+96	Can view semination	24	view_semination
+97	Can add culling sow	25	add_cullingsow
+98	Can change culling sow	25	change_cullingsow
+99	Can delete culling sow	25	delete_cullingsow
+100	Can view culling sow	25	view_cullingsow
+101	Can add abortion sow	26	add_abortionsow
+102	Can change abortion sow	26	change_abortionsow
+103	Can delete abortion sow	26	delete_abortionsow
+104	Can view abortion sow	26	view_abortionsow
+105	Can add weighing piglets	27	add_weighingpiglets
+106	Can change weighing piglets	27	change_weighingpiglets
+107	Can delete weighing piglets	27	delete_weighingpiglets
+108	Can view weighing piglets	27	view_weighingpiglets
+109	Can add piglets split	28	add_pigletssplit
+110	Can change piglets split	28	change_pigletssplit
+111	Can delete piglets split	28	delete_pigletssplit
+112	Can view piglets split	28	view_pigletssplit
+113	Can add piglets merger	29	add_pigletsmerger
+114	Can change piglets merger	29	change_pigletsmerger
+115	Can delete piglets merger	29	delete_pigletsmerger
+116	Can view piglets merger	29	view_pigletsmerger
+117	Can add culling piglets	30	add_cullingpiglets
+118	Can change culling piglets	30	change_cullingpiglets
+119	Can delete culling piglets	30	delete_cullingpiglets
+120	Can view culling piglets	30	view_cullingpiglets
+121	Can add sow transaction	31	add_sowtransaction
+122	Can change sow transaction	31	change_sowtransaction
+123	Can delete sow transaction	31	delete_sowtransaction
+124	Can view sow transaction	31	view_sowtransaction
+125	Can add piglets transaction	32	add_pigletstransaction
+126	Can change piglets transaction	32	change_pigletstransaction
+127	Can delete piglets transaction	32	delete_pigletstransaction
+128	Can view piglets transaction	32	view_pigletstransaction
+129	Can add meta tour	33	add_metatour
+130	Can change meta tour	33	change_metatour
+131	Can delete meta tour	33	delete_metatour
+132	Can view meta tour	33	view_metatour
+133	Can add tour	34	add_tour
+134	Can change tour	34	change_tour
+135	Can delete tour	34	delete_tour
+136	Can view tour	34	view_tour
+137	Can add meta tour record	35	add_metatourrecord
+138	Can change meta tour record	35	change_metatourrecord
+139	Can delete meta tour record	35	delete_metatourrecord
+140	Can view meta tour record	35	view_metatourrecord
+141	Can add work shop employee	36	add_workshopemployee
+142	Can change work shop employee	36	change_workshopemployee
+143	Can delete work shop employee	36	delete_workshopemployee
+144	Can view work shop employee	36	view_workshopemployee
+145	Can add Token	37	add_token
+146	Can change Token	37	change_token
+147	Can delete Token	37	delete_token
+148	Can view Token	37	view_token
 \.
 
 
@@ -2482,15 +2068,22 @@ COPY auth_permission (id, name, content_type_id, codename) FROM stdin;
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$150000$Dbh2ihachZwO$4kuqmpO7e/86KiqFM6YOvFfr7xo1YFNlaYHHfcd9eUM=	\N	f	test_seminator			t@t.ru	f	t	2019-10-17 13:28:57.788099+00
-9	pbkdf2_sha256$150000$KjFFkDtsnJtH$0NWwvFG0+kTFb6VwGbUXmSEQGrvde377tM9IDflKdqI=	\N	f	d.perfiliev	Дмитрий	Перфильев		f	t	2019-10-21 06:18:44+00
-7	pbkdf2_sha256$150000$r08plwYAkj4k$fXZUhEeXP4W2gnlWEeA4vWJK/Vz4DxDdlA+JVrFNDYY=	\N	f	borisov_seminator		3 Борисов		f	t	2019-10-21 05:56:31+00
-5	pbkdf2_sha256$150000$5sibB2j926ao$7KzI6czOK0+rVGPc6K0fDqP2wODCbNMiT6c8fUoVDpk=	\N	f	semenova		1 Семенова		f	t	2019-10-21 05:55:14+00
-6	pbkdf2_sha256$150000$ZB8lPCRvvDL6$GIpHaLcN37jyMsPmKJrHovXWxBmJuusBJN3XxmswfkU=	\N	f	ivanov_semenator		2 Иванов		f	t	2019-10-21 05:55:39+00
-4	pbkdf2_sha256$150000$T2JkRiuqJcIS$lcxeEvj89b4W8BuXuB8JI6ucCBX43HRmi1nFxrG2lKQ=	\N	f	v.shmigina	Валентина	4 Шмыгина		f	t	2019-10-21 05:46:56+00
-10	pbkdf2_sha256$150000$wvPRMlCjnFYg$PuH+uu2BJnSbWzwL00zwXVBJcelMVxev/UmI7/k30Po=	\N	f	gary		5 Гари		f	t	2019-10-21 07:30:51+00
-2	pbkdf2_sha256$150000$Hy5iYce7OLUI$wP4jtqQ1zZU9hQxaGVwdn5FEDEHRUZVcc+pPUAkKWZg=	2019-11-04 08:25:41.781155+00	t	smileman			kzrster@gmail.com	t	t	2019-10-21 05:36:32.165661+00
-8	pbkdf2_sha256$150000$Um9MhrHlrnCT$rGqjP5BC9DzL0oT6F1Up1bWwuTS1GePF9k/8pLcS2m4=	\N	f	test_admin				t	t	2019-10-21 06:16:27+00
+1	pbkdf2_sha256$180000$jUl4AfSyYYy7$9zvkA0XmfaQof9cE/DtesjAfKwUVLWwxEW+EIpwIPZo=	\N	t	kaizerj			kzrster@gmail.com	t	t	2020-01-24 04:41:23.608956+00
+2	pbkdf2_sha256$180000$zRgGmon0hOoW$HxC/ti/4LXASixxdu3NPukcDkTXCtVyGuCjzkkbHXSw=	\N	f	test_admin			t@t.ru	f	t	2020-01-24 04:41:23.781719+00
+3	pbkdf2_sha256$180000$zUqYqJBG4vCH$oNtix3d08SoVdK3DDNib+M2h6IYKzj5JKBYmEbBu97o=	\N	f	test_officer			t@t.ru	f	t	2020-01-24 04:41:23.938849+00
+4	pbkdf2_sha256$180000$tZugr14yvrNT$wVkyM9mi7UpttSsL7WyrPYhP/X15fejrvfTf7wV+3nc=	\N	f	shmigina			t@t.ru	f	t	2020-01-24 04:41:24.092875+00
+5	pbkdf2_sha256$180000$DklY8F7OAa1A$y/Dzt8ZLBLQAAveOXtMxYWuVNwdHpBhwfNR2l8FzNzU=	\N	f	borisov			t@t.ru	f	t	2020-01-24 04:41:24.246455+00
+6	pbkdf2_sha256$180000$HOfxzSbWdz48$eHZe4KY9gsbxdAL0JuoOJp+qrCR0g+XGHQ9k38oop1g=	\N	f	semenova			t@t.ru	f	t	2020-01-24 04:41:24.402652+00
+7	pbkdf2_sha256$180000$HZIM0D7bMwRp$o+RjIogw85eh+hGxH0PirvVhkHmM8LgjMdnsLTTLHKg=	\N	f	gary			t@t.ru	f	t	2020-01-24 04:41:24.561546+00
+8	pbkdf2_sha256$180000$OutRbHL5wuC8$hfqIAK3By1iWQkdctk26hrIIOVeaTeqxvYN844K+9e4=	\N	f	ivanov			t@t.ru	f	t	2020-01-24 04:41:24.732572+00
+9	pbkdf2_sha256$180000$0NPfT0XuiQjv$RZW/1j36I8wcQAZC2Zx7KAr0p8gl+GiFWhzpPT9dljI=	\N	f	stude			t@t.ru	f	t	2020-01-24 04:41:24.892294+00
+10	pbkdf2_sha256$180000$7B8VkgAQ6MuH$ixE5u9JxqMILUs+i+0CpIISeWgGoiF13kD/NofZCKik=	\N	f	brigadir1			t@t.ru	f	t	2020-01-24 04:41:25.163421+00
+11	pbkdf2_sha256$180000$fynVSFMXJvoZ$ljd6mEjOUbzkUpPPwy0E88msYGqV/Ras0ojh9oSIf2U=	\N	f	brigadir2			t@t.ru	f	t	2020-01-24 04:41:25.322643+00
+12	pbkdf2_sha256$180000$2fESouihvEDK$errOnELJMVgC0vLHCL2w6fdo47D/pokPChWdPimslZk=	\N	f	brigadir3			t@t.ru	f	t	2020-01-24 04:41:25.500316+00
+13	pbkdf2_sha256$180000$GygTxzKFTFjE$FbstqGtQR66sxPSqF7NJ5NtEwoTCWez9sORWrnsD4Tw=	\N	f	brigadir4			t@t.ru	f	t	2020-01-24 04:41:25.656453+00
+14	pbkdf2_sha256$180000$Ps0qbyYHDw1K$Na+clXfmZNwRUDspkzAJvg/bEhH2N6tWmsYwD3LTQJQ=	\N	f	brigadir5			t@t.ru	f	t	2020-01-24 04:41:25.814379+00
+15	pbkdf2_sha256$180000$PpOP3xXArsRZ$ECXiB9JebaKFZhG0XNNEPyG8mOeEDrGYFD/EQc4DCCA=	\N	f	brigadir6			t@t.ru	f	t	2020-01-24 04:41:25.973421+00
+16	pbkdf2_sha256$180000$fS32WAsn5Ahj$ogAfUokeuHRnGGtdHvMM7KhKAo6vw+wRYP04eBiPUvE=	\N	f	brigadir7			t@t.ru	f	t	2020-01-24 04:41:26.142654+00
 \.
 
 
@@ -2523,62 +2116,6 @@ COPY authtoken_token (key, created, user_id) FROM stdin;
 --
 
 COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, change_message, content_type_id, user_id) FROM stdin;
-1	2019-10-21 05:40:47.215688+00	3	v.shmigina	1	[{"added": {}}]	4	2
-2	2019-10-21 05:41:32.936273+00	3	v.shmigina	2	[{"changed": {"fields": ["first_name", "last_name"]}}]	4	2
-3	2019-10-21 05:41:54.291575+00	3	v.shmigina	3		4	2
-4	2019-10-21 05:46:56.207658+00	4	v.shmigina	1	[{"added": {}}]	4	2
-5	2019-10-21 05:47:15.624996+00	4	v.shmigina	2	[{"changed": {"fields": ["first_name", "last_name"]}}]	4	2
-6	2019-10-21 05:48:04.183057+00	2	Employee v.shmigina 	1	[{"added": {}}]	44	2
-7	2019-10-21 05:50:01.457644+00	3	Boar object (3)	1	[{"added": {}}]	18	2
-8	2019-10-21 05:50:14.958743+00	4	Boar object (4)	1	[{"added": {}}]	18	2
-9	2019-10-21 05:50:27.307161+00	5	Boar object (5)	1	[{"added": {}}]	18	2
-10	2019-10-21 05:50:35.487662+00	6	Boar object (6)	1	[{"added": {}}]	18	2
-11	2019-10-21 05:50:45.165868+00	7	Boar object (7)	1	[{"added": {}}]	18	2
-12	2019-10-21 05:50:57.534846+00	8	Boar object (8)	1	[{"added": {}}]	18	2
-13	2019-10-21 05:51:07.91922+00	9	Boar object (9)	1	[{"added": {}}]	18	2
-14	2019-10-21 05:51:16.330869+00	10	Boar object (10)	1	[{"added": {}}]	18	2
-15	2019-10-21 05:51:31.080817+00	11	Boar object (11)	1	[{"added": {}}]	18	2
-16	2019-10-21 05:51:38.664374+00	12	Boar object (12)	1	[{"added": {}}]	18	2
-17	2019-10-21 05:55:14.61221+00	5	semenova	1	[{"added": {}}]	4	2
-18	2019-10-21 05:55:39.707683+00	6	ivanov_semenator	1	[{"added": {}}]	4	2
-19	2019-10-21 05:56:31.704315+00	7	borisov_seminator	1	[{"added": {}}]	4	2
-20	2019-10-21 05:56:36.587706+00	7	borisov_seminator	2	[]	4	2
-21	2019-10-21 05:57:10.45968+00	2	Employee v.shmigina 	2	[{"changed": {"fields": ["is_seminator"]}}]	44	2
-22	2019-10-21 05:57:22.596313+00	3	Employee semenova 	1	[{"added": {}}]	44	2
-23	2019-10-21 05:57:28.996103+00	4	Employee borisov_seminator 	1	[{"added": {}}]	44	2
-24	2019-10-21 05:57:35.758977+00	5	Employee ivanov_semenator 	1	[{"added": {}}]	44	2
-25	2019-10-21 05:59:43.901903+00	4	Employee borisov_seminator 	2	[{"changed": {"fields": ["is_officer", "is_seminator"]}}]	44	2
-26	2019-10-21 06:03:58.62821+00	1	Employee test_seminator 	3		44	2
-27	2019-10-21 06:06:11.545941+00	1	Boar object (1)	3		18	2
-28	2019-10-21 06:06:21.669653+00	2	Boar object (2)	3		18	2
-29	2019-10-21 06:09:42.995521+00	5	semenova	2	[{"changed": {"fields": ["last_name"]}}]	4	2
-30	2019-10-21 06:09:59.99052+00	7	borisov_seminator	2	[{"changed": {"fields": ["last_name"]}}]	4	2
-31	2019-10-21 06:10:14.101939+00	6	ivanov_semenator	2	[{"changed": {"fields": ["last_name"]}}]	4	2
-32	2019-10-21 06:16:27.243949+00	8	test_admin	1	[{"added": {}}]	4	2
-33	2019-10-21 06:16:50.052832+00	8	test_admin	2	[{"changed": {"fields": ["is_staff"]}}]	4	2
-34	2019-10-21 06:17:07.380004+00	6	Employee test_admin 	1	[{"added": {}}]	44	2
-35	2019-10-21 06:18:44.17773+00	9	d.perfiliev	1	[{"added": {}}]	4	2
-36	2019-10-21 06:19:01.596287+00	9	d.perfiliev	2	[{"changed": {"fields": ["first_name", "last_name"]}}]	4	2
-37	2019-10-21 06:19:31.454665+00	7	Employee d.perfiliev 	1	[{"added": {}}]	44	2
-38	2019-10-21 06:40:30.125+00	79	Sow #2618	3		16	2
-39	2019-10-21 07:29:45.875878+00	7	borisov_seminator	2	[{"changed": {"fields": ["last_name"]}}]	4	2
-40	2019-10-21 07:29:56.038684+00	6	ivanov_semenator	2	[{"changed": {"fields": ["last_name"]}}]	4	2
-41	2019-10-21 07:30:06.951533+00	5	semenova	2	[{"changed": {"fields": ["last_name"]}}]	4	2
-42	2019-10-21 07:30:15.764126+00	6	ivanov_semenator	2	[{"changed": {"fields": ["last_name"]}}]	4	2
-43	2019-10-21 07:30:30.806807+00	4	v.shmigina	2	[{"changed": {"fields": ["last_name"]}}]	4	2
-44	2019-10-21 07:30:51.643618+00	10	gary	1	[{"added": {}}]	4	2
-45	2019-10-21 07:31:04.889606+00	10	gary	2	[{"changed": {"fields": ["last_name"]}}]	4	2
-46	2019-10-21 07:31:22.125941+00	8	Employee gary 	1	[{"added": {}}]	44	2
-47	2019-10-25 04:33:42.436354+00	2	Employee v.shmigina 	2	[{"changed": {"fields": ["farm_name"]}}]	44	2
-48	2019-10-25 04:33:54.645715+00	3	Employee semenova 	2	[{"changed": {"fields": ["farm_name"]}}]	44	2
-49	2019-10-25 04:34:09.848149+00	4	Employee borisov_seminator 	2	[{"changed": {"fields": ["farm_name"]}}]	44	2
-50	2019-10-25 04:34:29.27736+00	5	Employee ivanov_semenator 	2	[{"changed": {"fields": ["farm_name"]}}]	44	2
-51	2019-10-25 04:34:42.035085+00	8	Employee gary 	2	[{"changed": {"fields": ["farm_name"]}}]	44	2
-52	2019-10-25 10:58:27.771694+00	6	Employee test_admin 	2	[{"changed": {"fields": ["farm_name", "is_seminator"]}}]	44	2
-53	2019-10-30 10:09:13.08097+00	4	Супорос 35	2	[{"changed": {"fields": ["title"]}}]	15	2
-54	2019-10-30 10:09:20.550881+00	3	Супорос 28	2	[{"changed": {"fields": ["title"]}}]	15	2
-55	2019-11-04 08:29:31.915478+00	256	Sow #19465	2	[{"changed": {"fields": ["birth_id", "farm_id"]}}]	16	2
-56	2019-11-05 07:17:23.442671+00	8	test_admin	2	[{"changed": {"fields": ["password"]}}]	4	2
 \.
 
 
@@ -2600,38 +2137,30 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 11	locations	workshop
 12	locations	sowsinglecell
 13	locations	sowgroupcell
-14	sows	giltstatus
-15	sows	sowstatus
-16	sows	sow
-17	sows	gilt
-18	sows	boar
-19	piglets	newbornpigletsgroup
-20	piglets	nomadpigletsgroup
-21	piglets	pigletsstatus
-22	sows_events	ultrasoundtype
-23	sows_events	weaningsow
-24	sows_events	ultrasound
-25	sows_events	sowfarrow
-26	sows_events	semination
-27	sows_events	cullingsow
-28	sows_events	abortionsow
-29	piglets_events	weighingpiglets
-30	piglets_events	splitnomadpigletsgroup
-31	piglets_events	nomadpigletsgrouprecount
-32	piglets_events	nomadpigletsgroupmerger
-33	piglets_events	nomadmergerrecord
-34	piglets_events	newbornpigletsmerger
-35	piglets_events	newbornpigletsgrouprecount
-36	piglets_events	newbornmergerrecord
-37	piglets_events	cullingnomadpiglets
-38	piglets_events	cullingnewbornpiglets
-39	gilts_events	castinglisttosevenfiveevent
-40	gilts_events	giltmerger
-41	transactions	sowtransaction
-42	transactions	pigletstransaction
-43	tours	tour
-44	staff	workshopemployee
-45	authtoken	token
+14	sows	boar
+15	sows	gilt
+16	sows	sowstatus
+17	sows	sow
+18	piglets	pigletsstatus
+19	piglets	piglets
+20	sows_events	ultrasoundtype
+21	sows_events	weaningsow
+22	sows_events	ultrasound
+23	sows_events	sowfarrow
+24	sows_events	semination
+25	sows_events	cullingsow
+26	sows_events	abortionsow
+27	piglets_events	weighingpiglets
+28	piglets_events	pigletssplit
+29	piglets_events	pigletsmerger
+30	piglets_events	cullingpiglets
+31	transactions	sowtransaction
+32	transactions	pigletstransaction
+33	tours	metatour
+34	tours	tour
+35	tours	metatourrecord
+36	staff	workshopemployee
+37	authtoken	token
 \.
 
 
@@ -2640,42 +2169,36 @@ COPY django_content_type (id, app_label, model) FROM stdin;
 --
 
 COPY django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2019-10-17 12:51:42.577366+00
-2	auth	0001_initial	2019-10-17 12:51:42.643696+00
-3	admin	0001_initial	2019-10-17 12:51:42.740355+00
-4	admin	0002_logentry_remove_auto_add	2019-10-17 12:51:42.760839+00
-5	admin	0003_logentry_add_action_flag_choices	2019-10-17 12:51:42.774073+00
-6	contenttypes	0002_remove_content_type_name	2019-10-17 12:51:42.834791+00
-7	auth	0002_alter_permission_name_max_length	2019-10-17 12:51:42.844374+00
-8	auth	0003_alter_user_email_max_length	2019-10-17 12:51:42.856606+00
-9	auth	0004_alter_user_username_opts	2019-10-17 12:51:42.869131+00
-10	auth	0005_alter_user_last_login_null	2019-10-17 12:51:42.879647+00
-11	auth	0006_require_contenttypes_0002	2019-10-17 12:51:42.882844+00
-12	auth	0007_alter_validators_add_error_messages	2019-10-17 12:51:42.893959+00
-13	auth	0008_alter_user_username_max_length	2019-10-17 12:51:42.909393+00
-14	auth	0009_alter_user_last_name_max_length	2019-10-17 12:51:42.921853+00
-15	auth	0010_alter_group_name_max_length	2019-10-17 12:51:42.93394+00
-16	auth	0011_update_proxy_permissions	2019-10-17 12:51:42.945783+00
-17	authtoken	0001_initial	2019-10-17 12:51:42.970003+00
-18	authtoken	0002_auto_20160226_1747	2019-10-17 12:51:43.010917+00
-19	piglets	0001_initial	2019-10-17 12:51:43.045112+00
-20	gilts_events	0001_initial	2019-10-17 12:51:43.067829+00
-21	gilts_events	0002_auto_20191017_2051	2019-10-17 12:51:43.096572+00
-22	tours	0001_initial	2019-10-17 12:51:43.113419+00
-23	locations	0001_initial	2019-10-17 12:51:43.183786+00
-24	sows	0001_initial	2019-10-17 12:51:43.315337+00
-25	locations	0002_auto_20191017_2051	2019-10-17 12:51:43.713908+00
-26	piglets_events	0001_initial	2019-10-17 12:51:44.204445+00
-27	piglets	0002_auto_20191017_2051	2019-10-17 12:51:44.596428+00
-28	sessions	0001_initial	2019-10-17 12:51:44.652588+00
-29	transactions	0001_initial	2019-10-17 12:51:44.831512+00
-30	sows_events	0001_initial	2019-10-17 12:51:45.184446+00
-31	staff	0001_initial	2019-10-17 12:51:45.370188+00
-32	staff	0002_workshopemployee_farm_name	2019-10-25 04:32:32.62857+00
-33	gilts_events	0003_auto_20191025_1555	2019-10-25 07:55:14.293896+00
-34	piglets_events	0002_auto_20191025_1555	2019-10-25 07:55:14.593723+00
-35	sows_events	0002_auto_20191025_1555	2019-10-25 07:55:14.925489+00
-36	transactions	0002_auto_20191025_1555	2019-10-25 07:55:15.013497+00
+1	contenttypes	0001_initial	2020-01-24 04:40:59.234105+00
+2	auth	0001_initial	2020-01-24 04:40:59.292738+00
+3	admin	0001_initial	2020-01-24 04:40:59.388379+00
+4	admin	0002_logentry_remove_auto_add	2020-01-24 04:40:59.413557+00
+5	admin	0003_logentry_add_action_flag_choices	2020-01-24 04:40:59.463956+00
+6	contenttypes	0002_remove_content_type_name	2020-01-24 04:40:59.48537+00
+7	auth	0002_alter_permission_name_max_length	2020-01-24 04:40:59.492357+00
+8	auth	0003_alter_user_email_max_length	2020-01-24 04:40:59.503451+00
+9	auth	0004_alter_user_username_opts	2020-01-24 04:40:59.51413+00
+10	auth	0005_alter_user_last_login_null	2020-01-24 04:40:59.527466+00
+11	auth	0006_require_contenttypes_0002	2020-01-24 04:40:59.534709+00
+12	auth	0007_alter_validators_add_error_messages	2020-01-24 04:40:59.545446+00
+13	auth	0008_alter_user_username_max_length	2020-01-24 04:40:59.565045+00
+14	auth	0009_alter_user_last_name_max_length	2020-01-24 04:40:59.576289+00
+15	auth	0010_alter_group_name_max_length	2020-01-24 04:40:59.586667+00
+16	auth	0011_update_proxy_permissions	2020-01-24 04:40:59.596926+00
+17	authtoken	0001_initial	2020-01-24 04:40:59.618197+00
+18	authtoken	0002_auto_20160226_1747	2020-01-24 04:40:59.659257+00
+19	locations	0001_initial	2020-01-24 04:40:59.723983+00
+20	piglets	0001_initial	2020-01-24 04:40:59.771953+00
+21	tours	0001_initial	2020-01-24 04:40:59.825793+00
+22	sows	0001_initial	2020-01-24 04:40:59.88684+00
+23	locations	0002_auto_20200124_1240	2020-01-24 04:41:00.189603+00
+24	piglets_events	0001_initial	2020-01-24 04:41:00.375357+00
+25	piglets	0002_auto_20200124_1240	2020-01-24 04:41:00.505291+00
+26	sessions	0001_initial	2020-01-24 04:41:00.53992+00
+27	sows_events	0001_initial	2020-01-24 04:41:00.846723+00
+28	sows	0002_auto_20200124_1240	2020-01-24 04:41:01.155969+00
+29	staff	0001_initial	2020-01-24 04:41:01.250216+00
+30	transactions	0001_initial	2020-01-24 04:41:01.362121+00
 \.
 
 
@@ -2684,25 +2207,6 @@ COPY django_migrations (id, app, name, applied) FROM stdin;
 --
 
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
-6makjowmv2axz5j18ljrk7otokr97co2	ODlhYWI1NGRmNWVmZWY3ZmY1MWQ5ZTNlZTMwMjRjNmE3ZTU3MTljNjp7Il9hdXRoX3VzZXJfaWQiOiIyIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiI5ZGRiMTk5MzBjZGQ1MTRmZTVhMmE0ODc2MDcxMjliZGY1ZTM0ZmQ4In0=	2019-11-04 06:39:41.685164+00
-fnkk44vvtffdul9ga6a6uf8iv6jfskua	ODlhYWI1NGRmNWVmZWY3ZmY1MWQ5ZTNlZTMwMjRjNmE3ZTU3MTljNjp7Il9hdXRoX3VzZXJfaWQiOiIyIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiI5ZGRiMTk5MzBjZGQ1MTRmZTVhMmE0ODc2MDcxMjliZGY1ZTM0ZmQ4In0=	2019-11-18 08:25:41.789553+00
-hctexgv43o0natnvjnghywg7fwgebqi7	ODlhYWI1NGRmNWVmZWY3ZmY1MWQ5ZTNlZTMwMjRjNmE3ZTU3MTljNjp7Il9hdXRoX3VzZXJfaWQiOiIyIiwiX2F1dGhfdXNlcl9iYWNrZW5kIjoiZGphbmdvLmNvbnRyaWIuYXV0aC5iYWNrZW5kcy5Nb2RlbEJhY2tlbmQiLCJfYXV0aF91c2VyX2hhc2giOiI5ZGRiMTk5MzBjZGQ1MTRmZTVhMmE0ODc2MDcxMjliZGY1ZTM0ZmQ4In0=	2019-11-19 07:17:23.529089+00
-\.
-
-
---
--- Data for Name: gilts_events_castinglisttosevenfiveevent; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY gilts_events_castinglisttosevenfiveevent (id, created_at, modified_at, date, initiator_id) FROM stdin;
-\.
-
-
---
--- Data for Name: gilts_events_giltmerger; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY gilts_events_giltmerger (id, created_at, modified_at, date, initiator_id, nomad_group_id) FROM stdin;
 \.
 
 
@@ -2711,484 +2215,431 @@ COPY gilts_events_giltmerger (id, created_at, modified_at, date, initiator_id, n
 --
 
 COPY locations_location (id, created_at, modified_at, "pigletsGroupCell_id", section_id, "sowAndPigletsCell_id", "sowGroupCell_id", "sowSingleCell_id", workshop_id) FROM stdin;
-1	2019-10-17 13:28:57.266424+00	2019-10-17 13:28:57.266442+00	\N	\N	\N	\N	\N	1
-2	2019-10-17 13:28:57.266487+00	2019-10-17 13:28:57.266496+00	\N	\N	\N	\N	\N	2
-3	2019-10-17 13:28:57.266519+00	2019-10-17 13:28:57.266527+00	\N	\N	\N	\N	\N	3
-4	2019-10-17 13:28:57.266548+00	2019-10-17 13:28:57.266555+00	\N	\N	\N	\N	\N	4
-5	2019-10-17 13:28:57.266575+00	2019-10-17 13:28:57.266583+00	\N	\N	\N	\N	\N	5
-6	2019-10-17 13:28:57.266603+00	2019-10-17 13:28:57.26661+00	\N	\N	\N	\N	\N	6
-7	2019-10-17 13:28:57.266631+00	2019-10-17 13:28:57.266638+00	\N	\N	\N	\N	\N	7
-8	2019-10-17 13:28:57.266676+00	2019-10-17 13:28:57.266684+00	\N	\N	\N	\N	\N	8
-9	2019-10-17 13:28:57.266705+00	2019-10-17 13:28:57.266712+00	\N	\N	\N	\N	\N	9
-10	2019-10-17 13:28:57.266733+00	2019-10-17 13:28:57.26674+00	\N	\N	\N	\N	\N	10
-11	2019-10-17 13:28:57.279649+00	2019-10-17 13:28:57.279668+00	\N	1	\N	\N	\N	\N
-12	2019-10-17 13:28:57.2797+00	2019-10-17 13:28:57.279709+00	\N	2	\N	\N	\N	\N
-13	2019-10-17 13:28:57.279731+00	2019-10-17 13:28:57.279739+00	\N	3	\N	\N	\N	\N
-14	2019-10-17 13:28:57.290717+00	2019-10-17 13:28:57.290736+00	\N	4	\N	\N	\N	\N
-15	2019-10-17 13:28:57.290771+00	2019-10-17 13:28:57.29078+00	\N	5	\N	\N	\N	\N
-16	2019-10-17 13:28:57.303637+00	2019-10-17 13:28:57.303656+00	\N	\N	\N	1	\N	\N
-17	2019-10-17 13:28:57.30369+00	2019-10-17 13:28:57.303699+00	\N	\N	\N	2	\N	\N
-18	2019-10-17 13:28:57.303722+00	2019-10-17 13:28:57.30373+00	\N	\N	\N	3	\N	\N
-19	2019-10-17 13:28:57.303751+00	2019-10-17 13:28:57.303768+00	\N	\N	\N	4	\N	\N
-20	2019-10-17 13:28:57.303804+00	2019-10-17 13:28:57.303814+00	\N	\N	\N	5	\N	\N
-21	2019-10-17 13:28:57.303842+00	2019-10-17 13:28:57.303851+00	\N	\N	\N	6	\N	\N
-22	2019-10-17 13:28:57.318539+00	2019-10-17 13:28:57.318566+00	\N	\N	\N	7	\N	\N
-23	2019-10-17 13:28:57.3186+00	2019-10-17 13:28:57.318609+00	\N	\N	\N	8	\N	\N
-24	2019-10-17 13:28:57.31864+00	2019-10-17 13:28:57.318648+00	\N	\N	\N	9	\N	\N
-25	2019-10-17 13:28:57.318674+00	2019-10-17 13:28:57.318682+00	\N	\N	\N	10	\N	\N
-26	2019-10-17 13:28:57.318703+00	2019-10-17 13:28:57.31871+00	\N	\N	\N	11	\N	\N
-27	2019-10-17 13:28:57.318731+00	2019-10-17 13:28:57.318738+00	\N	\N	\N	12	\N	\N
-28	2019-10-17 13:28:57.331432+00	2019-10-17 13:28:57.331451+00	\N	6	\N	\N	\N	\N
-29	2019-10-17 13:28:57.331484+00	2019-10-17 13:28:57.331493+00	\N	7	\N	\N	\N	\N
-30	2019-10-17 13:28:57.331515+00	2019-10-17 13:28:57.331524+00	\N	8	\N	\N	\N	\N
-31	2019-10-17 13:28:57.331545+00	2019-10-17 13:28:57.331553+00	\N	9	\N	\N	\N	\N
-32	2019-10-17 13:28:57.331573+00	2019-10-17 13:28:57.331581+00	\N	10	\N	\N	\N	\N
-33	2019-10-17 13:28:57.331601+00	2019-10-17 13:28:57.331608+00	\N	11	\N	\N	\N	\N
-34	2019-10-17 13:28:57.351318+00	2019-10-17 13:28:57.351341+00	\N	\N	1	\N	\N	\N
-35	2019-10-17 13:28:57.351375+00	2019-10-17 13:28:57.351384+00	\N	\N	2	\N	\N	\N
-36	2019-10-17 13:28:57.351406+00	2019-10-17 13:28:57.351414+00	\N	\N	3	\N	\N	\N
-37	2019-10-17 13:28:57.351435+00	2019-10-17 13:28:57.351443+00	\N	\N	4	\N	\N	\N
-38	2019-10-17 13:28:57.351463+00	2019-10-17 13:28:57.351471+00	\N	\N	5	\N	\N	\N
-39	2019-10-17 13:28:57.351491+00	2019-10-17 13:28:57.351499+00	\N	\N	6	\N	\N	\N
-40	2019-10-17 13:28:57.351519+00	2019-10-17 13:28:57.351527+00	\N	\N	7	\N	\N	\N
-41	2019-10-17 13:28:57.351547+00	2019-10-17 13:28:57.351555+00	\N	\N	8	\N	\N	\N
-42	2019-10-17 13:28:57.351575+00	2019-10-17 13:28:57.351582+00	\N	\N	9	\N	\N	\N
-43	2019-10-17 13:28:57.351603+00	2019-10-17 13:28:57.35161+00	\N	\N	10	\N	\N	\N
-44	2019-10-17 13:28:57.351631+00	2019-10-17 13:28:57.351638+00	\N	\N	11	\N	\N	\N
-45	2019-10-17 13:28:57.351658+00	2019-10-17 13:28:57.351666+00	\N	\N	12	\N	\N	\N
-46	2019-10-17 13:28:57.351686+00	2019-10-17 13:28:57.351693+00	\N	\N	13	\N	\N	\N
-47	2019-10-17 13:28:57.351713+00	2019-10-17 13:28:57.35172+00	\N	\N	14	\N	\N	\N
-48	2019-10-17 13:28:57.35174+00	2019-10-17 13:28:57.351747+00	\N	\N	15	\N	\N	\N
-49	2019-10-17 13:28:57.351768+00	2019-10-17 13:28:57.351775+00	\N	\N	16	\N	\N	\N
-50	2019-10-17 13:28:57.351795+00	2019-10-17 13:28:57.351802+00	\N	\N	17	\N	\N	\N
-51	2019-10-17 13:28:57.351822+00	2019-10-17 13:28:57.351829+00	\N	\N	18	\N	\N	\N
-52	2019-10-17 13:28:57.35185+00	2019-10-17 13:28:57.351857+00	\N	\N	19	\N	\N	\N
-53	2019-10-17 13:28:57.351889+00	2019-10-17 13:28:57.351898+00	\N	\N	20	\N	\N	\N
-54	2019-10-17 13:28:57.35192+00	2019-10-17 13:28:57.351928+00	\N	\N	21	\N	\N	\N
-55	2019-10-17 13:28:57.351948+00	2019-10-17 13:28:57.351956+00	\N	\N	22	\N	\N	\N
-56	2019-10-17 13:28:57.351976+00	2019-10-17 13:28:57.351983+00	\N	\N	23	\N	\N	\N
-57	2019-10-17 13:28:57.352003+00	2019-10-17 13:28:57.352011+00	\N	\N	24	\N	\N	\N
-58	2019-10-17 13:28:57.352031+00	2019-10-17 13:28:57.352038+00	\N	\N	25	\N	\N	\N
-59	2019-10-17 13:28:57.352058+00	2019-10-17 13:28:57.352065+00	\N	\N	26	\N	\N	\N
-60	2019-10-17 13:28:57.352085+00	2019-10-17 13:28:57.352093+00	\N	\N	27	\N	\N	\N
-61	2019-10-17 13:28:57.352113+00	2019-10-17 13:28:57.35212+00	\N	\N	28	\N	\N	\N
-62	2019-10-17 13:28:57.352141+00	2019-10-17 13:28:57.352148+00	\N	\N	29	\N	\N	\N
-63	2019-10-17 13:28:57.352168+00	2019-10-17 13:28:57.352176+00	\N	\N	30	\N	\N	\N
-64	2019-10-17 13:28:57.352196+00	2019-10-17 13:28:57.352203+00	\N	\N	31	\N	\N	\N
-65	2019-10-17 13:28:57.352224+00	2019-10-17 13:28:57.352231+00	\N	\N	32	\N	\N	\N
-66	2019-10-17 13:28:57.352251+00	2019-10-17 13:28:57.352259+00	\N	\N	33	\N	\N	\N
-67	2019-10-17 13:28:57.352279+00	2019-10-17 13:28:57.352286+00	\N	\N	34	\N	\N	\N
-68	2019-10-17 13:28:57.352318+00	2019-10-17 13:28:57.352326+00	\N	\N	35	\N	\N	\N
-69	2019-10-17 13:28:57.352347+00	2019-10-17 13:28:57.352354+00	\N	\N	36	\N	\N	\N
-70	2019-10-17 13:28:57.352374+00	2019-10-17 13:28:57.352389+00	\N	\N	37	\N	\N	\N
-71	2019-10-17 13:28:57.352411+00	2019-10-17 13:28:57.352419+00	\N	\N	38	\N	\N	\N
-72	2019-10-17 13:28:57.352439+00	2019-10-17 13:28:57.352446+00	\N	\N	39	\N	\N	\N
-73	2019-10-17 13:28:57.352466+00	2019-10-17 13:28:57.352474+00	\N	\N	40	\N	\N	\N
-74	2019-10-17 13:28:57.352494+00	2019-10-17 13:28:57.352501+00	\N	\N	41	\N	\N	\N
-75	2019-10-17 13:28:57.352522+00	2019-10-17 13:28:57.352529+00	\N	\N	42	\N	\N	\N
-76	2019-10-17 13:28:57.352549+00	2019-10-17 13:28:57.352556+00	\N	\N	43	\N	\N	\N
-77	2019-10-17 13:28:57.352576+00	2019-10-17 13:28:57.352584+00	\N	\N	44	\N	\N	\N
-78	2019-10-17 13:28:57.352604+00	2019-10-17 13:28:57.352611+00	\N	\N	45	\N	\N	\N
-79	2019-10-17 13:28:57.369332+00	2019-10-17 13:28:57.369351+00	\N	\N	46	\N	\N	\N
-80	2019-10-17 13:28:57.369385+00	2019-10-17 13:28:57.369393+00	\N	\N	47	\N	\N	\N
-81	2019-10-17 13:28:57.369417+00	2019-10-17 13:28:57.369424+00	\N	\N	48	\N	\N	\N
-82	2019-10-17 13:28:57.369446+00	2019-10-17 13:28:57.369453+00	\N	\N	49	\N	\N	\N
-83	2019-10-17 13:28:57.369474+00	2019-10-17 13:28:57.369482+00	\N	\N	50	\N	\N	\N
-84	2019-10-17 13:28:57.369511+00	2019-10-17 13:28:57.36952+00	\N	\N	51	\N	\N	\N
-85	2019-10-17 13:28:57.369543+00	2019-10-17 13:28:57.36955+00	\N	\N	52	\N	\N	\N
-86	2019-10-17 13:28:57.369571+00	2019-10-17 13:28:57.369579+00	\N	\N	53	\N	\N	\N
-87	2019-10-17 13:28:57.3696+00	2019-10-17 13:28:57.369607+00	\N	\N	54	\N	\N	\N
-88	2019-10-17 13:28:57.369628+00	2019-10-17 13:28:57.369636+00	\N	\N	55	\N	\N	\N
-89	2019-10-17 13:28:57.369656+00	2019-10-17 13:28:57.369663+00	\N	\N	56	\N	\N	\N
-90	2019-10-17 13:28:57.369684+00	2019-10-17 13:28:57.369691+00	\N	\N	57	\N	\N	\N
-91	2019-10-17 13:28:57.369711+00	2019-10-17 13:28:57.369719+00	\N	\N	58	\N	\N	\N
-92	2019-10-17 13:28:57.369739+00	2019-10-17 13:28:57.369746+00	\N	\N	59	\N	\N	\N
-93	2019-10-17 13:28:57.369767+00	2019-10-17 13:28:57.369774+00	\N	\N	60	\N	\N	\N
-94	2019-10-17 13:28:57.369794+00	2019-10-17 13:28:57.369801+00	\N	\N	61	\N	\N	\N
-95	2019-10-17 13:28:57.369821+00	2019-10-17 13:28:57.369828+00	\N	\N	62	\N	\N	\N
-96	2019-10-17 13:28:57.369849+00	2019-10-17 13:28:57.369856+00	\N	\N	63	\N	\N	\N
-97	2019-10-17 13:28:57.369877+00	2019-10-17 13:28:57.369884+00	\N	\N	64	\N	\N	\N
-98	2019-10-17 13:28:57.369904+00	2019-10-17 13:28:57.369911+00	\N	\N	65	\N	\N	\N
-99	2019-10-17 13:28:57.369932+00	2019-10-17 13:28:57.369939+00	\N	\N	66	\N	\N	\N
-100	2019-10-17 13:28:57.369959+00	2019-10-17 13:28:57.369966+00	\N	\N	67	\N	\N	\N
-101	2019-10-17 13:28:57.369987+00	2019-10-17 13:28:57.369994+00	\N	\N	68	\N	\N	\N
-102	2019-10-17 13:28:57.370014+00	2019-10-17 13:28:57.370022+00	\N	\N	69	\N	\N	\N
-103	2019-10-17 13:28:57.370042+00	2019-10-17 13:28:57.370049+00	\N	\N	70	\N	\N	\N
-104	2019-10-17 13:28:57.370069+00	2019-10-17 13:28:57.370077+00	\N	\N	71	\N	\N	\N
-105	2019-10-17 13:28:57.370097+00	2019-10-17 13:28:57.370104+00	\N	\N	72	\N	\N	\N
-106	2019-10-17 13:28:57.370124+00	2019-10-17 13:28:57.370132+00	\N	\N	73	\N	\N	\N
-107	2019-10-17 13:28:57.370152+00	2019-10-17 13:28:57.370159+00	\N	\N	74	\N	\N	\N
-108	2019-10-17 13:28:57.370179+00	2019-10-17 13:28:57.370186+00	\N	\N	75	\N	\N	\N
-109	2019-10-17 13:28:57.370207+00	2019-10-17 13:28:57.370221+00	\N	\N	76	\N	\N	\N
-110	2019-10-17 13:28:57.370244+00	2019-10-17 13:28:57.370251+00	\N	\N	77	\N	\N	\N
-111	2019-10-17 13:28:57.370271+00	2019-10-17 13:28:57.370279+00	\N	\N	78	\N	\N	\N
-112	2019-10-17 13:28:57.370299+00	2019-10-17 13:28:57.370306+00	\N	\N	79	\N	\N	\N
-113	2019-10-17 13:28:57.370327+00	2019-10-17 13:28:57.370334+00	\N	\N	80	\N	\N	\N
-114	2019-10-17 13:28:57.370355+00	2019-10-17 13:28:57.370362+00	\N	\N	81	\N	\N	\N
-115	2019-10-17 13:28:57.370382+00	2019-10-17 13:28:57.37039+00	\N	\N	82	\N	\N	\N
-116	2019-10-17 13:28:57.37041+00	2019-10-17 13:28:57.370417+00	\N	\N	83	\N	\N	\N
-117	2019-10-17 13:28:57.370438+00	2019-10-17 13:28:57.370445+00	\N	\N	84	\N	\N	\N
-118	2019-10-17 13:28:57.370465+00	2019-10-17 13:28:57.370473+00	\N	\N	85	\N	\N	\N
-119	2019-10-17 13:28:57.370493+00	2019-10-17 13:28:57.370501+00	\N	\N	86	\N	\N	\N
-120	2019-10-17 13:28:57.370521+00	2019-10-17 13:28:57.370529+00	\N	\N	87	\N	\N	\N
-121	2019-10-17 13:28:57.370549+00	2019-10-17 13:28:57.370557+00	\N	\N	88	\N	\N	\N
-122	2019-10-17 13:28:57.370577+00	2019-10-17 13:28:57.370584+00	\N	\N	89	\N	\N	\N
-123	2019-10-17 13:28:57.370605+00	2019-10-17 13:28:57.370612+00	\N	\N	90	\N	\N	\N
-124	2019-10-17 13:28:57.386992+00	2019-10-17 13:28:57.387012+00	\N	\N	91	\N	\N	\N
-125	2019-10-17 13:28:57.387046+00	2019-10-17 13:28:57.387055+00	\N	\N	92	\N	\N	\N
-126	2019-10-17 13:28:57.387078+00	2019-10-17 13:28:57.387086+00	\N	\N	93	\N	\N	\N
-127	2019-10-17 13:28:57.387107+00	2019-10-17 13:28:57.387115+00	\N	\N	94	\N	\N	\N
-128	2019-10-17 13:28:57.387136+00	2019-10-17 13:28:57.387144+00	\N	\N	95	\N	\N	\N
-129	2019-10-17 13:28:57.387165+00	2019-10-17 13:28:57.387172+00	\N	\N	96	\N	\N	\N
-130	2019-10-17 13:28:57.387193+00	2019-10-17 13:28:57.3872+00	\N	\N	97	\N	\N	\N
-131	2019-10-17 13:28:57.387221+00	2019-10-17 13:28:57.387229+00	\N	\N	98	\N	\N	\N
-132	2019-10-17 13:28:57.38725+00	2019-10-17 13:28:57.387286+00	\N	\N	99	\N	\N	\N
-133	2019-10-17 13:28:57.387312+00	2019-10-17 13:28:57.38732+00	\N	\N	100	\N	\N	\N
-134	2019-10-17 13:28:57.387341+00	2019-10-17 13:28:57.387348+00	\N	\N	101	\N	\N	\N
-135	2019-10-17 13:28:57.387369+00	2019-10-17 13:28:57.387376+00	\N	\N	102	\N	\N	\N
-136	2019-10-17 13:28:57.387396+00	2019-10-17 13:28:57.387404+00	\N	\N	103	\N	\N	\N
-137	2019-10-17 13:28:57.387424+00	2019-10-17 13:28:57.387431+00	\N	\N	104	\N	\N	\N
-138	2019-10-17 13:28:57.387452+00	2019-10-17 13:28:57.387459+00	\N	\N	105	\N	\N	\N
-139	2019-10-17 13:28:57.387479+00	2019-10-17 13:28:57.387487+00	\N	\N	106	\N	\N	\N
-140	2019-10-17 13:28:57.387507+00	2019-10-17 13:28:57.387514+00	\N	\N	107	\N	\N	\N
-141	2019-10-17 13:28:57.387535+00	2019-10-17 13:28:57.387542+00	\N	\N	108	\N	\N	\N
-142	2019-10-17 13:28:57.387563+00	2019-10-17 13:28:57.38757+00	\N	\N	109	\N	\N	\N
-143	2019-10-17 13:28:57.387591+00	2019-10-17 13:28:57.387598+00	\N	\N	110	\N	\N	\N
-144	2019-10-17 13:28:57.387618+00	2019-10-17 13:28:57.387626+00	\N	\N	111	\N	\N	\N
-145	2019-10-17 13:28:57.387646+00	2019-10-17 13:28:57.387653+00	\N	\N	112	\N	\N	\N
-146	2019-10-17 13:28:57.387673+00	2019-10-17 13:28:57.387681+00	\N	\N	113	\N	\N	\N
-147	2019-10-17 13:28:57.387701+00	2019-10-17 13:28:57.387709+00	\N	\N	114	\N	\N	\N
-148	2019-10-17 13:28:57.387729+00	2019-10-17 13:28:57.387745+00	\N	\N	115	\N	\N	\N
-149	2019-10-17 13:28:57.387768+00	2019-10-17 13:28:57.387776+00	\N	\N	116	\N	\N	\N
-150	2019-10-17 13:28:57.387797+00	2019-10-17 13:28:57.387804+00	\N	\N	117	\N	\N	\N
-151	2019-10-17 13:28:57.387825+00	2019-10-17 13:28:57.387833+00	\N	\N	118	\N	\N	\N
-152	2019-10-17 13:28:57.387854+00	2019-10-17 13:28:57.387862+00	\N	\N	119	\N	\N	\N
-153	2019-10-17 13:28:57.387882+00	2019-10-17 13:28:57.387889+00	\N	\N	120	\N	\N	\N
-154	2019-10-17 13:28:57.38791+00	2019-10-17 13:28:57.387917+00	\N	\N	121	\N	\N	\N
-155	2019-10-17 13:28:57.387938+00	2019-10-17 13:28:57.387945+00	\N	\N	122	\N	\N	\N
-156	2019-10-17 13:28:57.387966+00	2019-10-17 13:28:57.387973+00	\N	\N	123	\N	\N	\N
-157	2019-10-17 13:28:57.387994+00	2019-10-17 13:28:57.388002+00	\N	\N	124	\N	\N	\N
-158	2019-10-17 13:28:57.388022+00	2019-10-17 13:28:57.388029+00	\N	\N	125	\N	\N	\N
-159	2019-10-17 13:28:57.38805+00	2019-10-17 13:28:57.388057+00	\N	\N	126	\N	\N	\N
-160	2019-10-17 13:28:57.388077+00	2019-10-17 13:28:57.388085+00	\N	\N	127	\N	\N	\N
-161	2019-10-17 13:28:57.388105+00	2019-10-17 13:28:57.388112+00	\N	\N	128	\N	\N	\N
-162	2019-10-17 13:28:57.388133+00	2019-10-17 13:28:57.38814+00	\N	\N	129	\N	\N	\N
-163	2019-10-17 13:28:57.388161+00	2019-10-17 13:28:57.388168+00	\N	\N	130	\N	\N	\N
-164	2019-10-17 13:28:57.388188+00	2019-10-17 13:28:57.388195+00	\N	\N	131	\N	\N	\N
-165	2019-10-17 13:28:57.388216+00	2019-10-17 13:28:57.388223+00	\N	\N	132	\N	\N	\N
-166	2019-10-17 13:28:57.388243+00	2019-10-17 13:28:57.38825+00	\N	\N	133	\N	\N	\N
-167	2019-10-17 13:28:57.38827+00	2019-10-17 13:28:57.388278+00	\N	\N	134	\N	\N	\N
-168	2019-10-17 13:28:57.388308+00	2019-10-17 13:28:57.388317+00	\N	\N	135	\N	\N	\N
-169	2019-10-17 13:28:57.404476+00	2019-10-17 13:28:57.404504+00	\N	\N	136	\N	\N	\N
-170	2019-10-17 13:28:57.40454+00	2019-10-17 13:28:57.404549+00	\N	\N	137	\N	\N	\N
-171	2019-10-17 13:28:57.404572+00	2019-10-17 13:28:57.40458+00	\N	\N	138	\N	\N	\N
-172	2019-10-17 13:28:57.404601+00	2019-10-17 13:28:57.404608+00	\N	\N	139	\N	\N	\N
-173	2019-10-17 13:28:57.404629+00	2019-10-17 13:28:57.404636+00	\N	\N	140	\N	\N	\N
-174	2019-10-17 13:28:57.404657+00	2019-10-17 13:28:57.404664+00	\N	\N	141	\N	\N	\N
-175	2019-10-17 13:28:57.404694+00	2019-10-17 13:28:57.404703+00	\N	\N	142	\N	\N	\N
-176	2019-10-17 13:28:57.404725+00	2019-10-17 13:28:57.404733+00	\N	\N	143	\N	\N	\N
-177	2019-10-17 13:28:57.404753+00	2019-10-17 13:28:57.40476+00	\N	\N	144	\N	\N	\N
-178	2019-10-17 13:28:57.404781+00	2019-10-17 13:28:57.404789+00	\N	\N	145	\N	\N	\N
-179	2019-10-17 13:28:57.404809+00	2019-10-17 13:28:57.404817+00	\N	\N	146	\N	\N	\N
-180	2019-10-17 13:28:57.404837+00	2019-10-17 13:28:57.404844+00	\N	\N	147	\N	\N	\N
-181	2019-10-17 13:28:57.404865+00	2019-10-17 13:28:57.404872+00	\N	\N	148	\N	\N	\N
-182	2019-10-17 13:28:57.404902+00	2019-10-17 13:28:57.404911+00	\N	\N	149	\N	\N	\N
-183	2019-10-17 13:28:57.404932+00	2019-10-17 13:28:57.404939+00	\N	\N	150	\N	\N	\N
-184	2019-10-17 13:28:57.40496+00	2019-10-17 13:28:57.404967+00	\N	\N	151	\N	\N	\N
-185	2019-10-17 13:28:57.404988+00	2019-10-17 13:28:57.404995+00	\N	\N	152	\N	\N	\N
-186	2019-10-17 13:28:57.405016+00	2019-10-17 13:28:57.405023+00	\N	\N	153	\N	\N	\N
-187	2019-10-17 13:28:57.405044+00	2019-10-17 13:28:57.405059+00	\N	\N	154	\N	\N	\N
-188	2019-10-17 13:28:57.405082+00	2019-10-17 13:28:57.405089+00	\N	\N	155	\N	\N	\N
-189	2019-10-17 13:28:57.40512+00	2019-10-17 13:28:57.405128+00	\N	\N	156	\N	\N	\N
-190	2019-10-17 13:28:57.405149+00	2019-10-17 13:28:57.405156+00	\N	\N	157	\N	\N	\N
-191	2019-10-17 13:28:57.405176+00	2019-10-17 13:28:57.405184+00	\N	\N	158	\N	\N	\N
-192	2019-10-17 13:28:57.405204+00	2019-10-17 13:28:57.405211+00	\N	\N	159	\N	\N	\N
-193	2019-10-17 13:28:57.405232+00	2019-10-17 13:28:57.405239+00	\N	\N	160	\N	\N	\N
-194	2019-10-17 13:28:57.40526+00	2019-10-17 13:28:57.405267+00	\N	\N	161	\N	\N	\N
-195	2019-10-17 13:28:57.405295+00	2019-10-17 13:28:57.405304+00	\N	\N	162	\N	\N	\N
-196	2019-10-17 13:28:57.405327+00	2019-10-17 13:28:57.405334+00	\N	\N	163	\N	\N	\N
-197	2019-10-17 13:28:57.405355+00	2019-10-17 13:28:57.405362+00	\N	\N	164	\N	\N	\N
-198	2019-10-17 13:28:57.405383+00	2019-10-17 13:28:57.40539+00	\N	\N	165	\N	\N	\N
-199	2019-10-17 13:28:57.405411+00	2019-10-17 13:28:57.405419+00	\N	\N	166	\N	\N	\N
-200	2019-10-17 13:28:57.40544+00	2019-10-17 13:28:57.405447+00	\N	\N	167	\N	\N	\N
-201	2019-10-17 13:28:57.405467+00	2019-10-17 13:28:57.405475+00	\N	\N	168	\N	\N	\N
-202	2019-10-17 13:28:57.405507+00	2019-10-17 13:28:57.405516+00	\N	\N	169	\N	\N	\N
-203	2019-10-17 13:28:57.405536+00	2019-10-17 13:28:57.405544+00	\N	\N	170	\N	\N	\N
-204	2019-10-17 13:28:57.405564+00	2019-10-17 13:28:57.405572+00	\N	\N	171	\N	\N	\N
-205	2019-10-17 13:28:57.405593+00	2019-10-17 13:28:57.4056+00	\N	\N	172	\N	\N	\N
-206	2019-10-17 13:28:57.405621+00	2019-10-17 13:28:57.405628+00	\N	\N	173	\N	\N	\N
-207	2019-10-17 13:28:57.405649+00	2019-10-17 13:28:57.405656+00	\N	\N	174	\N	\N	\N
-208	2019-10-17 13:28:57.405676+00	2019-10-17 13:28:57.405692+00	\N	\N	175	\N	\N	\N
-209	2019-10-17 13:28:57.405715+00	2019-10-17 13:28:57.405723+00	\N	\N	176	\N	\N	\N
-210	2019-10-17 13:28:57.405743+00	2019-10-17 13:28:57.40575+00	\N	\N	177	\N	\N	\N
-211	2019-10-17 13:28:57.40577+00	2019-10-17 13:28:57.405777+00	\N	\N	178	\N	\N	\N
-212	2019-10-17 13:28:57.405798+00	2019-10-17 13:28:57.405805+00	\N	\N	179	\N	\N	\N
-213	2019-10-17 13:28:57.405825+00	2019-10-17 13:28:57.405832+00	\N	\N	180	\N	\N	\N
-214	2019-10-17 13:28:57.424705+00	2019-10-17 13:28:57.424723+00	\N	\N	181	\N	\N	\N
-215	2019-10-17 13:28:57.424756+00	2019-10-17 13:28:57.424765+00	\N	\N	182	\N	\N	\N
-216	2019-10-17 13:28:57.424788+00	2019-10-17 13:28:57.424796+00	\N	\N	183	\N	\N	\N
-217	2019-10-17 13:28:57.424817+00	2019-10-17 13:28:57.424824+00	\N	\N	184	\N	\N	\N
-218	2019-10-17 13:28:57.424856+00	2019-10-17 13:28:57.424865+00	\N	\N	185	\N	\N	\N
-219	2019-10-17 13:28:57.424888+00	2019-10-17 13:28:57.424895+00	\N	\N	186	\N	\N	\N
-220	2019-10-17 13:28:57.424916+00	2019-10-17 13:28:57.424923+00	\N	\N	187	\N	\N	\N
-221	2019-10-17 13:28:57.424944+00	2019-10-17 13:28:57.424951+00	\N	\N	188	\N	\N	\N
-222	2019-10-17 13:28:57.424972+00	2019-10-17 13:28:57.42498+00	\N	\N	189	\N	\N	\N
-223	2019-10-17 13:28:57.425001+00	2019-10-17 13:28:57.425008+00	\N	\N	190	\N	\N	\N
-224	2019-10-17 13:28:57.425029+00	2019-10-17 13:28:57.425036+00	\N	\N	191	\N	\N	\N
-225	2019-10-17 13:28:57.425057+00	2019-10-17 13:28:57.425064+00	\N	\N	192	\N	\N	\N
-226	2019-10-17 13:28:57.425084+00	2019-10-17 13:28:57.425099+00	\N	\N	193	\N	\N	\N
-227	2019-10-17 13:28:57.425128+00	2019-10-17 13:28:57.425138+00	\N	\N	194	\N	\N	\N
-228	2019-10-17 13:28:57.425161+00	2019-10-17 13:28:57.425168+00	\N	\N	195	\N	\N	\N
-229	2019-10-17 13:28:57.425189+00	2019-10-17 13:28:57.425196+00	\N	\N	196	\N	\N	\N
-230	2019-10-17 13:28:57.425216+00	2019-10-17 13:28:57.425223+00	\N	\N	197	\N	\N	\N
-231	2019-10-17 13:28:57.425244+00	2019-10-17 13:28:57.425251+00	\N	\N	198	\N	\N	\N
-232	2019-10-17 13:28:57.425272+00	2019-10-17 13:28:57.425279+00	\N	\N	199	\N	\N	\N
-233	2019-10-17 13:28:57.425299+00	2019-10-17 13:28:57.425307+00	\N	\N	200	\N	\N	\N
-234	2019-10-17 13:28:57.425337+00	2019-10-17 13:28:57.425346+00	\N	\N	201	\N	\N	\N
-235	2019-10-17 13:28:57.425366+00	2019-10-17 13:28:57.425374+00	\N	\N	202	\N	\N	\N
-236	2019-10-17 13:28:57.425394+00	2019-10-17 13:28:57.425401+00	\N	\N	203	\N	\N	\N
-237	2019-10-17 13:28:57.425421+00	2019-10-17 13:28:57.425429+00	\N	\N	204	\N	\N	\N
-238	2019-10-17 13:28:57.425449+00	2019-10-17 13:28:57.425456+00	\N	\N	205	\N	\N	\N
-239	2019-10-17 13:28:57.425476+00	2019-10-17 13:28:57.425483+00	\N	\N	206	\N	\N	\N
-240	2019-10-17 13:28:57.425504+00	2019-10-17 13:28:57.425511+00	\N	\N	207	\N	\N	\N
-241	2019-10-17 13:28:57.425531+00	2019-10-17 13:28:57.425538+00	\N	\N	208	\N	\N	\N
-242	2019-10-17 13:28:57.425558+00	2019-10-17 13:28:57.425566+00	\N	\N	209	\N	\N	\N
-243	2019-10-17 13:28:57.425586+00	2019-10-17 13:28:57.425593+00	\N	\N	210	\N	\N	\N
-244	2019-10-17 13:28:57.425613+00	2019-10-17 13:28:57.425621+00	\N	\N	211	\N	\N	\N
-245	2019-10-17 13:28:57.425641+00	2019-10-17 13:28:57.425648+00	\N	\N	212	\N	\N	\N
-246	2019-10-17 13:28:57.425668+00	2019-10-17 13:28:57.425675+00	\N	\N	213	\N	\N	\N
-247	2019-10-17 13:28:57.425695+00	2019-10-17 13:28:57.425703+00	\N	\N	214	\N	\N	\N
-248	2019-10-17 13:28:57.425723+00	2019-10-17 13:28:57.42573+00	\N	\N	215	\N	\N	\N
-249	2019-10-17 13:28:57.425758+00	2019-10-17 13:28:57.425767+00	\N	\N	216	\N	\N	\N
-250	2019-10-17 13:28:57.42579+00	2019-10-17 13:28:57.425797+00	\N	\N	217	\N	\N	\N
-251	2019-10-17 13:28:57.425818+00	2019-10-17 13:28:57.425825+00	\N	\N	218	\N	\N	\N
-252	2019-10-17 13:28:57.425846+00	2019-10-17 13:28:57.425853+00	\N	\N	219	\N	\N	\N
-253	2019-10-17 13:28:57.425873+00	2019-10-17 13:28:57.42588+00	\N	\N	220	\N	\N	\N
-254	2019-10-17 13:28:57.425901+00	2019-10-17 13:28:57.425908+00	\N	\N	221	\N	\N	\N
-255	2019-10-17 13:28:57.425928+00	2019-10-17 13:28:57.425935+00	\N	\N	222	\N	\N	\N
-256	2019-10-17 13:28:57.425956+00	2019-10-17 13:28:57.425963+00	\N	\N	223	\N	\N	\N
-257	2019-10-17 13:28:57.425983+00	2019-10-17 13:28:57.42599+00	\N	\N	224	\N	\N	\N
-258	2019-10-17 13:28:57.426011+00	2019-10-17 13:28:57.426018+00	\N	\N	225	\N	\N	\N
-259	2019-10-17 13:28:57.444317+00	2019-10-17 13:28:57.444336+00	\N	\N	226	\N	\N	\N
-260	2019-10-17 13:28:57.44437+00	2019-10-17 13:28:57.444379+00	\N	\N	227	\N	\N	\N
-261	2019-10-17 13:28:57.444402+00	2019-10-17 13:28:57.444409+00	\N	\N	228	\N	\N	\N
-262	2019-10-17 13:28:57.444431+00	2019-10-17 13:28:57.444438+00	\N	\N	229	\N	\N	\N
-263	2019-10-17 13:28:57.444459+00	2019-10-17 13:28:57.444466+00	\N	\N	230	\N	\N	\N
-264	2019-10-17 13:28:57.444487+00	2019-10-17 13:28:57.444494+00	\N	\N	231	\N	\N	\N
-265	2019-10-17 13:28:57.444515+00	2019-10-17 13:28:57.44453+00	\N	\N	232	\N	\N	\N
-266	2019-10-17 13:28:57.444554+00	2019-10-17 13:28:57.444561+00	\N	\N	233	\N	\N	\N
-267	2019-10-17 13:28:57.444582+00	2019-10-17 13:28:57.444589+00	\N	\N	234	\N	\N	\N
-268	2019-10-17 13:28:57.44461+00	2019-10-17 13:28:57.444617+00	\N	\N	235	\N	\N	\N
-269	2019-10-17 13:28:57.444638+00	2019-10-17 13:28:57.444645+00	\N	\N	236	\N	\N	\N
-270	2019-10-17 13:28:57.444666+00	2019-10-17 13:28:57.444673+00	\N	\N	237	\N	\N	\N
-271	2019-10-17 13:28:57.444694+00	2019-10-17 13:28:57.444701+00	\N	\N	238	\N	\N	\N
-272	2019-10-17 13:28:57.444722+00	2019-10-17 13:28:57.444729+00	\N	\N	239	\N	\N	\N
-273	2019-10-17 13:28:57.444749+00	2019-10-17 13:28:57.444757+00	\N	\N	240	\N	\N	\N
-274	2019-10-17 13:28:57.444777+00	2019-10-17 13:28:57.444784+00	\N	\N	241	\N	\N	\N
-275	2019-10-17 13:28:57.444805+00	2019-10-17 13:28:57.444812+00	\N	\N	242	\N	\N	\N
-276	2019-10-17 13:28:57.444833+00	2019-10-17 13:28:57.44484+00	\N	\N	243	\N	\N	\N
-277	2019-10-17 13:28:57.444861+00	2019-10-17 13:28:57.444868+00	\N	\N	244	\N	\N	\N
-278	2019-10-17 13:28:57.444888+00	2019-10-17 13:28:57.444896+00	\N	\N	245	\N	\N	\N
-279	2019-10-17 13:28:57.444916+00	2019-10-17 13:28:57.444924+00	\N	\N	246	\N	\N	\N
-280	2019-10-17 13:28:57.444952+00	2019-10-17 13:28:57.444961+00	\N	\N	247	\N	\N	\N
-281	2019-10-17 13:28:57.444983+00	2019-10-17 13:28:57.444991+00	\N	\N	248	\N	\N	\N
-282	2019-10-17 13:28:57.445011+00	2019-10-17 13:28:57.445019+00	\N	\N	249	\N	\N	\N
-283	2019-10-17 13:28:57.44504+00	2019-10-17 13:28:57.445047+00	\N	\N	250	\N	\N	\N
-284	2019-10-17 13:28:57.445068+00	2019-10-17 13:28:57.445075+00	\N	\N	251	\N	\N	\N
-285	2019-10-17 13:28:57.445096+00	2019-10-17 13:28:57.445103+00	\N	\N	252	\N	\N	\N
-286	2019-10-17 13:28:57.445124+00	2019-10-17 13:28:57.445131+00	\N	\N	253	\N	\N	\N
-287	2019-10-17 13:28:57.445152+00	2019-10-17 13:28:57.44516+00	\N	\N	254	\N	\N	\N
-288	2019-10-17 13:28:57.445181+00	2019-10-17 13:28:57.445188+00	\N	\N	255	\N	\N	\N
-289	2019-10-17 13:28:57.445209+00	2019-10-17 13:28:57.445216+00	\N	\N	256	\N	\N	\N
-290	2019-10-17 13:28:57.445237+00	2019-10-17 13:28:57.445244+00	\N	\N	257	\N	\N	\N
-291	2019-10-17 13:28:57.445265+00	2019-10-17 13:28:57.445272+00	\N	\N	258	\N	\N	\N
-292	2019-10-17 13:28:57.445292+00	2019-10-17 13:28:57.4453+00	\N	\N	259	\N	\N	\N
-293	2019-10-17 13:28:57.44532+00	2019-10-17 13:28:57.445328+00	\N	\N	260	\N	\N	\N
-294	2019-10-17 13:28:57.445348+00	2019-10-17 13:28:57.445356+00	\N	\N	261	\N	\N	\N
-295	2019-10-17 13:28:57.445376+00	2019-10-17 13:28:57.445384+00	\N	\N	262	\N	\N	\N
-296	2019-10-17 13:28:57.445404+00	2019-10-17 13:28:57.445412+00	\N	\N	263	\N	\N	\N
-297	2019-10-17 13:28:57.445432+00	2019-10-17 13:28:57.445439+00	\N	\N	264	\N	\N	\N
-298	2019-10-17 13:28:57.44546+00	2019-10-17 13:28:57.445467+00	\N	\N	265	\N	\N	\N
-299	2019-10-17 13:28:57.445487+00	2019-10-17 13:28:57.445495+00	\N	\N	266	\N	\N	\N
-300	2019-10-17 13:28:57.445515+00	2019-10-17 13:28:57.445523+00	\N	\N	267	\N	\N	\N
-301	2019-10-17 13:28:57.445543+00	2019-10-17 13:28:57.44555+00	\N	\N	268	\N	\N	\N
-302	2019-10-17 13:28:57.445571+00	2019-10-17 13:28:57.445578+00	\N	\N	269	\N	\N	\N
-303	2019-10-17 13:28:57.445599+00	2019-10-17 13:28:57.445606+00	\N	\N	270	\N	\N	\N
-304	2019-10-17 13:28:57.456009+00	2019-10-17 13:28:57.456026+00	\N	12	\N	\N	\N	\N
-305	2019-10-17 13:28:57.456059+00	2019-10-17 13:28:57.456068+00	\N	13	\N	\N	\N	\N
-306	2019-10-17 13:28:57.456091+00	2019-10-17 13:28:57.456099+00	\N	14	\N	\N	\N	\N
-307	2019-10-17 13:28:57.45612+00	2019-10-17 13:28:57.456127+00	\N	15	\N	\N	\N	\N
-308	2019-10-17 13:28:57.456148+00	2019-10-17 13:28:57.456156+00	\N	16	\N	\N	\N	\N
-309	2019-10-17 13:28:57.46922+00	2019-10-17 13:28:57.469239+00	1	\N	\N	\N	\N	\N
-310	2019-10-17 13:28:57.469272+00	2019-10-17 13:28:57.469281+00	2	\N	\N	\N	\N	\N
-311	2019-10-17 13:28:57.469303+00	2019-10-17 13:28:57.469311+00	3	\N	\N	\N	\N	\N
-312	2019-10-17 13:28:57.469332+00	2019-10-17 13:28:57.469339+00	4	\N	\N	\N	\N	\N
-313	2019-10-17 13:28:57.46936+00	2019-10-17 13:28:57.469368+00	5	\N	\N	\N	\N	\N
-314	2019-10-17 13:28:57.469389+00	2019-10-17 13:28:57.469396+00	6	\N	\N	\N	\N	\N
-315	2019-10-17 13:28:57.477672+00	2019-10-17 13:28:57.477695+00	7	\N	\N	\N	\N	\N
-316	2019-10-17 13:28:57.477729+00	2019-10-17 13:28:57.477738+00	8	\N	\N	\N	\N	\N
-317	2019-10-17 13:28:57.477761+00	2019-10-17 13:28:57.477768+00	9	\N	\N	\N	\N	\N
-318	2019-10-17 13:28:57.47779+00	2019-10-17 13:28:57.477797+00	10	\N	\N	\N	\N	\N
-319	2019-10-17 13:28:57.477818+00	2019-10-17 13:28:57.477825+00	11	\N	\N	\N	\N	\N
-320	2019-10-17 13:28:57.477846+00	2019-10-17 13:28:57.477853+00	12	\N	\N	\N	\N	\N
-321	2019-10-17 13:28:57.48416+00	2019-10-17 13:28:57.484177+00	13	\N	\N	\N	\N	\N
-322	2019-10-17 13:28:57.484209+00	2019-10-17 13:28:57.484218+00	14	\N	\N	\N	\N	\N
-323	2019-10-17 13:28:57.484251+00	2019-10-17 13:28:57.48426+00	15	\N	\N	\N	\N	\N
-324	2019-10-17 13:28:57.48429+00	2019-10-17 13:28:57.484363+00	16	\N	\N	\N	\N	\N
-325	2019-10-17 13:28:57.484389+00	2019-10-17 13:28:57.484396+00	17	\N	\N	\N	\N	\N
-326	2019-10-17 13:28:57.484417+00	2019-10-17 13:28:57.484424+00	18	\N	\N	\N	\N	\N
-327	2019-10-17 13:28:57.490874+00	2019-10-17 13:28:57.490891+00	19	\N	\N	\N	\N	\N
-328	2019-10-17 13:28:57.490923+00	2019-10-17 13:28:57.490931+00	20	\N	\N	\N	\N	\N
-329	2019-10-17 13:28:57.490954+00	2019-10-17 13:28:57.490961+00	21	\N	\N	\N	\N	\N
-330	2019-10-17 13:28:57.490982+00	2019-10-17 13:28:57.49099+00	22	\N	\N	\N	\N	\N
-331	2019-10-17 13:28:57.491011+00	2019-10-17 13:28:57.491019+00	23	\N	\N	\N	\N	\N
-332	2019-10-17 13:28:57.49104+00	2019-10-17 13:28:57.491048+00	24	\N	\N	\N	\N	\N
-333	2019-10-17 13:28:57.497802+00	2019-10-17 13:28:57.497818+00	25	\N	\N	\N	\N	\N
-334	2019-10-17 13:28:57.49785+00	2019-10-17 13:28:57.497858+00	26	\N	\N	\N	\N	\N
-335	2019-10-17 13:28:57.497881+00	2019-10-17 13:28:57.497888+00	27	\N	\N	\N	\N	\N
-336	2019-10-17 13:28:57.49791+00	2019-10-17 13:28:57.497918+00	28	\N	\N	\N	\N	\N
-337	2019-10-17 13:28:57.497939+00	2019-10-17 13:28:57.497947+00	29	\N	\N	\N	\N	\N
-338	2019-10-17 13:28:57.497968+00	2019-10-17 13:28:57.497975+00	30	\N	\N	\N	\N	\N
-339	2019-10-17 13:28:57.503613+00	2019-10-17 13:28:57.50363+00	\N	17	\N	\N	\N	\N
-340	2019-10-17 13:28:57.503662+00	2019-10-17 13:28:57.503671+00	\N	18	\N	\N	\N	\N
-341	2019-10-17 13:28:57.503694+00	2019-10-17 13:28:57.503702+00	\N	19	\N	\N	\N	\N
-342	2019-10-17 13:28:57.503723+00	2019-10-17 13:28:57.50373+00	\N	20	\N	\N	\N	\N
-343	2019-10-17 13:28:57.503751+00	2019-10-17 13:28:57.503759+00	\N	21	\N	\N	\N	\N
-344	2019-10-17 13:28:57.510843+00	2019-10-17 13:28:57.51086+00	31	\N	\N	\N	\N	\N
-345	2019-10-17 13:28:57.510893+00	2019-10-17 13:28:57.510902+00	32	\N	\N	\N	\N	\N
-346	2019-10-17 13:28:57.510925+00	2019-10-17 13:28:57.510933+00	33	\N	\N	\N	\N	\N
-347	2019-10-17 13:28:57.510955+00	2019-10-17 13:28:57.510962+00	34	\N	\N	\N	\N	\N
-348	2019-10-17 13:28:57.510995+00	2019-10-17 13:28:57.511004+00	35	\N	\N	\N	\N	\N
-349	2019-10-17 13:28:57.511026+00	2019-10-17 13:28:57.511033+00	36	\N	\N	\N	\N	\N
-350	2019-10-17 13:28:57.522482+00	2019-10-17 13:28:57.5225+00	37	\N	\N	\N	\N	\N
-351	2019-10-17 13:28:57.522538+00	2019-10-17 13:28:57.522547+00	38	\N	\N	\N	\N	\N
-352	2019-10-17 13:28:57.52257+00	2019-10-17 13:28:57.522578+00	39	\N	\N	\N	\N	\N
-353	2019-10-17 13:28:57.522599+00	2019-10-17 13:28:57.522606+00	40	\N	\N	\N	\N	\N
-354	2019-10-17 13:28:57.522626+00	2019-10-17 13:28:57.522634+00	41	\N	\N	\N	\N	\N
-355	2019-10-17 13:28:57.522654+00	2019-10-17 13:28:57.522661+00	42	\N	\N	\N	\N	\N
-356	2019-10-17 13:28:57.533844+00	2019-10-17 13:28:57.533862+00	43	\N	\N	\N	\N	\N
-357	2019-10-17 13:28:57.533895+00	2019-10-17 13:28:57.533904+00	44	\N	\N	\N	\N	\N
-358	2019-10-17 13:28:57.533927+00	2019-10-17 13:28:57.533934+00	45	\N	\N	\N	\N	\N
-359	2019-10-17 13:28:57.533955+00	2019-10-17 13:28:57.533962+00	46	\N	\N	\N	\N	\N
-360	2019-10-17 13:28:57.533984+00	2019-10-17 13:28:57.533991+00	47	\N	\N	\N	\N	\N
-361	2019-10-17 13:28:57.534011+00	2019-10-17 13:28:57.534019+00	48	\N	\N	\N	\N	\N
-362	2019-10-17 13:28:57.545514+00	2019-10-17 13:28:57.545534+00	49	\N	\N	\N	\N	\N
-363	2019-10-17 13:28:57.545568+00	2019-10-17 13:28:57.545577+00	50	\N	\N	\N	\N	\N
-364	2019-10-17 13:28:57.5456+00	2019-10-17 13:28:57.545607+00	51	\N	\N	\N	\N	\N
-365	2019-10-17 13:28:57.545629+00	2019-10-17 13:28:57.545636+00	52	\N	\N	\N	\N	\N
-366	2019-10-17 13:28:57.545657+00	2019-10-17 13:28:57.545664+00	53	\N	\N	\N	\N	\N
-367	2019-10-17 13:28:57.545685+00	2019-10-17 13:28:57.545692+00	54	\N	\N	\N	\N	\N
-368	2019-10-17 13:28:57.583458+00	2019-10-17 13:28:57.583475+00	55	\N	\N	\N	\N	\N
-369	2019-10-17 13:28:57.583508+00	2019-10-17 13:28:57.583517+00	56	\N	\N	\N	\N	\N
-370	2019-10-17 13:28:57.583539+00	2019-10-17 13:28:57.583547+00	57	\N	\N	\N	\N	\N
-371	2019-10-17 13:28:57.583568+00	2019-10-17 13:28:57.583575+00	58	\N	\N	\N	\N	\N
-372	2019-10-17 13:28:57.583596+00	2019-10-17 13:28:57.583604+00	59	\N	\N	\N	\N	\N
-373	2019-10-17 13:28:57.583625+00	2019-10-17 13:28:57.583632+00	60	\N	\N	\N	\N	\N
-374	2019-10-17 13:28:57.591469+00	2019-10-17 13:28:57.591489+00	\N	22	\N	\N	\N	\N
-375	2019-10-17 13:28:57.591522+00	2019-10-17 13:28:57.591531+00	\N	23	\N	\N	\N	\N
-376	2019-10-17 13:28:57.591554+00	2019-10-17 13:28:57.591562+00	\N	24	\N	\N	\N	\N
-377	2019-10-17 13:28:57.591583+00	2019-10-17 13:28:57.59159+00	\N	25	\N	\N	\N	\N
-378	2019-10-17 13:28:57.591611+00	2019-10-17 13:28:57.59163+00	\N	26	\N	\N	\N	\N
-379	2019-10-17 13:28:57.603334+00	2019-10-17 13:28:57.603352+00	61	\N	\N	\N	\N	\N
-380	2019-10-17 13:28:57.603386+00	2019-10-17 13:28:57.603394+00	62	\N	\N	\N	\N	\N
-381	2019-10-17 13:28:57.603417+00	2019-10-17 13:28:57.603425+00	63	\N	\N	\N	\N	\N
-382	2019-10-17 13:28:57.603446+00	2019-10-17 13:28:57.603454+00	64	\N	\N	\N	\N	\N
-383	2019-10-17 13:28:57.603475+00	2019-10-17 13:28:57.603483+00	65	\N	\N	\N	\N	\N
-384	2019-10-17 13:28:57.603503+00	2019-10-17 13:28:57.603511+00	66	\N	\N	\N	\N	\N
-385	2019-10-17 13:28:57.614592+00	2019-10-17 13:28:57.614612+00	67	\N	\N	\N	\N	\N
-386	2019-10-17 13:28:57.614646+00	2019-10-17 13:28:57.614655+00	68	\N	\N	\N	\N	\N
-387	2019-10-17 13:28:57.614688+00	2019-10-17 13:28:57.614698+00	69	\N	\N	\N	\N	\N
-388	2019-10-17 13:28:57.614721+00	2019-10-17 13:28:57.614729+00	70	\N	\N	\N	\N	\N
-389	2019-10-17 13:28:57.61475+00	2019-10-17 13:28:57.614757+00	71	\N	\N	\N	\N	\N
-390	2019-10-17 13:28:57.614778+00	2019-10-17 13:28:57.614785+00	72	\N	\N	\N	\N	\N
-391	2019-10-17 13:28:57.625816+00	2019-10-17 13:28:57.625834+00	73	\N	\N	\N	\N	\N
-392	2019-10-17 13:28:57.625867+00	2019-10-17 13:28:57.625876+00	74	\N	\N	\N	\N	\N
-393	2019-10-17 13:28:57.625899+00	2019-10-17 13:28:57.625907+00	75	\N	\N	\N	\N	\N
-394	2019-10-17 13:28:57.625928+00	2019-10-17 13:28:57.625935+00	76	\N	\N	\N	\N	\N
-395	2019-10-17 13:28:57.625956+00	2019-10-17 13:28:57.625964+00	77	\N	\N	\N	\N	\N
-396	2019-10-17 13:28:57.625984+00	2019-10-17 13:28:57.625992+00	78	\N	\N	\N	\N	\N
-397	2019-10-17 13:28:57.632487+00	2019-10-17 13:28:57.632506+00	79	\N	\N	\N	\N	\N
-398	2019-10-17 13:28:57.632539+00	2019-10-17 13:28:57.632548+00	80	\N	\N	\N	\N	\N
-399	2019-10-17 13:28:57.632571+00	2019-10-17 13:28:57.632579+00	81	\N	\N	\N	\N	\N
-400	2019-10-17 13:28:57.6326+00	2019-10-17 13:28:57.632608+00	82	\N	\N	\N	\N	\N
-401	2019-10-17 13:28:57.632629+00	2019-10-17 13:28:57.632636+00	83	\N	\N	\N	\N	\N
-402	2019-10-17 13:28:57.632657+00	2019-10-17 13:28:57.632665+00	84	\N	\N	\N	\N	\N
-403	2019-10-17 13:28:57.643061+00	2019-10-17 13:28:57.643078+00	85	\N	\N	\N	\N	\N
-404	2019-10-17 13:28:57.643111+00	2019-10-17 13:28:57.64312+00	86	\N	\N	\N	\N	\N
-405	2019-10-17 13:28:57.643144+00	2019-10-17 13:28:57.643152+00	87	\N	\N	\N	\N	\N
-406	2019-10-17 13:28:57.643173+00	2019-10-17 13:28:57.643181+00	88	\N	\N	\N	\N	\N
-407	2019-10-17 13:28:57.643202+00	2019-10-17 13:28:57.643209+00	89	\N	\N	\N	\N	\N
-408	2019-10-17 13:28:57.64323+00	2019-10-17 13:28:57.643238+00	90	\N	\N	\N	\N	\N
-409	2019-10-17 13:28:57.654262+00	2019-10-17 13:28:57.654283+00	\N	27	\N	\N	\N	\N
-410	2019-10-17 13:28:57.654317+00	2019-10-17 13:28:57.654326+00	\N	28	\N	\N	\N	\N
-411	2019-10-17 13:28:57.654348+00	2019-10-17 13:28:57.654356+00	\N	29	\N	\N	\N	\N
-412	2019-10-17 13:28:57.654377+00	2019-10-17 13:28:57.654385+00	\N	30	\N	\N	\N	\N
-413	2019-10-17 13:28:57.654405+00	2019-10-17 13:28:57.654413+00	\N	31	\N	\N	\N	\N
-414	2019-10-17 13:28:57.665971+00	2019-10-17 13:28:57.665989+00	91	\N	\N	\N	\N	\N
-415	2019-10-17 13:28:57.666022+00	2019-10-17 13:28:57.666031+00	92	\N	\N	\N	\N	\N
-416	2019-10-17 13:28:57.666054+00	2019-10-17 13:28:57.666062+00	93	\N	\N	\N	\N	\N
-417	2019-10-17 13:28:57.666083+00	2019-10-17 13:28:57.66609+00	94	\N	\N	\N	\N	\N
-418	2019-10-17 13:28:57.666111+00	2019-10-17 13:28:57.666118+00	95	\N	\N	\N	\N	\N
-419	2019-10-17 13:28:57.666139+00	2019-10-17 13:28:57.666146+00	96	\N	\N	\N	\N	\N
-420	2019-10-17 13:28:57.677083+00	2019-10-17 13:28:57.677102+00	97	\N	\N	\N	\N	\N
-421	2019-10-17 13:28:57.677136+00	2019-10-17 13:28:57.677145+00	98	\N	\N	\N	\N	\N
-422	2019-10-17 13:28:57.677168+00	2019-10-17 13:28:57.677176+00	99	\N	\N	\N	\N	\N
-423	2019-10-17 13:28:57.677198+00	2019-10-17 13:28:57.677205+00	100	\N	\N	\N	\N	\N
-424	2019-10-17 13:28:57.677226+00	2019-10-17 13:28:57.677233+00	101	\N	\N	\N	\N	\N
-425	2019-10-17 13:28:57.677255+00	2019-10-17 13:28:57.677262+00	102	\N	\N	\N	\N	\N
-426	2019-10-17 13:28:57.688069+00	2019-10-17 13:28:57.688087+00	103	\N	\N	\N	\N	\N
-427	2019-10-17 13:28:57.68812+00	2019-10-17 13:28:57.688129+00	104	\N	\N	\N	\N	\N
-428	2019-10-17 13:28:57.688152+00	2019-10-17 13:28:57.68816+00	105	\N	\N	\N	\N	\N
-429	2019-10-17 13:28:57.688181+00	2019-10-17 13:28:57.688189+00	106	\N	\N	\N	\N	\N
-430	2019-10-17 13:28:57.68821+00	2019-10-17 13:28:57.688218+00	107	\N	\N	\N	\N	\N
-431	2019-10-17 13:28:57.688238+00	2019-10-17 13:28:57.688246+00	108	\N	\N	\N	\N	\N
-432	2019-10-17 13:28:57.699342+00	2019-10-17 13:28:57.69936+00	109	\N	\N	\N	\N	\N
-433	2019-10-17 13:28:57.699393+00	2019-10-17 13:28:57.699402+00	110	\N	\N	\N	\N	\N
-434	2019-10-17 13:28:57.699426+00	2019-10-17 13:28:57.699434+00	111	\N	\N	\N	\N	\N
-435	2019-10-17 13:28:57.699455+00	2019-10-17 13:28:57.699463+00	112	\N	\N	\N	\N	\N
-436	2019-10-17 13:28:57.699484+00	2019-10-17 13:28:57.699492+00	113	\N	\N	\N	\N	\N
-437	2019-10-17 13:28:57.699512+00	2019-10-17 13:28:57.69952+00	114	\N	\N	\N	\N	\N
-438	2019-10-17 13:28:57.707886+00	2019-10-17 13:28:57.707903+00	115	\N	\N	\N	\N	\N
-439	2019-10-17 13:28:57.707937+00	2019-10-17 13:28:57.707946+00	116	\N	\N	\N	\N	\N
-440	2019-10-17 13:28:57.707969+00	2019-10-17 13:28:57.707977+00	117	\N	\N	\N	\N	\N
-441	2019-10-17 13:28:57.707998+00	2019-10-17 13:28:57.708006+00	118	\N	\N	\N	\N	\N
-442	2019-10-17 13:28:57.708027+00	2019-10-17 13:28:57.708035+00	119	\N	\N	\N	\N	\N
-443	2019-10-17 13:28:57.708056+00	2019-10-17 13:28:57.708063+00	120	\N	\N	\N	\N	\N
-444	2019-10-17 13:28:57.718432+00	2019-10-17 13:28:57.718452+00	\N	32	\N	\N	\N	\N
-445	2019-10-17 13:28:57.718485+00	2019-10-17 13:28:57.718493+00	\N	33	\N	\N	\N	\N
-446	2019-10-17 13:28:57.718516+00	2019-10-17 13:28:57.718524+00	\N	34	\N	\N	\N	\N
-447	2019-10-17 13:28:57.718545+00	2019-10-17 13:28:57.718552+00	\N	35	\N	\N	\N	\N
-448	2019-10-17 13:28:57.718573+00	2019-10-17 13:28:57.71858+00	\N	36	\N	\N	\N	\N
-449	2019-10-17 13:28:57.732086+00	2019-10-17 13:28:57.732108+00	121	\N	\N	\N	\N	\N
-450	2019-10-17 13:28:57.732144+00	2019-10-17 13:28:57.732153+00	122	\N	\N	\N	\N	\N
-451	2019-10-17 13:28:57.732176+00	2019-10-17 13:28:57.732184+00	123	\N	\N	\N	\N	\N
-452	2019-10-17 13:28:57.732205+00	2019-10-17 13:28:57.732213+00	124	\N	\N	\N	\N	\N
-453	2019-10-17 13:28:57.732233+00	2019-10-17 13:28:57.732241+00	125	\N	\N	\N	\N	\N
-454	2019-10-17 13:28:57.732262+00	2019-10-17 13:28:57.732269+00	126	\N	\N	\N	\N	\N
-455	2019-10-17 13:28:57.743137+00	2019-10-17 13:28:57.743155+00	127	\N	\N	\N	\N	\N
-456	2019-10-17 13:28:57.743188+00	2019-10-17 13:28:57.743197+00	128	\N	\N	\N	\N	\N
-457	2019-10-17 13:28:57.74322+00	2019-10-17 13:28:57.743227+00	129	\N	\N	\N	\N	\N
-458	2019-10-17 13:28:57.743248+00	2019-10-17 13:28:57.743285+00	130	\N	\N	\N	\N	\N
-459	2019-10-17 13:28:57.743312+00	2019-10-17 13:28:57.743319+00	131	\N	\N	\N	\N	\N
-460	2019-10-17 13:28:57.74334+00	2019-10-17 13:28:57.743348+00	132	\N	\N	\N	\N	\N
-461	2019-10-17 13:28:57.754083+00	2019-10-17 13:28:57.754102+00	133	\N	\N	\N	\N	\N
-462	2019-10-17 13:28:57.754136+00	2019-10-17 13:28:57.754145+00	134	\N	\N	\N	\N	\N
-463	2019-10-17 13:28:57.754168+00	2019-10-17 13:28:57.754175+00	135	\N	\N	\N	\N	\N
-464	2019-10-17 13:28:57.754196+00	2019-10-17 13:28:57.754203+00	136	\N	\N	\N	\N	\N
-465	2019-10-17 13:28:57.754224+00	2019-10-17 13:28:57.754231+00	137	\N	\N	\N	\N	\N
-466	2019-10-17 13:28:57.754252+00	2019-10-17 13:28:57.754259+00	138	\N	\N	\N	\N	\N
-467	2019-10-17 13:28:57.765353+00	2019-10-17 13:28:57.765373+00	139	\N	\N	\N	\N	\N
-468	2019-10-17 13:28:57.765406+00	2019-10-17 13:28:57.765414+00	140	\N	\N	\N	\N	\N
-469	2019-10-17 13:28:57.765437+00	2019-10-17 13:28:57.765445+00	141	\N	\N	\N	\N	\N
-470	2019-10-17 13:28:57.765466+00	2019-10-17 13:28:57.765473+00	142	\N	\N	\N	\N	\N
-471	2019-10-17 13:28:57.765494+00	2019-10-17 13:28:57.765502+00	143	\N	\N	\N	\N	\N
-472	2019-10-17 13:28:57.765522+00	2019-10-17 13:28:57.765529+00	144	\N	\N	\N	\N	\N
-473	2019-10-17 13:28:57.776003+00	2019-10-17 13:28:57.77602+00	145	\N	\N	\N	\N	\N
-474	2019-10-17 13:28:57.776054+00	2019-10-17 13:28:57.776063+00	146	\N	\N	\N	\N	\N
-475	2019-10-17 13:28:57.776087+00	2019-10-17 13:28:57.776094+00	147	\N	\N	\N	\N	\N
-476	2019-10-17 13:28:57.776129+00	2019-10-17 13:28:57.776137+00	148	\N	\N	\N	\N	\N
-477	2019-10-17 13:28:57.776158+00	2019-10-17 13:28:57.776166+00	149	\N	\N	\N	\N	\N
-478	2019-10-17 13:28:57.776187+00	2019-10-17 13:28:57.776194+00	150	\N	\N	\N	\N	\N
+1	2020-01-24 04:41:22.928203+00	2020-01-24 04:41:22.928218+00	\N	\N	\N	\N	\N	1
+2	2020-01-24 04:41:22.928285+00	2020-01-24 04:41:22.928292+00	\N	\N	\N	\N	\N	2
+3	2020-01-24 04:41:22.928329+00	2020-01-24 04:41:22.928335+00	\N	\N	\N	\N	\N	3
+4	2020-01-24 04:41:22.928369+00	2020-01-24 04:41:22.928375+00	\N	\N	\N	\N	\N	4
+5	2020-01-24 04:41:22.928408+00	2020-01-24 04:41:22.928414+00	\N	\N	\N	\N	\N	5
+6	2020-01-24 04:41:22.928463+00	2020-01-24 04:41:22.928469+00	\N	\N	\N	\N	\N	6
+7	2020-01-24 04:41:22.928496+00	2020-01-24 04:41:22.928501+00	\N	\N	\N	\N	\N	7
+8	2020-01-24 04:41:22.928521+00	2020-01-24 04:41:22.928526+00	\N	\N	\N	\N	\N	8
+9	2020-01-24 04:41:22.928545+00	2020-01-24 04:41:22.92855+00	\N	\N	\N	\N	\N	9
+10	2020-01-24 04:41:22.92857+00	2020-01-24 04:41:22.928574+00	\N	\N	\N	\N	\N	10
+11	2020-01-24 04:41:22.928594+00	2020-01-24 04:41:22.928599+00	\N	\N	\N	\N	\N	11
+12	2020-01-24 04:41:22.945145+00	2020-01-24 04:41:22.945164+00	\N	1	\N	\N	\N	\N
+13	2020-01-24 04:41:22.945197+00	2020-01-24 04:41:22.945203+00	\N	2	\N	\N	\N	\N
+14	2020-01-24 04:41:22.945224+00	2020-01-24 04:41:22.945229+00	\N	3	\N	\N	\N	\N
+15	2020-01-24 04:41:22.962501+00	2020-01-24 04:41:22.962519+00	\N	4	\N	\N	\N	\N
+16	2020-01-24 04:41:22.962562+00	2020-01-24 04:41:22.962568+00	\N	5	\N	\N	\N	\N
+17	2020-01-24 04:41:22.97716+00	2020-01-24 04:41:22.977178+00	\N	6	\N	\N	\N	\N
+18	2020-01-24 04:41:22.977212+00	2020-01-24 04:41:22.977217+00	\N	7	\N	\N	\N	\N
+19	2020-01-24 04:41:22.977238+00	2020-01-24 04:41:22.977244+00	\N	8	\N	\N	\N	\N
+20	2020-01-24 04:41:22.977263+00	2020-01-24 04:41:22.977268+00	\N	9	\N	\N	\N	\N
+21	2020-01-24 04:41:22.977287+00	2020-01-24 04:41:22.977292+00	\N	10	\N	\N	\N	\N
+22	2020-01-24 04:41:22.977312+00	2020-01-24 04:41:22.977317+00	\N	11	\N	\N	\N	\N
+23	2020-01-24 04:41:22.998532+00	2020-01-24 04:41:22.998552+00	\N	\N	1	\N	\N	\N
+24	2020-01-24 04:41:22.998588+00	2020-01-24 04:41:22.998594+00	\N	\N	2	\N	\N	\N
+25	2020-01-24 04:41:22.998615+00	2020-01-24 04:41:22.99862+00	\N	\N	3	\N	\N	\N
+26	2020-01-24 04:41:22.99864+00	2020-01-24 04:41:22.998645+00	\N	\N	4	\N	\N	\N
+27	2020-01-24 04:41:22.998664+00	2020-01-24 04:41:22.998669+00	\N	\N	5	\N	\N	\N
+28	2020-01-24 04:41:22.998689+00	2020-01-24 04:41:22.998694+00	\N	\N	6	\N	\N	\N
+29	2020-01-24 04:41:22.998714+00	2020-01-24 04:41:22.998718+00	\N	\N	7	\N	\N	\N
+30	2020-01-24 04:41:22.998738+00	2020-01-24 04:41:22.998743+00	\N	\N	8	\N	\N	\N
+31	2020-01-24 04:41:22.998763+00	2020-01-24 04:41:22.998768+00	\N	\N	9	\N	\N	\N
+32	2020-01-24 04:41:22.998788+00	2020-01-24 04:41:22.998793+00	\N	\N	10	\N	\N	\N
+33	2020-01-24 04:41:22.998813+00	2020-01-24 04:41:22.998818+00	\N	\N	11	\N	\N	\N
+34	2020-01-24 04:41:22.998837+00	2020-01-24 04:41:22.998842+00	\N	\N	12	\N	\N	\N
+35	2020-01-24 04:41:22.998862+00	2020-01-24 04:41:22.998866+00	\N	\N	13	\N	\N	\N
+36	2020-01-24 04:41:22.998886+00	2020-01-24 04:41:22.998891+00	\N	\N	14	\N	\N	\N
+37	2020-01-24 04:41:22.99891+00	2020-01-24 04:41:22.998915+00	\N	\N	15	\N	\N	\N
+38	2020-01-24 04:41:22.998934+00	2020-01-24 04:41:22.998939+00	\N	\N	16	\N	\N	\N
+39	2020-01-24 04:41:22.998959+00	2020-01-24 04:41:22.998963+00	\N	\N	17	\N	\N	\N
+40	2020-01-24 04:41:22.999297+00	2020-01-24 04:41:22.999302+00	\N	\N	18	\N	\N	\N
+41	2020-01-24 04:41:22.999322+00	2020-01-24 04:41:22.999327+00	\N	\N	19	\N	\N	\N
+42	2020-01-24 04:41:22.999347+00	2020-01-24 04:41:22.999352+00	\N	\N	20	\N	\N	\N
+43	2020-01-24 04:41:22.999372+00	2020-01-24 04:41:22.999376+00	\N	\N	21	\N	\N	\N
+44	2020-01-24 04:41:22.999396+00	2020-01-24 04:41:22.999401+00	\N	\N	22	\N	\N	\N
+45	2020-01-24 04:41:22.99942+00	2020-01-24 04:41:22.999425+00	\N	\N	23	\N	\N	\N
+46	2020-01-24 04:41:22.999445+00	2020-01-24 04:41:22.999458+00	\N	\N	24	\N	\N	\N
+47	2020-01-24 04:41:22.99948+00	2020-01-24 04:41:22.999485+00	\N	\N	25	\N	\N	\N
+48	2020-01-24 04:41:22.999504+00	2020-01-24 04:41:22.999509+00	\N	\N	26	\N	\N	\N
+49	2020-01-24 04:41:22.999529+00	2020-01-24 04:41:22.999534+00	\N	\N	27	\N	\N	\N
+50	2020-01-24 04:41:22.999553+00	2020-01-24 04:41:22.999569+00	\N	\N	28	\N	\N	\N
+51	2020-01-24 04:41:22.99959+00	2020-01-24 04:41:22.999595+00	\N	\N	29	\N	\N	\N
+52	2020-01-24 04:41:22.999614+00	2020-01-24 04:41:22.999619+00	\N	\N	30	\N	\N	\N
+53	2020-01-24 04:41:22.999639+00	2020-01-24 04:41:22.999644+00	\N	\N	31	\N	\N	\N
+54	2020-01-24 04:41:22.999663+00	2020-01-24 04:41:22.999668+00	\N	\N	32	\N	\N	\N
+55	2020-01-24 04:41:22.999687+00	2020-01-24 04:41:22.999692+00	\N	\N	33	\N	\N	\N
+56	2020-01-24 04:41:22.999712+00	2020-01-24 04:41:22.999717+00	\N	\N	34	\N	\N	\N
+57	2020-01-24 04:41:22.999736+00	2020-01-24 04:41:22.999741+00	\N	\N	35	\N	\N	\N
+58	2020-01-24 04:41:22.999761+00	2020-01-24 04:41:22.999765+00	\N	\N	36	\N	\N	\N
+59	2020-01-24 04:41:22.999792+00	2020-01-24 04:41:22.999799+00	\N	\N	37	\N	\N	\N
+60	2020-01-24 04:41:22.99982+00	2020-01-24 04:41:22.999825+00	\N	\N	38	\N	\N	\N
+61	2020-01-24 04:41:22.999845+00	2020-01-24 04:41:22.99985+00	\N	\N	39	\N	\N	\N
+62	2020-01-24 04:41:22.99987+00	2020-01-24 04:41:22.999875+00	\N	\N	40	\N	\N	\N
+63	2020-01-24 04:41:22.999894+00	2020-01-24 04:41:22.999899+00	\N	\N	41	\N	\N	\N
+64	2020-01-24 04:41:22.999919+00	2020-01-24 04:41:22.999924+00	\N	\N	42	\N	\N	\N
+65	2020-01-24 04:41:22.999943+00	2020-01-24 04:41:22.999948+00	\N	\N	43	\N	\N	\N
+66	2020-01-24 04:41:22.999968+00	2020-01-24 04:41:22.999973+00	\N	\N	44	\N	\N	\N
+67	2020-01-24 04:41:22.999992+00	2020-01-24 04:41:22.999997+00	\N	\N	45	\N	\N	\N
+68	2020-01-24 04:41:23.022462+00	2020-01-24 04:41:23.022481+00	\N	\N	46	\N	\N	\N
+69	2020-01-24 04:41:23.022516+00	2020-01-24 04:41:23.022522+00	\N	\N	47	\N	\N	\N
+70	2020-01-24 04:41:23.022543+00	2020-01-24 04:41:23.022548+00	\N	\N	48	\N	\N	\N
+71	2020-01-24 04:41:23.022568+00	2020-01-24 04:41:23.022573+00	\N	\N	49	\N	\N	\N
+72	2020-01-24 04:41:23.022593+00	2020-01-24 04:41:23.022598+00	\N	\N	50	\N	\N	\N
+73	2020-01-24 04:41:23.022617+00	2020-01-24 04:41:23.022622+00	\N	\N	51	\N	\N	\N
+74	2020-01-24 04:41:23.022642+00	2020-01-24 04:41:23.022647+00	\N	\N	52	\N	\N	\N
+75	2020-01-24 04:41:23.022666+00	2020-01-24 04:41:23.022671+00	\N	\N	53	\N	\N	\N
+76	2020-01-24 04:41:23.022691+00	2020-01-24 04:41:23.022695+00	\N	\N	54	\N	\N	\N
+77	2020-01-24 04:41:23.022715+00	2020-01-24 04:41:23.02272+00	\N	\N	55	\N	\N	\N
+78	2020-01-24 04:41:23.022739+00	2020-01-24 04:41:23.022744+00	\N	\N	56	\N	\N	\N
+79	2020-01-24 04:41:23.022763+00	2020-01-24 04:41:23.022768+00	\N	\N	57	\N	\N	\N
+80	2020-01-24 04:41:23.022787+00	2020-01-24 04:41:23.022792+00	\N	\N	58	\N	\N	\N
+81	2020-01-24 04:41:23.022811+00	2020-01-24 04:41:23.022816+00	\N	\N	59	\N	\N	\N
+82	2020-01-24 04:41:23.022835+00	2020-01-24 04:41:23.022851+00	\N	\N	60	\N	\N	\N
+83	2020-01-24 04:41:23.022873+00	2020-01-24 04:41:23.022878+00	\N	\N	61	\N	\N	\N
+84	2020-01-24 04:41:23.022897+00	2020-01-24 04:41:23.022902+00	\N	\N	62	\N	\N	\N
+85	2020-01-24 04:41:23.022921+00	2020-01-24 04:41:23.022926+00	\N	\N	63	\N	\N	\N
+86	2020-01-24 04:41:23.022945+00	2020-01-24 04:41:23.02295+00	\N	\N	64	\N	\N	\N
+87	2020-01-24 04:41:23.022979+00	2020-01-24 04:41:23.022984+00	\N	\N	65	\N	\N	\N
+88	2020-01-24 04:41:23.023004+00	2020-01-24 04:41:23.023009+00	\N	\N	66	\N	\N	\N
+89	2020-01-24 04:41:23.023028+00	2020-01-24 04:41:23.023033+00	\N	\N	67	\N	\N	\N
+90	2020-01-24 04:41:23.023053+00	2020-01-24 04:41:23.023058+00	\N	\N	68	\N	\N	\N
+91	2020-01-24 04:41:23.023087+00	2020-01-24 04:41:23.023092+00	\N	\N	69	\N	\N	\N
+92	2020-01-24 04:41:23.023111+00	2020-01-24 04:41:23.023116+00	\N	\N	70	\N	\N	\N
+93	2020-01-24 04:41:23.023135+00	2020-01-24 04:41:23.02314+00	\N	\N	71	\N	\N	\N
+94	2020-01-24 04:41:23.02316+00	2020-01-24 04:41:23.023165+00	\N	\N	72	\N	\N	\N
+95	2020-01-24 04:41:23.023185+00	2020-01-24 04:41:23.023189+00	\N	\N	73	\N	\N	\N
+96	2020-01-24 04:41:23.023209+00	2020-01-24 04:41:23.023214+00	\N	\N	74	\N	\N	\N
+97	2020-01-24 04:41:23.023234+00	2020-01-24 04:41:23.023239+00	\N	\N	75	\N	\N	\N
+98	2020-01-24 04:41:23.023258+00	2020-01-24 04:41:23.023263+00	\N	\N	76	\N	\N	\N
+99	2020-01-24 04:41:23.023282+00	2020-01-24 04:41:23.023287+00	\N	\N	77	\N	\N	\N
+100	2020-01-24 04:41:23.023306+00	2020-01-24 04:41:23.023311+00	\N	\N	78	\N	\N	\N
+101	2020-01-24 04:41:23.02333+00	2020-01-24 04:41:23.023335+00	\N	\N	79	\N	\N	\N
+102	2020-01-24 04:41:23.023355+00	2020-01-24 04:41:23.023367+00	\N	\N	80	\N	\N	\N
+103	2020-01-24 04:41:23.023389+00	2020-01-24 04:41:23.023394+00	\N	\N	81	\N	\N	\N
+104	2020-01-24 04:41:23.023418+00	2020-01-24 04:41:23.023425+00	\N	\N	82	\N	\N	\N
+105	2020-01-24 04:41:23.023446+00	2020-01-24 04:41:23.023451+00	\N	\N	83	\N	\N	\N
+106	2020-01-24 04:41:23.02347+00	2020-01-24 04:41:23.023475+00	\N	\N	84	\N	\N	\N
+107	2020-01-24 04:41:23.023494+00	2020-01-24 04:41:23.023499+00	\N	\N	85	\N	\N	\N
+108	2020-01-24 04:41:23.023519+00	2020-01-24 04:41:23.023523+00	\N	\N	86	\N	\N	\N
+109	2020-01-24 04:41:23.023543+00	2020-01-24 04:41:23.023547+00	\N	\N	87	\N	\N	\N
+110	2020-01-24 04:41:23.023567+00	2020-01-24 04:41:23.023571+00	\N	\N	88	\N	\N	\N
+111	2020-01-24 04:41:23.023591+00	2020-01-24 04:41:23.023596+00	\N	\N	89	\N	\N	\N
+112	2020-01-24 04:41:23.023623+00	2020-01-24 04:41:23.023629+00	\N	\N	90	\N	\N	\N
+113	2020-01-24 04:41:23.041068+00	2020-01-24 04:41:23.041089+00	\N	\N	91	\N	\N	\N
+114	2020-01-24 04:41:23.041126+00	2020-01-24 04:41:23.041132+00	\N	\N	92	\N	\N	\N
+115	2020-01-24 04:41:23.041152+00	2020-01-24 04:41:23.041157+00	\N	\N	93	\N	\N	\N
+116	2020-01-24 04:41:23.041178+00	2020-01-24 04:41:23.041182+00	\N	\N	94	\N	\N	\N
+117	2020-01-24 04:41:23.041202+00	2020-01-24 04:41:23.041207+00	\N	\N	95	\N	\N	\N
+118	2020-01-24 04:41:23.041226+00	2020-01-24 04:41:23.041231+00	\N	\N	96	\N	\N	\N
+119	2020-01-24 04:41:23.041251+00	2020-01-24 04:41:23.041255+00	\N	\N	97	\N	\N	\N
+120	2020-01-24 04:41:23.041275+00	2020-01-24 04:41:23.04128+00	\N	\N	98	\N	\N	\N
+121	2020-01-24 04:41:23.0413+00	2020-01-24 04:41:23.041305+00	\N	\N	99	\N	\N	\N
+122	2020-01-24 04:41:23.041325+00	2020-01-24 04:41:23.041329+00	\N	\N	100	\N	\N	\N
+123	2020-01-24 04:41:23.041357+00	2020-01-24 04:41:23.041363+00	\N	\N	101	\N	\N	\N
+124	2020-01-24 04:41:23.041383+00	2020-01-24 04:41:23.041388+00	\N	\N	102	\N	\N	\N
+125	2020-01-24 04:41:23.041407+00	2020-01-24 04:41:23.041412+00	\N	\N	103	\N	\N	\N
+126	2020-01-24 04:41:23.041432+00	2020-01-24 04:41:23.041436+00	\N	\N	104	\N	\N	\N
+127	2020-01-24 04:41:23.041456+00	2020-01-24 04:41:23.041461+00	\N	\N	105	\N	\N	\N
+128	2020-01-24 04:41:23.04148+00	2020-01-24 04:41:23.041485+00	\N	\N	106	\N	\N	\N
+129	2020-01-24 04:41:23.041504+00	2020-01-24 04:41:23.041509+00	\N	\N	107	\N	\N	\N
+130	2020-01-24 04:41:23.041529+00	2020-01-24 04:41:23.041534+00	\N	\N	108	\N	\N	\N
+131	2020-01-24 04:41:23.041554+00	2020-01-24 04:41:23.041558+00	\N	\N	109	\N	\N	\N
+132	2020-01-24 04:41:23.041578+00	2020-01-24 04:41:23.041583+00	\N	\N	110	\N	\N	\N
+133	2020-01-24 04:41:23.041602+00	2020-01-24 04:41:23.041607+00	\N	\N	111	\N	\N	\N
+134	2020-01-24 04:41:23.041626+00	2020-01-24 04:41:23.041631+00	\N	\N	112	\N	\N	\N
+135	2020-01-24 04:41:23.041651+00	2020-01-24 04:41:23.041655+00	\N	\N	113	\N	\N	\N
+136	2020-01-24 04:41:23.041675+00	2020-01-24 04:41:23.04168+00	\N	\N	114	\N	\N	\N
+137	2020-01-24 04:41:23.041699+00	2020-01-24 04:41:23.041704+00	\N	\N	115	\N	\N	\N
+138	2020-01-24 04:41:23.041724+00	2020-01-24 04:41:23.041728+00	\N	\N	116	\N	\N	\N
+139	2020-01-24 04:41:23.041748+00	2020-01-24 04:41:23.041753+00	\N	\N	117	\N	\N	\N
+140	2020-01-24 04:41:23.041772+00	2020-01-24 04:41:23.041777+00	\N	\N	118	\N	\N	\N
+141	2020-01-24 04:41:23.041797+00	2020-01-24 04:41:23.041802+00	\N	\N	119	\N	\N	\N
+142	2020-01-24 04:41:23.041821+00	2020-01-24 04:41:23.041826+00	\N	\N	120	\N	\N	\N
+143	2020-01-24 04:41:23.041846+00	2020-01-24 04:41:23.041851+00	\N	\N	121	\N	\N	\N
+144	2020-01-24 04:41:23.04187+00	2020-01-24 04:41:23.041875+00	\N	\N	122	\N	\N	\N
+145	2020-01-24 04:41:23.041894+00	2020-01-24 04:41:23.041899+00	\N	\N	123	\N	\N	\N
+146	2020-01-24 04:41:23.041918+00	2020-01-24 04:41:23.041923+00	\N	\N	124	\N	\N	\N
+147	2020-01-24 04:41:23.041942+00	2020-01-24 04:41:23.041947+00	\N	\N	125	\N	\N	\N
+148	2020-01-24 04:41:23.041966+00	2020-01-24 04:41:23.041971+00	\N	\N	126	\N	\N	\N
+149	2020-01-24 04:41:23.041996+00	2020-01-24 04:41:23.042002+00	\N	\N	127	\N	\N	\N
+150	2020-01-24 04:41:23.042024+00	2020-01-24 04:41:23.042028+00	\N	\N	128	\N	\N	\N
+151	2020-01-24 04:41:23.042048+00	2020-01-24 04:41:23.042053+00	\N	\N	129	\N	\N	\N
+152	2020-01-24 04:41:23.042072+00	2020-01-24 04:41:23.042077+00	\N	\N	130	\N	\N	\N
+153	2020-01-24 04:41:23.042096+00	2020-01-24 04:41:23.042101+00	\N	\N	131	\N	\N	\N
+154	2020-01-24 04:41:23.04212+00	2020-01-24 04:41:23.042125+00	\N	\N	132	\N	\N	\N
+155	2020-01-24 04:41:23.042144+00	2020-01-24 04:41:23.042149+00	\N	\N	133	\N	\N	\N
+156	2020-01-24 04:41:23.042168+00	2020-01-24 04:41:23.042173+00	\N	\N	134	\N	\N	\N
+157	2020-01-24 04:41:23.042192+00	2020-01-24 04:41:23.042197+00	\N	\N	135	\N	\N	\N
+158	2020-01-24 04:41:23.069972+00	2020-01-24 04:41:23.069992+00	\N	\N	136	\N	\N	\N
+159	2020-01-24 04:41:23.070032+00	2020-01-24 04:41:23.070037+00	\N	\N	137	\N	\N	\N
+160	2020-01-24 04:41:23.070059+00	2020-01-24 04:41:23.070064+00	\N	\N	138	\N	\N	\N
+161	2020-01-24 04:41:23.070084+00	2020-01-24 04:41:23.070089+00	\N	\N	139	\N	\N	\N
+162	2020-01-24 04:41:23.070108+00	2020-01-24 04:41:23.070113+00	\N	\N	140	\N	\N	\N
+163	2020-01-24 04:41:23.070133+00	2020-01-24 04:41:23.070138+00	\N	\N	141	\N	\N	\N
+164	2020-01-24 04:41:23.070167+00	2020-01-24 04:41:23.070172+00	\N	\N	142	\N	\N	\N
+165	2020-01-24 04:41:23.070192+00	2020-01-24 04:41:23.070197+00	\N	\N	143	\N	\N	\N
+166	2020-01-24 04:41:23.070217+00	2020-01-24 04:41:23.070222+00	\N	\N	144	\N	\N	\N
+167	2020-01-24 04:41:23.070243+00	2020-01-24 04:41:23.070248+00	\N	\N	145	\N	\N	\N
+168	2020-01-24 04:41:23.070267+00	2020-01-24 04:41:23.070272+00	\N	\N	146	\N	\N	\N
+169	2020-01-24 04:41:23.070293+00	2020-01-24 04:41:23.070298+00	\N	\N	147	\N	\N	\N
+170	2020-01-24 04:41:23.070326+00	2020-01-24 04:41:23.070332+00	\N	\N	148	\N	\N	\N
+171	2020-01-24 04:41:23.070352+00	2020-01-24 04:41:23.070357+00	\N	\N	149	\N	\N	\N
+172	2020-01-24 04:41:23.070377+00	2020-01-24 04:41:23.070382+00	\N	\N	150	\N	\N	\N
+173	2020-01-24 04:41:23.070452+00	2020-01-24 04:41:23.07046+00	\N	\N	151	\N	\N	\N
+174	2020-01-24 04:41:23.070483+00	2020-01-24 04:41:23.070487+00	\N	\N	152	\N	\N	\N
+175	2020-01-24 04:41:23.070508+00	2020-01-24 04:41:23.070512+00	\N	\N	153	\N	\N	\N
+176	2020-01-24 04:41:23.070532+00	2020-01-24 04:41:23.070537+00	\N	\N	154	\N	\N	\N
+177	2020-01-24 04:41:23.070557+00	2020-01-24 04:41:23.070562+00	\N	\N	155	\N	\N	\N
+178	2020-01-24 04:41:23.070582+00	2020-01-24 04:41:23.070587+00	\N	\N	156	\N	\N	\N
+179	2020-01-24 04:41:23.070606+00	2020-01-24 04:41:23.070611+00	\N	\N	157	\N	\N	\N
+180	2020-01-24 04:41:23.070631+00	2020-01-24 04:41:23.070636+00	\N	\N	158	\N	\N	\N
+181	2020-01-24 04:41:23.070656+00	2020-01-24 04:41:23.07066+00	\N	\N	159	\N	\N	\N
+182	2020-01-24 04:41:23.07068+00	2020-01-24 04:41:23.070685+00	\N	\N	160	\N	\N	\N
+183	2020-01-24 04:41:23.070705+00	2020-01-24 04:41:23.07071+00	\N	\N	161	\N	\N	\N
+184	2020-01-24 04:41:23.070729+00	2020-01-24 04:41:23.070734+00	\N	\N	162	\N	\N	\N
+185	2020-01-24 04:41:23.070754+00	2020-01-24 04:41:23.070759+00	\N	\N	163	\N	\N	\N
+186	2020-01-24 04:41:23.070778+00	2020-01-24 04:41:23.070783+00	\N	\N	164	\N	\N	\N
+187	2020-01-24 04:41:23.070803+00	2020-01-24 04:41:23.070808+00	\N	\N	165	\N	\N	\N
+188	2020-01-24 04:41:23.071011+00	2020-01-24 04:41:23.071019+00	\N	\N	166	\N	\N	\N
+189	2020-01-24 04:41:23.071042+00	2020-01-24 04:41:23.071047+00	\N	\N	167	\N	\N	\N
+190	2020-01-24 04:41:23.071068+00	2020-01-24 04:41:23.071073+00	\N	\N	168	\N	\N	\N
+191	2020-01-24 04:41:23.071092+00	2020-01-24 04:41:23.071097+00	\N	\N	169	\N	\N	\N
+192	2020-01-24 04:41:23.071117+00	2020-01-24 04:41:23.071122+00	\N	\N	170	\N	\N	\N
+193	2020-01-24 04:41:23.071141+00	2020-01-24 04:41:23.071146+00	\N	\N	171	\N	\N	\N
+194	2020-01-24 04:41:23.071173+00	2020-01-24 04:41:23.07118+00	\N	\N	172	\N	\N	\N
+195	2020-01-24 04:41:23.071201+00	2020-01-24 04:41:23.071206+00	\N	\N	173	\N	\N	\N
+196	2020-01-24 04:41:23.071226+00	2020-01-24 04:41:23.071231+00	\N	\N	174	\N	\N	\N
+197	2020-01-24 04:41:23.071255+00	2020-01-24 04:41:23.07126+00	\N	\N	175	\N	\N	\N
+198	2020-01-24 04:41:23.07128+00	2020-01-24 04:41:23.071285+00	\N	\N	176	\N	\N	\N
+199	2020-01-24 04:41:23.071305+00	2020-01-24 04:41:23.07131+00	\N	\N	177	\N	\N	\N
+200	2020-01-24 04:41:23.07133+00	2020-01-24 04:41:23.071334+00	\N	\N	178	\N	\N	\N
+201	2020-01-24 04:41:23.071354+00	2020-01-24 04:41:23.071359+00	\N	\N	179	\N	\N	\N
+202	2020-01-24 04:41:23.071379+00	2020-01-24 04:41:23.071383+00	\N	\N	180	\N	\N	\N
+203	2020-01-24 04:41:23.093512+00	2020-01-24 04:41:23.093533+00	\N	\N	181	\N	\N	\N
+204	2020-01-24 04:41:23.093569+00	2020-01-24 04:41:23.093575+00	\N	\N	182	\N	\N	\N
+205	2020-01-24 04:41:23.093596+00	2020-01-24 04:41:23.093601+00	\N	\N	183	\N	\N	\N
+206	2020-01-24 04:41:23.093621+00	2020-01-24 04:41:23.093626+00	\N	\N	184	\N	\N	\N
+207	2020-01-24 04:41:23.093646+00	2020-01-24 04:41:23.093651+00	\N	\N	185	\N	\N	\N
+208	2020-01-24 04:41:23.09367+00	2020-01-24 04:41:23.093675+00	\N	\N	186	\N	\N	\N
+209	2020-01-24 04:41:23.093695+00	2020-01-24 04:41:23.0937+00	\N	\N	187	\N	\N	\N
+210	2020-01-24 04:41:23.09372+00	2020-01-24 04:41:23.093725+00	\N	\N	188	\N	\N	\N
+211	2020-01-24 04:41:23.093744+00	2020-01-24 04:41:23.093756+00	\N	\N	189	\N	\N	\N
+212	2020-01-24 04:41:23.093781+00	2020-01-24 04:41:23.093786+00	\N	\N	190	\N	\N	\N
+213	2020-01-24 04:41:23.093806+00	2020-01-24 04:41:23.093811+00	\N	\N	191	\N	\N	\N
+214	2020-01-24 04:41:23.09383+00	2020-01-24 04:41:23.093835+00	\N	\N	192	\N	\N	\N
+215	2020-01-24 04:41:23.093855+00	2020-01-24 04:41:23.093859+00	\N	\N	193	\N	\N	\N
+216	2020-01-24 04:41:23.093879+00	2020-01-24 04:41:23.093884+00	\N	\N	194	\N	\N	\N
+217	2020-01-24 04:41:23.093903+00	2020-01-24 04:41:23.093908+00	\N	\N	195	\N	\N	\N
+218	2020-01-24 04:41:23.093927+00	2020-01-24 04:41:23.093932+00	\N	\N	196	\N	\N	\N
+219	2020-01-24 04:41:23.093952+00	2020-01-24 04:41:23.093957+00	\N	\N	197	\N	\N	\N
+220	2020-01-24 04:41:23.093987+00	2020-01-24 04:41:23.093992+00	\N	\N	198	\N	\N	\N
+221	2020-01-24 04:41:23.094011+00	2020-01-24 04:41:23.094016+00	\N	\N	199	\N	\N	\N
+222	2020-01-24 04:41:23.094036+00	2020-01-24 04:41:23.09404+00	\N	\N	200	\N	\N	\N
+223	2020-01-24 04:41:23.09406+00	2020-01-24 04:41:23.094065+00	\N	\N	201	\N	\N	\N
+224	2020-01-24 04:41:23.094085+00	2020-01-24 04:41:23.09409+00	\N	\N	202	\N	\N	\N
+225	2020-01-24 04:41:23.094109+00	2020-01-24 04:41:23.094114+00	\N	\N	203	\N	\N	\N
+226	2020-01-24 04:41:23.094134+00	2020-01-24 04:41:23.094139+00	\N	\N	204	\N	\N	\N
+227	2020-01-24 04:41:23.094158+00	2020-01-24 04:41:23.094163+00	\N	\N	205	\N	\N	\N
+228	2020-01-24 04:41:23.094183+00	2020-01-24 04:41:23.094187+00	\N	\N	206	\N	\N	\N
+229	2020-01-24 04:41:23.094207+00	2020-01-24 04:41:23.094212+00	\N	\N	207	\N	\N	\N
+230	2020-01-24 04:41:23.094231+00	2020-01-24 04:41:23.094244+00	\N	\N	208	\N	\N	\N
+231	2020-01-24 04:41:23.094265+00	2020-01-24 04:41:23.09427+00	\N	\N	209	\N	\N	\N
+232	2020-01-24 04:41:23.094289+00	2020-01-24 04:41:23.094294+00	\N	\N	210	\N	\N	\N
+233	2020-01-24 04:41:23.094314+00	2020-01-24 04:41:23.094318+00	\N	\N	211	\N	\N	\N
+234	2020-01-24 04:41:23.094338+00	2020-01-24 04:41:23.094343+00	\N	\N	212	\N	\N	\N
+235	2020-01-24 04:41:23.094363+00	2020-01-24 04:41:23.094367+00	\N	\N	213	\N	\N	\N
+236	2020-01-24 04:41:23.094387+00	2020-01-24 04:41:23.094392+00	\N	\N	214	\N	\N	\N
+237	2020-01-24 04:41:23.094412+00	2020-01-24 04:41:23.094416+00	\N	\N	215	\N	\N	\N
+238	2020-01-24 04:41:23.094436+00	2020-01-24 04:41:23.09444+00	\N	\N	216	\N	\N	\N
+239	2020-01-24 04:41:23.094466+00	2020-01-24 04:41:23.094473+00	\N	\N	217	\N	\N	\N
+240	2020-01-24 04:41:23.094494+00	2020-01-24 04:41:23.094499+00	\N	\N	218	\N	\N	\N
+241	2020-01-24 04:41:23.094519+00	2020-01-24 04:41:23.094524+00	\N	\N	219	\N	\N	\N
+242	2020-01-24 04:41:23.094543+00	2020-01-24 04:41:23.094548+00	\N	\N	220	\N	\N	\N
+243	2020-01-24 04:41:23.094568+00	2020-01-24 04:41:23.094572+00	\N	\N	221	\N	\N	\N
+244	2020-01-24 04:41:23.094592+00	2020-01-24 04:41:23.094597+00	\N	\N	222	\N	\N	\N
+245	2020-01-24 04:41:23.094617+00	2020-01-24 04:41:23.094621+00	\N	\N	223	\N	\N	\N
+246	2020-01-24 04:41:23.094641+00	2020-01-24 04:41:23.094646+00	\N	\N	224	\N	\N	\N
+247	2020-01-24 04:41:23.094666+00	2020-01-24 04:41:23.094671+00	\N	\N	225	\N	\N	\N
+248	2020-01-24 04:41:23.117948+00	2020-01-24 04:41:23.117968+00	\N	\N	226	\N	\N	\N
+249	2020-01-24 04:41:23.118004+00	2020-01-24 04:41:23.118009+00	\N	\N	227	\N	\N	\N
+250	2020-01-24 04:41:23.118031+00	2020-01-24 04:41:23.118035+00	\N	\N	228	\N	\N	\N
+251	2020-01-24 04:41:23.118055+00	2020-01-24 04:41:23.11806+00	\N	\N	229	\N	\N	\N
+252	2020-01-24 04:41:23.11808+00	2020-01-24 04:41:23.118084+00	\N	\N	230	\N	\N	\N
+253	2020-01-24 04:41:23.118104+00	2020-01-24 04:41:23.118109+00	\N	\N	231	\N	\N	\N
+254	2020-01-24 04:41:23.118129+00	2020-01-24 04:41:23.118134+00	\N	\N	232	\N	\N	\N
+255	2020-01-24 04:41:23.118154+00	2020-01-24 04:41:23.118159+00	\N	\N	233	\N	\N	\N
+256	2020-01-24 04:41:23.118178+00	2020-01-24 04:41:23.118183+00	\N	\N	234	\N	\N	\N
+257	2020-01-24 04:41:23.118202+00	2020-01-24 04:41:23.118207+00	\N	\N	235	\N	\N	\N
+258	2020-01-24 04:41:23.118227+00	2020-01-24 04:41:23.118232+00	\N	\N	236	\N	\N	\N
+259	2020-01-24 04:41:23.118251+00	2020-01-24 04:41:23.118256+00	\N	\N	237	\N	\N	\N
+260	2020-01-24 04:41:23.118275+00	2020-01-24 04:41:23.11828+00	\N	\N	238	\N	\N	\N
+261	2020-01-24 04:41:23.1183+00	2020-01-24 04:41:23.118305+00	\N	\N	239	\N	\N	\N
+262	2020-01-24 04:41:23.118324+00	2020-01-24 04:41:23.118329+00	\N	\N	240	\N	\N	\N
+263	2020-01-24 04:41:23.118348+00	2020-01-24 04:41:23.118353+00	\N	\N	241	\N	\N	\N
+264	2020-01-24 04:41:23.118372+00	2020-01-24 04:41:23.118377+00	\N	\N	242	\N	\N	\N
+265	2020-01-24 04:41:23.118397+00	2020-01-24 04:41:23.118402+00	\N	\N	243	\N	\N	\N
+266	2020-01-24 04:41:23.118421+00	2020-01-24 04:41:23.118426+00	\N	\N	244	\N	\N	\N
+267	2020-01-24 04:41:23.118445+00	2020-01-24 04:41:23.11845+00	\N	\N	245	\N	\N	\N
+268	2020-01-24 04:41:23.11847+00	2020-01-24 04:41:23.118475+00	\N	\N	246	\N	\N	\N
+269	2020-01-24 04:41:23.118495+00	2020-01-24 04:41:23.118499+00	\N	\N	247	\N	\N	\N
+270	2020-01-24 04:41:23.118519+00	2020-01-24 04:41:23.118524+00	\N	\N	248	\N	\N	\N
+271	2020-01-24 04:41:23.118543+00	2020-01-24 04:41:23.118548+00	\N	\N	249	\N	\N	\N
+272	2020-01-24 04:41:23.118568+00	2020-01-24 04:41:23.118572+00	\N	\N	250	\N	\N	\N
+273	2020-01-24 04:41:23.118592+00	2020-01-24 04:41:23.118597+00	\N	\N	251	\N	\N	\N
+274	2020-01-24 04:41:23.118617+00	2020-01-24 04:41:23.118622+00	\N	\N	252	\N	\N	\N
+275	2020-01-24 04:41:23.118642+00	2020-01-24 04:41:23.118647+00	\N	\N	253	\N	\N	\N
+276	2020-01-24 04:41:23.118676+00	2020-01-24 04:41:23.118681+00	\N	\N	254	\N	\N	\N
+277	2020-01-24 04:41:23.1187+00	2020-01-24 04:41:23.118705+00	\N	\N	255	\N	\N	\N
+278	2020-01-24 04:41:23.118725+00	2020-01-24 04:41:23.11873+00	\N	\N	256	\N	\N	\N
+279	2020-01-24 04:41:23.118749+00	2020-01-24 04:41:23.118754+00	\N	\N	257	\N	\N	\N
+280	2020-01-24 04:41:23.118774+00	2020-01-24 04:41:23.118778+00	\N	\N	258	\N	\N	\N
+281	2020-01-24 04:41:23.118798+00	2020-01-24 04:41:23.118803+00	\N	\N	259	\N	\N	\N
+282	2020-01-24 04:41:23.118822+00	2020-01-24 04:41:23.118827+00	\N	\N	260	\N	\N	\N
+283	2020-01-24 04:41:23.118847+00	2020-01-24 04:41:23.118851+00	\N	\N	261	\N	\N	\N
+284	2020-01-24 04:41:23.118888+00	2020-01-24 04:41:23.118895+00	\N	\N	262	\N	\N	\N
+285	2020-01-24 04:41:23.118937+00	2020-01-24 04:41:23.118944+00	\N	\N	263	\N	\N	\N
+286	2020-01-24 04:41:23.119223+00	2020-01-24 04:41:23.119232+00	\N	\N	264	\N	\N	\N
+287	2020-01-24 04:41:23.119267+00	2020-01-24 04:41:23.119274+00	\N	\N	265	\N	\N	\N
+288	2020-01-24 04:41:23.119306+00	2020-01-24 04:41:23.119313+00	\N	\N	266	\N	\N	\N
+289	2020-01-24 04:41:23.119345+00	2020-01-24 04:41:23.119352+00	\N	\N	267	\N	\N	\N
+290	2020-01-24 04:41:23.119383+00	2020-01-24 04:41:23.11939+00	\N	\N	268	\N	\N	\N
+291	2020-01-24 04:41:23.119422+00	2020-01-24 04:41:23.119429+00	\N	\N	269	\N	\N	\N
+292	2020-01-24 04:41:23.11946+00	2020-01-24 04:41:23.119467+00	\N	\N	270	\N	\N	\N
+293	2020-01-24 04:41:23.137862+00	2020-01-24 04:41:23.137888+00	\N	12	\N	\N	\N	\N
+294	2020-01-24 04:41:23.137922+00	2020-01-24 04:41:23.137928+00	\N	13	\N	\N	\N	\N
+295	2020-01-24 04:41:23.137948+00	2020-01-24 04:41:23.137953+00	\N	14	\N	\N	\N	\N
+296	2020-01-24 04:41:23.137973+00	2020-01-24 04:41:23.137978+00	\N	15	\N	\N	\N	\N
+297	2020-01-24 04:41:23.137997+00	2020-01-24 04:41:23.138002+00	\N	16	\N	\N	\N	\N
+298	2020-01-24 04:41:23.138021+00	2020-01-24 04:41:23.138026+00	\N	17	\N	\N	\N	\N
+299	2020-01-24 04:41:23.138046+00	2020-01-24 04:41:23.138051+00	\N	18	\N	\N	\N	\N
+300	2020-01-24 04:41:23.13807+00	2020-01-24 04:41:23.138075+00	\N	19	\N	\N	\N	\N
+301	2020-01-24 04:41:23.138095+00	2020-01-24 04:41:23.1381+00	\N	20	\N	\N	\N	\N
+302	2020-01-24 04:41:23.138119+00	2020-01-24 04:41:23.138124+00	\N	21	\N	\N	\N	\N
+303	2020-01-24 04:41:23.155326+00	2020-01-24 04:41:23.155345+00	1	\N	\N	\N	\N	\N
+304	2020-01-24 04:41:23.155381+00	2020-01-24 04:41:23.155387+00	2	\N	\N	\N	\N	\N
+305	2020-01-24 04:41:23.155408+00	2020-01-24 04:41:23.155413+00	3	\N	\N	\N	\N	\N
+306	2020-01-24 04:41:23.155432+00	2020-01-24 04:41:23.155437+00	4	\N	\N	\N	\N	\N
+307	2020-01-24 04:41:23.174955+00	2020-01-24 04:41:23.174985+00	5	\N	\N	\N	\N	\N
+308	2020-01-24 04:41:23.17502+00	2020-01-24 04:41:23.175025+00	6	\N	\N	\N	\N	\N
+309	2020-01-24 04:41:23.175057+00	2020-01-24 04:41:23.175062+00	7	\N	\N	\N	\N	\N
+310	2020-01-24 04:41:23.175083+00	2020-01-24 04:41:23.175088+00	8	\N	\N	\N	\N	\N
+311	2020-01-24 04:41:23.188936+00	2020-01-24 04:41:23.188953+00	9	\N	\N	\N	\N	\N
+312	2020-01-24 04:41:23.188986+00	2020-01-24 04:41:23.188991+00	10	\N	\N	\N	\N	\N
+313	2020-01-24 04:41:23.189012+00	2020-01-24 04:41:23.189017+00	11	\N	\N	\N	\N	\N
+314	2020-01-24 04:41:23.189037+00	2020-01-24 04:41:23.189041+00	12	\N	\N	\N	\N	\N
+315	2020-01-24 04:41:23.20184+00	2020-01-24 04:41:23.201856+00	13	\N	\N	\N	\N	\N
+316	2020-01-24 04:41:23.201888+00	2020-01-24 04:41:23.201894+00	14	\N	\N	\N	\N	\N
+317	2020-01-24 04:41:23.201915+00	2020-01-24 04:41:23.20192+00	15	\N	\N	\N	\N	\N
+318	2020-01-24 04:41:23.20194+00	2020-01-24 04:41:23.201945+00	16	\N	\N	\N	\N	\N
+319	2020-01-24 04:41:23.212883+00	2020-01-24 04:41:23.212899+00	17	\N	\N	\N	\N	\N
+320	2020-01-24 04:41:23.212931+00	2020-01-24 04:41:23.212937+00	18	\N	\N	\N	\N	\N
+321	2020-01-24 04:41:23.212958+00	2020-01-24 04:41:23.212963+00	19	\N	\N	\N	\N	\N
+322	2020-01-24 04:41:23.212983+00	2020-01-24 04:41:23.212988+00	20	\N	\N	\N	\N	\N
+323	2020-01-24 04:41:23.257846+00	2020-01-24 04:41:23.257866+00	21	\N	\N	\N	\N	\N
+324	2020-01-24 04:41:23.2579+00	2020-01-24 04:41:23.257906+00	22	\N	\N	\N	\N	\N
+325	2020-01-24 04:41:23.257927+00	2020-01-24 04:41:23.257932+00	23	\N	\N	\N	\N	\N
+326	2020-01-24 04:41:23.257952+00	2020-01-24 04:41:23.257956+00	24	\N	\N	\N	\N	\N
+327	2020-01-24 04:41:23.265312+00	2020-01-24 04:41:23.265327+00	25	\N	\N	\N	\N	\N
+328	2020-01-24 04:41:23.265361+00	2020-01-24 04:41:23.265367+00	26	\N	\N	\N	\N	\N
+329	2020-01-24 04:41:23.265388+00	2020-01-24 04:41:23.265393+00	27	\N	\N	\N	\N	\N
+330	2020-01-24 04:41:23.265412+00	2020-01-24 04:41:23.265417+00	28	\N	\N	\N	\N	\N
+331	2020-01-24 04:41:23.272423+00	2020-01-24 04:41:23.272437+00	29	\N	\N	\N	\N	\N
+332	2020-01-24 04:41:23.272469+00	2020-01-24 04:41:23.272474+00	30	\N	\N	\N	\N	\N
+333	2020-01-24 04:41:23.272495+00	2020-01-24 04:41:23.2725+00	31	\N	\N	\N	\N	\N
+334	2020-01-24 04:41:23.272519+00	2020-01-24 04:41:23.272524+00	32	\N	\N	\N	\N	\N
+335	2020-01-24 04:41:23.279315+00	2020-01-24 04:41:23.279328+00	33	\N	\N	\N	\N	\N
+336	2020-01-24 04:41:23.279359+00	2020-01-24 04:41:23.279365+00	34	\N	\N	\N	\N	\N
+337	2020-01-24 04:41:23.279386+00	2020-01-24 04:41:23.279391+00	35	\N	\N	\N	\N	\N
+338	2020-01-24 04:41:23.27941+00	2020-01-24 04:41:23.279415+00	36	\N	\N	\N	\N	\N
+339	2020-01-24 04:41:23.289466+00	2020-01-24 04:41:23.289481+00	37	\N	\N	\N	\N	\N
+340	2020-01-24 04:41:23.289514+00	2020-01-24 04:41:23.28952+00	38	\N	\N	\N	\N	\N
+341	2020-01-24 04:41:23.304349+00	2020-01-24 04:41:23.304365+00	\N	22	\N	\N	\N	\N
+342	2020-01-24 04:41:23.304399+00	2020-01-24 04:41:23.304405+00	\N	23	\N	\N	\N	\N
+343	2020-01-24 04:41:23.304426+00	2020-01-24 04:41:23.304431+00	\N	24	\N	\N	\N	\N
+344	2020-01-24 04:41:23.304451+00	2020-01-24 04:41:23.304456+00	\N	25	\N	\N	\N	\N
+345	2020-01-24 04:41:23.318248+00	2020-01-24 04:41:23.318265+00	39	\N	\N	\N	\N	\N
+346	2020-01-24 04:41:23.318299+00	2020-01-24 04:41:23.318305+00	40	\N	\N	\N	\N	\N
+347	2020-01-24 04:41:23.318326+00	2020-01-24 04:41:23.318331+00	41	\N	\N	\N	\N	\N
+348	2020-01-24 04:41:23.31835+00	2020-01-24 04:41:23.318355+00	42	\N	\N	\N	\N	\N
+349	2020-01-24 04:41:23.330047+00	2020-01-24 04:41:23.330064+00	43	\N	\N	\N	\N	\N
+350	2020-01-24 04:41:23.330097+00	2020-01-24 04:41:23.330102+00	44	\N	\N	\N	\N	\N
+351	2020-01-24 04:41:23.330123+00	2020-01-24 04:41:23.330128+00	45	\N	\N	\N	\N	\N
+352	2020-01-24 04:41:23.330149+00	2020-01-24 04:41:23.330154+00	46	\N	\N	\N	\N	\N
+353	2020-01-24 04:41:23.341014+00	2020-01-24 04:41:23.341029+00	47	\N	\N	\N	\N	\N
+354	2020-01-24 04:41:23.341062+00	2020-01-24 04:41:23.341068+00	48	\N	\N	\N	\N	\N
+355	2020-01-24 04:41:23.341089+00	2020-01-24 04:41:23.341094+00	49	\N	\N	\N	\N	\N
+356	2020-01-24 04:41:23.341114+00	2020-01-24 04:41:23.341118+00	50	\N	\N	\N	\N	\N
+357	2020-01-24 04:41:23.354161+00	2020-01-24 04:41:23.35418+00	51	\N	\N	\N	\N	\N
+358	2020-01-24 04:41:23.354215+00	2020-01-24 04:41:23.35422+00	52	\N	\N	\N	\N	\N
+359	2020-01-24 04:41:23.354242+00	2020-01-24 04:41:23.354247+00	53	\N	\N	\N	\N	\N
+360	2020-01-24 04:41:23.354267+00	2020-01-24 04:41:23.354272+00	54	\N	\N	\N	\N	\N
+361	2020-01-24 04:41:23.368952+00	2020-01-24 04:41:23.36897+00	\N	26	\N	\N	\N	\N
+362	2020-01-24 04:41:23.369005+00	2020-01-24 04:41:23.36901+00	\N	27	\N	\N	\N	\N
+363	2020-01-24 04:41:23.369031+00	2020-01-24 04:41:23.369036+00	\N	28	\N	\N	\N	\N
+364	2020-01-24 04:41:23.369056+00	2020-01-24 04:41:23.369061+00	\N	29	\N	\N	\N	\N
+365	2020-01-24 04:41:23.378013+00	2020-01-24 04:41:23.378027+00	55	\N	\N	\N	\N	\N
+366	2020-01-24 04:41:23.378059+00	2020-01-24 04:41:23.378064+00	56	\N	\N	\N	\N	\N
+367	2020-01-24 04:41:23.378085+00	2020-01-24 04:41:23.37809+00	57	\N	\N	\N	\N	\N
+368	2020-01-24 04:41:23.378111+00	2020-01-24 04:41:23.378116+00	58	\N	\N	\N	\N	\N
+369	2020-01-24 04:41:23.384895+00	2020-01-24 04:41:23.384907+00	59	\N	\N	\N	\N	\N
+370	2020-01-24 04:41:23.384939+00	2020-01-24 04:41:23.384945+00	60	\N	\N	\N	\N	\N
+371	2020-01-24 04:41:23.384965+00	2020-01-24 04:41:23.38497+00	61	\N	\N	\N	\N	\N
+372	2020-01-24 04:41:23.38499+00	2020-01-24 04:41:23.384995+00	62	\N	\N	\N	\N	\N
+373	2020-01-24 04:41:23.398695+00	2020-01-24 04:41:23.398712+00	63	\N	\N	\N	\N	\N
+374	2020-01-24 04:41:23.398745+00	2020-01-24 04:41:23.398751+00	64	\N	\N	\N	\N	\N
+375	2020-01-24 04:41:23.398772+00	2020-01-24 04:41:23.398777+00	65	\N	\N	\N	\N	\N
+376	2020-01-24 04:41:23.398796+00	2020-01-24 04:41:23.398801+00	66	\N	\N	\N	\N	\N
+377	2020-01-24 04:41:23.411692+00	2020-01-24 04:41:23.41171+00	67	\N	\N	\N	\N	\N
+378	2020-01-24 04:41:23.411744+00	2020-01-24 04:41:23.41175+00	68	\N	\N	\N	\N	\N
+379	2020-01-24 04:41:23.411771+00	2020-01-24 04:41:23.411776+00	69	\N	\N	\N	\N	\N
+380	2020-01-24 04:41:23.411796+00	2020-01-24 04:41:23.411801+00	70	\N	\N	\N	\N	\N
+381	2020-01-24 04:41:23.431223+00	2020-01-24 04:41:23.431243+00	\N	30	\N	\N	\N	\N
+382	2020-01-24 04:41:23.431279+00	2020-01-24 04:41:23.431285+00	\N	31	\N	\N	\N	\N
+383	2020-01-24 04:41:23.431306+00	2020-01-24 04:41:23.431311+00	\N	32	\N	\N	\N	\N
+384	2020-01-24 04:41:23.431331+00	2020-01-24 04:41:23.431336+00	\N	33	\N	\N	\N	\N
+385	2020-01-24 04:41:23.45078+00	2020-01-24 04:41:23.450799+00	71	\N	\N	\N	\N	\N
+386	2020-01-24 04:41:23.450833+00	2020-01-24 04:41:23.450839+00	72	\N	\N	\N	\N	\N
+387	2020-01-24 04:41:23.450864+00	2020-01-24 04:41:23.450869+00	73	\N	\N	\N	\N	\N
+388	2020-01-24 04:41:23.450889+00	2020-01-24 04:41:23.450949+00	74	\N	\N	\N	\N	\N
+389	2020-01-24 04:41:23.469371+00	2020-01-24 04:41:23.46939+00	75	\N	\N	\N	\N	\N
+390	2020-01-24 04:41:23.469586+00	2020-01-24 04:41:23.469594+00	76	\N	\N	\N	\N	\N
+391	2020-01-24 04:41:23.469633+00	2020-01-24 04:41:23.46964+00	77	\N	\N	\N	\N	\N
+392	2020-01-24 04:41:23.469662+00	2020-01-24 04:41:23.469667+00	78	\N	\N	\N	\N	\N
+393	2020-01-24 04:41:23.486515+00	2020-01-24 04:41:23.486534+00	79	\N	\N	\N	\N	\N
+394	2020-01-24 04:41:23.486568+00	2020-01-24 04:41:23.486573+00	80	\N	\N	\N	\N	\N
+395	2020-01-24 04:41:23.486594+00	2020-01-24 04:41:23.486599+00	81	\N	\N	\N	\N	\N
+396	2020-01-24 04:41:23.486618+00	2020-01-24 04:41:23.486623+00	82	\N	\N	\N	\N	\N
+397	2020-01-24 04:41:23.502611+00	2020-01-24 04:41:23.502629+00	83	\N	\N	\N	\N	\N
+398	2020-01-24 04:41:23.502673+00	2020-01-24 04:41:23.502679+00	84	\N	\N	\N	\N	\N
+399	2020-01-24 04:41:23.502757+00	2020-01-24 04:41:23.502763+00	85	\N	\N	\N	\N	\N
+400	2020-01-24 04:41:23.502784+00	2020-01-24 04:41:23.50279+00	86	\N	\N	\N	\N	\N
+401	2020-01-24 04:41:23.513117+00	2020-01-24 04:41:23.513132+00	\N	34	\N	\N	\N	\N
+402	2020-01-24 04:41:23.513165+00	2020-01-24 04:41:23.513171+00	\N	35	\N	\N	\N	\N
+403	2020-01-24 04:41:23.513192+00	2020-01-24 04:41:23.513197+00	\N	36	\N	\N	\N	\N
+404	2020-01-24 04:41:23.513217+00	2020-01-24 04:41:23.513222+00	\N	37	\N	\N	\N	\N
+405	2020-01-24 04:41:23.522618+00	2020-01-24 04:41:23.522632+00	87	\N	\N	\N	\N	\N
+406	2020-01-24 04:41:23.522663+00	2020-01-24 04:41:23.522669+00	88	\N	\N	\N	\N	\N
+407	2020-01-24 04:41:23.52269+00	2020-01-24 04:41:23.522695+00	89	\N	\N	\N	\N	\N
+408	2020-01-24 04:41:23.522714+00	2020-01-24 04:41:23.522719+00	90	\N	\N	\N	\N	\N
+409	2020-01-24 04:41:23.531249+00	2020-01-24 04:41:23.531263+00	91	\N	\N	\N	\N	\N
+410	2020-01-24 04:41:23.531295+00	2020-01-24 04:41:23.5313+00	92	\N	\N	\N	\N	\N
+411	2020-01-24 04:41:23.531321+00	2020-01-24 04:41:23.531326+00	93	\N	\N	\N	\N	\N
+412	2020-01-24 04:41:23.531346+00	2020-01-24 04:41:23.531351+00	94	\N	\N	\N	\N	\N
+413	2020-01-24 04:41:23.539911+00	2020-01-24 04:41:23.539928+00	95	\N	\N	\N	\N	\N
+414	2020-01-24 04:41:23.539961+00	2020-01-24 04:41:23.539966+00	96	\N	\N	\N	\N	\N
+415	2020-01-24 04:41:23.539988+00	2020-01-24 04:41:23.539993+00	97	\N	\N	\N	\N	\N
+416	2020-01-24 04:41:23.540013+00	2020-01-24 04:41:23.540018+00	98	\N	\N	\N	\N	\N
+417	2020-01-24 04:41:23.551338+00	2020-01-24 04:41:23.551361+00	99	\N	\N	\N	\N	\N
+418	2020-01-24 04:41:23.55146+00	2020-01-24 04:41:23.551467+00	100	\N	\N	\N	\N	\N
+419	2020-01-24 04:41:23.551488+00	2020-01-24 04:41:23.551493+00	101	\N	\N	\N	\N	\N
+420	2020-01-24 04:41:23.551513+00	2020-01-24 04:41:23.551518+00	102	\N	\N	\N	\N	\N
+421	2020-01-24 04:41:23.567035+00	2020-01-24 04:41:23.567053+00	\N	38	\N	\N	\N	\N
+422	2020-01-24 04:41:23.581916+00	2020-01-24 04:41:23.581934+00	103	\N	\N	\N	\N	\N
+423	2020-01-24 04:41:23.581968+00	2020-01-24 04:41:23.581974+00	104	\N	\N	\N	\N	\N
+424	2020-01-24 04:41:23.582007+00	2020-01-24 04:41:23.582012+00	105	\N	\N	\N	\N	\N
+425	2020-01-24 04:41:23.582032+00	2020-01-24 04:41:23.582037+00	106	\N	\N	\N	\N	\N
 \.
 
 
@@ -3197,156 +2648,112 @@ COPY locations_location (id, created_at, modified_at, "pigletsGroupCell_id", sec
 --
 
 COPY locations_pigletsgroupcell (id, created_at, modified_at, number, section_id, workshop_id) FROM stdin;
-1	2019-10-17 13:28:57.462111+00	2019-10-17 13:28:57.462129+00	1	12	4
-2	2019-10-17 13:28:57.462166+00	2019-10-17 13:28:57.462175+00	2	12	4
-3	2019-10-17 13:28:57.4622+00	2019-10-17 13:28:57.462208+00	3	12	4
-4	2019-10-17 13:28:57.462232+00	2019-10-17 13:28:57.462239+00	4	12	4
-5	2019-10-17 13:28:57.462262+00	2019-10-17 13:28:57.462269+00	5	12	4
-6	2019-10-17 13:28:57.462292+00	2019-10-17 13:28:57.4623+00	6	12	4
-7	2019-10-17 13:28:57.474678+00	2019-10-17 13:28:57.474696+00	1	13	4
-8	2019-10-17 13:28:57.474733+00	2019-10-17 13:28:57.474742+00	2	13	4
-9	2019-10-17 13:28:57.474766+00	2019-10-17 13:28:57.474773+00	3	13	4
-10	2019-10-17 13:28:57.474796+00	2019-10-17 13:28:57.474804+00	4	13	4
-11	2019-10-17 13:28:57.474826+00	2019-10-17 13:28:57.474834+00	5	13	4
-12	2019-10-17 13:28:57.474856+00	2019-10-17 13:28:57.474863+00	6	13	4
-13	2019-10-17 13:28:57.480841+00	2019-10-17 13:28:57.480857+00	1	14	4
-14	2019-10-17 13:28:57.480894+00	2019-10-17 13:28:57.480903+00	2	14	4
-15	2019-10-17 13:28:57.480927+00	2019-10-17 13:28:57.480934+00	3	14	4
-16	2019-10-17 13:28:57.480957+00	2019-10-17 13:28:57.480965+00	4	14	4
-17	2019-10-17 13:28:57.480987+00	2019-10-17 13:28:57.480995+00	5	14	4
-18	2019-10-17 13:28:57.481017+00	2019-10-17 13:28:57.481024+00	6	14	4
-19	2019-10-17 13:28:57.48723+00	2019-10-17 13:28:57.487246+00	1	15	4
-20	2019-10-17 13:28:57.48731+00	2019-10-17 13:28:57.48732+00	2	15	4
-21	2019-10-17 13:28:57.487344+00	2019-10-17 13:28:57.487352+00	3	15	4
-22	2019-10-17 13:28:57.487374+00	2019-10-17 13:28:57.487382+00	4	15	4
-23	2019-10-17 13:28:57.487404+00	2019-10-17 13:28:57.487412+00	5	15	4
-24	2019-10-17 13:28:57.487434+00	2019-10-17 13:28:57.487442+00	6	15	4
-25	2019-10-17 13:28:57.494587+00	2019-10-17 13:28:57.494604+00	1	16	4
-26	2019-10-17 13:28:57.494641+00	2019-10-17 13:28:57.49465+00	2	16	4
-27	2019-10-17 13:28:57.494674+00	2019-10-17 13:28:57.494682+00	3	16	4
-28	2019-10-17 13:28:57.494706+00	2019-10-17 13:28:57.494713+00	4	16	4
-29	2019-10-17 13:28:57.494736+00	2019-10-17 13:28:57.494743+00	5	16	4
-30	2019-10-17 13:28:57.494766+00	2019-10-17 13:28:57.494773+00	6	16	4
-31	2019-10-17 13:28:57.507452+00	2019-10-17 13:28:57.50747+00	1	17	6
-32	2019-10-17 13:28:57.507506+00	2019-10-17 13:28:57.507515+00	2	17	6
-33	2019-10-17 13:28:57.507539+00	2019-10-17 13:28:57.507547+00	3	17	6
-34	2019-10-17 13:28:57.50757+00	2019-10-17 13:28:57.507577+00	4	17	6
-35	2019-10-17 13:28:57.5076+00	2019-10-17 13:28:57.507607+00	5	17	6
-36	2019-10-17 13:28:57.50763+00	2019-10-17 13:28:57.507637+00	6	17	6
-37	2019-10-17 13:28:57.516845+00	2019-10-17 13:28:57.516862+00	1	18	6
-38	2019-10-17 13:28:57.5169+00	2019-10-17 13:28:57.516909+00	2	18	6
-39	2019-10-17 13:28:57.516933+00	2019-10-17 13:28:57.516941+00	3	18	6
-40	2019-10-17 13:28:57.516964+00	2019-10-17 13:28:57.516971+00	4	18	6
-41	2019-10-17 13:28:57.516994+00	2019-10-17 13:28:57.517002+00	5	18	6
-42	2019-10-17 13:28:57.517038+00	2019-10-17 13:28:57.517047+00	6	18	6
-43	2019-10-17 13:28:57.527994+00	2019-10-17 13:28:57.528013+00	1	19	6
-44	2019-10-17 13:28:57.528053+00	2019-10-17 13:28:57.528064+00	2	19	6
-45	2019-10-17 13:28:57.528088+00	2019-10-17 13:28:57.528096+00	3	19	6
-46	2019-10-17 13:28:57.528119+00	2019-10-17 13:28:57.528126+00	4	19	6
-47	2019-10-17 13:28:57.528149+00	2019-10-17 13:28:57.528157+00	5	19	6
-48	2019-10-17 13:28:57.528179+00	2019-10-17 13:28:57.528187+00	6	19	6
-49	2019-10-17 13:28:57.53947+00	2019-10-17 13:28:57.539487+00	1	20	6
-50	2019-10-17 13:28:57.539525+00	2019-10-17 13:28:57.539534+00	2	20	6
-51	2019-10-17 13:28:57.539558+00	2019-10-17 13:28:57.539566+00	3	20	6
-52	2019-10-17 13:28:57.539589+00	2019-10-17 13:28:57.539597+00	4	20	6
-53	2019-10-17 13:28:57.53962+00	2019-10-17 13:28:57.539627+00	5	20	6
-54	2019-10-17 13:28:57.53965+00	2019-10-17 13:28:57.539658+00	6	20	6
-55	2019-10-17 13:28:57.577521+00	2019-10-17 13:28:57.577544+00	1	21	6
-56	2019-10-17 13:28:57.577584+00	2019-10-17 13:28:57.577592+00	2	21	6
-57	2019-10-17 13:28:57.577617+00	2019-10-17 13:28:57.577625+00	3	21	6
-58	2019-10-17 13:28:57.577648+00	2019-10-17 13:28:57.577655+00	4	21	6
-59	2019-10-17 13:28:57.577678+00	2019-10-17 13:28:57.577685+00	5	21	6
-60	2019-10-17 13:28:57.577708+00	2019-10-17 13:28:57.577715+00	6	21	6
-61	2019-10-17 13:28:57.597832+00	2019-10-17 13:28:57.597851+00	1	22	7
-62	2019-10-17 13:28:57.597889+00	2019-10-17 13:28:57.597899+00	2	22	7
-63	2019-10-17 13:28:57.597923+00	2019-10-17 13:28:57.597931+00	3	22	7
-64	2019-10-17 13:28:57.597954+00	2019-10-17 13:28:57.597962+00	4	22	7
-65	2019-10-17 13:28:57.597984+00	2019-10-17 13:28:57.597992+00	5	22	7
-66	2019-10-17 13:28:57.598015+00	2019-10-17 13:28:57.598023+00	6	22	7
-67	2019-10-17 13:28:57.608633+00	2019-10-17 13:28:57.608653+00	1	23	7
-68	2019-10-17 13:28:57.608693+00	2019-10-17 13:28:57.608702+00	2	23	7
-69	2019-10-17 13:28:57.608726+00	2019-10-17 13:28:57.608734+00	3	23	7
-70	2019-10-17 13:28:57.608757+00	2019-10-17 13:28:57.608765+00	4	23	7
-71	2019-10-17 13:28:57.608788+00	2019-10-17 13:28:57.608796+00	5	23	7
-72	2019-10-17 13:28:57.608818+00	2019-10-17 13:28:57.608826+00	6	23	7
-73	2019-10-17 13:28:57.62018+00	2019-10-17 13:28:57.620199+00	1	24	7
-74	2019-10-17 13:28:57.620236+00	2019-10-17 13:28:57.620245+00	2	24	7
-75	2019-10-17 13:28:57.62027+00	2019-10-17 13:28:57.620278+00	3	24	7
-76	2019-10-17 13:28:57.620372+00	2019-10-17 13:28:57.620381+00	4	24	7
-77	2019-10-17 13:28:57.620406+00	2019-10-17 13:28:57.620414+00	5	24	7
-78	2019-10-17 13:28:57.620441+00	2019-10-17 13:28:57.62045+00	6	24	7
-79	2019-10-17 13:28:57.628933+00	2019-10-17 13:28:57.62896+00	1	25	7
-80	2019-10-17 13:28:57.629+00	2019-10-17 13:28:57.629009+00	2	25	7
-81	2019-10-17 13:28:57.629034+00	2019-10-17 13:28:57.629042+00	3	25	7
-82	2019-10-17 13:28:57.629065+00	2019-10-17 13:28:57.629072+00	4	25	7
-83	2019-10-17 13:28:57.629094+00	2019-10-17 13:28:57.629102+00	5	25	7
-84	2019-10-17 13:28:57.629124+00	2019-10-17 13:28:57.629148+00	6	25	7
-85	2019-10-17 13:28:57.637832+00	2019-10-17 13:28:57.63785+00	1	26	7
-86	2019-10-17 13:28:57.637887+00	2019-10-17 13:28:57.637897+00	2	26	7
-87	2019-10-17 13:28:57.637922+00	2019-10-17 13:28:57.63793+00	3	26	7
-88	2019-10-17 13:28:57.637953+00	2019-10-17 13:28:57.63796+00	4	26	7
-89	2019-10-17 13:28:57.637983+00	2019-10-17 13:28:57.637991+00	5	26	7
-90	2019-10-17 13:28:57.638014+00	2019-10-17 13:28:57.638021+00	6	26	7
-91	2019-10-17 13:28:57.660248+00	2019-10-17 13:28:57.660266+00	1	27	8
-92	2019-10-17 13:28:57.660318+00	2019-10-17 13:28:57.660329+00	2	27	8
-93	2019-10-17 13:28:57.660354+00	2019-10-17 13:28:57.660362+00	3	27	8
-94	2019-10-17 13:28:57.660385+00	2019-10-17 13:28:57.660393+00	4	27	8
-95	2019-10-17 13:28:57.660416+00	2019-10-17 13:28:57.660423+00	5	27	8
-96	2019-10-17 13:28:57.660446+00	2019-10-17 13:28:57.660453+00	6	27	8
-97	2019-10-17 13:28:57.671197+00	2019-10-17 13:28:57.671215+00	1	28	8
-98	2019-10-17 13:28:57.671267+00	2019-10-17 13:28:57.671291+00	2	28	8
-99	2019-10-17 13:28:57.671321+00	2019-10-17 13:28:57.671329+00	3	28	8
-100	2019-10-17 13:28:57.671352+00	2019-10-17 13:28:57.671359+00	4	28	8
-101	2019-10-17 13:28:57.671382+00	2019-10-17 13:28:57.671389+00	5	28	8
-102	2019-10-17 13:28:57.671412+00	2019-10-17 13:28:57.671419+00	6	28	8
-103	2019-10-17 13:28:57.682728+00	2019-10-17 13:28:57.682746+00	1	29	8
-104	2019-10-17 13:28:57.682784+00	2019-10-17 13:28:57.682793+00	2	29	8
-105	2019-10-17 13:28:57.682818+00	2019-10-17 13:28:57.682826+00	3	29	8
-106	2019-10-17 13:28:57.682849+00	2019-10-17 13:28:57.682856+00	4	29	8
-107	2019-10-17 13:28:57.68288+00	2019-10-17 13:28:57.682887+00	5	29	8
-108	2019-10-17 13:28:57.68291+00	2019-10-17 13:28:57.682918+00	6	29	8
-109	2019-10-17 13:28:57.693583+00	2019-10-17 13:28:57.693601+00	1	30	8
-110	2019-10-17 13:28:57.693639+00	2019-10-17 13:28:57.693648+00	2	30	8
-111	2019-10-17 13:28:57.693672+00	2019-10-17 13:28:57.69368+00	3	30	8
-112	2019-10-17 13:28:57.693703+00	2019-10-17 13:28:57.693711+00	4	30	8
-113	2019-10-17 13:28:57.693733+00	2019-10-17 13:28:57.693741+00	5	30	8
-114	2019-10-17 13:28:57.693764+00	2019-10-17 13:28:57.693771+00	6	30	8
-115	2019-10-17 13:28:57.702372+00	2019-10-17 13:28:57.70239+00	1	31	8
-116	2019-10-17 13:28:57.702427+00	2019-10-17 13:28:57.702437+00	2	31	8
-117	2019-10-17 13:28:57.702461+00	2019-10-17 13:28:57.702469+00	3	31	8
-118	2019-10-17 13:28:57.702492+00	2019-10-17 13:28:57.7025+00	4	31	8
-119	2019-10-17 13:28:57.702523+00	2019-10-17 13:28:57.702531+00	5	31	8
-120	2019-10-17 13:28:57.702553+00	2019-10-17 13:28:57.702561+00	6	31	8
-121	2019-10-17 13:28:57.724685+00	2019-10-17 13:28:57.724705+00	1	32	5
-122	2019-10-17 13:28:57.724743+00	2019-10-17 13:28:57.724753+00	2	32	5
-123	2019-10-17 13:28:57.724777+00	2019-10-17 13:28:57.724785+00	3	32	5
-124	2019-10-17 13:28:57.724808+00	2019-10-17 13:28:57.724816+00	4	32	5
-125	2019-10-17 13:28:57.724839+00	2019-10-17 13:28:57.724846+00	5	32	5
-126	2019-10-17 13:28:57.724869+00	2019-10-17 13:28:57.724877+00	6	32	5
-127	2019-10-17 13:28:57.737697+00	2019-10-17 13:28:57.737716+00	1	33	5
-128	2019-10-17 13:28:57.737754+00	2019-10-17 13:28:57.737763+00	2	33	5
-129	2019-10-17 13:28:57.737787+00	2019-10-17 13:28:57.737795+00	3	33	5
-130	2019-10-17 13:28:57.737818+00	2019-10-17 13:28:57.737825+00	4	33	5
-131	2019-10-17 13:28:57.737848+00	2019-10-17 13:28:57.737855+00	5	33	5
-132	2019-10-17 13:28:57.737877+00	2019-10-17 13:28:57.737885+00	6	33	5
-133	2019-10-17 13:28:57.748412+00	2019-10-17 13:28:57.74843+00	1	34	5
-134	2019-10-17 13:28:57.748467+00	2019-10-17 13:28:57.748477+00	2	34	5
-135	2019-10-17 13:28:57.748501+00	2019-10-17 13:28:57.748509+00	3	34	5
-136	2019-10-17 13:28:57.748531+00	2019-10-17 13:28:57.748539+00	4	34	5
-137	2019-10-17 13:28:57.748561+00	2019-10-17 13:28:57.748568+00	5	34	5
-138	2019-10-17 13:28:57.74859+00	2019-10-17 13:28:57.748598+00	6	34	5
-139	2019-10-17 13:28:57.759365+00	2019-10-17 13:28:57.759383+00	1	35	5
-140	2019-10-17 13:28:57.759421+00	2019-10-17 13:28:57.759431+00	2	35	5
-141	2019-10-17 13:28:57.759455+00	2019-10-17 13:28:57.759463+00	3	35	5
-142	2019-10-17 13:28:57.759486+00	2019-10-17 13:28:57.759494+00	4	35	5
-143	2019-10-17 13:28:57.759516+00	2019-10-17 13:28:57.759524+00	5	35	5
-144	2019-10-17 13:28:57.759546+00	2019-10-17 13:28:57.759554+00	6	35	5
-145	2019-10-17 13:28:57.770575+00	2019-10-17 13:28:57.770593+00	1	36	5
-146	2019-10-17 13:28:57.770629+00	2019-10-17 13:28:57.770638+00	2	36	5
-147	2019-10-17 13:28:57.770663+00	2019-10-17 13:28:57.77067+00	3	36	5
-148	2019-10-17 13:28:57.770694+00	2019-10-17 13:28:57.770701+00	4	36	5
-149	2019-10-17 13:28:57.770723+00	2019-10-17 13:28:57.77073+00	5	36	5
-150	2019-10-17 13:28:57.770752+00	2019-10-17 13:28:57.77076+00	6	36	5
+1	2020-01-24 04:41:23.146755+00	2020-01-24 04:41:23.146774+00	1	12	4
+2	2020-01-24 04:41:23.146809+00	2020-01-24 04:41:23.146815+00	2	12	4
+3	2020-01-24 04:41:23.146835+00	2020-01-24 04:41:23.14684+00	3	12	4
+4	2020-01-24 04:41:23.146859+00	2020-01-24 04:41:23.146863+00	4	12	4
+5	2020-01-24 04:41:23.162214+00	2020-01-24 04:41:23.162232+00	1	13	4
+6	2020-01-24 04:41:23.162267+00	2020-01-24 04:41:23.162273+00	2	13	4
+7	2020-01-24 04:41:23.162292+00	2020-01-24 04:41:23.162297+00	3	13	4
+8	2020-01-24 04:41:23.162315+00	2020-01-24 04:41:23.16232+00	4	13	4
+9	2020-01-24 04:41:23.181341+00	2020-01-24 04:41:23.181357+00	1	14	4
+10	2020-01-24 04:41:23.181391+00	2020-01-24 04:41:23.181396+00	2	14	4
+11	2020-01-24 04:41:23.181416+00	2020-01-24 04:41:23.181422+00	3	14	4
+12	2020-01-24 04:41:23.181441+00	2020-01-24 04:41:23.181446+00	4	14	4
+13	2020-01-24 04:41:23.1954+00	2020-01-24 04:41:23.195417+00	1	15	4
+14	2020-01-24 04:41:23.195459+00	2020-01-24 04:41:23.195466+00	2	15	4
+15	2020-01-24 04:41:23.195487+00	2020-01-24 04:41:23.195492+00	3	15	4
+16	2020-01-24 04:41:23.195515+00	2020-01-24 04:41:23.195521+00	4	15	4
+17	2020-01-24 04:41:23.208962+00	2020-01-24 04:41:23.208979+00	1	16	4
+18	2020-01-24 04:41:23.209025+00	2020-01-24 04:41:23.209031+00	2	16	4
+19	2020-01-24 04:41:23.209052+00	2020-01-24 04:41:23.209057+00	3	16	4
+20	2020-01-24 04:41:23.209076+00	2020-01-24 04:41:23.20908+00	4	16	4
+21	2020-01-24 04:41:23.25192+00	2020-01-24 04:41:23.25194+00	1	17	4
+22	2020-01-24 04:41:23.251978+00	2020-01-24 04:41:23.251984+00	2	17	4
+23	2020-01-24 04:41:23.252004+00	2020-01-24 04:41:23.252009+00	3	17	4
+24	2020-01-24 04:41:23.252028+00	2020-01-24 04:41:23.252032+00	4	17	4
+25	2020-01-24 04:41:23.261727+00	2020-01-24 04:41:23.261742+00	1	18	4
+26	2020-01-24 04:41:23.261782+00	2020-01-24 04:41:23.261812+00	2	18	4
+27	2020-01-24 04:41:23.261834+00	2020-01-24 04:41:23.261861+00	3	18	4
+28	2020-01-24 04:41:23.261882+00	2020-01-24 04:41:23.261887+00	4	18	4
+29	2020-01-24 04:41:23.269105+00	2020-01-24 04:41:23.26912+00	1	19	4
+30	2020-01-24 04:41:23.269153+00	2020-01-24 04:41:23.269159+00	2	19	4
+31	2020-01-24 04:41:23.269179+00	2020-01-24 04:41:23.269185+00	3	19	4
+32	2020-01-24 04:41:23.269204+00	2020-01-24 04:41:23.269209+00	4	19	4
+33	2020-01-24 04:41:23.275946+00	2020-01-24 04:41:23.27596+00	1	20	4
+34	2020-01-24 04:41:23.275993+00	2020-01-24 04:41:23.275998+00	2	20	4
+35	2020-01-24 04:41:23.276018+00	2020-01-24 04:41:23.276023+00	3	20	4
+36	2020-01-24 04:41:23.276051+00	2020-01-24 04:41:23.276056+00	4	20	4
+37	2020-01-24 04:41:23.284715+00	2020-01-24 04:41:23.284729+00	1	21	4
+38	2020-01-24 04:41:23.284762+00	2020-01-24 04:41:23.284768+00	2	21	4
+39	2020-01-24 04:41:23.311522+00	2020-01-24 04:41:23.311539+00	1	22	8
+40	2020-01-24 04:41:23.311578+00	2020-01-24 04:41:23.311584+00	2	22	8
+41	2020-01-24 04:41:23.311605+00	2020-01-24 04:41:23.31161+00	3	22	8
+42	2020-01-24 04:41:23.311628+00	2020-01-24 04:41:23.311633+00	4	22	8
+43	2020-01-24 04:41:23.324501+00	2020-01-24 04:41:23.324518+00	1	23	8
+44	2020-01-24 04:41:23.324552+00	2020-01-24 04:41:23.324558+00	2	23	8
+45	2020-01-24 04:41:23.324577+00	2020-01-24 04:41:23.324582+00	3	23	8
+46	2020-01-24 04:41:23.324601+00	2020-01-24 04:41:23.324606+00	4	23	8
+47	2020-01-24 04:41:23.335632+00	2020-01-24 04:41:23.335647+00	1	24	8
+48	2020-01-24 04:41:23.335692+00	2020-01-24 04:41:23.335698+00	2	24	8
+49	2020-01-24 04:41:23.335719+00	2020-01-24 04:41:23.335724+00	3	24	8
+50	2020-01-24 04:41:23.335747+00	2020-01-24 04:41:23.335753+00	4	24	8
+51	2020-01-24 04:41:23.347574+00	2020-01-24 04:41:23.347593+00	1	25	8
+52	2020-01-24 04:41:23.34763+00	2020-01-24 04:41:23.347636+00	2	25	8
+53	2020-01-24 04:41:23.347657+00	2020-01-24 04:41:23.347662+00	3	25	8
+54	2020-01-24 04:41:23.347681+00	2020-01-24 04:41:23.347686+00	4	25	8
+55	2020-01-24 04:41:23.374274+00	2020-01-24 04:41:23.37429+00	1	26	5
+56	2020-01-24 04:41:23.374325+00	2020-01-24 04:41:23.37433+00	2	26	5
+57	2020-01-24 04:41:23.37435+00	2020-01-24 04:41:23.374355+00	3	26	5
+58	2020-01-24 04:41:23.374374+00	2020-01-24 04:41:23.374379+00	4	26	5
+59	2020-01-24 04:41:23.381937+00	2020-01-24 04:41:23.381952+00	1	27	5
+60	2020-01-24 04:41:23.381984+00	2020-01-24 04:41:23.38199+00	2	27	5
+61	2020-01-24 04:41:23.382009+00	2020-01-24 04:41:23.382015+00	3	27	5
+62	2020-01-24 04:41:23.382034+00	2020-01-24 04:41:23.382039+00	4	27	5
+63	2020-01-24 04:41:23.391701+00	2020-01-24 04:41:23.391719+00	1	28	5
+64	2020-01-24 04:41:23.391756+00	2020-01-24 04:41:23.391762+00	2	28	5
+65	2020-01-24 04:41:23.391791+00	2020-01-24 04:41:23.3918+00	3	28	5
+66	2020-01-24 04:41:23.39182+00	2020-01-24 04:41:23.391825+00	4	28	5
+67	2020-01-24 04:41:23.405014+00	2020-01-24 04:41:23.40503+00	1	29	5
+68	2020-01-24 04:41:23.405063+00	2020-01-24 04:41:23.405069+00	2	29	5
+69	2020-01-24 04:41:23.405089+00	2020-01-24 04:41:23.405094+00	3	29	5
+70	2020-01-24 04:41:23.405113+00	2020-01-24 04:41:23.405118+00	4	29	5
+71	2020-01-24 04:41:23.438805+00	2020-01-24 04:41:23.438822+00	1	30	6
+72	2020-01-24 04:41:23.438855+00	2020-01-24 04:41:23.438861+00	2	30	6
+73	2020-01-24 04:41:23.438881+00	2020-01-24 04:41:23.438886+00	3	30	6
+74	2020-01-24 04:41:23.438905+00	2020-01-24 04:41:23.43891+00	4	30	6
+75	2020-01-24 04:41:23.461012+00	2020-01-24 04:41:23.461052+00	1	31	6
+76	2020-01-24 04:41:23.461091+00	2020-01-24 04:41:23.461097+00	2	31	6
+77	2020-01-24 04:41:23.461118+00	2020-01-24 04:41:23.461123+00	3	31	6
+78	2020-01-24 04:41:23.461143+00	2020-01-24 04:41:23.461148+00	4	31	6
+79	2020-01-24 04:41:23.476964+00	2020-01-24 04:41:23.476982+00	1	32	6
+80	2020-01-24 04:41:23.477074+00	2020-01-24 04:41:23.477081+00	2	32	6
+81	2020-01-24 04:41:23.477103+00	2020-01-24 04:41:23.477108+00	3	32	6
+82	2020-01-24 04:41:23.477128+00	2020-01-24 04:41:23.477133+00	4	32	6
+83	2020-01-24 04:41:23.493578+00	2020-01-24 04:41:23.493597+00	1	33	6
+84	2020-01-24 04:41:23.493637+00	2020-01-24 04:41:23.493643+00	2	33	6
+85	2020-01-24 04:41:23.493663+00	2020-01-24 04:41:23.493668+00	3	33	6
+86	2020-01-24 04:41:23.493687+00	2020-01-24 04:41:23.493692+00	4	33	6
+87	2020-01-24 04:41:23.518517+00	2020-01-24 04:41:23.518533+00	1	34	7
+88	2020-01-24 04:41:23.518569+00	2020-01-24 04:41:23.518575+00	2	34	7
+89	2020-01-24 04:41:23.518602+00	2020-01-24 04:41:23.518608+00	3	34	7
+90	2020-01-24 04:41:23.518627+00	2020-01-24 04:41:23.518636+00	4	34	7
+91	2020-01-24 04:41:23.527496+00	2020-01-24 04:41:23.527512+00	1	35	7
+92	2020-01-24 04:41:23.527547+00	2020-01-24 04:41:23.527553+00	2	35	7
+93	2020-01-24 04:41:23.527574+00	2020-01-24 04:41:23.527579+00	3	35	7
+94	2020-01-24 04:41:23.527598+00	2020-01-24 04:41:23.527603+00	4	35	7
+95	2020-01-24 04:41:23.536024+00	2020-01-24 04:41:23.536041+00	1	36	7
+96	2020-01-24 04:41:23.536074+00	2020-01-24 04:41:23.53608+00	2	36	7
+97	2020-01-24 04:41:23.536099+00	2020-01-24 04:41:23.536105+00	3	36	7
+98	2020-01-24 04:41:23.536152+00	2020-01-24 04:41:23.536173+00	4	36	7
+99	2020-01-24 04:41:23.544512+00	2020-01-24 04:41:23.544528+00	1	37	7
+100	2020-01-24 04:41:23.544562+00	2020-01-24 04:41:23.544568+00	2	37	7
+101	2020-01-24 04:41:23.544588+00	2020-01-24 04:41:23.544593+00	3	37	7
+102	2020-01-24 04:41:23.544611+00	2020-01-24 04:41:23.544616+00	4	37	7
+103	2020-01-24 04:41:23.574667+00	2020-01-24 04:41:23.574685+00	1	38	11
+104	2020-01-24 04:41:23.574719+00	2020-01-24 04:41:23.574725+00	2	38	11
+105	2020-01-24 04:41:23.574745+00	2020-01-24 04:41:23.57475+00	3	38	11
+106	2020-01-24 04:41:23.574769+00	2020-01-24 04:41:23.574775+00	4	38	11
 \.
 
 
@@ -3355,42 +2762,44 @@ COPY locations_pigletsgroupcell (id, created_at, modified_at, number, section_id
 --
 
 COPY locations_section (id, created_at, modified_at, name, number, workshop_id) FROM stdin;
-1	2019-10-17 13:28:57.27368+00	2019-10-17 13:28:57.273698+00	Змейка	1	1
-2	2019-10-17 13:28:57.273739+00	2019-10-17 13:28:57.273749+00	Ряд осеменения	2	1
-3	2019-10-17 13:28:57.273781+00	2019-10-17 13:28:57.273789+00	Групповые клетки	3	1
-4	2019-10-17 13:28:57.285471+00	2019-10-17 13:28:57.285489+00	Секция 2-1	1	2
-5	2019-10-17 13:28:57.285521+00	2019-10-17 13:28:57.28553+00	Секция 2-2	2	2
-6	2019-10-17 13:28:57.32573+00	2019-10-17 13:28:57.32575+00	Секция 3-1	1	3
-7	2019-10-17 13:28:57.325782+00	2019-10-17 13:28:57.325791+00	Секция 3-2	2	3
-8	2019-10-17 13:28:57.325817+00	2019-10-17 13:28:57.325824+00	Секция 3-3	3	3
-9	2019-10-17 13:28:57.325844+00	2019-10-17 13:28:57.325851+00	Секция 3-4	4	3
-10	2019-10-17 13:28:57.32587+00	2019-10-17 13:28:57.325878+00	Секция 3-5	5	3
-11	2019-10-17 13:28:57.325897+00	2019-10-17 13:28:57.325905+00	Секция 3-6	6	3
-12	2019-10-17 13:28:57.451006+00	2019-10-17 13:28:57.451023+00	Секция 4-1	1	4
-13	2019-10-17 13:28:57.451055+00	2019-10-17 13:28:57.451063+00	Секция 4-2	2	4
-14	2019-10-17 13:28:57.451084+00	2019-10-17 13:28:57.451092+00	Секция 4-3	3	4
-15	2019-10-17 13:28:57.451112+00	2019-10-17 13:28:57.451119+00	Секция 4-4	4	4
-16	2019-10-17 13:28:57.451138+00	2019-10-17 13:28:57.451145+00	Секция 4-5	5	4
-17	2019-10-17 13:28:57.500681+00	2019-10-17 13:28:57.500699+00	Секция 5-1	1	6
-18	2019-10-17 13:28:57.500731+00	2019-10-17 13:28:57.50074+00	Секция 5-2	2	6
-19	2019-10-17 13:28:57.500762+00	2019-10-17 13:28:57.50077+00	Секция 5-3	3	6
-20	2019-10-17 13:28:57.50079+00	2019-10-17 13:28:57.500797+00	Секция 5-4	4	6
-21	2019-10-17 13:28:57.500816+00	2019-10-17 13:28:57.500824+00	Секция 5-5	5	6
-22	2019-10-17 13:28:57.586404+00	2019-10-17 13:28:57.586423+00	Секция 6-1	1	7
-23	2019-10-17 13:28:57.586456+00	2019-10-17 13:28:57.586465+00	Секция 6-2	2	7
-24	2019-10-17 13:28:57.586486+00	2019-10-17 13:28:57.586494+00	Секция 6-3	3	7
-25	2019-10-17 13:28:57.586513+00	2019-10-17 13:28:57.58652+00	Секция 6-4	4	7
-26	2019-10-17 13:28:57.586539+00	2019-10-17 13:28:57.586546+00	Секция 6-5	5	7
-27	2019-10-17 13:28:57.649047+00	2019-10-17 13:28:57.649066+00	Секция 7-1	1	8
-28	2019-10-17 13:28:57.649099+00	2019-10-17 13:28:57.649109+00	Секция 7-2	2	8
-29	2019-10-17 13:28:57.64913+00	2019-10-17 13:28:57.649137+00	Секция 7-3	3	8
-30	2019-10-17 13:28:57.649157+00	2019-10-17 13:28:57.649164+00	Секция 7-4	4	8
-31	2019-10-17 13:28:57.649183+00	2019-10-17 13:28:57.649191+00	Секция 7-5	5	8
-32	2019-10-17 13:28:57.713188+00	2019-10-17 13:28:57.713206+00	Секция 8-1	1	5
-33	2019-10-17 13:28:57.713238+00	2019-10-17 13:28:57.713247+00	Секция 8-2	2	5
-34	2019-10-17 13:28:57.713268+00	2019-10-17 13:28:57.713276+00	Секция 8-3	3	5
-35	2019-10-17 13:28:57.713295+00	2019-10-17 13:28:57.713303+00	Секция 8-4	4	5
-36	2019-10-17 13:28:57.713322+00	2019-10-17 13:28:57.713329+00	Секция 8-5	5	5
+1	2020-01-24 04:41:22.9395+00	2020-01-24 04:41:22.939519+00	Змейка	1	1
+2	2020-01-24 04:41:22.939549+00	2020-01-24 04:41:22.939555+00	Ряд осеменения	2	1
+3	2020-01-24 04:41:22.939572+00	2020-01-24 04:41:22.939577+00	Групповые клетки	3	1
+4	2020-01-24 04:41:22.955429+00	2020-01-24 04:41:22.955448+00	Секция 2-1	1	2
+5	2020-01-24 04:41:22.95548+00	2020-01-24 04:41:22.955485+00	Секция 2-2	2	2
+6	2020-01-24 04:41:22.970296+00	2020-01-24 04:41:22.970314+00	Секция 3-1	1	3
+7	2020-01-24 04:41:22.970345+00	2020-01-24 04:41:22.970351+00	Секция 3-2	2	3
+8	2020-01-24 04:41:22.970367+00	2020-01-24 04:41:22.970372+00	Секция 3-3	3	3
+9	2020-01-24 04:41:22.970388+00	2020-01-24 04:41:22.970392+00	Секция 3-4	4	3
+10	2020-01-24 04:41:22.970408+00	2020-01-24 04:41:22.970413+00	Секция 3-5	5	3
+11	2020-01-24 04:41:22.970428+00	2020-01-24 04:41:22.970433+00	Секция 3-6	6	3
+12	2020-01-24 04:41:23.130146+00	2020-01-24 04:41:23.130164+00	Секция 4-1	1	4
+13	2020-01-24 04:41:23.130195+00	2020-01-24 04:41:23.130201+00	Секция 4-2	2	4
+14	2020-01-24 04:41:23.130219+00	2020-01-24 04:41:23.130224+00	Секция 4-3	3	4
+15	2020-01-24 04:41:23.130239+00	2020-01-24 04:41:23.130244+00	Секция 4-4	4	4
+16	2020-01-24 04:41:23.13026+00	2020-01-24 04:41:23.130264+00	Секция 4-5	5	4
+17	2020-01-24 04:41:23.13028+00	2020-01-24 04:41:23.130285+00	Секция 4-6	6	4
+18	2020-01-24 04:41:23.1303+00	2020-01-24 04:41:23.130305+00	Секция 4-7	7	4
+19	2020-01-24 04:41:23.13032+00	2020-01-24 04:41:23.130325+00	Секция 4-8	8	4
+20	2020-01-24 04:41:23.13034+00	2020-01-24 04:41:23.130345+00	Секция 4-9	9	4
+21	2020-01-24 04:41:23.130369+00	2020-01-24 04:41:23.130374+00	Секция 4-10	10	4
+22	2020-01-24 04:41:23.298454+00	2020-01-24 04:41:23.298472+00	Секция 8-1	1	8
+23	2020-01-24 04:41:23.298503+00	2020-01-24 04:41:23.298508+00	Секция 8-2	2	8
+24	2020-01-24 04:41:23.298525+00	2020-01-24 04:41:23.29853+00	Секция 8-3	3	8
+25	2020-01-24 04:41:23.298546+00	2020-01-24 04:41:23.298551+00	Секция 8-4	4	8
+26	2020-01-24 04:41:23.362122+00	2020-01-24 04:41:23.362141+00	Секция 5-1	1	5
+27	2020-01-24 04:41:23.362172+00	2020-01-24 04:41:23.362178+00	Секция 5-2	2	5
+28	2020-01-24 04:41:23.362194+00	2020-01-24 04:41:23.362199+00	Секция 5-3	3	5
+29	2020-01-24 04:41:23.362215+00	2020-01-24 04:41:23.36222+00	Секция 5-4	4	5
+30	2020-01-24 04:41:23.417487+00	2020-01-24 04:41:23.417506+00	Секция 6-1	1	6
+31	2020-01-24 04:41:23.417539+00	2020-01-24 04:41:23.417545+00	Секция 6-2	2	6
+32	2020-01-24 04:41:23.417562+00	2020-01-24 04:41:23.417567+00	Секция 6-3	3	6
+33	2020-01-24 04:41:23.417583+00	2020-01-24 04:41:23.417588+00	Секция 6-4	4	6
+34	2020-01-24 04:41:23.509186+00	2020-01-24 04:41:23.509205+00	Секция 7-1	1	7
+35	2020-01-24 04:41:23.509238+00	2020-01-24 04:41:23.509243+00	Секция 7-2	2	7
+36	2020-01-24 04:41:23.509261+00	2020-01-24 04:41:23.509266+00	Секция 7-3	3	7
+37	2020-01-24 04:41:23.509282+00	2020-01-24 04:41:23.509286+00	Секция 7-4	4	7
+38	2020-01-24 04:41:23.560531+00	2020-01-24 04:41:23.560549+00	Секция 11-1	1	11
 \.
 
 
@@ -3399,276 +2808,276 @@ COPY locations_section (id, created_at, modified_at, name, number, workshop_id) 
 --
 
 COPY locations_sowandpigletscell (id, created_at, modified_at, number, section_id, workshop_id) FROM stdin;
-1	2019-10-17 13:28:57.338068+00	2019-10-17 13:28:57.338086+00	1	6	3
-2	2019-10-17 13:28:57.338125+00	2019-10-17 13:28:57.338134+00	2	6	3
-3	2019-10-17 13:28:57.338158+00	2019-10-17 13:28:57.338166+00	3	6	3
-4	2019-10-17 13:28:57.338189+00	2019-10-17 13:28:57.338196+00	4	6	3
-5	2019-10-17 13:28:57.338219+00	2019-10-17 13:28:57.338226+00	5	6	3
-6	2019-10-17 13:28:57.338249+00	2019-10-17 13:28:57.338257+00	6	6	3
-7	2019-10-17 13:28:57.33828+00	2019-10-17 13:28:57.338287+00	7	6	3
-8	2019-10-17 13:28:57.338309+00	2019-10-17 13:28:57.338317+00	8	6	3
-9	2019-10-17 13:28:57.338339+00	2019-10-17 13:28:57.338355+00	9	6	3
-10	2019-10-17 13:28:57.338383+00	2019-10-17 13:28:57.338391+00	10	6	3
-11	2019-10-17 13:28:57.338414+00	2019-10-17 13:28:57.338422+00	11	6	3
-12	2019-10-17 13:28:57.338444+00	2019-10-17 13:28:57.338452+00	12	6	3
-13	2019-10-17 13:28:57.338474+00	2019-10-17 13:28:57.338482+00	13	6	3
-14	2019-10-17 13:28:57.338504+00	2019-10-17 13:28:57.338512+00	14	6	3
-15	2019-10-17 13:28:57.338534+00	2019-10-17 13:28:57.338541+00	15	6	3
-16	2019-10-17 13:28:57.338563+00	2019-10-17 13:28:57.338578+00	16	6	3
-17	2019-10-17 13:28:57.338629+00	2019-10-17 13:28:57.338639+00	17	6	3
-18	2019-10-17 13:28:57.338663+00	2019-10-17 13:28:57.338671+00	18	6	3
-19	2019-10-17 13:28:57.338694+00	2019-10-17 13:28:57.338701+00	19	6	3
-20	2019-10-17 13:28:57.338724+00	2019-10-17 13:28:57.338731+00	20	6	3
-21	2019-10-17 13:28:57.338754+00	2019-10-17 13:28:57.338761+00	21	6	3
-22	2019-10-17 13:28:57.338784+00	2019-10-17 13:28:57.338791+00	22	6	3
-23	2019-10-17 13:28:57.338814+00	2019-10-17 13:28:57.338821+00	23	6	3
-24	2019-10-17 13:28:57.338844+00	2019-10-17 13:28:57.338851+00	24	6	3
-25	2019-10-17 13:28:57.338883+00	2019-10-17 13:28:57.338891+00	25	6	3
-26	2019-10-17 13:28:57.338915+00	2019-10-17 13:28:57.338923+00	26	6	3
-27	2019-10-17 13:28:57.338945+00	2019-10-17 13:28:57.338953+00	27	6	3
-28	2019-10-17 13:28:57.338975+00	2019-10-17 13:28:57.338982+00	28	6	3
-29	2019-10-17 13:28:57.339005+00	2019-10-17 13:28:57.339012+00	29	6	3
-30	2019-10-17 13:28:57.339034+00	2019-10-17 13:28:57.339042+00	30	6	3
-31	2019-10-17 13:28:57.339064+00	2019-10-17 13:28:57.339071+00	31	6	3
-32	2019-10-17 13:28:57.339094+00	2019-10-17 13:28:57.339101+00	32	6	3
-33	2019-10-17 13:28:57.339123+00	2019-10-17 13:28:57.339131+00	33	6	3
-34	2019-10-17 13:28:57.339153+00	2019-10-17 13:28:57.33916+00	34	6	3
-35	2019-10-17 13:28:57.339182+00	2019-10-17 13:28:57.33919+00	35	6	3
-36	2019-10-17 13:28:57.339212+00	2019-10-17 13:28:57.339219+00	36	6	3
-37	2019-10-17 13:28:57.339242+00	2019-10-17 13:28:57.33925+00	37	6	3
-38	2019-10-17 13:28:57.339296+00	2019-10-17 13:28:57.339304+00	38	6	3
-39	2019-10-17 13:28:57.339327+00	2019-10-17 13:28:57.339334+00	39	6	3
-40	2019-10-17 13:28:57.339357+00	2019-10-17 13:28:57.339364+00	40	6	3
-41	2019-10-17 13:28:57.339387+00	2019-10-17 13:28:57.339394+00	41	6	3
-42	2019-10-17 13:28:57.339416+00	2019-10-17 13:28:57.339423+00	42	6	3
-43	2019-10-17 13:28:57.339446+00	2019-10-17 13:28:57.339453+00	43	6	3
-44	2019-10-17 13:28:57.339475+00	2019-10-17 13:28:57.339483+00	44	6	3
-45	2019-10-17 13:28:57.339505+00	2019-10-17 13:28:57.339512+00	45	6	3
-46	2019-10-17 13:28:57.360757+00	2019-10-17 13:28:57.360781+00	1	7	3
-47	2019-10-17 13:28:57.360822+00	2019-10-17 13:28:57.360832+00	2	7	3
-48	2019-10-17 13:28:57.360856+00	2019-10-17 13:28:57.360864+00	3	7	3
-49	2019-10-17 13:28:57.360887+00	2019-10-17 13:28:57.360894+00	4	7	3
-50	2019-10-17 13:28:57.360917+00	2019-10-17 13:28:57.360925+00	5	7	3
-51	2019-10-17 13:28:57.360948+00	2019-10-17 13:28:57.360956+00	6	7	3
-52	2019-10-17 13:28:57.360978+00	2019-10-17 13:28:57.360986+00	7	7	3
-53	2019-10-17 13:28:57.361009+00	2019-10-17 13:28:57.361016+00	8	7	3
-54	2019-10-17 13:28:57.361038+00	2019-10-17 13:28:57.361046+00	9	7	3
-55	2019-10-17 13:28:57.361069+00	2019-10-17 13:28:57.361086+00	10	7	3
-56	2019-10-17 13:28:57.361112+00	2019-10-17 13:28:57.361121+00	11	7	3
-57	2019-10-17 13:28:57.361143+00	2019-10-17 13:28:57.361151+00	12	7	3
-58	2019-10-17 13:28:57.361173+00	2019-10-17 13:28:57.361181+00	13	7	3
-59	2019-10-17 13:28:57.361203+00	2019-10-17 13:28:57.36121+00	14	7	3
-60	2019-10-17 13:28:57.361233+00	2019-10-17 13:28:57.36124+00	15	7	3
-61	2019-10-17 13:28:57.361262+00	2019-10-17 13:28:57.36127+00	16	7	3
-62	2019-10-17 13:28:57.361292+00	2019-10-17 13:28:57.361299+00	17	7	3
-63	2019-10-17 13:28:57.36133+00	2019-10-17 13:28:57.361338+00	18	7	3
-64	2019-10-17 13:28:57.361362+00	2019-10-17 13:28:57.361373+00	19	7	3
-65	2019-10-17 13:28:57.361396+00	2019-10-17 13:28:57.361404+00	20	7	3
-66	2019-10-17 13:28:57.361426+00	2019-10-17 13:28:57.361433+00	21	7	3
-67	2019-10-17 13:28:57.361455+00	2019-10-17 13:28:57.361462+00	22	7	3
-68	2019-10-17 13:28:57.361485+00	2019-10-17 13:28:57.361492+00	23	7	3
-69	2019-10-17 13:28:57.361514+00	2019-10-17 13:28:57.361522+00	24	7	3
-70	2019-10-17 13:28:57.361544+00	2019-10-17 13:28:57.361551+00	25	7	3
-71	2019-10-17 13:28:57.361574+00	2019-10-17 13:28:57.361581+00	26	7	3
-72	2019-10-17 13:28:57.361603+00	2019-10-17 13:28:57.361611+00	27	7	3
-73	2019-10-17 13:28:57.361633+00	2019-10-17 13:28:57.36164+00	28	7	3
-74	2019-10-17 13:28:57.361662+00	2019-10-17 13:28:57.36167+00	29	7	3
-75	2019-10-17 13:28:57.361692+00	2019-10-17 13:28:57.3617+00	30	7	3
-76	2019-10-17 13:28:57.361722+00	2019-10-17 13:28:57.361729+00	31	7	3
-77	2019-10-17 13:28:57.361751+00	2019-10-17 13:28:57.361759+00	32	7	3
-78	2019-10-17 13:28:57.361781+00	2019-10-17 13:28:57.361789+00	33	7	3
-79	2019-10-17 13:28:57.361811+00	2019-10-17 13:28:57.361826+00	34	7	3
-80	2019-10-17 13:28:57.361857+00	2019-10-17 13:28:57.361865+00	35	7	3
-81	2019-10-17 13:28:57.361887+00	2019-10-17 13:28:57.361894+00	36	7	3
-82	2019-10-17 13:28:57.361917+00	2019-10-17 13:28:57.361924+00	37	7	3
-83	2019-10-17 13:28:57.361946+00	2019-10-17 13:28:57.361954+00	38	7	3
-84	2019-10-17 13:28:57.361976+00	2019-10-17 13:28:57.361983+00	39	7	3
-85	2019-10-17 13:28:57.362006+00	2019-10-17 13:28:57.362013+00	40	7	3
-86	2019-10-17 13:28:57.362035+00	2019-10-17 13:28:57.362042+00	41	7	3
-87	2019-10-17 13:28:57.362064+00	2019-10-17 13:28:57.362072+00	42	7	3
-88	2019-10-17 13:28:57.362094+00	2019-10-17 13:28:57.362101+00	43	7	3
-89	2019-10-17 13:28:57.362123+00	2019-10-17 13:28:57.36213+00	44	7	3
-90	2019-10-17 13:28:57.362152+00	2019-10-17 13:28:57.36216+00	45	7	3
-91	2019-10-17 13:28:57.376037+00	2019-10-17 13:28:57.376056+00	1	8	3
-92	2019-10-17 13:28:57.376094+00	2019-10-17 13:28:57.376103+00	2	8	3
-93	2019-10-17 13:28:57.376127+00	2019-10-17 13:28:57.376135+00	3	8	3
-94	2019-10-17 13:28:57.376158+00	2019-10-17 13:28:57.376166+00	4	8	3
-95	2019-10-17 13:28:57.37619+00	2019-10-17 13:28:57.376198+00	5	8	3
-96	2019-10-17 13:28:57.376231+00	2019-10-17 13:28:57.37624+00	6	8	3
-97	2019-10-17 13:28:57.376263+00	2019-10-17 13:28:57.376271+00	7	8	3
-98	2019-10-17 13:28:57.376293+00	2019-10-17 13:28:57.376311+00	8	8	3
-99	2019-10-17 13:28:57.376336+00	2019-10-17 13:28:57.376343+00	9	8	3
-100	2019-10-17 13:28:57.376366+00	2019-10-17 13:28:57.376374+00	10	8	3
-101	2019-10-17 13:28:57.376396+00	2019-10-17 13:28:57.376404+00	11	8	3
-102	2019-10-17 13:28:57.376426+00	2019-10-17 13:28:57.376434+00	12	8	3
-103	2019-10-17 13:28:57.376456+00	2019-10-17 13:28:57.376464+00	13	8	3
-104	2019-10-17 13:28:57.376486+00	2019-10-17 13:28:57.376493+00	14	8	3
-105	2019-10-17 13:28:57.376516+00	2019-10-17 13:28:57.376523+00	15	8	3
-106	2019-10-17 13:28:57.376545+00	2019-10-17 13:28:57.376553+00	16	8	3
-107	2019-10-17 13:28:57.376575+00	2019-10-17 13:28:57.376582+00	17	8	3
-108	2019-10-17 13:28:57.376605+00	2019-10-17 13:28:57.376612+00	18	8	3
-109	2019-10-17 13:28:57.376634+00	2019-10-17 13:28:57.376641+00	19	8	3
-110	2019-10-17 13:28:57.376664+00	2019-10-17 13:28:57.376671+00	20	8	3
-111	2019-10-17 13:28:57.376693+00	2019-10-17 13:28:57.3767+00	21	8	3
-112	2019-10-17 13:28:57.376722+00	2019-10-17 13:28:57.37673+00	22	8	3
-113	2019-10-17 13:28:57.376752+00	2019-10-17 13:28:57.376759+00	23	8	3
-114	2019-10-17 13:28:57.376781+00	2019-10-17 13:28:57.376789+00	24	8	3
-115	2019-10-17 13:28:57.376811+00	2019-10-17 13:28:57.376818+00	25	8	3
-116	2019-10-17 13:28:57.37684+00	2019-10-17 13:28:57.376847+00	26	8	3
-117	2019-10-17 13:28:57.37687+00	2019-10-17 13:28:57.376877+00	27	8	3
-118	2019-10-17 13:28:57.376899+00	2019-10-17 13:28:57.376915+00	28	8	3
-119	2019-10-17 13:28:57.37694+00	2019-10-17 13:28:57.376948+00	29	8	3
-120	2019-10-17 13:28:57.376978+00	2019-10-17 13:28:57.376986+00	30	8	3
-121	2019-10-17 13:28:57.377009+00	2019-10-17 13:28:57.377016+00	31	8	3
-122	2019-10-17 13:28:57.377039+00	2019-10-17 13:28:57.377046+00	32	8	3
-123	2019-10-17 13:28:57.377068+00	2019-10-17 13:28:57.377076+00	33	8	3
-124	2019-10-17 13:28:57.377098+00	2019-10-17 13:28:57.377105+00	34	8	3
-125	2019-10-17 13:28:57.377127+00	2019-10-17 13:28:57.377134+00	35	8	3
-126	2019-10-17 13:28:57.377156+00	2019-10-17 13:28:57.377164+00	36	8	3
-127	2019-10-17 13:28:57.377186+00	2019-10-17 13:28:57.377193+00	37	8	3
-128	2019-10-17 13:28:57.377215+00	2019-10-17 13:28:57.377222+00	38	8	3
-129	2019-10-17 13:28:57.377245+00	2019-10-17 13:28:57.377252+00	39	8	3
-130	2019-10-17 13:28:57.377274+00	2019-10-17 13:28:57.377281+00	40	8	3
-131	2019-10-17 13:28:57.377303+00	2019-10-17 13:28:57.37731+00	41	8	3
-132	2019-10-17 13:28:57.377332+00	2019-10-17 13:28:57.37734+00	42	8	3
-133	2019-10-17 13:28:57.377362+00	2019-10-17 13:28:57.377369+00	43	8	3
-134	2019-10-17 13:28:57.377391+00	2019-10-17 13:28:57.377398+00	44	8	3
-135	2019-10-17 13:28:57.37742+00	2019-10-17 13:28:57.377428+00	45	8	3
-136	2019-10-17 13:28:57.396183+00	2019-10-17 13:28:57.396203+00	1	9	3
-137	2019-10-17 13:28:57.396254+00	2019-10-17 13:28:57.396265+00	2	9	3
-138	2019-10-17 13:28:57.396292+00	2019-10-17 13:28:57.39636+00	3	9	3
-139	2019-10-17 13:28:57.396388+00	2019-10-17 13:28:57.396396+00	4	9	3
-140	2019-10-17 13:28:57.396419+00	2019-10-17 13:28:57.396427+00	5	9	3
-141	2019-10-17 13:28:57.39645+00	2019-10-17 13:28:57.396458+00	6	9	3
-142	2019-10-17 13:28:57.396481+00	2019-10-17 13:28:57.396488+00	7	9	3
-143	2019-10-17 13:28:57.396511+00	2019-10-17 13:28:57.396519+00	8	9	3
-144	2019-10-17 13:28:57.396542+00	2019-10-17 13:28:57.39655+00	9	9	3
-145	2019-10-17 13:28:57.396573+00	2019-10-17 13:28:57.396581+00	10	9	3
-146	2019-10-17 13:28:57.396605+00	2019-10-17 13:28:57.396612+00	11	9	3
-147	2019-10-17 13:28:57.396635+00	2019-10-17 13:28:57.396642+00	12	9	3
-148	2019-10-17 13:28:57.396665+00	2019-10-17 13:28:57.396673+00	13	9	3
-149	2019-10-17 13:28:57.396695+00	2019-10-17 13:28:57.396703+00	14	9	3
-150	2019-10-17 13:28:57.396726+00	2019-10-17 13:28:57.396733+00	15	9	3
-151	2019-10-17 13:28:57.396755+00	2019-10-17 13:28:57.396763+00	16	9	3
-152	2019-10-17 13:28:57.396786+00	2019-10-17 13:28:57.396793+00	17	9	3
-153	2019-10-17 13:28:57.396816+00	2019-10-17 13:28:57.396823+00	18	9	3
-154	2019-10-17 13:28:57.396845+00	2019-10-17 13:28:57.396853+00	19	9	3
-155	2019-10-17 13:28:57.396875+00	2019-10-17 13:28:57.396883+00	20	9	3
-156	2019-10-17 13:28:57.396905+00	2019-10-17 13:28:57.396913+00	21	9	3
-157	2019-10-17 13:28:57.396935+00	2019-10-17 13:28:57.396952+00	22	9	3
-158	2019-10-17 13:28:57.396977+00	2019-10-17 13:28:57.396985+00	23	9	3
-159	2019-10-17 13:28:57.397007+00	2019-10-17 13:28:57.397015+00	24	9	3
-160	2019-10-17 13:28:57.397045+00	2019-10-17 13:28:57.397053+00	25	9	3
-161	2019-10-17 13:28:57.397077+00	2019-10-17 13:28:57.397085+00	26	9	3
-162	2019-10-17 13:28:57.397107+00	2019-10-17 13:28:57.397115+00	27	9	3
-163	2019-10-17 13:28:57.397137+00	2019-10-17 13:28:57.397145+00	28	9	3
-164	2019-10-17 13:28:57.397167+00	2019-10-17 13:28:57.397175+00	29	9	3
-165	2019-10-17 13:28:57.397197+00	2019-10-17 13:28:57.397205+00	30	9	3
-166	2019-10-17 13:28:57.397227+00	2019-10-17 13:28:57.397235+00	31	9	3
-167	2019-10-17 13:28:57.397257+00	2019-10-17 13:28:57.397265+00	32	9	3
-168	2019-10-17 13:28:57.397287+00	2019-10-17 13:28:57.397295+00	33	9	3
-169	2019-10-17 13:28:57.397317+00	2019-10-17 13:28:57.397325+00	34	9	3
-170	2019-10-17 13:28:57.397347+00	2019-10-17 13:28:57.397354+00	35	9	3
-171	2019-10-17 13:28:57.397377+00	2019-10-17 13:28:57.397384+00	36	9	3
-172	2019-10-17 13:28:57.397407+00	2019-10-17 13:28:57.397414+00	37	9	3
-173	2019-10-17 13:28:57.397437+00	2019-10-17 13:28:57.397444+00	38	9	3
-174	2019-10-17 13:28:57.397467+00	2019-10-17 13:28:57.397474+00	39	9	3
-175	2019-10-17 13:28:57.397497+00	2019-10-17 13:28:57.397504+00	40	9	3
-176	2019-10-17 13:28:57.397527+00	2019-10-17 13:28:57.397534+00	41	9	3
-177	2019-10-17 13:28:57.397556+00	2019-10-17 13:28:57.397564+00	42	9	3
-178	2019-10-17 13:28:57.397586+00	2019-10-17 13:28:57.397594+00	43	9	3
-179	2019-10-17 13:28:57.397616+00	2019-10-17 13:28:57.397624+00	44	9	3
-180	2019-10-17 13:28:57.397646+00	2019-10-17 13:28:57.397653+00	45	9	3
-181	2019-10-17 13:28:57.413715+00	2019-10-17 13:28:57.413733+00	1	10	3
-182	2019-10-17 13:28:57.413771+00	2019-10-17 13:28:57.413779+00	2	10	3
-183	2019-10-17 13:28:57.413816+00	2019-10-17 13:28:57.413825+00	3	10	3
-184	2019-10-17 13:28:57.413849+00	2019-10-17 13:28:57.413856+00	4	10	3
-185	2019-10-17 13:28:57.413878+00	2019-10-17 13:28:57.413886+00	5	10	3
-186	2019-10-17 13:28:57.413909+00	2019-10-17 13:28:57.413916+00	6	10	3
-187	2019-10-17 13:28:57.413938+00	2019-10-17 13:28:57.413946+00	7	10	3
-188	2019-10-17 13:28:57.413968+00	2019-10-17 13:28:57.413975+00	8	10	3
-189	2019-10-17 13:28:57.414009+00	2019-10-17 13:28:57.414016+00	9	10	3
-190	2019-10-17 13:28:57.414039+00	2019-10-17 13:28:57.414046+00	10	10	3
-191	2019-10-17 13:28:57.414069+00	2019-10-17 13:28:57.414076+00	11	10	3
-192	2019-10-17 13:28:57.414099+00	2019-10-17 13:28:57.414106+00	12	10	3
-193	2019-10-17 13:28:57.414128+00	2019-10-17 13:28:57.414136+00	13	10	3
-194	2019-10-17 13:28:57.414158+00	2019-10-17 13:28:57.414172+00	14	10	3
-195	2019-10-17 13:28:57.414198+00	2019-10-17 13:28:57.414206+00	15	10	3
-196	2019-10-17 13:28:57.414228+00	2019-10-17 13:28:57.414243+00	16	10	3
-197	2019-10-17 13:28:57.414267+00	2019-10-17 13:28:57.414274+00	17	10	3
-198	2019-10-17 13:28:57.414296+00	2019-10-17 13:28:57.414303+00	18	10	3
-199	2019-10-17 13:28:57.414325+00	2019-10-17 13:28:57.414333+00	19	10	3
-200	2019-10-17 13:28:57.414361+00	2019-10-17 13:28:57.414376+00	20	10	3
-201	2019-10-17 13:28:57.414403+00	2019-10-17 13:28:57.41441+00	21	10	3
-202	2019-10-17 13:28:57.414433+00	2019-10-17 13:28:57.41444+00	22	10	3
-203	2019-10-17 13:28:57.414462+00	2019-10-17 13:28:57.414469+00	23	10	3
-204	2019-10-17 13:28:57.414491+00	2019-10-17 13:28:57.414498+00	24	10	3
-205	2019-10-17 13:28:57.414521+00	2019-10-17 13:28:57.414528+00	25	10	3
-206	2019-10-17 13:28:57.41456+00	2019-10-17 13:28:57.414569+00	26	10	3
-207	2019-10-17 13:28:57.414592+00	2019-10-17 13:28:57.414599+00	27	10	3
-208	2019-10-17 13:28:57.414621+00	2019-10-17 13:28:57.414628+00	28	10	3
-209	2019-10-17 13:28:57.41465+00	2019-10-17 13:28:57.414657+00	29	10	3
-210	2019-10-17 13:28:57.414679+00	2019-10-17 13:28:57.414687+00	30	10	3
-211	2019-10-17 13:28:57.414709+00	2019-10-17 13:28:57.414716+00	31	10	3
-212	2019-10-17 13:28:57.414747+00	2019-10-17 13:28:57.414756+00	32	10	3
-213	2019-10-17 13:28:57.414779+00	2019-10-17 13:28:57.414786+00	33	10	3
-214	2019-10-17 13:28:57.414808+00	2019-10-17 13:28:57.414816+00	34	10	3
-215	2019-10-17 13:28:57.414838+00	2019-10-17 13:28:57.414845+00	35	10	3
-216	2019-10-17 13:28:57.414867+00	2019-10-17 13:28:57.414874+00	36	10	3
-217	2019-10-17 13:28:57.414896+00	2019-10-17 13:28:57.414904+00	37	10	3
-218	2019-10-17 13:28:57.414933+00	2019-10-17 13:28:57.414942+00	38	10	3
-219	2019-10-17 13:28:57.414966+00	2019-10-17 13:28:57.414974+00	39	10	3
-220	2019-10-17 13:28:57.414996+00	2019-10-17 13:28:57.415003+00	40	10	3
-221	2019-10-17 13:28:57.415025+00	2019-10-17 13:28:57.415033+00	41	10	3
-222	2019-10-17 13:28:57.415055+00	2019-10-17 13:28:57.415062+00	42	10	3
-223	2019-10-17 13:28:57.415084+00	2019-10-17 13:28:57.415091+00	43	10	3
-224	2019-10-17 13:28:57.41512+00	2019-10-17 13:28:57.415135+00	44	10	3
-225	2019-10-17 13:28:57.41516+00	2019-10-17 13:28:57.415167+00	45	10	3
-226	2019-10-17 13:28:57.433485+00	2019-10-17 13:28:57.43352+00	1	11	3
-227	2019-10-17 13:28:57.43356+00	2019-10-17 13:28:57.433569+00	2	11	3
-228	2019-10-17 13:28:57.433594+00	2019-10-17 13:28:57.433601+00	3	11	3
-229	2019-10-17 13:28:57.433624+00	2019-10-17 13:28:57.433632+00	4	11	3
-230	2019-10-17 13:28:57.433654+00	2019-10-17 13:28:57.433662+00	5	11	3
-231	2019-10-17 13:28:57.433695+00	2019-10-17 13:28:57.433704+00	6	11	3
-232	2019-10-17 13:28:57.433727+00	2019-10-17 13:28:57.433735+00	7	11	3
-233	2019-10-17 13:28:57.433757+00	2019-10-17 13:28:57.433765+00	8	11	3
-234	2019-10-17 13:28:57.433787+00	2019-10-17 13:28:57.433795+00	9	11	3
-235	2019-10-17 13:28:57.433818+00	2019-10-17 13:28:57.433832+00	10	11	3
-236	2019-10-17 13:28:57.433858+00	2019-10-17 13:28:57.433866+00	11	11	3
-237	2019-10-17 13:28:57.433896+00	2019-10-17 13:28:57.433905+00	12	11	3
-238	2019-10-17 13:28:57.43393+00	2019-10-17 13:28:57.433937+00	13	11	3
-239	2019-10-17 13:28:57.43396+00	2019-10-17 13:28:57.433967+00	14	11	3
-240	2019-10-17 13:28:57.43399+00	2019-10-17 13:28:57.433997+00	15	11	3
-241	2019-10-17 13:28:57.434021+00	2019-10-17 13:28:57.434035+00	16	11	3
-242	2019-10-17 13:28:57.434061+00	2019-10-17 13:28:57.434068+00	17	11	3
-243	2019-10-17 13:28:57.43409+00	2019-10-17 13:28:57.434098+00	18	11	3
-244	2019-10-17 13:28:57.43412+00	2019-10-17 13:28:57.434127+00	19	11	3
-245	2019-10-17 13:28:57.434149+00	2019-10-17 13:28:57.434156+00	20	11	3
-246	2019-10-17 13:28:57.434178+00	2019-10-17 13:28:57.434186+00	21	11	3
-247	2019-10-17 13:28:57.434208+00	2019-10-17 13:28:57.434215+00	22	11	3
-248	2019-10-17 13:28:57.434237+00	2019-10-17 13:28:57.434244+00	23	11	3
-249	2019-10-17 13:28:57.434267+00	2019-10-17 13:28:57.434274+00	24	11	3
-250	2019-10-17 13:28:57.434296+00	2019-10-17 13:28:57.434303+00	25	11	3
-251	2019-10-17 13:28:57.434326+00	2019-10-17 13:28:57.434333+00	26	11	3
-252	2019-10-17 13:28:57.434355+00	2019-10-17 13:28:57.434363+00	27	11	3
-253	2019-10-17 13:28:57.434385+00	2019-10-17 13:28:57.434392+00	28	11	3
-254	2019-10-17 13:28:57.434414+00	2019-10-17 13:28:57.434422+00	29	11	3
-255	2019-10-17 13:28:57.434444+00	2019-10-17 13:28:57.434451+00	30	11	3
-256	2019-10-17 13:28:57.434473+00	2019-10-17 13:28:57.434488+00	31	11	3
-257	2019-10-17 13:28:57.434515+00	2019-10-17 13:28:57.434522+00	32	11	3
-258	2019-10-17 13:28:57.434545+00	2019-10-17 13:28:57.434552+00	33	11	3
-259	2019-10-17 13:28:57.434574+00	2019-10-17 13:28:57.434581+00	34	11	3
-260	2019-10-17 13:28:57.434604+00	2019-10-17 13:28:57.434611+00	35	11	3
-261	2019-10-17 13:28:57.434633+00	2019-10-17 13:28:57.43464+00	36	11	3
-262	2019-10-17 13:28:57.434663+00	2019-10-17 13:28:57.43467+00	37	11	3
-263	2019-10-17 13:28:57.434692+00	2019-10-17 13:28:57.4347+00	38	11	3
-264	2019-10-17 13:28:57.434732+00	2019-10-17 13:28:57.434741+00	39	11	3
-265	2019-10-17 13:28:57.434764+00	2019-10-17 13:28:57.434778+00	40	11	3
-266	2019-10-17 13:28:57.434802+00	2019-10-17 13:28:57.43481+00	41	11	3
-267	2019-10-17 13:28:57.434832+00	2019-10-17 13:28:57.434839+00	42	11	3
-268	2019-10-17 13:28:57.434861+00	2019-10-17 13:28:57.434868+00	43	11	3
-269	2019-10-17 13:28:57.434891+00	2019-10-17 13:28:57.434898+00	44	11	3
-270	2019-10-17 13:28:57.43492+00	2019-10-17 13:28:57.434927+00	45	11	3
+1	2020-01-24 04:41:22.984869+00	2020-01-24 04:41:22.984887+00	1	6	3
+2	2020-01-24 04:41:22.984923+00	2020-01-24 04:41:22.984928+00	2	6	3
+3	2020-01-24 04:41:22.984948+00	2020-01-24 04:41:22.984952+00	3	6	3
+4	2020-01-24 04:41:22.984971+00	2020-01-24 04:41:22.984976+00	4	6	3
+5	2020-01-24 04:41:22.984994+00	2020-01-24 04:41:22.984999+00	5	6	3
+6	2020-01-24 04:41:22.985017+00	2020-01-24 04:41:22.985022+00	6	6	3
+7	2020-01-24 04:41:22.98504+00	2020-01-24 04:41:22.985045+00	7	6	3
+8	2020-01-24 04:41:22.985063+00	2020-01-24 04:41:22.985068+00	8	6	3
+9	2020-01-24 04:41:22.985087+00	2020-01-24 04:41:22.985092+00	9	6	3
+10	2020-01-24 04:41:22.98511+00	2020-01-24 04:41:22.985115+00	10	6	3
+11	2020-01-24 04:41:22.985133+00	2020-01-24 04:41:22.985138+00	11	6	3
+12	2020-01-24 04:41:22.985157+00	2020-01-24 04:41:22.985162+00	12	6	3
+13	2020-01-24 04:41:22.98518+00	2020-01-24 04:41:22.985184+00	13	6	3
+14	2020-01-24 04:41:22.985202+00	2020-01-24 04:41:22.985207+00	14	6	3
+15	2020-01-24 04:41:22.985225+00	2020-01-24 04:41:22.98523+00	15	6	3
+16	2020-01-24 04:41:22.985249+00	2020-01-24 04:41:22.985254+00	16	6	3
+17	2020-01-24 04:41:22.985283+00	2020-01-24 04:41:22.985289+00	17	6	3
+18	2020-01-24 04:41:22.985307+00	2020-01-24 04:41:22.985312+00	18	6	3
+19	2020-01-24 04:41:22.985331+00	2020-01-24 04:41:22.985335+00	19	6	3
+20	2020-01-24 04:41:22.985354+00	2020-01-24 04:41:22.985359+00	20	6	3
+21	2020-01-24 04:41:22.985378+00	2020-01-24 04:41:22.985383+00	21	6	3
+22	2020-01-24 04:41:22.985401+00	2020-01-24 04:41:22.985406+00	22	6	3
+23	2020-01-24 04:41:22.985424+00	2020-01-24 04:41:22.985429+00	23	6	3
+24	2020-01-24 04:41:22.985447+00	2020-01-24 04:41:22.985452+00	24	6	3
+25	2020-01-24 04:41:22.98547+00	2020-01-24 04:41:22.985475+00	25	6	3
+26	2020-01-24 04:41:22.985494+00	2020-01-24 04:41:22.985498+00	26	6	3
+27	2020-01-24 04:41:22.985517+00	2020-01-24 04:41:22.985522+00	27	6	3
+28	2020-01-24 04:41:22.985541+00	2020-01-24 04:41:22.985545+00	28	6	3
+29	2020-01-24 04:41:22.985564+00	2020-01-24 04:41:22.985569+00	29	6	3
+30	2020-01-24 04:41:22.985587+00	2020-01-24 04:41:22.985592+00	30	6	3
+31	2020-01-24 04:41:22.98561+00	2020-01-24 04:41:22.985615+00	31	6	3
+32	2020-01-24 04:41:22.985633+00	2020-01-24 04:41:22.985638+00	32	6	3
+33	2020-01-24 04:41:22.985657+00	2020-01-24 04:41:22.985661+00	33	6	3
+34	2020-01-24 04:41:22.98568+00	2020-01-24 04:41:22.985684+00	34	6	3
+35	2020-01-24 04:41:22.985703+00	2020-01-24 04:41:22.985708+00	35	6	3
+36	2020-01-24 04:41:22.985726+00	2020-01-24 04:41:22.985731+00	36	6	3
+37	2020-01-24 04:41:22.985755+00	2020-01-24 04:41:22.985762+00	37	6	3
+38	2020-01-24 04:41:22.985782+00	2020-01-24 04:41:22.985787+00	38	6	3
+39	2020-01-24 04:41:22.985805+00	2020-01-24 04:41:22.98581+00	39	6	3
+40	2020-01-24 04:41:22.985828+00	2020-01-24 04:41:22.985833+00	40	6	3
+41	2020-01-24 04:41:22.985859+00	2020-01-24 04:41:22.985864+00	41	6	3
+42	2020-01-24 04:41:22.985882+00	2020-01-24 04:41:22.985887+00	42	6	3
+43	2020-01-24 04:41:22.985905+00	2020-01-24 04:41:22.98591+00	43	6	3
+44	2020-01-24 04:41:22.985928+00	2020-01-24 04:41:22.985933+00	44	6	3
+45	2020-01-24 04:41:22.985951+00	2020-01-24 04:41:22.985956+00	45	6	3
+46	2020-01-24 04:41:23.009459+00	2020-01-24 04:41:23.00948+00	1	7	3
+47	2020-01-24 04:41:23.00952+00	2020-01-24 04:41:23.009526+00	2	7	3
+48	2020-01-24 04:41:23.009545+00	2020-01-24 04:41:23.00955+00	3	7	3
+49	2020-01-24 04:41:23.009568+00	2020-01-24 04:41:23.009573+00	4	7	3
+50	2020-01-24 04:41:23.009591+00	2020-01-24 04:41:23.009596+00	5	7	3
+51	2020-01-24 04:41:23.009614+00	2020-01-24 04:41:23.009619+00	6	7	3
+52	2020-01-24 04:41:23.009637+00	2020-01-24 04:41:23.009642+00	7	7	3
+53	2020-01-24 04:41:23.00966+00	2020-01-24 04:41:23.009665+00	8	7	3
+54	2020-01-24 04:41:23.009683+00	2020-01-24 04:41:23.009687+00	9	7	3
+55	2020-01-24 04:41:23.009705+00	2020-01-24 04:41:23.00971+00	10	7	3
+56	2020-01-24 04:41:23.009728+00	2020-01-24 04:41:23.009733+00	11	7	3
+57	2020-01-24 04:41:23.009752+00	2020-01-24 04:41:23.009756+00	12	7	3
+58	2020-01-24 04:41:23.009774+00	2020-01-24 04:41:23.009779+00	13	7	3
+59	2020-01-24 04:41:23.009808+00	2020-01-24 04:41:23.009813+00	14	7	3
+60	2020-01-24 04:41:23.009831+00	2020-01-24 04:41:23.009836+00	15	7	3
+61	2020-01-24 04:41:23.009854+00	2020-01-24 04:41:23.009859+00	16	7	3
+62	2020-01-24 04:41:23.009877+00	2020-01-24 04:41:23.009881+00	17	7	3
+63	2020-01-24 04:41:23.0099+00	2020-01-24 04:41:23.009904+00	18	7	3
+64	2020-01-24 04:41:23.009922+00	2020-01-24 04:41:23.009927+00	19	7	3
+65	2020-01-24 04:41:23.009945+00	2020-01-24 04:41:23.00995+00	20	7	3
+66	2020-01-24 04:41:23.009967+00	2020-01-24 04:41:23.009972+00	21	7	3
+67	2020-01-24 04:41:23.00999+00	2020-01-24 04:41:23.009995+00	22	7	3
+68	2020-01-24 04:41:23.010013+00	2020-01-24 04:41:23.010018+00	23	7	3
+69	2020-01-24 04:41:23.010045+00	2020-01-24 04:41:23.010051+00	24	7	3
+70	2020-01-24 04:41:23.010069+00	2020-01-24 04:41:23.010074+00	25	7	3
+71	2020-01-24 04:41:23.010092+00	2020-01-24 04:41:23.010097+00	26	7	3
+72	2020-01-24 04:41:23.010115+00	2020-01-24 04:41:23.01012+00	27	7	3
+73	2020-01-24 04:41:23.010138+00	2020-01-24 04:41:23.010143+00	28	7	3
+74	2020-01-24 04:41:23.010161+00	2020-01-24 04:41:23.010166+00	29	7	3
+75	2020-01-24 04:41:23.010193+00	2020-01-24 04:41:23.010198+00	30	7	3
+76	2020-01-24 04:41:23.010216+00	2020-01-24 04:41:23.010221+00	31	7	3
+77	2020-01-24 04:41:23.010239+00	2020-01-24 04:41:23.010243+00	32	7	3
+78	2020-01-24 04:41:23.010261+00	2020-01-24 04:41:23.010266+00	33	7	3
+79	2020-01-24 04:41:23.010284+00	2020-01-24 04:41:23.010288+00	34	7	3
+80	2020-01-24 04:41:23.010306+00	2020-01-24 04:41:23.010311+00	35	7	3
+81	2020-01-24 04:41:23.010328+00	2020-01-24 04:41:23.010333+00	36	7	3
+82	2020-01-24 04:41:23.010356+00	2020-01-24 04:41:23.010363+00	37	7	3
+83	2020-01-24 04:41:23.010383+00	2020-01-24 04:41:23.010388+00	38	7	3
+84	2020-01-24 04:41:23.010406+00	2020-01-24 04:41:23.010411+00	39	7	3
+85	2020-01-24 04:41:23.010429+00	2020-01-24 04:41:23.010433+00	40	7	3
+86	2020-01-24 04:41:23.010451+00	2020-01-24 04:41:23.010456+00	41	7	3
+87	2020-01-24 04:41:23.010474+00	2020-01-24 04:41:23.010479+00	42	7	3
+88	2020-01-24 04:41:23.010497+00	2020-01-24 04:41:23.010501+00	43	7	3
+89	2020-01-24 04:41:23.010519+00	2020-01-24 04:41:23.010524+00	44	7	3
+90	2020-01-24 04:41:23.010542+00	2020-01-24 04:41:23.010547+00	45	7	3
+91	2020-01-24 04:41:23.029931+00	2020-01-24 04:41:23.02995+00	1	8	3
+92	2020-01-24 04:41:23.02999+00	2020-01-24 04:41:23.029996+00	2	8	3
+93	2020-01-24 04:41:23.030015+00	2020-01-24 04:41:23.03002+00	3	8	3
+94	2020-01-24 04:41:23.030038+00	2020-01-24 04:41:23.030043+00	4	8	3
+95	2020-01-24 04:41:23.030061+00	2020-01-24 04:41:23.030066+00	5	8	3
+96	2020-01-24 04:41:23.030084+00	2020-01-24 04:41:23.030089+00	6	8	3
+97	2020-01-24 04:41:23.030107+00	2020-01-24 04:41:23.030112+00	7	8	3
+98	2020-01-24 04:41:23.03013+00	2020-01-24 04:41:23.030135+00	8	8	3
+99	2020-01-24 04:41:23.030153+00	2020-01-24 04:41:23.030158+00	9	8	3
+100	2020-01-24 04:41:23.030176+00	2020-01-24 04:41:23.030181+00	10	8	3
+101	2020-01-24 04:41:23.030208+00	2020-01-24 04:41:23.030214+00	11	8	3
+102	2020-01-24 04:41:23.030232+00	2020-01-24 04:41:23.030237+00	12	8	3
+103	2020-01-24 04:41:23.030255+00	2020-01-24 04:41:23.03026+00	13	8	3
+104	2020-01-24 04:41:23.030278+00	2020-01-24 04:41:23.030283+00	14	8	3
+105	2020-01-24 04:41:23.030301+00	2020-01-24 04:41:23.030306+00	15	8	3
+106	2020-01-24 04:41:23.030324+00	2020-01-24 04:41:23.030329+00	16	8	3
+107	2020-01-24 04:41:23.030347+00	2020-01-24 04:41:23.030352+00	17	8	3
+108	2020-01-24 04:41:23.03037+00	2020-01-24 04:41:23.030375+00	18	8	3
+109	2020-01-24 04:41:23.030394+00	2020-01-24 04:41:23.030399+00	19	8	3
+110	2020-01-24 04:41:23.030417+00	2020-01-24 04:41:23.030422+00	20	8	3
+111	2020-01-24 04:41:23.03044+00	2020-01-24 04:41:23.030445+00	21	8	3
+112	2020-01-24 04:41:23.030463+00	2020-01-24 04:41:23.030468+00	22	8	3
+113	2020-01-24 04:41:23.030521+00	2020-01-24 04:41:23.030527+00	23	8	3
+114	2020-01-24 04:41:23.030547+00	2020-01-24 04:41:23.030552+00	24	8	3
+115	2020-01-24 04:41:23.030571+00	2020-01-24 04:41:23.030576+00	25	8	3
+116	2020-01-24 04:41:23.030594+00	2020-01-24 04:41:23.0306+00	26	8	3
+117	2020-01-24 04:41:23.030618+00	2020-01-24 04:41:23.030623+00	27	8	3
+118	2020-01-24 04:41:23.030642+00	2020-01-24 04:41:23.030646+00	28	8	3
+119	2020-01-24 04:41:23.030665+00	2020-01-24 04:41:23.03067+00	29	8	3
+120	2020-01-24 04:41:23.030688+00	2020-01-24 04:41:23.030693+00	30	8	3
+121	2020-01-24 04:41:23.030712+00	2020-01-24 04:41:23.030717+00	31	8	3
+122	2020-01-24 04:41:23.030735+00	2020-01-24 04:41:23.03074+00	32	8	3
+123	2020-01-24 04:41:23.030758+00	2020-01-24 04:41:23.030763+00	33	8	3
+124	2020-01-24 04:41:23.030782+00	2020-01-24 04:41:23.030787+00	34	8	3
+125	2020-01-24 04:41:23.030805+00	2020-01-24 04:41:23.03081+00	35	8	3
+126	2020-01-24 04:41:23.030828+00	2020-01-24 04:41:23.030833+00	36	8	3
+127	2020-01-24 04:41:23.030858+00	2020-01-24 04:41:23.030865+00	37	8	3
+128	2020-01-24 04:41:23.030886+00	2020-01-24 04:41:23.030891+00	38	8	3
+129	2020-01-24 04:41:23.03091+00	2020-01-24 04:41:23.030915+00	39	8	3
+130	2020-01-24 04:41:23.030933+00	2020-01-24 04:41:23.030938+00	40	8	3
+131	2020-01-24 04:41:23.030964+00	2020-01-24 04:41:23.03098+00	41	8	3
+132	2020-01-24 04:41:23.031+00	2020-01-24 04:41:23.031004+00	42	8	3
+133	2020-01-24 04:41:23.031032+00	2020-01-24 04:41:23.031037+00	43	8	3
+134	2020-01-24 04:41:23.031056+00	2020-01-24 04:41:23.031061+00	44	8	3
+135	2020-01-24 04:41:23.031079+00	2020-01-24 04:41:23.031084+00	45	8	3
+136	2020-01-24 04:41:23.051563+00	2020-01-24 04:41:23.051589+00	1	9	3
+137	2020-01-24 04:41:23.051629+00	2020-01-24 04:41:23.051635+00	2	9	3
+138	2020-01-24 04:41:23.051654+00	2020-01-24 04:41:23.051659+00	3	9	3
+139	2020-01-24 04:41:23.051678+00	2020-01-24 04:41:23.051683+00	4	9	3
+140	2020-01-24 04:41:23.051701+00	2020-01-24 04:41:23.051705+00	5	9	3
+141	2020-01-24 04:41:23.051724+00	2020-01-24 04:41:23.051728+00	6	9	3
+142	2020-01-24 04:41:23.051746+00	2020-01-24 04:41:23.051751+00	7	9	3
+143	2020-01-24 04:41:23.051769+00	2020-01-24 04:41:23.051774+00	8	9	3
+144	2020-01-24 04:41:23.051792+00	2020-01-24 04:41:23.051797+00	9	9	3
+145	2020-01-24 04:41:23.051815+00	2020-01-24 04:41:23.05182+00	10	9	3
+146	2020-01-24 04:41:23.051838+00	2020-01-24 04:41:23.051843+00	11	9	3
+147	2020-01-24 04:41:23.051861+00	2020-01-24 04:41:23.051866+00	12	9	3
+148	2020-01-24 04:41:23.051891+00	2020-01-24 04:41:23.051897+00	13	9	3
+149	2020-01-24 04:41:23.051917+00	2020-01-24 04:41:23.051922+00	14	9	3
+150	2020-01-24 04:41:23.05194+00	2020-01-24 04:41:23.051945+00	15	9	3
+151	2020-01-24 04:41:23.051963+00	2020-01-24 04:41:23.051968+00	16	9	3
+152	2020-01-24 04:41:23.051986+00	2020-01-24 04:41:23.05199+00	17	9	3
+153	2020-01-24 04:41:23.052008+00	2020-01-24 04:41:23.052013+00	18	9	3
+154	2020-01-24 04:41:23.052031+00	2020-01-24 04:41:23.052036+00	19	9	3
+155	2020-01-24 04:41:23.052054+00	2020-01-24 04:41:23.052059+00	20	9	3
+156	2020-01-24 04:41:23.052077+00	2020-01-24 04:41:23.052082+00	21	9	3
+157	2020-01-24 04:41:23.0521+00	2020-01-24 04:41:23.052104+00	22	9	3
+158	2020-01-24 04:41:23.05215+00	2020-01-24 04:41:23.052156+00	23	9	3
+159	2020-01-24 04:41:23.052175+00	2020-01-24 04:41:23.05218+00	24	9	3
+160	2020-01-24 04:41:23.052198+00	2020-01-24 04:41:23.052203+00	25	9	3
+161	2020-01-24 04:41:23.052221+00	2020-01-24 04:41:23.052226+00	26	9	3
+162	2020-01-24 04:41:23.052244+00	2020-01-24 04:41:23.052249+00	27	9	3
+163	2020-01-24 04:41:23.052267+00	2020-01-24 04:41:23.052272+00	28	9	3
+164	2020-01-24 04:41:23.05229+00	2020-01-24 04:41:23.052295+00	29	9	3
+165	2020-01-24 04:41:23.052313+00	2020-01-24 04:41:23.052317+00	30	9	3
+166	2020-01-24 04:41:23.052336+00	2020-01-24 04:41:23.052341+00	31	9	3
+167	2020-01-24 04:41:23.052358+00	2020-01-24 04:41:23.052363+00	32	9	3
+168	2020-01-24 04:41:23.052381+00	2020-01-24 04:41:23.052386+00	33	9	3
+169	2020-01-24 04:41:23.052404+00	2020-01-24 04:41:23.052408+00	34	9	3
+170	2020-01-24 04:41:23.052427+00	2020-01-24 04:41:23.052431+00	35	9	3
+171	2020-01-24 04:41:23.052449+00	2020-01-24 04:41:23.052454+00	36	9	3
+172	2020-01-24 04:41:23.052484+00	2020-01-24 04:41:23.052491+00	37	9	3
+173	2020-01-24 04:41:23.052511+00	2020-01-24 04:41:23.052516+00	38	9	3
+174	2020-01-24 04:41:23.052534+00	2020-01-24 04:41:23.052539+00	39	9	3
+175	2020-01-24 04:41:23.052557+00	2020-01-24 04:41:23.052562+00	40	9	3
+176	2020-01-24 04:41:23.05258+00	2020-01-24 04:41:23.052585+00	41	9	3
+177	2020-01-24 04:41:23.052603+00	2020-01-24 04:41:23.052608+00	42	9	3
+178	2020-01-24 04:41:23.052626+00	2020-01-24 04:41:23.052631+00	43	9	3
+179	2020-01-24 04:41:23.052648+00	2020-01-24 04:41:23.052653+00	44	9	3
+180	2020-01-24 04:41:23.052671+00	2020-01-24 04:41:23.052676+00	45	9	3
+181	2020-01-24 04:41:23.082311+00	2020-01-24 04:41:23.082333+00	1	10	3
+182	2020-01-24 04:41:23.082376+00	2020-01-24 04:41:23.082382+00	2	10	3
+183	2020-01-24 04:41:23.082401+00	2020-01-24 04:41:23.082406+00	3	10	3
+184	2020-01-24 04:41:23.082424+00	2020-01-24 04:41:23.082429+00	4	10	3
+185	2020-01-24 04:41:23.082447+00	2020-01-24 04:41:23.082452+00	5	10	3
+186	2020-01-24 04:41:23.082471+00	2020-01-24 04:41:23.082475+00	6	10	3
+187	2020-01-24 04:41:23.082494+00	2020-01-24 04:41:23.082499+00	7	10	3
+188	2020-01-24 04:41:23.082525+00	2020-01-24 04:41:23.082531+00	8	10	3
+189	2020-01-24 04:41:23.082935+00	2020-01-24 04:41:23.082945+00	9	10	3
+190	2020-01-24 04:41:23.083322+00	2020-01-24 04:41:23.083329+00	10	10	3
+191	2020-01-24 04:41:23.083351+00	2020-01-24 04:41:23.083356+00	11	10	3
+192	2020-01-24 04:41:23.083375+00	2020-01-24 04:41:23.083388+00	12	10	3
+193	2020-01-24 04:41:23.083409+00	2020-01-24 04:41:23.083414+00	13	10	3
+194	2020-01-24 04:41:23.083433+00	2020-01-24 04:41:23.083437+00	14	10	3
+195	2020-01-24 04:41:23.083456+00	2020-01-24 04:41:23.083461+00	15	10	3
+196	2020-01-24 04:41:23.083479+00	2020-01-24 04:41:23.083484+00	16	10	3
+197	2020-01-24 04:41:23.083502+00	2020-01-24 04:41:23.083507+00	17	10	3
+198	2020-01-24 04:41:23.083525+00	2020-01-24 04:41:23.08353+00	18	10	3
+199	2020-01-24 04:41:23.083548+00	2020-01-24 04:41:23.083553+00	19	10	3
+200	2020-01-24 04:41:23.083571+00	2020-01-24 04:41:23.083576+00	20	10	3
+201	2020-01-24 04:41:23.083594+00	2020-01-24 04:41:23.083599+00	21	10	3
+202	2020-01-24 04:41:23.083618+00	2020-01-24 04:41:23.083622+00	22	10	3
+203	2020-01-24 04:41:23.083641+00	2020-01-24 04:41:23.083646+00	23	10	3
+204	2020-01-24 04:41:23.083664+00	2020-01-24 04:41:23.083668+00	24	10	3
+205	2020-01-24 04:41:23.083687+00	2020-01-24 04:41:23.083692+00	25	10	3
+206	2020-01-24 04:41:23.083896+00	2020-01-24 04:41:23.083905+00	26	10	3
+207	2020-01-24 04:41:23.083931+00	2020-01-24 04:41:23.083937+00	27	10	3
+208	2020-01-24 04:41:23.083956+00	2020-01-24 04:41:23.083961+00	28	10	3
+209	2020-01-24 04:41:23.08398+00	2020-01-24 04:41:23.083985+00	29	10	3
+210	2020-01-24 04:41:23.084003+00	2020-01-24 04:41:23.084008+00	30	10	3
+211	2020-01-24 04:41:23.084026+00	2020-01-24 04:41:23.084031+00	31	10	3
+212	2020-01-24 04:41:23.084059+00	2020-01-24 04:41:23.084064+00	32	10	3
+213	2020-01-24 04:41:23.084084+00	2020-01-24 04:41:23.084089+00	33	10	3
+214	2020-01-24 04:41:23.084107+00	2020-01-24 04:41:23.084112+00	34	10	3
+215	2020-01-24 04:41:23.084155+00	2020-01-24 04:41:23.084161+00	35	10	3
+216	2020-01-24 04:41:23.084179+00	2020-01-24 04:41:23.084184+00	36	10	3
+217	2020-01-24 04:41:23.084208+00	2020-01-24 04:41:23.084215+00	37	10	3
+218	2020-01-24 04:41:23.084235+00	2020-01-24 04:41:23.08424+00	38	10	3
+219	2020-01-24 04:41:23.084259+00	2020-01-24 04:41:23.084263+00	39	10	3
+220	2020-01-24 04:41:23.084281+00	2020-01-24 04:41:23.084338+00	40	10	3
+221	2020-01-24 04:41:23.084359+00	2020-01-24 04:41:23.084365+00	41	10	3
+222	2020-01-24 04:41:23.084383+00	2020-01-24 04:41:23.084388+00	42	10	3
+223	2020-01-24 04:41:23.084406+00	2020-01-24 04:41:23.084411+00	43	10	3
+224	2020-01-24 04:41:23.084429+00	2020-01-24 04:41:23.084434+00	44	10	3
+225	2020-01-24 04:41:23.084452+00	2020-01-24 04:41:23.084457+00	45	10	3
+226	2020-01-24 04:41:23.101886+00	2020-01-24 04:41:23.101907+00	1	11	3
+227	2020-01-24 04:41:23.101947+00	2020-01-24 04:41:23.101953+00	2	11	3
+228	2020-01-24 04:41:23.101993+00	2020-01-24 04:41:23.101999+00	3	11	3
+229	2020-01-24 04:41:23.102017+00	2020-01-24 04:41:23.102022+00	4	11	3
+230	2020-01-24 04:41:23.10204+00	2020-01-24 04:41:23.102045+00	5	11	3
+231	2020-01-24 04:41:23.102063+00	2020-01-24 04:41:23.102068+00	6	11	3
+232	2020-01-24 04:41:23.102086+00	2020-01-24 04:41:23.102091+00	7	11	3
+233	2020-01-24 04:41:23.102109+00	2020-01-24 04:41:23.102113+00	8	11	3
+234	2020-01-24 04:41:23.102179+00	2020-01-24 04:41:23.102185+00	9	11	3
+235	2020-01-24 04:41:23.102204+00	2020-01-24 04:41:23.102209+00	10	11	3
+236	2020-01-24 04:41:23.102227+00	2020-01-24 04:41:23.102232+00	11	11	3
+237	2020-01-24 04:41:23.10225+00	2020-01-24 04:41:23.102255+00	12	11	3
+238	2020-01-24 04:41:23.102273+00	2020-01-24 04:41:23.102277+00	13	11	3
+239	2020-01-24 04:41:23.102295+00	2020-01-24 04:41:23.1023+00	14	11	3
+240	2020-01-24 04:41:23.102327+00	2020-01-24 04:41:23.102332+00	15	11	3
+241	2020-01-24 04:41:23.10235+00	2020-01-24 04:41:23.102355+00	16	11	3
+242	2020-01-24 04:41:23.102373+00	2020-01-24 04:41:23.102378+00	17	11	3
+243	2020-01-24 04:41:23.102396+00	2020-01-24 04:41:23.102401+00	18	11	3
+244	2020-01-24 04:41:23.102419+00	2020-01-24 04:41:23.102596+00	19	11	3
+245	2020-01-24 04:41:23.102631+00	2020-01-24 04:41:23.102637+00	20	11	3
+246	2020-01-24 04:41:23.102656+00	2020-01-24 04:41:23.102661+00	21	11	3
+247	2020-01-24 04:41:23.102679+00	2020-01-24 04:41:23.102684+00	22	11	3
+248	2020-01-24 04:41:23.102762+00	2020-01-24 04:41:23.102777+00	23	11	3
+249	2020-01-24 04:41:23.10281+00	2020-01-24 04:41:23.102815+00	24	11	3
+250	2020-01-24 04:41:23.102834+00	2020-01-24 04:41:23.102839+00	25	11	3
+251	2020-01-24 04:41:23.102857+00	2020-01-24 04:41:23.102862+00	26	11	3
+252	2020-01-24 04:41:23.1029+00	2020-01-24 04:41:23.102907+00	27	11	3
+253	2020-01-24 04:41:23.102927+00	2020-01-24 04:41:23.102932+00	28	11	3
+254	2020-01-24 04:41:23.10295+00	2020-01-24 04:41:23.102955+00	29	11	3
+255	2020-01-24 04:41:23.102982+00	2020-01-24 04:41:23.102988+00	30	11	3
+256	2020-01-24 04:41:23.103007+00	2020-01-24 04:41:23.103011+00	31	11	3
+257	2020-01-24 04:41:23.10303+00	2020-01-24 04:41:23.103035+00	32	11	3
+258	2020-01-24 04:41:23.103053+00	2020-01-24 04:41:23.103058+00	33	11	3
+259	2020-01-24 04:41:23.103084+00	2020-01-24 04:41:23.103089+00	34	11	3
+260	2020-01-24 04:41:23.103108+00	2020-01-24 04:41:23.103113+00	35	11	3
+261	2020-01-24 04:41:23.103131+00	2020-01-24 04:41:23.103136+00	36	11	3
+262	2020-01-24 04:41:23.10316+00	2020-01-24 04:41:23.103167+00	37	11	3
+263	2020-01-24 04:41:23.103187+00	2020-01-24 04:41:23.103192+00	38	11	3
+264	2020-01-24 04:41:23.10321+00	2020-01-24 04:41:23.103215+00	39	11	3
+265	2020-01-24 04:41:23.103234+00	2020-01-24 04:41:23.103239+00	40	11	3
+266	2020-01-24 04:41:23.103257+00	2020-01-24 04:41:23.103262+00	41	11	3
+267	2020-01-24 04:41:23.10328+00	2020-01-24 04:41:23.103285+00	42	11	3
+268	2020-01-24 04:41:23.103304+00	2020-01-24 04:41:23.103309+00	43	11	3
+269	2020-01-24 04:41:23.103327+00	2020-01-24 04:41:23.103332+00	44	11	3
+270	2020-01-24 04:41:23.10335+00	2020-01-24 04:41:23.103355+00	45	11	3
 \.
 
 
@@ -3677,18 +3086,6 @@ COPY locations_sowandpigletscell (id, created_at, modified_at, number, section_i
 --
 
 COPY locations_sowgroupcell (id, created_at, modified_at, number, sows_quantity, section_id, workshop_id) FROM stdin;
-1	2019-10-17 13:28:57.296189+00	2019-10-17 13:28:57.296208+00	1	0	4	2
-2	2019-10-17 13:28:57.29625+00	2019-10-17 13:28:57.296259+00	2	0	4	2
-3	2019-10-17 13:28:57.296286+00	2019-10-17 13:28:57.29637+00	3	0	4	2
-4	2019-10-17 13:28:57.296406+00	2019-10-17 13:28:57.296414+00	4	0	4	2
-5	2019-10-17 13:28:57.296439+00	2019-10-17 13:28:57.296447+00	5	0	4	2
-6	2019-10-17 13:28:57.296472+00	2019-10-17 13:28:57.296492+00	6	0	4	2
-7	2019-10-17 13:28:57.311862+00	2019-10-17 13:28:57.311893+00	1	0	5	2
-8	2019-10-17 13:28:57.311947+00	2019-10-17 13:28:57.311957+00	2	0	5	2
-9	2019-10-17 13:28:57.311984+00	2019-10-17 13:28:57.311992+00	3	0	5	2
-10	2019-10-17 13:28:57.312024+00	2019-10-17 13:28:57.312032+00	4	0	5	2
-11	2019-10-17 13:28:57.312058+00	2019-10-17 13:28:57.312065+00	5	0	5	2
-12	2019-10-17 13:28:57.31209+00	2019-10-17 13:28:57.312098+00	6	0	5	2
 \.
 
 
@@ -3713,95 +3110,41 @@ COPY locations_sowsinglecell (id, created_at, modified_at, number, section_id, w
 --
 
 COPY locations_workshop (id, created_at, modified_at, number, title) FROM stdin;
-1	2019-10-17 13:28:57.26252+00	2019-10-17 13:28:57.26256+00	1	Цех 1 Осеменение
-2	2019-10-17 13:28:57.262584+00	2019-10-17 13:28:57.262592+00	2	Цех 2 Ожидание родов
-3	2019-10-17 13:28:57.262605+00	2019-10-17 13:28:57.262612+00	3	Цех 3 Маточник
-4	2019-10-17 13:28:57.262633+00	2019-10-17 13:28:57.26264+00	4	Цех 4 Доращивание 4
-5	2019-10-17 13:28:57.262653+00	2019-10-17 13:28:57.26266+00	8	Цех 8 Доращивание 8
-6	2019-10-17 13:28:57.262672+00	2019-10-17 13:28:57.262686+00	5	Цех 5 Откорм 5
-7	2019-10-17 13:28:57.262707+00	2019-10-17 13:28:57.262714+00	6	Цех 6 Откорм 6
-8	2019-10-17 13:28:57.262727+00	2019-10-17 13:28:57.262733+00	7	Цех 7 Откорм 7
-9	2019-10-17 13:28:57.262746+00	2019-10-17 13:28:57.262753+00	9	Цех 9 Убойный цех
-10	2019-10-17 13:28:57.262765+00	2019-10-17 13:28:57.262772+00	10	Цех 10 Крематорий
+1	2020-01-24 04:41:22.924152+00	2020-01-24 04:41:22.924183+00	1	Цех 1 Осеменение
+2	2020-01-24 04:41:22.924204+00	2020-01-24 04:41:22.924209+00	2	Цех 2 Ожидание родов
+3	2020-01-24 04:41:22.92422+00	2020-01-24 04:41:22.924225+00	3	Цех 3 Маточник
+4	2020-01-24 04:41:22.924235+00	2020-01-24 04:41:22.924245+00	4	Цех 4 Доращивание 4
+5	2020-01-24 04:41:22.924326+00	2020-01-24 04:41:22.924336+00	5	Цех 5 Откорм 5
+6	2020-01-24 04:41:22.924348+00	2020-01-24 04:41:22.924353+00	6	Цех 6 Откорм 6
+7	2020-01-24 04:41:22.924363+00	2020-01-24 04:41:22.924368+00	7	Цех 7 Откорм 7
+8	2020-01-24 04:41:22.924378+00	2020-01-24 04:41:22.924382+00	8	Цех 8 Доращивание 8
+9	2020-01-24 04:41:22.924392+00	2020-01-24 04:41:22.924397+00	9	Цех 9 Убойный цех
+10	2020-01-24 04:41:22.924407+00	2020-01-24 04:41:22.924412+00	10	Цех 10 Крематорий
+11	2020-01-24 04:41:22.924422+00	2020-01-24 04:41:22.924426+00	11	Цех 7-5 Ремонтные
 \.
 
 
 --
--- Data for Name: piglets_events_cullingnewbornpiglets; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: piglets_events_cullingpiglets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY piglets_events_cullingnewbornpiglets (id, created_at, modified_at, date, culling_type, quantity, reason, is_it_gilt, initiator_id, piglets_group_id) FROM stdin;
+COPY piglets_events_cullingpiglets (id, created_at, modified_at, date, culling_type, reason, is_it_gilt, initiator_id, piglets_group_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: piglets_events_cullingnomadpiglets; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: piglets_events_pigletsmerger; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY piglets_events_cullingnomadpiglets (id, created_at, modified_at, date, culling_type, quantity, reason, is_it_gilt, initiator_id, piglets_group_id) FROM stdin;
+COPY piglets_events_pigletsmerger (id, created_at, modified_at, date, created_piglets_id, initiator_id) FROM stdin;
 \.
 
 
 --
--- Data for Name: piglets_events_newbornmergerrecord; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: piglets_events_pigletssplit; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY piglets_events_newbornmergerrecord (id, created_at, modified_at, quantity, percentage, merger_id, tour_id) FROM stdin;
-\.
-
-
---
--- Data for Name: piglets_events_newbornpigletsgrouprecount; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY piglets_events_newbornpigletsgrouprecount (id, created_at, modified_at, date, quantity_before, quantity_after, balance, initiator_id, piglets_group_id) FROM stdin;
-1	2019-11-04 09:00:52.402016+00	2019-11-04 09:00:52.402035+00	2019-11-04 09:00:52.401626+00	32	16	-16	4	2
-2	2019-11-04 09:01:15.400154+00	2019-11-04 09:01:15.400171+00	2019-11-04 09:01:15.399907+00	24	12	-12	4	1
-3	2019-11-04 09:01:39.237475+00	2019-11-04 09:01:39.237493+00	2019-11-04 09:01:39.237123+00	30	15	-15	4	4
-4	2019-11-04 09:01:51.749841+00	2019-11-04 09:01:51.749868+00	2019-11-04 09:01:51.749454+00	24	12	-12	4	5
-5	2019-11-04 09:03:59.826605+00	2019-11-04 09:03:59.826623+00	2019-11-04 09:03:59.826318+00	24	12	-12	4	6
-6	2019-11-04 09:04:12.853904+00	2019-11-04 09:04:12.853932+00	2019-11-04 09:04:12.853455+00	22	11	-11	4	7
-7	2019-11-04 09:04:32.480892+00	2019-11-04 09:04:32.480911+00	2019-11-04 09:04:32.480621+00	30	15	-15	4	8
-\.
-
-
---
--- Data for Name: piglets_events_newbornpigletsmerger; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY piglets_events_newbornpigletsmerger (id, created_at, modified_at, date, part_number, initiator_id, nomad_group_id) FROM stdin;
-\.
-
-
---
--- Data for Name: piglets_events_nomadmergerrecord; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY piglets_events_nomadmergerrecord (id, created_at, modified_at, quantity, percentage, merger_id, nomad_group_id) FROM stdin;
-\.
-
-
---
--- Data for Name: piglets_events_nomadpigletsgroupmerger; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY piglets_events_nomadpigletsgroupmerger (id, created_at, modified_at, date, initiator_id, new_location_id, nomad_group_id) FROM stdin;
-\.
-
-
---
--- Data for Name: piglets_events_nomadpigletsgrouprecount; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY piglets_events_nomadpigletsgrouprecount (id, created_at, modified_at, date, quantity_before, quantity_after, balance, initiator_id, piglets_group_id) FROM stdin;
-\.
-
-
---
--- Data for Name: piglets_events_splitnomadpigletsgroup; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY piglets_events_splitnomadpigletsgroup (id, created_at, modified_at, date, initiator_id, parent_group_id) FROM stdin;
+COPY piglets_events_pigletssplit (id, created_at, modified_at, date, initiator_id, parent_piglets_id) FROM stdin;
 \.
 
 
@@ -3814,138 +3157,10 @@ COPY piglets_events_weighingpiglets (id, created_at, modified_at, date, total_we
 
 
 --
--- Data for Name: piglets_newbornpigletsgroup; Type: TABLE DATA; Schema: public; Owner: postgres
+-- Data for Name: piglets_piglets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY piglets_newbornpigletsgroup (id, created_at, modified_at, start_quantity, quantity, active, transfer_label, gilts_quantity, size_label, location_id, merger_id, status_id, tour_id) FROM stdin;
-12	2019-10-29 08:14:38.149579+00	2019-10-29 08:14:38.149604+00	13	13	t	f	0	\N	169	\N	\N	2
-13	2019-10-29 08:16:17.36444+00	2019-10-29 08:16:17.364462+00	3	3	t	f	0	\N	170	\N	\N	2
-14	2019-10-29 08:16:56.723488+00	2019-10-29 08:17:14.223869+00	12	13	t	f	0	\N	171	\N	\N	2
-15	2019-10-29 08:18:07.198938+00	2019-10-29 08:18:07.198961+00	12	12	t	f	0	\N	172	\N	\N	2
-16	2019-10-29 08:18:35.131464+00	2019-10-29 08:18:35.131485+00	16	16	t	f	0	\N	173	\N	\N	2
-17	2019-10-29 08:19:42.471028+00	2019-10-29 08:19:42.471178+00	12	12	t	f	0	\N	174	\N	\N	2
-18	2019-10-29 08:19:57.382379+00	2019-10-29 08:19:57.382406+00	17	17	t	f	0	\N	175	\N	\N	2
-19	2019-10-29 08:20:16.513052+00	2019-10-29 08:20:16.513079+00	10	10	t	f	0	\N	176	\N	\N	2
-20	2019-10-29 08:20:35.765884+00	2019-10-29 08:20:35.765923+00	13	13	t	f	0	\N	177	\N	\N	2
-21	2019-10-29 08:21:15.424224+00	2019-10-29 08:21:15.424247+00	10	10	t	f	0	\N	186	\N	\N	2
-22	2019-10-29 08:21:48.663456+00	2019-10-29 08:21:48.663476+00	15	15	t	f	0	\N	185	\N	\N	2
-23	2019-10-29 08:22:20.623333+00	2019-10-29 08:22:20.623363+00	12	12	t	f	0	\N	184	\N	\N	2
-24	2019-10-29 08:22:33.072821+00	2019-10-29 08:22:33.072845+00	9	9	t	f	0	\N	183	\N	\N	2
-25	2019-10-29 08:22:44.98207+00	2019-10-29 08:22:44.982091+00	12	12	t	f	0	\N	182	\N	\N	2
-26	2019-10-29 08:23:06.645011+00	2019-10-29 08:23:06.645033+00	12	12	t	f	0	\N	181	\N	\N	2
-27	2019-10-29 08:23:24.239607+00	2019-10-29 08:23:24.239635+00	7	7	t	f	0	\N	180	\N	\N	2
-28	2019-10-29 08:24:01.548686+00	2019-10-29 08:24:01.548722+00	9	9	t	f	0	\N	179	\N	\N	2
-29	2019-10-29 08:24:19.128992+00	2019-10-29 08:24:19.129014+00	12	12	t	f	0	\N	178	\N	\N	2
-85	2019-11-04 09:01:31.722319+00	2019-11-04 09:01:31.722343+00	7	7	t	f	0	\N	250	\N	\N	2
-73	2019-11-04 08:57:22.740667+00	2019-11-04 08:57:22.74069+00	16	16	t	f	0	\N	238	\N	\N	2
-4	2019-10-29 07:31:06.197941+00	2019-11-04 09:01:39.266476+00	15	15	t	f	0	\N	190	\N	\N	2
-30	2019-10-29 08:25:41.166885+00	2019-10-29 08:25:41.166907+00	15	15	t	f	0	\N	189	\N	\N	1
-86	2019-11-04 09:02:14.840478+00	2019-11-04 09:02:14.840497+00	6	6	t	f	0	\N	252	\N	\N	2
-87	2019-11-04 09:02:27.335011+00	2019-11-04 09:02:27.335036+00	12	12	t	f	0	\N	253	\N	\N	2
-7	2019-10-29 07:32:27.030677+00	2019-11-04 09:04:12.856914+00	11	11	t	f	0	\N	194	\N	\N	2
-93	2019-11-04 09:04:18.138956+00	2019-11-04 09:04:18.138983+00	11	11	t	f	0	\N	260	\N	\N	2
-31	2019-10-29 08:28:21.085415+00	2019-10-29 08:28:21.08544+00	12	12	t	f	0	\N	195	\N	\N	2
-94	2019-11-04 09:04:34.398426+00	2019-11-04 09:04:34.398447+00	12	12	t	f	0	\N	261	\N	\N	2
-96	2019-11-04 09:05:02.959393+00	2019-11-04 09:05:02.959416+00	13	13	t	f	0	\N	263	\N	\N	2
-74	2019-11-04 08:57:51.063886+00	2019-11-04 08:57:51.063903+00	9	9	t	f	0	\N	239	\N	\N	2
-10	2019-10-29 07:33:46.521293+00	2019-10-29 08:30:27.581945+00	12	12	t	f	0	\N	199	\N	\N	2
-3	2019-10-29 07:30:28.718782+00	2019-11-04 09:05:54.591974+00	12	12	t	f	0	\N	201	\N	\N	2
-32	2019-10-29 08:31:36.731347+00	2019-11-04 09:06:30.795564+00	15	17	t	f	0	\N	202	\N	\N	2
-34	2019-10-29 08:32:57.217344+00	2019-10-29 08:32:57.217367+00	9	9	t	f	0	\N	167	\N	\N	2
-35	2019-10-29 08:34:12.31715+00	2019-10-29 08:34:12.317172+00	11	11	t	f	0	\N	166	\N	\N	2
-36	2019-10-29 08:37:33.834727+00	2019-10-29 08:37:33.834748+00	10	10	t	f	0	\N	165	\N	\N	2
-37	2019-10-29 08:37:54.005193+00	2019-10-29 08:37:54.005214+00	11	11	t	f	0	\N	164	\N	\N	2
-38	2019-10-29 08:38:11.853054+00	2019-10-29 08:38:11.853071+00	11	11	t	f	0	\N	163	\N	\N	2
-39	2019-10-29 08:38:40.430181+00	2019-10-29 08:38:40.430202+00	15	15	t	f	0	\N	162	\N	\N	2
-40	2019-10-29 08:39:01.045088+00	2019-10-29 08:39:01.045142+00	9	9	t	f	0	\N	161	\N	\N	2
-41	2019-10-29 08:39:26.284836+00	2019-10-29 08:39:26.284857+00	8	8	t	f	0	\N	160	\N	\N	2
-42	2019-10-29 08:39:44.192767+00	2019-10-29 08:39:44.192786+00	14	14	t	f	0	\N	159	\N	\N	2
-43	2019-10-29 08:39:58.344676+00	2019-10-29 08:40:09.930169+00	0	12	t	f	0	\N	158	\N	\N	2
-44	2019-10-29 08:40:31.050741+00	2019-10-29 08:40:31.050778+00	15	15	t	f	0	\N	157	\N	\N	2
-45	2019-10-29 08:40:44.732962+00	2019-10-29 08:40:44.732991+00	15	15	t	f	0	\N	156	\N	\N	2
-46	2019-10-29 08:40:54.126041+00	2019-10-29 08:40:54.126064+00	11	11	t	f	0	\N	155	\N	\N	2
-47	2019-10-29 08:41:07.409021+00	2019-10-29 08:41:07.409042+00	8	8	t	f	0	\N	154	\N	\N	2
-48	2019-10-29 08:41:22.654471+00	2019-10-29 08:41:22.654493+00	8	8	t	f	0	\N	153	\N	\N	2
-49	2019-10-29 08:41:36.776195+00	2019-10-29 08:41:36.776213+00	14	14	t	f	0	\N	152	\N	\N	2
-50	2019-11-04 08:46:27.781406+00	2019-11-04 08:46:27.781433+00	12	12	t	f	0	\N	214	\N	\N	2
-51	2019-11-04 08:46:39.310248+00	2019-11-04 08:46:39.310267+00	14	14	t	f	0	\N	215	\N	\N	2
-52	2019-11-04 08:46:49.764182+00	2019-11-04 08:46:49.764202+00	12	12	t	f	0	\N	216	\N	\N	2
-53	2019-11-04 08:47:01.147489+00	2019-11-04 08:47:01.147512+00	12	12	t	f	0	\N	217	\N	\N	2
-54	2019-11-04 08:47:14.238909+00	2019-11-04 08:47:14.238928+00	10	10	t	f	0	\N	218	\N	\N	2
-56	2019-11-04 08:47:39.661928+00	2019-11-04 08:47:39.661953+00	14	14	t	f	0	\N	220	\N	\N	2
-57	2019-11-04 08:47:53.53572+00	2019-11-04 08:47:53.535736+00	9	9	t	f	0	\N	221	\N	\N	2
-58	2019-11-04 08:48:10.421918+00	2019-11-04 08:48:10.421939+00	13	13	t	f	0	\N	222	\N	\N	2
-59	2019-11-04 08:48:30.618328+00	2019-11-04 08:48:30.618353+00	14	14	t	f	0	\N	223	\N	\N	2
-60	2019-11-04 08:52:44.408392+00	2019-11-04 08:52:44.408418+00	16	16	t	f	0	\N	224	\N	\N	2
-61	2019-11-04 08:53:03.1578+00	2019-11-04 08:53:03.157826+00	12	12	t	f	0	\N	225	\N	\N	2
-62	2019-11-04 08:53:16.468979+00	2019-11-04 08:53:16.468998+00	5	5	t	f	0	\N	226	\N	\N	2
-63	2019-11-04 08:53:29.842327+00	2019-11-04 08:53:29.842352+00	13	13	t	f	0	\N	227	\N	\N	2
-64	2019-11-04 08:54:21.656689+00	2019-11-04 08:54:21.65671+00	11	11	t	f	0	\N	228	\N	\N	2
-55	2019-11-04 08:47:27.208965+00	2019-11-04 08:54:42.709072+00	12	17	t	f	0	\N	219	\N	\N	2
-65	2019-11-04 08:54:56.580844+00	2019-11-04 08:54:56.580871+00	11	11	t	f	0	\N	230	\N	\N	2
-66	2019-11-04 08:55:12.556059+00	2019-11-04 08:55:12.556081+00	7	7	t	f	0	\N	231	\N	\N	2
-67	2019-11-04 08:55:35.523015+00	2019-11-04 08:55:35.523033+00	12	12	t	f	0	\N	232	\N	\N	2
-68	2019-11-04 08:55:49.715138+00	2019-11-04 08:55:49.715445+00	14	14	t	f	0	\N	233	\N	\N	2
-69	2019-11-04 08:56:07.852293+00	2019-11-04 08:56:07.85231+00	16	16	t	f	0	\N	234	\N	\N	2
-70	2019-11-04 08:56:28.030096+00	2019-11-04 08:56:28.030124+00	10	10	t	f	0	\N	235	\N	\N	2
-71	2019-11-04 08:56:50.531586+00	2019-11-04 08:56:50.531608+00	13	13	t	f	0	\N	236	\N	\N	2
-72	2019-11-04 08:57:06.89947+00	2019-11-04 08:57:06.899492+00	11	11	t	f	0	\N	237	\N	\N	2
-75	2019-11-04 08:58:09.72204+00	2019-11-04 08:58:09.722063+00	8	8	t	f	0	\N	240	\N	\N	2
-76	2019-11-04 08:58:24.552086+00	2019-11-04 08:58:24.552113+00	9	9	t	f	0	\N	241	\N	\N	2
-77	2019-11-04 08:58:36.807376+00	2019-11-04 08:58:36.807398+00	9	9	t	f	0	\N	242	\N	\N	2
-78	2019-11-04 08:58:51.559113+00	2019-11-04 08:59:06.441216+00	13	13	t	f	0	\N	243	\N	\N	2
-79	2019-11-04 08:59:24.640231+00	2019-11-04 08:59:24.640254+00	16	16	t	f	0	\N	244	\N	\N	2
-80	2019-11-04 08:59:43.296748+00	2019-11-04 08:59:43.296768+00	11	11	t	f	0	\N	245	\N	\N	2
-81	2019-11-04 09:00:04.929915+00	2019-11-04 09:00:04.931166+00	10	10	t	f	0	\N	246	\N	\N	2
-82	2019-11-04 09:00:24.590149+00	2019-11-04 09:00:24.590173+00	8	8	t	f	0	\N	247	\N	\N	2
-83	2019-11-04 09:00:41.897163+00	2019-11-04 09:00:41.897183+00	18	18	t	f	0	\N	248	\N	\N	2
-2	2019-10-29 07:29:48.86969+00	2019-11-04 09:00:52.40913+00	16	16	t	f	0	\N	187	\N	\N	2
-84	2019-11-04 09:00:57.443932+00	2019-11-04 09:00:57.44395+00	5	5	t	f	0	\N	249	\N	\N	2
-1	2019-10-29 07:29:08.036217+00	2019-11-04 09:01:15.402276+00	12	12	t	f	0	\N	188	\N	\N	2
-5	2019-10-29 07:31:36.874424+00	2019-11-04 09:01:51.753366+00	12	12	t	f	0	\N	191	\N	\N	2
-88	2019-11-04 09:02:38.335766+00	2019-11-04 09:02:38.335787+00	5	5	t	f	0	\N	254	\N	\N	2
-89	2019-11-04 09:02:42.142726+00	2019-11-04 09:02:42.142752+00	10	10	t	f	0	\N	192	\N	\N	2
-90	2019-11-04 09:02:56.422509+00	2019-11-04 09:02:56.42261+00	11	11	t	f	0	\N	256	\N	\N	2
-91	2019-11-04 09:03:11.886727+00	2019-11-04 09:03:11.886752+00	3	3	t	f	0	\N	257	\N	\N	4
-92	2019-11-04 09:03:59.620896+00	2019-11-04 09:03:59.620918+00	12	12	t	f	0	\N	259	\N	\N	2
-6	2019-10-29 07:32:05.310141+00	2019-11-04 09:03:59.829261+00	12	12	t	f	0	\N	193	\N	\N	2
-8	2019-10-29 07:32:55.949786+00	2019-11-04 09:04:32.484641+00	15	15	t	f	0	\N	196	\N	\N	2
-95	2019-11-04 09:04:45.694006+00	2019-11-04 09:04:45.694028+00	10	10	t	f	0	\N	262	\N	\N	2
-9	2019-10-29 07:33:21.074069+00	2019-11-04 09:04:48.958706+00	12	12	t	f	0	\N	197	\N	\N	2
-33	2019-10-29 08:32:39.567442+00	2019-11-04 09:09:56.222535+00	12	12	t	f	0	\N	168	\N	\N	2
-97	2019-11-04 09:05:18.861123+00	2019-11-04 09:05:18.861203+00	8	8	t	f	0	\N	264	\N	\N	2
-98	2019-11-04 09:05:19.773346+00	2019-11-04 09:05:19.77337+00	15	15	t	f	0	\N	198	\N	\N	2
-11	2019-10-29 07:34:04.454258+00	2019-11-04 09:05:39.185898+00	10	10	t	f	0	\N	200	\N	\N	2
-99	2019-11-04 09:06:21.558809+00	2019-11-04 09:06:21.558833+00	14	14	t	f	0	\N	205	\N	\N	2
-100	2019-11-04 09:06:42.644318+00	2019-11-04 09:06:42.644342+00	5	5	t	f	0	\N	206	\N	\N	2
-101	2019-11-04 09:06:49.896368+00	2019-11-04 09:06:49.89639+00	11	11	t	f	0	\N	203	\N	\N	2
-102	2019-11-04 09:07:00.344215+00	2019-11-04 09:07:00.344236+00	12	12	t	f	0	\N	207	\N	\N	2
-103	2019-11-04 09:07:04.524215+00	2019-11-04 09:07:04.52424+00	16	16	t	f	0	\N	204	\N	\N	2
-104	2019-11-04 09:07:10.53732+00	2019-11-04 09:07:10.537341+00	11	11	t	f	0	\N	208	\N	\N	2
-105	2019-11-04 09:07:22.143857+00	2019-11-04 09:07:22.143884+00	17	17	t	f	0	\N	209	\N	\N	2
-106	2019-11-04 09:07:38.21924+00	2019-11-04 09:07:38.219263+00	12	12	t	f	0	\N	210	\N	\N	2
-107	2019-11-04 09:07:48.656068+00	2019-11-04 09:07:48.656084+00	13	13	t	f	0	\N	211	\N	\N	2
-108	2019-11-04 09:08:01.600314+00	2019-11-04 09:08:01.600395+00	10	10	t	f	0	\N	212	\N	\N	2
-109	2019-11-04 09:08:14.062258+00	2019-11-04 09:08:14.062331+00	12	12	t	f	0	\N	213	\N	\N	2
-110	2019-11-04 09:11:47.786374+00	2019-11-04 09:11:47.786397+00	14	14	t	f	0	\N	151	\N	\N	2
-111	2019-11-04 09:12:26.950657+00	2019-11-04 09:12:26.950673+00	12	12	t	f	0	\N	150	\N	\N	2
-112	2019-11-04 09:12:50.608388+00	2019-11-04 09:12:50.608409+00	15	15	t	f	0	\N	149	\N	\N	2
-113	2019-11-04 09:12:57.480001+00	2019-11-04 09:12:57.48002+00	15	15	t	f	0	\N	142	\N	\N	2
-114	2019-11-04 09:13:13.65607+00	2019-11-04 09:13:13.656089+00	14	14	t	f	0	\N	143	\N	\N	2
-115	2019-11-04 09:13:16.078011+00	2019-11-04 09:13:16.078041+00	13	13	t	f	0	\N	148	\N	\N	2
-116	2019-11-04 09:13:29.583929+00	2019-11-04 09:13:29.583954+00	15	15	t	f	0	\N	147	\N	\N	2
-117	2019-11-04 09:13:31.937827+00	2019-11-04 09:13:31.937846+00	10	10	t	f	0	\N	144	\N	\N	2
-118	2019-11-04 09:13:42.861857+00	2019-11-04 09:13:42.861882+00	13	13	t	f	0	\N	146	\N	\N	2
-119	2019-11-04 09:13:44.6417+00	2019-11-04 09:13:44.641723+00	6	6	t	f	0	\N	145	\N	\N	2
-120	2019-11-04 09:14:13.970234+00	2019-11-04 09:14:13.970249+00	9	9	t	f	0	\N	139	\N	\N	2
-\.
-
-
---
--- Data for Name: piglets_nomadpigletsgroup; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY piglets_nomadpigletsgroup (id, created_at, modified_at, start_quantity, quantity, active, transfer_label, gilts_quantity, groups_merger_id, location_id, split_record_id, status_id) FROM stdin;
+COPY piglets_piglets (id, created_at, modified_at, start_quantity, quantity, gilts_quantity, transfer_part_number, active, location_id, merger_as_parent_id, split_as_child_id, status_id) FROM stdin;
 \.
 
 
@@ -3954,11 +3169,11 @@ COPY piglets_nomadpigletsgroup (id, created_at, modified_at, start_quantity, qua
 --
 
 COPY piglets_pigletsstatus (id, created_at, modified_at, title) FROM stdin;
-1	2019-10-17 13:28:57.786068+00	2019-10-17 13:28:57.786086+00	Родились, кормятся
-2	2019-10-17 13:28:57.7861+00	2019-10-17 13:28:57.786108+00	Готовы ко взвешиванию
-3	2019-10-17 13:28:57.786118+00	2019-10-17 13:28:57.786125+00	Взвешены, готовы к заселению
-4	2019-10-17 13:28:57.786135+00	2019-10-17 13:28:57.786142+00	Кормятся
-5	2019-10-17 13:28:57.786152+00	2019-10-17 13:28:57.786159+00	Объединены с другой группой
+1	2020-01-24 04:41:23.603799+00	2020-01-24 04:41:23.60382+00	Родились, кормятся
+2	2020-01-24 04:41:23.603831+00	2020-01-24 04:41:23.603836+00	Готовы ко взвешиванию
+3	2020-01-24 04:41:23.603844+00	2020-01-24 04:41:23.603849+00	Взвешены, готовы к заселению
+4	2020-01-24 04:41:23.603856+00	2020-01-24 04:41:23.603861+00	Кормятся
+5	2020-01-24 04:41:23.603868+00	2020-01-24 04:41:23.603873+00	Объединены с другой группой
 \.
 
 
@@ -3967,22 +3182,18 @@ COPY piglets_pigletsstatus (id, created_at, modified_at, title) FROM stdin;
 --
 
 COPY sows_boar (id, created_at, modified_at, birth_id, location_id) FROM stdin;
-3	2019-10-21 05:50:01.432709+00	2019-10-21 05:50:01.432754+00	017	1
-4	2019-10-21 05:50:14.957832+00	2019-10-21 05:50:14.95797+00	018	1
-5	2019-10-21 05:50:27.306186+00	2019-10-21 05:50:27.306216+00	019	1
-6	2019-10-21 05:50:35.486347+00	2019-10-21 05:50:35.486375+00	020	1
-7	2019-10-21 05:50:45.16501+00	2019-10-21 05:50:45.165043+00	021	1
-8	2019-10-21 05:50:57.523223+00	2019-10-21 05:50:57.533611+00	022	1
-9	2019-10-21 05:51:07.918011+00	2019-10-21 05:51:07.918046+00	011	1
-10	2019-10-21 05:51:16.329727+00	2019-10-21 05:51:16.329763+00	416	1
-11	2019-10-21 05:51:31.079943+00	2019-10-21 05:51:31.079973+00	417	1
-12	2019-10-21 05:51:38.66361+00	2019-10-21 05:51:38.663639+00	216	1
-13	2019-10-25 06:51:31.085936+00	2019-10-25 06:51:31.085981+00	19	1
-14	2019-10-25 06:51:31.092311+00	2019-10-25 06:51:31.092333+00	18	1
-15	2019-10-25 06:51:31.133084+00	2019-10-25 06:51:31.133131+00	17	1
-16	2019-10-25 06:51:31.323709+00	2019-10-25 06:51:31.323735+00	21	1
-17	2019-10-25 06:51:33.628738+00	2019-10-25 06:51:33.628765+00	22	1
-18	2019-10-25 06:51:33.64103+00	2019-10-25 06:51:33.641055+00	20	1
+1	2020-01-24 04:41:26.303394+00	2020-01-24 04:41:26.303411+00	1	1
+2	2020-01-24 04:41:26.30999+00	2020-01-24 04:41:26.310006+00	2	1
+3	2020-01-24 04:43:05.494438+00	2020-01-24 04:43:05.494457+00	020	1
+4	2020-01-24 04:43:05.502111+00	2020-01-24 04:43:05.502128+00	022	1
+5	2020-01-24 04:43:06.019506+00	2020-01-24 04:43:06.019524+00	021	1
+6	2020-01-24 04:43:07.360356+00	2020-01-24 04:43:07.360376+00	019	1
+7	2020-01-24 04:43:07.45346+00	2020-01-24 04:43:07.453478+00	417	1
+8	2020-01-24 04:43:07.530705+00	2020-01-24 04:43:07.530723+00	018	1
+9	2020-01-24 04:43:07.88418+00	2020-01-24 04:43:07.884197+00	216	1
+10	2020-01-24 04:43:10.171654+00	2020-01-24 04:43:10.17167+00	017	1
+11	2020-01-24 04:43:12.117799+00	2020-01-24 04:43:12.117815+00	011	1
+12	2020-01-24 04:43:17.140852+00	2020-01-24 04:43:17.14087+00	416	1
 \.
 
 
@@ -3991,7 +3202,6 @@ COPY sows_boar (id, created_at, modified_at, birth_id, location_id) FROM stdin;
 --
 
 COPY sows_events_abortionsow (id, created_at, modified_at, date, initiator_id, sow_id, tour_id) FROM stdin;
-1	2019-11-04 08:08:05.494157+00	2019-11-04 08:08:05.494181+00	\N	9	272	4
 \.
 
 
@@ -4000,13 +3210,6 @@ COPY sows_events_abortionsow (id, created_at, modified_at, date, initiator_id, s
 --
 
 COPY sows_events_cullingsow (id, created_at, modified_at, date, culling_type, reason, initiator_id, sow_id, tour_id) FROM stdin;
-1	2019-11-04 08:06:57.472922+00	2019-11-04 08:06:57.473711+00	2019-11-04 08:06:57.469088+00	padej	padej	9	272	4
-2	2019-11-04 08:07:03.977397+00	2019-11-04 08:07:03.977457+00	2019-11-04 08:07:03.976738+00	padej	padej	9	272	4
-3	2019-11-04 08:07:29.801971+00	2019-11-04 08:07:29.802061+00	2019-11-04 08:07:29.801685+00	padej	padej	9	272	4
-4	2019-11-04 08:07:32.305777+00	2019-11-04 08:07:32.3058+00	2019-11-04 08:07:32.304876+00	padej	padej	9	272	4
-5	2019-11-04 08:08:27.958536+00	2019-11-04 08:08:27.958555+00	2019-11-04 08:08:27.957862+00	padej	padej	9	272	\N
-6	2019-11-04 08:08:40.62509+00	2019-11-04 08:08:40.62514+00	2019-11-04 08:08:40.624779+00	padej	padej	9	272	\N
-7	2019-11-04 08:08:44.54215+00	2019-11-04 08:08:44.542171+00	2019-11-04 08:08:44.54094+00	padej	padej	9	272	\N
 \.
 
 
@@ -4015,494 +3218,486 @@ COPY sows_events_cullingsow (id, created_at, modified_at, date, culling_type, re
 --
 
 COPY sows_events_semination (id, created_at, modified_at, date, boar_id, initiator_id, semination_employee_id, sow_id, tour_id) FROM stdin;
-1	2019-10-18 03:44:16.366805+00	2019-10-18 03:44:16.366823+00	2019-10-18 03:44:16.366832+00	\N	1	1	1	1
-2	2019-10-18 03:44:16.389361+00	2019-10-18 03:44:16.38938+00	2019-10-18 03:44:16.389389+00	\N	1	1	1	1
-3	2019-10-18 03:51:17.799836+00	2019-10-18 03:51:17.799866+00	2019-10-18 03:51:17.799875+00	\N	1	1	2	2
-4	2019-10-18 03:51:17.799932+00	2019-10-18 03:51:17.799942+00	2019-10-18 03:51:17.799949+00	\N	1	1	3	2
-5	2019-10-18 03:51:17.799984+00	2019-10-18 03:51:17.799992+00	2019-10-18 03:51:17.799999+00	\N	1	1	4	2
-6	2019-10-18 03:51:17.800033+00	2019-10-18 03:51:17.800041+00	2019-10-18 03:51:17.800049+00	\N	1	1	5	2
-7	2019-10-18 03:51:17.800082+00	2019-10-18 03:51:17.80009+00	2019-10-18 03:51:17.800097+00	\N	1	1	6	2
-8	2019-10-18 03:51:17.800135+00	2019-10-18 03:51:17.800143+00	2019-10-18 03:51:17.80015+00	\N	1	1	7	2
-9	2019-10-18 03:51:17.800183+00	2019-10-18 03:51:17.800191+00	2019-10-18 03:51:17.800205+00	\N	1	1	8	2
-10	2019-10-18 03:51:17.800238+00	2019-10-18 03:51:17.800245+00	2019-10-18 03:51:17.800252+00	\N	1	1	9	2
-11	2019-10-18 03:51:17.800342+00	2019-10-18 03:51:17.800351+00	2019-10-18 03:51:17.800358+00	\N	1	1	10	2
-12	2019-10-18 03:51:17.800391+00	2019-10-18 03:51:17.800405+00	2019-10-18 03:51:17.800412+00	\N	1	1	11	2
-13	2019-10-18 03:51:17.800445+00	2019-10-18 03:51:17.800453+00	2019-10-18 03:51:17.80046+00	\N	1	1	12	2
-14	2019-10-18 03:51:17.800493+00	2019-10-18 03:51:17.800503+00	2019-10-18 03:51:17.800512+00	\N	1	1	13	2
-15	2019-10-18 03:51:17.800552+00	2019-10-18 03:51:17.80056+00	2019-10-18 03:51:17.800567+00	\N	1	1	14	2
-16	2019-10-18 03:51:17.800601+00	2019-10-18 03:51:17.800608+00	2019-10-18 03:51:17.800615+00	\N	1	1	15	2
-17	2019-10-18 03:51:17.800648+00	2019-10-18 03:51:17.800656+00	2019-10-18 03:51:17.800662+00	\N	1	1	16	2
-18	2019-10-18 03:51:17.800695+00	2019-10-18 03:51:17.800709+00	2019-10-18 03:51:17.800716+00	\N	1	1	17	2
-19	2019-10-18 03:51:17.800749+00	2019-10-18 03:51:17.800757+00	2019-10-18 03:51:17.800764+00	\N	1	1	18	2
-20	2019-10-18 03:51:17.800796+00	2019-10-18 03:51:17.800804+00	2019-10-18 03:51:17.800811+00	\N	1	1	19	2
-21	2019-10-18 03:51:17.800844+00	2019-10-18 03:51:17.800852+00	2019-10-18 03:51:17.800859+00	\N	1	1	20	2
-22	2019-10-18 03:51:17.800891+00	2019-10-18 03:51:17.800899+00	2019-10-18 03:51:17.800906+00	\N	1	1	21	2
-23	2019-10-18 03:51:17.800938+00	2019-10-18 03:51:17.800946+00	2019-10-18 03:51:17.800952+00	\N	1	1	22	2
-24	2019-10-18 03:51:17.800985+00	2019-10-18 03:51:17.800993+00	2019-10-18 03:51:17.800999+00	\N	1	1	23	2
-25	2019-10-18 03:51:17.801032+00	2019-10-18 03:51:17.80104+00	2019-10-18 03:51:17.801047+00	\N	1	1	24	2
-26	2019-10-18 03:51:17.80108+00	2019-10-18 03:51:17.801087+00	2019-10-18 03:51:17.801094+00	\N	1	1	25	2
-27	2019-10-18 03:51:17.801127+00	2019-10-18 03:51:17.801135+00	2019-10-18 03:51:17.801142+00	\N	1	1	26	2
-28	2019-10-18 03:51:17.801175+00	2019-10-18 03:51:17.801182+00	2019-10-18 03:51:17.801189+00	\N	1	1	27	2
-29	2019-10-18 03:51:17.801229+00	2019-10-18 03:51:17.801237+00	2019-10-18 03:51:17.801244+00	\N	1	1	28	2
-30	2019-10-18 03:51:17.801277+00	2019-10-18 03:51:17.801285+00	2019-10-18 03:51:17.801291+00	\N	1	1	29	2
-31	2019-10-18 03:51:17.801338+00	2019-10-18 03:51:17.801347+00	2019-10-18 03:51:17.801354+00	\N	1	1	30	2
-32	2019-10-18 03:51:17.801388+00	2019-10-18 03:51:17.801396+00	2019-10-18 03:51:17.801403+00	\N	1	1	31	2
-33	2019-10-18 03:51:17.801437+00	2019-10-18 03:51:17.801444+00	2019-10-18 03:51:17.801451+00	\N	1	1	32	2
-34	2019-10-18 03:51:17.801484+00	2019-10-18 03:51:17.801492+00	2019-10-18 03:51:17.801499+00	\N	1	1	33	2
-35	2019-10-18 03:51:17.801532+00	2019-10-18 03:51:17.80154+00	2019-10-18 03:51:17.801547+00	\N	1	1	34	2
-36	2019-10-18 03:51:17.80158+00	2019-10-18 03:51:17.801588+00	2019-10-18 03:51:17.801594+00	\N	1	1	35	2
-37	2019-10-18 03:51:17.801628+00	2019-10-18 03:51:17.801635+00	2019-10-18 03:51:17.801642+00	\N	1	1	36	2
-38	2019-10-18 03:51:17.801676+00	2019-10-18 03:51:17.801683+00	2019-10-18 03:51:17.80169+00	\N	1	1	37	2
-39	2019-10-18 03:51:17.801724+00	2019-10-18 03:51:17.801731+00	2019-10-18 03:51:17.801738+00	\N	1	1	38	2
-40	2019-10-18 03:51:17.801771+00	2019-10-18 03:51:17.801779+00	2019-10-18 03:51:17.801786+00	\N	1	1	39	2
-41	2019-10-18 03:51:17.801819+00	2019-10-18 03:51:17.801827+00	2019-10-18 03:51:17.801834+00	\N	1	1	40	2
-42	2019-10-18 03:51:17.801867+00	2019-10-18 03:51:17.801874+00	2019-10-18 03:51:17.801881+00	\N	1	1	41	2
-43	2019-10-18 03:51:17.801914+00	2019-10-18 03:51:17.801922+00	2019-10-18 03:51:17.801929+00	\N	1	1	42	2
-44	2019-10-18 03:51:17.801962+00	2019-10-18 03:51:17.801969+00	2019-10-18 03:51:17.801976+00	\N	1	1	43	2
-45	2019-10-18 03:51:17.802009+00	2019-10-18 03:51:17.802017+00	2019-10-18 03:51:17.802024+00	\N	1	1	44	2
-46	2019-10-18 03:51:17.802057+00	2019-10-18 03:51:17.802064+00	2019-10-18 03:51:17.802071+00	\N	1	1	45	2
-47	2019-10-18 03:51:17.802104+00	2019-10-18 03:51:17.802111+00	2019-10-18 03:51:17.802118+00	\N	1	1	46	2
-48	2019-10-18 03:51:17.802151+00	2019-10-18 03:51:17.802159+00	2019-10-18 03:51:17.802166+00	\N	1	1	47	2
-49	2019-10-18 03:51:17.802199+00	2019-10-18 03:51:17.802206+00	2019-10-18 03:51:17.802213+00	\N	1	1	48	2
-50	2019-10-18 03:51:17.802246+00	2019-10-18 03:51:17.802254+00	2019-10-18 03:51:17.802261+00	\N	1	1	49	2
-51	2019-10-18 03:51:17.802294+00	2019-10-18 03:51:17.802302+00	2019-10-18 03:51:17.802309+00	\N	1	1	50	2
-52	2019-10-18 03:51:17.802342+00	2019-10-18 03:51:17.802349+00	2019-10-18 03:51:17.802356+00	\N	1	1	51	2
-53	2019-10-18 03:51:17.802434+00	2019-10-18 03:51:17.802443+00	2019-10-18 03:51:17.80245+00	\N	1	1	52	2
-54	2019-10-18 03:51:17.80249+00	2019-10-18 03:51:17.802498+00	2019-10-18 03:51:17.802505+00	\N	1	1	53	2
-55	2019-10-18 03:51:17.802538+00	2019-10-18 03:51:17.802545+00	2019-10-18 03:51:17.802552+00	\N	1	1	54	2
-56	2019-10-18 03:51:17.802585+00	2019-10-18 03:51:17.802593+00	2019-10-18 03:51:17.8026+00	\N	1	1	55	2
-57	2019-10-18 03:51:17.802632+00	2019-10-18 03:51:17.80264+00	2019-10-18 03:51:17.802647+00	\N	1	1	56	2
-58	2019-10-18 03:51:17.802687+00	2019-10-18 03:51:17.802696+00	2019-10-18 03:51:17.802704+00	\N	1	1	57	2
-59	2019-10-18 03:51:17.802737+00	2019-10-18 03:51:17.802745+00	2019-10-18 03:51:17.802752+00	\N	1	1	58	2
-60	2019-10-18 03:51:17.802786+00	2019-10-18 03:51:17.802794+00	2019-10-18 03:51:17.802801+00	\N	1	1	59	2
-61	2019-10-18 03:51:17.802835+00	2019-10-18 03:51:17.802843+00	2019-10-18 03:51:17.802849+00	\N	1	1	60	2
-62	2019-10-18 03:51:17.802913+00	2019-10-18 03:51:17.802924+00	2019-10-18 03:51:17.802931+00	\N	1	1	61	2
-63	2019-10-18 03:51:17.802965+00	2019-10-18 03:51:17.802972+00	2019-10-18 03:51:17.802979+00	\N	1	1	62	2
-64	2019-10-18 03:51:17.803012+00	2019-10-18 03:51:17.80302+00	2019-10-18 03:51:17.803027+00	\N	1	1	63	2
-65	2019-10-18 03:51:17.80306+00	2019-10-18 03:51:17.803068+00	2019-10-18 03:51:17.803075+00	\N	1	1	64	2
-66	2019-10-18 03:51:17.851639+00	2019-10-18 03:51:17.851667+00	2019-10-18 03:51:17.851676+00	\N	1	1	2	2
-67	2019-10-18 03:51:17.851724+00	2019-10-18 03:51:17.851733+00	2019-10-18 03:51:17.85174+00	\N	1	1	3	2
-68	2019-10-18 03:51:17.851775+00	2019-10-18 03:51:17.851783+00	2019-10-18 03:51:17.85179+00	\N	1	1	4	2
-69	2019-10-18 03:51:17.851823+00	2019-10-18 03:51:17.851831+00	2019-10-18 03:51:17.851838+00	\N	1	1	5	2
-70	2019-10-18 03:51:17.85187+00	2019-10-18 03:51:17.851878+00	2019-10-18 03:51:17.851885+00	\N	1	1	6	2
-71	2019-10-18 03:51:17.851918+00	2019-10-18 03:51:17.851926+00	2019-10-18 03:51:17.851933+00	\N	1	1	7	2
-72	2019-10-18 03:51:17.851967+00	2019-10-18 03:51:17.851981+00	2019-10-18 03:51:17.851987+00	\N	1	1	8	2
-73	2019-10-18 03:51:17.852023+00	2019-10-18 03:51:17.85203+00	2019-10-18 03:51:17.852037+00	\N	1	1	9	2
-74	2019-10-18 03:51:17.85207+00	2019-10-18 03:51:17.852078+00	2019-10-18 03:51:17.852085+00	\N	1	1	10	2
-75	2019-10-18 03:51:17.852118+00	2019-10-18 03:51:17.852126+00	2019-10-18 03:51:17.852133+00	\N	1	1	11	2
-76	2019-10-18 03:51:17.852166+00	2019-10-18 03:51:17.852173+00	2019-10-18 03:51:17.85218+00	\N	1	1	12	2
-77	2019-10-18 03:51:17.852213+00	2019-10-18 03:51:17.852221+00	2019-10-18 03:51:17.852228+00	\N	1	1	13	2
-78	2019-10-18 03:51:17.852261+00	2019-10-18 03:51:17.852268+00	2019-10-18 03:51:17.852275+00	\N	1	1	14	2
-79	2019-10-18 03:51:17.852308+00	2019-10-18 03:51:17.852316+00	2019-10-18 03:51:17.852323+00	\N	1	1	15	2
-80	2019-10-18 03:51:17.852356+00	2019-10-18 03:51:17.852363+00	2019-10-18 03:51:17.85237+00	\N	1	1	16	2
-81	2019-10-18 03:51:17.852403+00	2019-10-18 03:51:17.852411+00	2019-10-18 03:51:17.852418+00	\N	1	1	17	2
-82	2019-10-18 03:51:17.85245+00	2019-10-18 03:51:17.852458+00	2019-10-18 03:51:17.852465+00	\N	1	1	18	2
-83	2019-10-18 03:51:17.852498+00	2019-10-18 03:51:17.852506+00	2019-10-18 03:51:17.852513+00	\N	1	1	19	2
-84	2019-10-18 03:51:17.852546+00	2019-10-18 03:51:17.852553+00	2019-10-18 03:51:17.85256+00	\N	1	1	20	2
-85	2019-10-18 03:51:17.852593+00	2019-10-18 03:51:17.852601+00	2019-10-18 03:51:17.852607+00	\N	1	1	21	2
-86	2019-10-18 03:51:17.852641+00	2019-10-18 03:51:17.852648+00	2019-10-18 03:51:17.852655+00	\N	1	1	22	2
-87	2019-10-18 03:51:17.852688+00	2019-10-18 03:51:17.852695+00	2019-10-18 03:51:17.852702+00	\N	1	1	23	2
-88	2019-10-18 03:51:17.852735+00	2019-10-18 03:51:17.852742+00	2019-10-18 03:51:17.852749+00	\N	1	1	24	2
-89	2019-10-18 03:51:17.852782+00	2019-10-18 03:51:17.852789+00	2019-10-18 03:51:17.852796+00	\N	1	1	25	2
-90	2019-10-18 03:51:17.852829+00	2019-10-18 03:51:17.852837+00	2019-10-18 03:51:17.852844+00	\N	1	1	26	2
-91	2019-10-18 03:51:17.852876+00	2019-10-18 03:51:17.852884+00	2019-10-18 03:51:17.852891+00	\N	1	1	27	2
-92	2019-10-18 03:51:17.852924+00	2019-10-18 03:51:17.852932+00	2019-10-18 03:51:17.852939+00	\N	1	1	28	2
-93	2019-10-18 03:51:17.852972+00	2019-10-18 03:51:17.85298+00	2019-10-18 03:51:17.852987+00	\N	1	1	29	2
-94	2019-10-18 03:51:17.85302+00	2019-10-18 03:51:17.853027+00	2019-10-18 03:51:17.853035+00	\N	1	1	30	2
-95	2019-10-18 03:51:17.853068+00	2019-10-18 03:51:17.853076+00	2019-10-18 03:51:17.853083+00	\N	1	1	31	2
-96	2019-10-18 03:51:17.853116+00	2019-10-18 03:51:17.853123+00	2019-10-18 03:51:17.85313+00	\N	1	1	32	2
-97	2019-10-18 03:51:17.853163+00	2019-10-18 03:51:17.853171+00	2019-10-18 03:51:17.853178+00	\N	1	1	33	2
-98	2019-10-18 03:51:17.853211+00	2019-10-18 03:51:17.853218+00	2019-10-18 03:51:17.853225+00	\N	1	1	34	2
-99	2019-10-18 03:51:17.853258+00	2019-10-18 03:51:17.853265+00	2019-10-18 03:51:17.853272+00	\N	1	1	35	2
-100	2019-10-18 03:51:17.853305+00	2019-10-18 03:51:17.853312+00	2019-10-18 03:51:17.853319+00	\N	1	1	36	2
-101	2019-10-18 03:51:17.853352+00	2019-10-18 03:51:17.85336+00	2019-10-18 03:51:17.853367+00	\N	1	1	37	2
-102	2019-10-18 03:51:17.8534+00	2019-10-18 03:51:17.853407+00	2019-10-18 03:51:17.853414+00	\N	1	1	38	2
-103	2019-10-18 03:51:17.853447+00	2019-10-18 03:51:17.853455+00	2019-10-18 03:51:17.85348+00	\N	1	1	39	2
-104	2019-10-18 03:51:17.853529+00	2019-10-18 03:51:17.853536+00	2019-10-18 03:51:17.853543+00	\N	1	1	40	2
-105	2019-10-18 03:51:17.853576+00	2019-10-18 03:51:17.853584+00	2019-10-18 03:51:17.853591+00	\N	1	1	41	2
-106	2019-10-18 03:51:17.853624+00	2019-10-18 03:51:17.853631+00	2019-10-18 03:51:17.853638+00	\N	1	1	42	2
-107	2019-10-18 03:51:17.853671+00	2019-10-18 03:51:17.853679+00	2019-10-18 03:51:17.853685+00	\N	1	1	43	2
-108	2019-10-18 03:51:17.853718+00	2019-10-18 03:51:17.853726+00	2019-10-18 03:51:17.853733+00	\N	1	1	44	2
-109	2019-10-18 03:51:17.853766+00	2019-10-18 03:51:17.853773+00	2019-10-18 03:51:17.85378+00	\N	1	1	45	2
-110	2019-10-18 03:51:17.853813+00	2019-10-18 03:51:17.85382+00	2019-10-18 03:51:17.853827+00	\N	1	1	46	2
-111	2019-10-18 03:51:17.85386+00	2019-10-18 03:51:17.853868+00	2019-10-18 03:51:17.853875+00	\N	1	1	47	2
-112	2019-10-18 03:51:17.853907+00	2019-10-18 03:51:17.853915+00	2019-10-18 03:51:17.853922+00	\N	1	1	48	2
-113	2019-10-18 03:51:17.853955+00	2019-10-18 03:51:17.853963+00	2019-10-18 03:51:17.85397+00	\N	1	1	49	2
-114	2019-10-18 03:51:17.854003+00	2019-10-18 03:51:17.85401+00	2019-10-18 03:51:17.854017+00	\N	1	1	50	2
-115	2019-10-18 03:51:17.85405+00	2019-10-18 03:51:17.854058+00	2019-10-18 03:51:17.854065+00	\N	1	1	51	2
-116	2019-10-18 03:51:17.854097+00	2019-10-18 03:51:17.854105+00	2019-10-18 03:51:17.854112+00	\N	1	1	52	2
-117	2019-10-18 03:51:17.854145+00	2019-10-18 03:51:17.854152+00	2019-10-18 03:51:17.85416+00	\N	1	1	53	2
-118	2019-10-18 03:51:17.854192+00	2019-10-18 03:51:17.8542+00	2019-10-18 03:51:17.854207+00	\N	1	1	54	2
-119	2019-10-18 03:51:17.85424+00	2019-10-18 03:51:17.854247+00	2019-10-18 03:51:17.854254+00	\N	1	1	55	2
-120	2019-10-18 03:51:17.854287+00	2019-10-18 03:51:17.854294+00	2019-10-18 03:51:17.854301+00	\N	1	1	56	2
-121	2019-10-18 03:51:17.854334+00	2019-10-18 03:51:17.854342+00	2019-10-18 03:51:17.854348+00	\N	1	1	57	2
-122	2019-10-18 03:51:17.854393+00	2019-10-18 03:51:17.854401+00	2019-10-18 03:51:17.854408+00	\N	1	1	58	2
-123	2019-10-18 03:51:17.854441+00	2019-10-18 03:51:17.854448+00	2019-10-18 03:51:17.854455+00	\N	1	1	59	2
-124	2019-10-18 03:51:17.854488+00	2019-10-18 03:51:17.854496+00	2019-10-18 03:51:17.854502+00	\N	1	1	60	2
-125	2019-10-18 03:51:17.854536+00	2019-10-18 03:51:17.854544+00	2019-10-18 03:51:17.85455+00	\N	1	1	61	2
-126	2019-10-18 03:51:17.854583+00	2019-10-18 03:51:17.854591+00	2019-10-18 03:51:17.854598+00	\N	1	1	62	2
-127	2019-10-18 03:51:17.854631+00	2019-10-18 03:51:17.854638+00	2019-10-18 03:51:17.854645+00	\N	1	1	63	2
-128	2019-10-18 03:51:17.854678+00	2019-10-18 03:51:17.854685+00	2019-10-18 03:51:17.854692+00	\N	1	1	64	2
-417	2019-11-01 04:33:38.237912+00	2019-11-01 04:33:38.237938+00	2019-11-01 04:33:38.219486+00	\N	4	4	256	4
-418	2019-11-01 04:33:38.237997+00	2019-11-01 04:33:38.238003+00	2019-11-01 04:33:38.219486+00	\N	4	4	257	4
-419	2019-11-01 04:33:38.23804+00	2019-11-01 04:33:38.238046+00	2019-11-01 04:33:38.219486+00	\N	4	4	258	4
-420	2019-11-01 04:33:38.238081+00	2019-11-01 04:33:38.238087+00	2019-11-01 04:33:38.219486+00	\N	4	4	259	4
-421	2019-11-01 04:33:38.238122+00	2019-11-01 04:33:38.238128+00	2019-11-01 04:33:38.219486+00	\N	4	4	260	4
-422	2019-11-01 04:33:38.238164+00	2019-11-01 04:33:38.238169+00	2019-11-01 04:33:38.219486+00	\N	4	4	261	4
-423	2019-11-01 04:33:38.238204+00	2019-11-01 04:33:38.238209+00	2019-11-01 04:33:38.219486+00	\N	4	4	262	4
-424	2019-11-01 04:33:38.238245+00	2019-11-01 04:33:38.23825+00	2019-11-01 04:33:38.219486+00	\N	4	4	263	4
-425	2019-11-01 04:33:38.238286+00	2019-11-01 04:33:38.238291+00	2019-11-01 04:33:38.219486+00	\N	4	4	264	4
-426	2019-11-01 04:33:38.238326+00	2019-11-01 04:33:38.238332+00	2019-11-01 04:33:38.219486+00	\N	4	4	265	4
-427	2019-11-01 04:33:38.238367+00	2019-11-01 04:33:38.238372+00	2019-11-01 04:33:38.219486+00	\N	4	4	266	4
-428	2019-11-01 04:33:38.238408+00	2019-11-01 04:33:38.238413+00	2019-11-01 04:33:38.219486+00	\N	4	4	267	4
-429	2019-11-01 04:33:38.238448+00	2019-11-01 04:33:38.238453+00	2019-11-01 04:33:38.219486+00	\N	4	4	268	4
-430	2019-11-01 04:33:38.238514+00	2019-11-01 04:33:38.23852+00	2019-11-01 04:33:38.219486+00	\N	4	4	269	4
-431	2019-11-01 04:33:38.238558+00	2019-11-01 04:33:38.238563+00	2019-11-01 04:33:38.219486+00	\N	4	4	270	4
-432	2019-11-01 04:33:38.238599+00	2019-11-01 04:33:38.238604+00	2019-11-01 04:33:38.219486+00	\N	4	4	271	4
-433	2019-11-01 04:33:38.23864+00	2019-11-01 04:33:38.238645+00	2019-11-01 04:33:38.219486+00	\N	4	4	272	4
-434	2019-11-01 04:33:38.238681+00	2019-11-01 04:33:38.238686+00	2019-11-01 04:33:38.219486+00	\N	4	4	273	4
-435	2019-11-01 04:33:38.238721+00	2019-11-01 04:33:38.238727+00	2019-11-01 04:33:38.219486+00	\N	4	4	274	4
-436	2019-11-01 04:33:38.238772+00	2019-11-01 04:33:38.238777+00	2019-11-01 04:33:38.219486+00	\N	4	4	275	4
-437	2019-11-01 04:33:38.238813+00	2019-11-01 04:33:38.238821+00	2019-11-01 04:33:38.219486+00	\N	4	4	276	4
-438	2019-11-01 04:33:38.238865+00	2019-11-01 04:33:38.238872+00	2019-11-01 04:33:38.219486+00	\N	4	4	277	4
-439	2019-11-01 04:33:38.238914+00	2019-11-01 04:33:38.23892+00	2019-11-01 04:33:38.219486+00	\N	4	4	278	4
-440	2019-11-01 04:33:38.238962+00	2019-11-01 04:33:38.238969+00	2019-11-01 04:33:38.219486+00	\N	4	4	279	4
-441	2019-11-01 04:33:38.239011+00	2019-11-01 04:33:38.239018+00	2019-11-01 04:33:38.219486+00	\N	4	4	280	4
-442	2019-11-01 04:33:38.23906+00	2019-11-01 04:33:38.239066+00	2019-11-01 04:33:38.219486+00	\N	4	4	281	4
-443	2019-11-01 04:33:38.239108+00	2019-11-01 04:33:38.239115+00	2019-11-01 04:33:38.219486+00	\N	4	4	282	4
-444	2019-11-01 04:33:38.239163+00	2019-11-01 04:33:38.23917+00	2019-11-01 04:33:38.219486+00	\N	4	4	283	4
-445	2019-11-01 04:33:38.239211+00	2019-11-01 04:33:38.239217+00	2019-11-01 04:33:38.219486+00	\N	4	4	284	4
-446	2019-11-01 04:33:38.239253+00	2019-11-01 04:33:38.239259+00	2019-11-01 04:33:38.219486+00	\N	4	4	285	4
-447	2019-11-01 04:33:38.239294+00	2019-11-01 04:33:38.2393+00	2019-11-01 04:33:38.219486+00	\N	4	4	286	4
-448	2019-11-01 04:33:38.239335+00	2019-11-01 04:33:38.23934+00	2019-11-01 04:33:38.219486+00	\N	4	4	287	4
-449	2019-11-01 04:33:38.239376+00	2019-11-01 04:33:38.239381+00	2019-11-01 04:33:38.219486+00	\N	4	4	288	4
-450	2019-11-01 04:33:38.239416+00	2019-11-01 04:33:38.239421+00	2019-11-01 04:33:38.219486+00	\N	4	4	289	4
-451	2019-11-01 04:33:38.239456+00	2019-11-01 04:33:38.239462+00	2019-11-01 04:33:38.219486+00	\N	4	4	290	4
-452	2019-11-01 04:33:38.239497+00	2019-11-01 04:33:38.239502+00	2019-11-01 04:33:38.219486+00	\N	4	4	291	4
-163	2019-10-25 05:24:14.987849+00	2019-10-25 05:24:14.987874+00	2019-10-25 05:24:14.987883+00	\N	4	4	195	2
-164	2019-10-25 05:24:14.987932+00	2019-10-25 05:24:14.98794+00	2019-10-25 05:24:14.987948+00	\N	4	4	196	2
-165	2019-10-25 05:24:15.014265+00	2019-10-25 05:24:15.01429+00	2019-10-25 05:24:15.014299+00	\N	4	4	195	2
-166	2019-10-25 05:24:15.014346+00	2019-10-25 05:24:15.014355+00	2019-10-25 05:24:15.014362+00	\N	4	4	196	2
-167	2019-10-25 05:33:20.652054+00	2019-10-25 05:33:20.652093+00	2019-10-25 05:33:20.652102+00	\N	4	4	197	2
-168	2019-10-25 05:33:20.652174+00	2019-10-25 05:33:20.652183+00	2019-10-25 05:33:20.65219+00	\N	4	4	198	2
-169	2019-10-25 05:33:20.652225+00	2019-10-25 05:33:20.652233+00	2019-10-25 05:33:20.65224+00	\N	4	4	199	2
-170	2019-10-25 05:33:20.652274+00	2019-10-25 05:33:20.652282+00	2019-10-25 05:33:20.652289+00	\N	4	4	200	2
-171	2019-10-25 05:33:20.652323+00	2019-10-25 05:33:20.652331+00	2019-10-25 05:33:20.652338+00	\N	4	4	201	2
-172	2019-10-25 05:33:20.652372+00	2019-10-25 05:33:20.652379+00	2019-10-25 05:33:20.652386+00	\N	4	4	202	2
-173	2019-10-25 05:33:20.65242+00	2019-10-25 05:33:20.652428+00	2019-10-25 05:33:20.652435+00	\N	4	4	203	2
-174	2019-10-25 05:33:20.652469+00	2019-10-25 05:33:20.652476+00	2019-10-25 05:33:20.652483+00	\N	4	4	204	2
-175	2019-10-25 05:33:20.652517+00	2019-10-25 05:33:20.652524+00	2019-10-25 05:33:20.652531+00	\N	4	4	205	2
-176	2019-10-25 05:33:20.652565+00	2019-10-25 05:33:20.652583+00	2019-10-25 05:33:20.652592+00	\N	4	4	206	2
-177	2019-10-25 05:33:20.652627+00	2019-10-25 05:33:20.652635+00	2019-10-25 05:33:20.652642+00	\N	4	4	207	2
-178	2019-10-25 05:33:20.652675+00	2019-10-25 05:33:20.652683+00	2019-10-25 05:33:20.65269+00	\N	4	4	208	2
-179	2019-10-25 05:33:20.652724+00	2019-10-25 05:33:20.652732+00	2019-10-25 05:33:20.652739+00	\N	4	4	209	2
-180	2019-10-25 05:33:20.652772+00	2019-10-25 05:33:20.65278+00	2019-10-25 05:33:20.652787+00	\N	4	4	210	2
-181	2019-10-25 05:33:20.65282+00	2019-10-25 05:33:20.652828+00	2019-10-25 05:33:20.652835+00	\N	4	4	211	2
-182	2019-10-25 05:33:20.652869+00	2019-10-25 05:33:20.652877+00	2019-10-25 05:33:20.652884+00	\N	4	4	212	2
-183	2019-10-25 05:33:20.652971+00	2019-10-25 05:33:20.652983+00	2019-10-25 05:33:20.652991+00	\N	4	4	213	2
-184	2019-10-25 05:33:20.653027+00	2019-10-25 05:33:20.653035+00	2019-10-25 05:33:20.653042+00	\N	4	4	214	2
-185	2019-10-25 05:33:20.653076+00	2019-10-25 05:33:20.653083+00	2019-10-25 05:33:20.65309+00	\N	4	4	215	2
-186	2019-10-25 05:33:20.653166+00	2019-10-25 05:33:20.653175+00	2019-10-25 05:33:20.653182+00	\N	4	4	216	2
-187	2019-10-25 05:33:20.653216+00	2019-10-25 05:33:20.653224+00	2019-10-25 05:33:20.653231+00	\N	4	4	217	2
-188	2019-10-25 05:33:20.653265+00	2019-10-25 05:33:20.653272+00	2019-10-25 05:33:20.653279+00	\N	4	4	218	2
-189	2019-10-25 05:33:20.653313+00	2019-10-25 05:33:20.653321+00	2019-10-25 05:33:20.653328+00	\N	4	4	219	2
-190	2019-10-25 05:33:20.653361+00	2019-10-25 05:33:20.653369+00	2019-10-25 05:33:20.653376+00	\N	4	4	220	2
-191	2019-10-25 05:33:20.65341+00	2019-10-25 05:33:20.653417+00	2019-10-25 05:33:20.653424+00	\N	4	4	221	2
-192	2019-10-25 05:33:20.653458+00	2019-10-25 05:33:20.653466+00	2019-10-25 05:33:20.653473+00	\N	4	4	222	2
-193	2019-10-25 05:33:20.653507+00	2019-10-25 05:33:20.653515+00	2019-10-25 05:33:20.653522+00	\N	4	4	223	2
-194	2019-10-25 05:33:20.653556+00	2019-10-25 05:33:20.653563+00	2019-10-25 05:33:20.65357+00	\N	4	4	224	2
-195	2019-10-25 05:33:20.653604+00	2019-10-25 05:33:20.653612+00	2019-10-25 05:33:20.653619+00	\N	4	4	225	2
-196	2019-10-25 05:33:20.653671+00	2019-10-25 05:33:20.65368+00	2019-10-25 05:33:20.653687+00	\N	4	4	226	2
-197	2019-10-25 05:33:20.653721+00	2019-10-25 05:33:20.653729+00	2019-10-25 05:33:20.653736+00	\N	4	4	227	2
-198	2019-10-25 05:33:20.65377+00	2019-10-25 05:33:20.653777+00	2019-10-25 05:33:20.653784+00	\N	4	4	228	2
-199	2019-10-25 05:33:20.653818+00	2019-10-25 05:33:20.653826+00	2019-10-25 05:33:20.653833+00	\N	4	4	229	2
-200	2019-10-25 05:33:20.653867+00	2019-10-25 05:33:20.653874+00	2019-10-25 05:33:20.653881+00	\N	4	4	230	2
-201	2019-10-25 05:33:20.653915+00	2019-10-25 05:33:20.653923+00	2019-10-25 05:33:20.65393+00	\N	4	4	231	2
-202	2019-10-25 05:33:20.65402+00	2019-10-25 05:33:20.65403+00	2019-10-25 05:33:20.654037+00	\N	4	4	232	2
-203	2019-10-25 05:33:20.654072+00	2019-10-25 05:33:20.65408+00	2019-10-25 05:33:20.654088+00	\N	4	4	233	2
-204	2019-10-25 05:33:20.654121+00	2019-10-25 05:33:20.654129+00	2019-10-25 05:33:20.654136+00	\N	4	4	234	2
-205	2019-10-25 05:33:20.65417+00	2019-10-25 05:33:20.654178+00	2019-10-25 05:33:20.654185+00	\N	4	4	235	2
-206	2019-10-25 05:33:20.654219+00	2019-10-25 05:33:20.654227+00	2019-10-25 05:33:20.654234+00	\N	4	4	236	2
-207	2019-10-25 05:33:20.654269+00	2019-10-25 05:33:20.654277+00	2019-10-25 05:33:20.654284+00	\N	4	4	237	2
-208	2019-10-25 05:33:20.654319+00	2019-10-25 05:33:20.654327+00	2019-10-25 05:33:20.654334+00	\N	4	4	238	2
-209	2019-10-25 05:33:20.654368+00	2019-10-25 05:33:20.654376+00	2019-10-25 05:33:20.654383+00	\N	4	4	239	2
-210	2019-10-25 05:33:20.654416+00	2019-10-25 05:33:20.654424+00	2019-10-25 05:33:20.654431+00	\N	4	4	240	2
-211	2019-10-25 05:33:20.654465+00	2019-10-25 05:33:20.654473+00	2019-10-25 05:33:20.65448+00	\N	4	4	241	2
-212	2019-10-25 05:33:20.654529+00	2019-10-25 05:33:20.65454+00	2019-10-25 05:33:20.654547+00	\N	4	4	242	2
-213	2019-10-25 05:33:20.654581+00	2019-10-25 05:33:20.654589+00	2019-10-25 05:33:20.654596+00	\N	4	4	243	2
-214	2019-10-25 05:33:20.654631+00	2019-10-25 05:33:20.654639+00	2019-10-25 05:33:20.654646+00	\N	4	4	244	2
-215	2019-10-25 05:33:20.654679+00	2019-10-25 05:33:20.654687+00	2019-10-25 05:33:20.654694+00	\N	4	4	245	2
-216	2019-10-25 05:33:20.654727+00	2019-10-25 05:33:20.654735+00	2019-10-25 05:33:20.654742+00	\N	4	4	246	2
-217	2019-10-25 05:33:20.654775+00	2019-10-25 05:33:20.654782+00	2019-10-25 05:33:20.654789+00	\N	4	4	247	2
-218	2019-10-25 05:33:20.654823+00	2019-10-25 05:33:20.65483+00	2019-10-25 05:33:20.654837+00	\N	4	4	248	2
-219	2019-10-25 05:33:20.654871+00	2019-10-25 05:33:20.654878+00	2019-10-25 05:33:20.654885+00	\N	4	4	249	2
-220	2019-10-25 05:33:20.654919+00	2019-10-25 05:33:20.654927+00	2019-10-25 05:33:20.654934+00	\N	4	4	250	2
-221	2019-10-25 05:33:20.655012+00	2019-10-25 05:33:20.655024+00	2019-10-25 05:33:20.655031+00	\N	4	4	251	2
-222	2019-10-25 05:33:20.655067+00	2019-10-25 05:33:20.655075+00	2019-10-25 05:33:20.655082+00	\N	4	4	252	2
-223	2019-10-25 05:33:20.655116+00	2019-10-25 05:33:20.655124+00	2019-10-25 05:33:20.655131+00	\N	4	4	253	2
-224	2019-10-25 05:33:20.65518+00	2019-10-25 05:33:20.655188+00	2019-10-25 05:33:20.655195+00	\N	4	4	254	2
-225	2019-10-25 05:33:20.655229+00	2019-10-25 05:33:20.655237+00	2019-10-25 05:33:20.655244+00	\N	4	4	255	2
-226	2019-10-25 05:33:20.775524+00	2019-10-25 05:33:20.775549+00	2019-10-25 05:33:20.775558+00	\N	4	4	208	2
-227	2019-10-25 05:33:20.775606+00	2019-10-25 05:33:20.775615+00	2019-10-25 05:33:20.775623+00	\N	4	4	209	2
-228	2019-10-25 05:33:20.775657+00	2019-10-25 05:33:20.775665+00	2019-10-25 05:33:20.775672+00	\N	4	4	210	2
-229	2019-10-25 05:33:20.775705+00	2019-10-25 05:33:20.775713+00	2019-10-25 05:33:20.77572+00	\N	4	4	211	2
-230	2019-10-25 05:33:20.775753+00	2019-10-25 05:33:20.775761+00	2019-10-25 05:33:20.775768+00	\N	4	4	212	2
-231	2019-10-25 05:33:20.775801+00	2019-10-25 05:33:20.775809+00	2019-10-25 05:33:20.775816+00	\N	4	4	213	2
-232	2019-10-25 05:33:20.77585+00	2019-10-25 05:33:20.775858+00	2019-10-25 05:33:20.775865+00	\N	4	4	214	2
-233	2019-10-25 05:33:20.775899+00	2019-10-25 05:33:20.775906+00	2019-10-25 05:33:20.775913+00	\N	4	4	215	2
-234	2019-10-25 05:33:20.775947+00	2019-10-25 05:33:20.775954+00	2019-10-25 05:33:20.775961+00	\N	4	4	216	2
-235	2019-10-25 05:33:20.775995+00	2019-10-25 05:33:20.776003+00	2019-10-25 05:33:20.77601+00	\N	4	4	217	2
-236	2019-10-25 05:33:20.776043+00	2019-10-25 05:33:20.776051+00	2019-10-25 05:33:20.776058+00	\N	4	4	218	2
-237	2019-10-25 05:33:20.776091+00	2019-10-25 05:33:20.776098+00	2019-10-25 05:33:20.776105+00	\N	4	4	219	2
-238	2019-10-25 05:33:20.776139+00	2019-10-25 05:33:20.776146+00	2019-10-25 05:33:20.776153+00	\N	4	4	220	2
-239	2019-10-25 05:33:20.776186+00	2019-10-25 05:33:20.776193+00	2019-10-25 05:33:20.7762+00	\N	4	4	197	2
-240	2019-10-25 05:33:20.776233+00	2019-10-25 05:33:20.776241+00	2019-10-25 05:33:20.776248+00	\N	4	4	198	2
-241	2019-10-25 05:33:20.776281+00	2019-10-25 05:33:20.776288+00	2019-10-25 05:33:20.776295+00	\N	4	4	199	2
-242	2019-10-25 05:33:20.776328+00	2019-10-25 05:33:20.776336+00	2019-10-25 05:33:20.776343+00	\N	4	4	200	2
-243	2019-10-25 05:33:20.776376+00	2019-10-25 05:33:20.776384+00	2019-10-25 05:33:20.776391+00	\N	4	4	201	2
-244	2019-10-25 05:33:20.776424+00	2019-10-25 05:33:20.776431+00	2019-10-25 05:33:20.776438+00	\N	4	4	202	2
-245	2019-10-25 05:33:20.776472+00	2019-10-25 05:33:20.776479+00	2019-10-25 05:33:20.776486+00	\N	4	4	203	2
-246	2019-10-25 05:33:20.776519+00	2019-10-25 05:33:20.776527+00	2019-10-25 05:33:20.776534+00	\N	4	4	204	2
-247	2019-10-25 05:33:20.776567+00	2019-10-25 05:33:20.776586+00	2019-10-25 05:33:20.776594+00	\N	4	4	205	2
-248	2019-10-25 05:33:20.776629+00	2019-10-25 05:33:20.776636+00	2019-10-25 05:33:20.776643+00	\N	4	4	206	2
-249	2019-10-25 05:33:20.776677+00	2019-10-25 05:33:20.776684+00	2019-10-25 05:33:20.776691+00	\N	4	4	207	2
-250	2019-10-25 05:33:20.776725+00	2019-10-25 05:33:20.776732+00	2019-10-25 05:33:20.776739+00	\N	4	4	221	2
-251	2019-10-25 05:33:20.776773+00	2019-10-25 05:33:20.77678+00	2019-10-25 05:33:20.776787+00	\N	4	4	222	2
-252	2019-10-25 05:33:20.776821+00	2019-10-25 05:33:20.776828+00	2019-10-25 05:33:20.776835+00	\N	4	4	223	2
-253	2019-10-25 05:33:20.776869+00	2019-10-25 05:33:20.776877+00	2019-10-25 05:33:20.776884+00	\N	4	4	224	2
-254	2019-10-25 05:33:20.776916+00	2019-10-25 05:33:20.776924+00	2019-10-25 05:33:20.776931+00	\N	4	4	225	2
-255	2019-10-25 05:33:20.776964+00	2019-10-25 05:33:20.776971+00	2019-10-25 05:33:20.776978+00	\N	4	4	226	2
-256	2019-10-25 05:33:20.777011+00	2019-10-25 05:33:20.777019+00	2019-10-25 05:33:20.777025+00	\N	4	4	227	2
-257	2019-10-25 05:33:20.777058+00	2019-10-25 05:33:20.777066+00	2019-10-25 05:33:20.777073+00	\N	4	4	228	2
-258	2019-10-25 05:33:20.777129+00	2019-10-25 05:33:20.777139+00	2019-10-25 05:33:20.777146+00	\N	4	4	229	2
-259	2019-10-25 05:33:20.777179+00	2019-10-25 05:33:20.777187+00	2019-10-25 05:33:20.777194+00	\N	4	4	230	2
-260	2019-10-25 05:33:20.777226+00	2019-10-25 05:33:20.777234+00	2019-10-25 05:33:20.777241+00	\N	4	4	231	2
-261	2019-10-25 05:33:20.777274+00	2019-10-25 05:33:20.777281+00	2019-10-25 05:33:20.777288+00	\N	4	4	232	2
-262	2019-10-25 05:33:20.777322+00	2019-10-25 05:33:20.777329+00	2019-10-25 05:33:20.777336+00	\N	4	4	233	2
-263	2019-10-25 05:33:20.777369+00	2019-10-25 05:33:20.777376+00	2019-10-25 05:33:20.777383+00	\N	4	4	234	2
-264	2019-10-25 05:33:20.777416+00	2019-10-25 05:33:20.777424+00	2019-10-25 05:33:20.77743+00	\N	4	4	235	2
-265	2019-10-25 05:33:20.777463+00	2019-10-25 05:33:20.777471+00	2019-10-25 05:33:20.777478+00	\N	4	4	236	2
-266	2019-10-25 05:33:20.77751+00	2019-10-25 05:33:20.777518+00	2019-10-25 05:33:20.777524+00	\N	4	4	237	2
-267	2019-10-25 05:33:20.777558+00	2019-10-25 05:33:20.777565+00	2019-10-25 05:33:20.777572+00	\N	4	4	238	2
-268	2019-10-25 05:33:20.777605+00	2019-10-25 05:33:20.777612+00	2019-10-25 05:33:20.777619+00	\N	4	4	239	2
-269	2019-10-25 05:33:20.777652+00	2019-10-25 05:33:20.777659+00	2019-10-25 05:33:20.777666+00	\N	4	4	240	2
-270	2019-10-25 05:33:20.7777+00	2019-10-25 05:33:20.777707+00	2019-10-25 05:33:20.777714+00	\N	4	4	241	2
-271	2019-10-25 05:33:20.777747+00	2019-10-25 05:33:20.777754+00	2019-10-25 05:33:20.777762+00	\N	4	4	242	2
-272	2019-10-25 05:33:20.777794+00	2019-10-25 05:33:20.777802+00	2019-10-25 05:33:20.777809+00	\N	4	4	243	2
-273	2019-10-25 05:33:20.777942+00	2019-10-25 05:33:20.777951+00	2019-10-25 05:33:20.777959+00	\N	4	4	244	2
-274	2019-10-25 05:33:20.777991+00	2019-10-25 05:33:20.777999+00	2019-10-25 05:33:20.778006+00	\N	4	4	245	2
-275	2019-10-25 05:33:20.778039+00	2019-10-25 05:33:20.778047+00	2019-10-25 05:33:20.778053+00	\N	4	4	246	2
-276	2019-10-25 05:33:20.778086+00	2019-10-25 05:33:20.778094+00	2019-10-25 05:33:20.778101+00	\N	4	4	247	2
-277	2019-10-25 05:33:20.778133+00	2019-10-25 05:33:20.778141+00	2019-10-25 05:33:20.778148+00	\N	4	4	248	2
-278	2019-10-25 05:33:20.77818+00	2019-10-25 05:33:20.778188+00	2019-10-25 05:33:20.778194+00	\N	4	4	249	2
-279	2019-10-25 05:33:20.778227+00	2019-10-25 05:33:20.778234+00	2019-10-25 05:33:20.778241+00	\N	4	4	250	2
-280	2019-10-25 05:33:20.778274+00	2019-10-25 05:33:20.778281+00	2019-10-25 05:33:20.778288+00	\N	4	4	251	2
-281	2019-10-25 05:33:20.778321+00	2019-10-25 05:33:20.778328+00	2019-10-25 05:33:20.778335+00	\N	4	4	252	2
-282	2019-10-25 05:33:20.778367+00	2019-10-25 05:33:20.778375+00	2019-10-25 05:33:20.778382+00	\N	4	4	253	2
-283	2019-10-25 05:33:20.778414+00	2019-10-25 05:33:20.778422+00	2019-10-25 05:33:20.778429+00	\N	4	4	254	2
-284	2019-10-25 05:33:20.778462+00	2019-10-25 05:33:20.77847+00	2019-10-25 05:33:20.778477+00	\N	4	4	255	2
-453	2019-11-01 04:33:38.239538+00	2019-11-01 04:33:38.239543+00	2019-11-01 04:33:38.219486+00	\N	4	4	292	4
-454	2019-11-01 04:33:38.239578+00	2019-11-01 04:33:38.239584+00	2019-11-01 04:33:38.219486+00	\N	4	4	293	4
-455	2019-11-01 04:33:38.239619+00	2019-11-01 04:33:38.239624+00	2019-11-01 04:33:38.219486+00	\N	4	4	294	4
-456	2019-11-01 04:33:38.239659+00	2019-11-01 04:33:38.239665+00	2019-11-01 04:33:38.219486+00	\N	4	4	295	4
-457	2019-11-01 04:33:38.2397+00	2019-11-01 04:33:38.239705+00	2019-11-01 04:33:38.219486+00	\N	4	4	296	4
-458	2019-11-01 04:33:38.239739+00	2019-11-01 04:33:38.239745+00	2019-11-01 04:33:38.219486+00	\N	4	4	297	4
-459	2019-11-01 04:33:38.23978+00	2019-11-01 04:33:38.239785+00	2019-11-01 04:33:38.219486+00	\N	4	4	298	4
-460	2019-11-01 04:33:38.239819+00	2019-11-01 04:33:38.239825+00	2019-11-01 04:33:38.219486+00	\N	4	4	299	4
-461	2019-11-01 04:33:38.23986+00	2019-11-01 04:33:38.239865+00	2019-11-01 04:33:38.219486+00	\N	4	4	300	4
-462	2019-11-01 04:33:38.2399+00	2019-11-01 04:33:38.239905+00	2019-11-01 04:33:38.219486+00	\N	4	4	301	4
-463	2019-11-01 04:33:38.23994+00	2019-11-01 04:33:38.239946+00	2019-11-01 04:33:38.219486+00	\N	4	4	302	4
-464	2019-11-01 04:33:38.239981+00	2019-11-01 04:33:38.239986+00	2019-11-01 04:33:38.219486+00	\N	4	4	303	4
-465	2019-11-01 04:33:38.240021+00	2019-11-01 04:33:38.240026+00	2019-11-01 04:33:38.219486+00	\N	4	4	304	4
-466	2019-11-01 04:33:38.240061+00	2019-11-01 04:33:38.240067+00	2019-11-01 04:33:38.219486+00	\N	4	4	305	4
-467	2019-11-01 04:33:38.240102+00	2019-11-01 04:33:38.240107+00	2019-11-01 04:33:38.219486+00	\N	4	4	306	4
-468	2019-11-01 04:33:38.240142+00	2019-11-01 04:33:38.240147+00	2019-11-01 04:33:38.219486+00	\N	4	4	307	4
-469	2019-11-01 04:33:38.240182+00	2019-11-01 04:33:38.240188+00	2019-11-01 04:33:38.219486+00	\N	4	4	308	4
-470	2019-11-01 04:33:38.240222+00	2019-11-01 04:33:38.240228+00	2019-11-01 04:33:38.219486+00	\N	4	4	309	4
-471	2019-11-01 04:33:38.240263+00	2019-11-01 04:33:38.240268+00	2019-11-01 04:33:38.219486+00	\N	4	4	310	4
-472	2019-11-01 04:33:38.240303+00	2019-11-01 04:33:38.240308+00	2019-11-01 04:33:38.219486+00	\N	4	4	311	4
-473	2019-11-01 04:33:38.240343+00	2019-11-01 04:33:38.240349+00	2019-11-01 04:33:38.219486+00	\N	4	4	312	4
-474	2019-11-01 04:33:38.240384+00	2019-11-01 04:33:38.240389+00	2019-11-01 04:33:38.219486+00	\N	4	4	313	4
-475	2019-11-01 04:33:38.240424+00	2019-11-01 04:33:38.24043+00	2019-11-01 04:33:38.219486+00	\N	4	4	314	4
-476	2019-11-01 04:33:38.240465+00	2019-11-01 04:33:38.240471+00	2019-11-01 04:33:38.219486+00	\N	4	4	315	4
-477	2019-11-01 04:33:38.240506+00	2019-11-01 04:33:38.240512+00	2019-11-01 04:33:38.219486+00	\N	4	4	316	4
-478	2019-11-01 04:33:38.240547+00	2019-11-01 04:33:38.240552+00	2019-11-01 04:33:38.219486+00	\N	4	4	317	4
-479	2019-11-01 04:33:38.240587+00	2019-11-01 04:33:38.240592+00	2019-11-01 04:33:38.219486+00	\N	4	4	318	4
-480	2019-11-01 04:33:38.240628+00	2019-11-01 04:33:38.240633+00	2019-11-01 04:33:38.219486+00	\N	4	4	319	4
-481	2019-11-01 04:33:38.305265+00	2019-11-01 04:33:38.30529+00	2019-11-01 04:33:38.299336+00	\N	4	4	256	4
-482	2019-11-01 04:33:38.30535+00	2019-11-01 04:33:38.305356+00	2019-11-01 04:33:38.299336+00	\N	4	4	257	4
-483	2019-11-01 04:33:38.305394+00	2019-11-01 04:33:38.305399+00	2019-11-01 04:33:38.299336+00	\N	4	4	258	4
-484	2019-11-01 04:33:38.30544+00	2019-11-01 04:33:38.305445+00	2019-11-01 04:33:38.299336+00	\N	4	4	259	4
-485	2019-11-01 04:33:38.305481+00	2019-11-01 04:33:38.305486+00	2019-11-01 04:33:38.299336+00	\N	4	4	260	4
-486	2019-11-01 04:33:38.305522+00	2019-11-01 04:33:38.305527+00	2019-11-01 04:33:38.299336+00	\N	4	4	261	4
-487	2019-11-01 04:33:38.305563+00	2019-11-01 04:33:38.305569+00	2019-11-01 04:33:38.299336+00	\N	4	4	262	4
-488	2019-11-01 04:33:38.305628+00	2019-11-01 04:33:38.305635+00	2019-11-01 04:33:38.299336+00	\N	4	4	263	4
-489	2019-11-01 04:33:38.30567+00	2019-11-01 04:33:38.305676+00	2019-11-01 04:33:38.299336+00	\N	4	4	264	4
-490	2019-11-01 04:33:38.305711+00	2019-11-01 04:33:38.305717+00	2019-11-01 04:33:38.299336+00	\N	4	4	265	4
-491	2019-11-01 04:33:38.305752+00	2019-11-01 04:33:38.305757+00	2019-11-01 04:33:38.299336+00	\N	4	4	266	4
-492	2019-11-01 04:33:38.305793+00	2019-11-01 04:33:38.305798+00	2019-11-01 04:33:38.299336+00	\N	4	4	267	4
-493	2019-11-01 04:33:38.305833+00	2019-11-01 04:33:38.305838+00	2019-11-01 04:33:38.299336+00	\N	4	4	268	4
-494	2019-11-01 04:33:38.305873+00	2019-11-01 04:33:38.305878+00	2019-11-01 04:33:38.299336+00	\N	4	4	269	4
-495	2019-11-01 04:33:38.305913+00	2019-11-01 04:33:38.305919+00	2019-11-01 04:33:38.299336+00	\N	4	4	270	4
-496	2019-11-01 04:33:38.305954+00	2019-11-01 04:33:38.30596+00	2019-11-01 04:33:38.299336+00	\N	4	4	271	4
-497	2019-11-01 04:33:38.305995+00	2019-11-01 04:33:38.306+00	2019-11-01 04:33:38.299336+00	\N	4	4	272	4
-498	2019-11-01 04:33:38.306035+00	2019-11-01 04:33:38.306041+00	2019-11-01 04:33:38.299336+00	\N	4	4	273	4
-499	2019-11-01 04:33:38.306094+00	2019-11-01 04:33:38.3061+00	2019-11-01 04:33:38.299336+00	\N	4	4	274	4
-500	2019-11-01 04:33:38.306136+00	2019-11-01 04:33:38.306141+00	2019-11-01 04:33:38.299336+00	\N	4	4	275	4
-501	2019-11-01 04:33:38.306176+00	2019-11-01 04:33:38.306181+00	2019-11-01 04:33:38.299336+00	\N	4	4	276	4
-502	2019-11-01 04:33:38.306216+00	2019-11-01 04:33:38.306221+00	2019-11-01 04:33:38.299336+00	\N	4	4	277	4
-503	2019-11-01 04:33:38.306256+00	2019-11-01 04:33:38.306261+00	2019-11-01 04:33:38.299336+00	\N	4	4	278	4
-504	2019-11-01 04:33:38.306296+00	2019-11-01 04:33:38.306302+00	2019-11-01 04:33:38.299336+00	\N	4	4	279	4
-505	2019-11-01 04:33:38.306341+00	2019-11-01 04:33:38.306346+00	2019-11-01 04:33:38.299336+00	\N	4	4	280	4
-506	2019-11-01 04:33:38.306381+00	2019-11-01 04:33:38.306386+00	2019-11-01 04:33:38.299336+00	\N	4	4	281	4
-507	2019-11-01 04:33:38.306422+00	2019-11-01 04:33:38.306427+00	2019-11-01 04:33:38.299336+00	\N	4	4	282	4
-508	2019-11-01 04:33:38.306462+00	2019-11-01 04:33:38.306468+00	2019-11-01 04:33:38.299336+00	\N	4	4	283	4
-509	2019-11-01 04:33:38.306512+00	2019-11-01 04:33:38.306517+00	2019-11-01 04:33:38.299336+00	\N	4	4	284	4
-510	2019-11-01 04:33:38.306552+00	2019-11-01 04:33:38.306557+00	2019-11-01 04:33:38.299336+00	\N	4	4	285	4
-511	2019-11-01 04:33:38.306593+00	2019-11-01 04:33:38.306598+00	2019-11-01 04:33:38.299336+00	\N	4	4	286	4
-512	2019-11-01 04:33:38.306633+00	2019-11-01 04:33:38.306638+00	2019-11-01 04:33:38.299336+00	\N	4	4	287	4
-513	2019-11-01 04:33:38.306673+00	2019-11-01 04:33:38.306679+00	2019-11-01 04:33:38.299336+00	\N	4	4	288	4
-514	2019-11-01 04:33:38.306714+00	2019-11-01 04:33:38.306719+00	2019-11-01 04:33:38.299336+00	\N	4	4	289	4
-515	2019-11-01 04:33:38.306755+00	2019-11-01 04:33:38.306761+00	2019-11-01 04:33:38.299336+00	\N	4	4	290	4
-516	2019-11-01 04:33:38.306797+00	2019-11-01 04:33:38.306804+00	2019-11-01 04:33:38.299336+00	\N	4	4	291	4
-517	2019-11-01 04:33:38.306849+00	2019-11-01 04:33:38.306856+00	2019-11-01 04:33:38.299336+00	\N	4	4	292	4
-518	2019-11-01 04:33:38.306899+00	2019-11-01 04:33:38.306905+00	2019-11-01 04:33:38.299336+00	\N	4	4	293	4
-519	2019-11-01 04:33:38.306947+00	2019-11-01 04:33:38.306954+00	2019-11-01 04:33:38.299336+00	\N	4	4	294	4
-520	2019-11-01 04:33:38.306996+00	2019-11-01 04:33:38.307002+00	2019-11-01 04:33:38.299336+00	\N	4	4	295	4
-521	2019-11-01 04:33:38.307044+00	2019-11-01 04:33:38.307051+00	2019-11-01 04:33:38.299336+00	\N	4	4	296	4
-522	2019-11-01 04:33:38.307092+00	2019-11-01 04:33:38.307098+00	2019-11-01 04:33:38.299336+00	\N	4	4	297	4
-523	2019-11-01 04:33:38.30714+00	2019-11-01 04:33:38.307146+00	2019-11-01 04:33:38.299336+00	\N	4	4	298	4
-524	2019-11-01 04:33:38.307188+00	2019-11-01 04:33:38.307195+00	2019-11-01 04:33:38.299336+00	\N	4	4	299	4
-525	2019-11-01 04:33:38.307236+00	2019-11-01 04:33:38.307243+00	2019-11-01 04:33:38.299336+00	\N	4	4	300	4
-526	2019-11-01 04:33:38.307284+00	2019-11-01 04:33:38.307291+00	2019-11-01 04:33:38.299336+00	\N	4	4	301	4
-527	2019-11-01 04:33:38.307332+00	2019-11-01 04:33:38.307339+00	2019-11-01 04:33:38.299336+00	\N	4	4	302	4
-528	2019-11-01 04:33:38.307381+00	2019-11-01 04:33:38.307387+00	2019-11-01 04:33:38.299336+00	\N	4	4	303	4
-529	2019-11-01 04:33:38.307429+00	2019-11-01 04:33:38.307436+00	2019-11-01 04:33:38.299336+00	\N	4	4	304	4
-530	2019-11-01 04:33:38.307478+00	2019-11-01 04:33:38.307484+00	2019-11-01 04:33:38.299336+00	\N	4	4	305	4
-531	2019-11-01 04:33:38.307525+00	2019-11-01 04:33:38.307532+00	2019-11-01 04:33:38.299336+00	\N	4	4	306	4
-532	2019-11-01 04:33:38.307568+00	2019-11-01 04:33:38.307573+00	2019-11-01 04:33:38.299336+00	\N	4	4	307	4
-533	2019-11-01 04:33:38.307609+00	2019-11-01 04:33:38.307614+00	2019-11-01 04:33:38.299336+00	\N	4	4	308	4
-534	2019-11-01 04:33:38.30765+00	2019-11-01 04:33:38.307656+00	2019-11-01 04:33:38.299336+00	\N	4	4	309	4
-535	2019-11-01 04:33:38.307691+00	2019-11-01 04:33:38.307696+00	2019-11-01 04:33:38.299336+00	\N	4	4	310	4
-536	2019-11-01 04:33:38.307732+00	2019-11-01 04:33:38.307737+00	2019-11-01 04:33:38.299336+00	\N	4	4	311	4
-537	2019-11-01 04:33:38.307773+00	2019-11-01 04:33:38.307778+00	2019-11-01 04:33:38.299336+00	\N	4	4	312	4
-538	2019-11-01 04:33:38.307813+00	2019-11-01 04:33:38.307819+00	2019-11-01 04:33:38.299336+00	\N	4	4	313	4
-539	2019-11-01 04:33:38.307854+00	2019-11-01 04:33:38.307859+00	2019-11-01 04:33:38.299336+00	\N	4	4	314	4
-540	2019-11-01 04:33:38.307896+00	2019-11-01 04:33:38.307901+00	2019-11-01 04:33:38.299336+00	\N	4	4	315	4
-541	2019-11-01 04:33:38.307936+00	2019-11-01 04:33:38.307941+00	2019-11-01 04:33:38.299336+00	\N	4	4	316	4
-542	2019-11-01 04:33:38.307977+00	2019-11-01 04:33:38.307983+00	2019-11-01 04:33:38.299336+00	\N	4	4	317	4
-543	2019-11-01 04:33:38.308018+00	2019-11-01 04:33:38.308024+00	2019-11-01 04:33:38.299336+00	\N	4	4	318	4
-544	2019-11-01 04:33:38.308059+00	2019-11-01 04:33:38.308065+00	2019-11-01 04:33:38.299336+00	\N	4	4	319	4
-545	2019-11-09 03:32:56.825488+00	2019-11-09 03:32:56.825507+00	2019-11-09 03:32:56.808263+00	\N	4	4	320	5
-546	2019-11-09 03:32:56.825567+00	2019-11-09 03:32:56.825575+00	2019-11-09 03:32:56.808263+00	\N	4	4	321	5
-547	2019-11-09 03:32:56.825618+00	2019-11-09 03:32:56.825624+00	2019-11-09 03:32:56.808263+00	\N	4	4	322	5
-548	2019-11-09 03:32:56.825666+00	2019-11-09 03:32:56.825672+00	2019-11-09 03:32:56.808263+00	\N	4	4	323	5
-549	2019-11-09 03:32:56.825708+00	2019-11-09 03:32:56.825714+00	2019-11-09 03:32:56.808263+00	\N	4	4	324	5
-550	2019-11-09 03:32:56.825749+00	2019-11-09 03:32:56.825754+00	2019-11-09 03:32:56.808263+00	\N	4	4	325	5
-551	2019-11-09 03:32:56.825789+00	2019-11-09 03:32:56.825794+00	2019-11-09 03:32:56.808263+00	\N	4	4	326	5
-552	2019-11-09 03:32:56.825829+00	2019-11-09 03:32:56.825834+00	2019-11-09 03:32:56.808263+00	\N	4	4	327	5
-553	2019-11-09 03:32:56.825869+00	2019-11-09 03:32:56.825874+00	2019-11-09 03:32:56.808263+00	\N	4	4	328	5
-554	2019-11-09 03:32:56.825909+00	2019-11-09 03:32:56.825914+00	2019-11-09 03:32:56.808263+00	\N	4	4	329	5
-555	2019-11-09 03:32:56.825949+00	2019-11-09 03:32:56.825954+00	2019-11-09 03:32:56.808263+00	\N	4	4	330	5
-556	2019-11-09 03:32:56.825989+00	2019-11-09 03:32:56.825994+00	2019-11-09 03:32:56.808263+00	\N	4	4	331	5
-557	2019-11-09 03:32:56.826029+00	2019-11-09 03:32:56.826034+00	2019-11-09 03:32:56.808263+00	\N	4	4	332	5
-558	2019-11-09 03:32:56.826069+00	2019-11-09 03:32:56.826074+00	2019-11-09 03:32:56.808263+00	\N	4	4	333	5
-559	2019-11-09 03:32:56.826109+00	2019-11-09 03:32:56.826114+00	2019-11-09 03:32:56.808263+00	\N	4	4	334	5
-560	2019-11-09 03:32:56.82615+00	2019-11-09 03:32:56.826155+00	2019-11-09 03:32:56.808263+00	\N	4	4	335	5
-561	2019-11-09 03:32:56.826191+00	2019-11-09 03:32:56.826196+00	2019-11-09 03:32:56.808263+00	\N	4	4	336	5
-562	2019-11-09 03:32:56.826231+00	2019-11-09 03:32:56.826236+00	2019-11-09 03:32:56.808263+00	\N	4	4	337	5
-563	2019-11-09 03:32:56.826271+00	2019-11-09 03:32:56.826276+00	2019-11-09 03:32:56.808263+00	\N	4	4	338	5
-564	2019-11-09 03:32:56.826311+00	2019-11-09 03:32:56.826316+00	2019-11-09 03:32:56.808263+00	\N	4	4	339	5
-565	2019-11-09 03:32:56.82635+00	2019-11-09 03:32:56.826356+00	2019-11-09 03:32:56.808263+00	\N	4	4	340	5
-566	2019-11-09 03:32:56.826391+00	2019-11-09 03:32:56.826396+00	2019-11-09 03:32:56.808263+00	\N	4	4	341	5
-567	2019-11-09 03:32:56.826431+00	2019-11-09 03:32:56.826436+00	2019-11-09 03:32:56.808263+00	\N	4	4	342	5
-568	2019-11-09 03:32:56.82647+00	2019-11-09 03:32:56.826475+00	2019-11-09 03:32:56.808263+00	\N	4	4	343	5
-569	2019-11-09 03:32:56.82651+00	2019-11-09 03:32:56.826516+00	2019-11-09 03:32:56.808263+00	\N	4	4	344	5
-570	2019-11-09 03:32:56.82655+00	2019-11-09 03:32:56.826555+00	2019-11-09 03:32:56.808263+00	\N	4	4	345	5
-571	2019-11-09 03:32:56.82659+00	2019-11-09 03:32:56.826596+00	2019-11-09 03:32:56.808263+00	\N	4	4	346	5
-572	2019-11-09 03:32:56.82663+00	2019-11-09 03:32:56.826635+00	2019-11-09 03:32:56.808263+00	\N	4	4	347	5
-573	2019-11-09 03:32:56.82667+00	2019-11-09 03:32:56.826675+00	2019-11-09 03:32:56.808263+00	\N	4	4	348	5
-574	2019-11-09 03:32:56.82671+00	2019-11-09 03:32:56.826715+00	2019-11-09 03:32:56.808263+00	\N	4	4	349	5
-575	2019-11-09 03:32:56.82675+00	2019-11-09 03:32:56.826755+00	2019-11-09 03:32:56.808263+00	\N	4	4	350	5
-576	2019-11-09 03:32:56.82679+00	2019-11-09 03:32:56.826795+00	2019-11-09 03:32:56.808263+00	\N	4	4	351	5
-577	2019-11-09 03:32:56.82683+00	2019-11-09 03:32:56.826835+00	2019-11-09 03:32:56.808263+00	\N	4	4	352	5
-578	2019-11-09 03:32:56.82687+00	2019-11-09 03:32:56.826875+00	2019-11-09 03:32:56.808263+00	\N	4	4	353	5
-579	2019-11-09 03:32:56.82691+00	2019-11-09 03:32:56.826915+00	2019-11-09 03:32:56.808263+00	\N	4	4	354	5
-580	2019-11-09 03:32:56.82695+00	2019-11-09 03:32:56.826955+00	2019-11-09 03:32:56.808263+00	\N	4	4	355	5
-581	2019-11-09 03:32:56.82699+00	2019-11-09 03:32:56.826995+00	2019-11-09 03:32:56.808263+00	\N	4	4	356	5
-582	2019-11-09 03:32:56.82703+00	2019-11-09 03:32:56.827035+00	2019-11-09 03:32:56.808263+00	\N	4	4	357	5
-583	2019-11-09 03:32:56.827069+00	2019-11-09 03:32:56.827075+00	2019-11-09 03:32:56.808263+00	\N	4	4	358	5
-584	2019-11-09 03:32:56.827109+00	2019-11-09 03:32:56.827115+00	2019-11-09 03:32:56.808263+00	\N	4	4	359	5
-585	2019-11-09 03:32:56.827149+00	2019-11-09 03:32:56.827155+00	2019-11-09 03:32:56.808263+00	\N	4	4	360	5
-586	2019-11-09 03:32:56.82719+00	2019-11-09 03:32:56.827195+00	2019-11-09 03:32:56.808263+00	\N	4	4	361	5
-587	2019-11-09 03:32:56.827244+00	2019-11-09 03:32:56.827251+00	2019-11-09 03:32:56.808263+00	\N	4	4	362	5
-588	2019-11-09 03:32:56.827286+00	2019-11-09 03:32:56.827291+00	2019-11-09 03:32:56.808263+00	\N	4	4	363	5
-589	2019-11-09 03:32:56.827338+00	2019-11-09 03:32:56.827344+00	2019-11-09 03:32:56.808263+00	\N	4	4	364	5
-590	2019-11-09 03:32:56.827379+00	2019-11-09 03:32:56.827384+00	2019-11-09 03:32:56.808263+00	\N	4	4	365	5
-591	2019-11-09 03:32:56.827419+00	2019-11-09 03:32:56.827425+00	2019-11-09 03:32:56.808263+00	\N	4	4	366	5
-592	2019-11-09 03:32:56.82746+00	2019-11-09 03:32:56.827465+00	2019-11-09 03:32:56.808263+00	\N	4	4	367	5
-593	2019-11-09 03:32:56.8275+00	2019-11-09 03:32:56.827505+00	2019-11-09 03:32:56.808263+00	\N	4	4	368	5
-594	2019-11-09 03:32:56.82754+00	2019-11-09 03:32:56.827545+00	2019-11-09 03:32:56.808263+00	\N	4	4	369	5
-595	2019-11-09 03:32:56.82758+00	2019-11-09 03:32:56.827585+00	2019-11-09 03:32:56.808263+00	\N	4	4	370	5
-596	2019-11-09 03:32:56.82762+00	2019-11-09 03:32:56.827625+00	2019-11-09 03:32:56.808263+00	\N	4	4	371	5
-597	2019-11-09 03:32:56.82766+00	2019-11-09 03:32:56.827665+00	2019-11-09 03:32:56.808263+00	\N	4	4	372	5
-598	2019-11-09 03:32:56.8277+00	2019-11-09 03:32:56.827705+00	2019-11-09 03:32:56.808263+00	\N	4	4	373	5
-599	2019-11-09 03:32:56.827739+00	2019-11-09 03:32:56.827745+00	2019-11-09 03:32:56.808263+00	\N	4	4	374	5
-600	2019-11-09 03:32:56.870578+00	2019-11-09 03:32:56.870598+00	2019-11-09 03:32:56.866118+00	\N	4	4	320	5
-601	2019-11-09 03:32:56.870652+00	2019-11-09 03:32:56.870658+00	2019-11-09 03:32:56.866118+00	\N	4	4	321	5
-602	2019-11-09 03:32:56.870694+00	2019-11-09 03:32:56.870699+00	2019-11-09 03:32:56.866118+00	\N	4	4	322	5
-603	2019-11-09 03:32:56.870735+00	2019-11-09 03:32:56.87074+00	2019-11-09 03:32:56.866118+00	\N	4	4	323	5
-604	2019-11-09 03:32:56.870775+00	2019-11-09 03:32:56.87078+00	2019-11-09 03:32:56.866118+00	\N	4	4	324	5
-605	2019-11-09 03:32:56.870815+00	2019-11-09 03:32:56.870821+00	2019-11-09 03:32:56.866118+00	\N	4	4	325	5
-606	2019-11-09 03:32:56.870856+00	2019-11-09 03:32:56.870862+00	2019-11-09 03:32:56.866118+00	\N	4	4	326	5
-607	2019-11-09 03:32:56.870897+00	2019-11-09 03:32:56.870902+00	2019-11-09 03:32:56.866118+00	\N	4	4	327	5
-608	2019-11-09 03:32:56.870936+00	2019-11-09 03:32:56.870942+00	2019-11-09 03:32:56.866118+00	\N	4	4	328	5
-609	2019-11-09 03:32:56.870976+00	2019-11-09 03:32:56.870982+00	2019-11-09 03:32:56.866118+00	\N	4	4	329	5
-610	2019-11-09 03:32:56.871017+00	2019-11-09 03:32:56.871022+00	2019-11-09 03:32:56.866118+00	\N	4	4	330	5
-611	2019-11-09 03:32:56.871056+00	2019-11-09 03:32:56.871062+00	2019-11-09 03:32:56.866118+00	\N	4	4	331	5
-612	2019-11-09 03:32:56.871096+00	2019-11-09 03:32:56.871102+00	2019-11-09 03:32:56.866118+00	\N	4	4	332	5
-613	2019-11-09 03:32:56.871136+00	2019-11-09 03:32:56.871142+00	2019-11-09 03:32:56.866118+00	\N	4	4	333	5
-614	2019-11-09 03:32:56.871176+00	2019-11-09 03:32:56.871182+00	2019-11-09 03:32:56.866118+00	\N	4	4	334	5
-615	2019-11-09 03:32:56.871216+00	2019-11-09 03:32:56.871221+00	2019-11-09 03:32:56.866118+00	\N	4	4	335	5
-616	2019-11-09 03:32:56.871256+00	2019-11-09 03:32:56.871261+00	2019-11-09 03:32:56.866118+00	\N	4	4	336	5
-617	2019-11-09 03:32:56.871296+00	2019-11-09 03:32:56.871301+00	2019-11-09 03:32:56.866118+00	\N	4	4	337	5
-618	2019-11-09 03:32:56.871348+00	2019-11-09 03:32:56.871354+00	2019-11-09 03:32:56.866118+00	\N	4	4	338	5
-619	2019-11-09 03:32:56.871388+00	2019-11-09 03:32:56.871394+00	2019-11-09 03:32:56.866118+00	\N	4	4	339	5
-620	2019-11-09 03:32:56.871429+00	2019-11-09 03:32:56.871434+00	2019-11-09 03:32:56.866118+00	\N	4	4	340	5
-621	2019-11-09 03:32:56.871469+00	2019-11-09 03:32:56.871474+00	2019-11-09 03:32:56.866118+00	\N	4	4	341	5
-622	2019-11-09 03:32:56.871509+00	2019-11-09 03:32:56.871514+00	2019-11-09 03:32:56.866118+00	\N	4	4	342	5
-623	2019-11-09 03:32:56.871549+00	2019-11-09 03:32:56.871555+00	2019-11-09 03:32:56.866118+00	\N	4	4	343	5
-624	2019-11-09 03:32:56.87159+00	2019-11-09 03:32:56.871595+00	2019-11-09 03:32:56.866118+00	\N	4	4	344	5
-625	2019-11-09 03:32:56.87163+00	2019-11-09 03:32:56.871635+00	2019-11-09 03:32:56.866118+00	\N	4	4	345	5
-626	2019-11-09 03:32:56.87167+00	2019-11-09 03:32:56.871676+00	2019-11-09 03:32:56.866118+00	\N	4	4	346	5
-627	2019-11-09 03:32:56.87171+00	2019-11-09 03:32:56.871716+00	2019-11-09 03:32:56.866118+00	\N	4	4	347	5
-628	2019-11-09 03:32:56.87175+00	2019-11-09 03:32:56.871756+00	2019-11-09 03:32:56.866118+00	\N	4	4	348	5
-629	2019-11-09 03:32:56.871791+00	2019-11-09 03:32:56.871796+00	2019-11-09 03:32:56.866118+00	\N	4	4	349	5
-630	2019-11-09 03:32:56.871831+00	2019-11-09 03:32:56.871837+00	2019-11-09 03:32:56.866118+00	\N	4	4	350	5
-631	2019-11-09 03:32:56.871871+00	2019-11-09 03:32:56.871877+00	2019-11-09 03:32:56.866118+00	\N	4	4	351	5
-632	2019-11-09 03:32:56.871912+00	2019-11-09 03:32:56.871917+00	2019-11-09 03:32:56.866118+00	\N	4	4	352	5
-633	2019-11-09 03:32:56.871952+00	2019-11-09 03:32:56.871957+00	2019-11-09 03:32:56.866118+00	\N	4	4	353	5
-634	2019-11-09 03:32:56.871992+00	2019-11-09 03:32:56.871997+00	2019-11-09 03:32:56.866118+00	\N	4	4	354	5
-635	2019-11-09 03:32:56.872032+00	2019-11-09 03:32:56.872037+00	2019-11-09 03:32:56.866118+00	\N	4	4	355	5
-636	2019-11-09 03:32:56.872072+00	2019-11-09 03:32:56.872078+00	2019-11-09 03:32:56.866118+00	\N	4	4	356	5
-637	2019-11-09 03:32:56.872113+00	2019-11-09 03:32:56.872118+00	2019-11-09 03:32:56.866118+00	\N	4	4	357	5
-638	2019-11-09 03:32:56.872153+00	2019-11-09 03:32:56.872158+00	2019-11-09 03:32:56.866118+00	\N	4	4	358	5
-639	2019-11-09 03:32:56.872193+00	2019-11-09 03:32:56.872199+00	2019-11-09 03:32:56.866118+00	\N	4	4	359	5
-640	2019-11-09 03:32:56.872233+00	2019-11-09 03:32:56.872239+00	2019-11-09 03:32:56.866118+00	\N	4	4	360	5
-641	2019-11-09 03:32:56.872274+00	2019-11-09 03:32:56.872279+00	2019-11-09 03:32:56.866118+00	\N	4	4	361	5
-642	2019-11-09 03:32:56.872314+00	2019-11-09 03:32:56.87232+00	2019-11-09 03:32:56.866118+00	\N	4	4	362	5
-643	2019-11-09 03:32:56.872354+00	2019-11-09 03:32:56.87236+00	2019-11-09 03:32:56.866118+00	\N	4	4	363	5
-644	2019-11-09 03:32:56.872395+00	2019-11-09 03:32:56.8724+00	2019-11-09 03:32:56.866118+00	\N	4	4	364	5
-645	2019-11-09 03:32:56.872435+00	2019-11-09 03:32:56.87244+00	2019-11-09 03:32:56.866118+00	\N	4	4	365	5
-646	2019-11-09 03:32:56.872475+00	2019-11-09 03:32:56.87248+00	2019-11-09 03:32:56.866118+00	\N	4	4	366	5
-647	2019-11-09 03:32:56.872516+00	2019-11-09 03:32:56.872521+00	2019-11-09 03:32:56.866118+00	\N	4	4	367	5
-648	2019-11-09 03:32:56.872556+00	2019-11-09 03:32:56.872562+00	2019-11-09 03:32:56.866118+00	\N	4	4	368	5
-649	2019-11-09 03:32:56.872596+00	2019-11-09 03:32:56.872602+00	2019-11-09 03:32:56.866118+00	\N	4	4	369	5
-650	2019-11-09 03:32:56.872636+00	2019-11-09 03:32:56.872642+00	2019-11-09 03:32:56.866118+00	\N	4	4	370	5
-651	2019-11-09 03:32:56.872676+00	2019-11-09 03:32:56.872682+00	2019-11-09 03:32:56.866118+00	\N	4	4	371	5
-652	2019-11-09 03:32:56.872717+00	2019-11-09 03:32:56.872722+00	2019-11-09 03:32:56.866118+00	\N	4	4	372	5
-653	2019-11-09 03:32:56.872757+00	2019-11-09 03:32:56.872763+00	2019-11-09 03:32:56.866118+00	\N	4	4	373	5
-654	2019-11-09 03:32:56.872797+00	2019-11-09 03:32:56.872803+00	2019-11-09 03:32:56.866118+00	\N	4	4	374	5
+1	2020-01-24 04:43:05.520972+00	2020-01-24 04:43:05.52099+00	2019-09-16 16:00:00+00	3	\N	5	1	1
+2	2020-01-24 04:43:05.535998+00	2020-01-24 04:43:05.536021+00	2019-09-16 16:00:00+00	4	\N	5	1	1
+3	2020-01-24 04:43:05.615848+00	2020-01-24 04:43:05.615866+00	2019-09-16 16:00:00+00	3	\N	6	2	1
+4	2020-01-24 04:43:05.632555+00	2020-01-24 04:43:05.632575+00	2019-09-16 16:00:00+00	4	\N	6	2	1
+5	2020-01-24 04:43:05.71193+00	2020-01-24 04:43:05.711949+00	2019-09-16 16:00:00+00	3	\N	6	3	1
+6	2020-01-24 04:43:05.72463+00	2020-01-24 04:43:05.724648+00	2019-09-16 16:00:00+00	4	\N	6	3	1
+7	2020-01-24 04:43:05.788295+00	2020-01-24 04:43:05.788312+00	2019-09-16 16:00:00+00	3	\N	5	4	1
+8	2020-01-24 04:43:05.800325+00	2020-01-24 04:43:05.800344+00	2019-09-16 16:00:00+00	4	\N	5	4	1
+9	2020-01-24 04:43:05.854236+00	2020-01-24 04:43:05.854255+00	2019-09-16 16:00:00+00	3	\N	5	5	1
+10	2020-01-24 04:43:05.866179+00	2020-01-24 04:43:05.866193+00	2019-09-16 16:00:00+00	4	\N	5	5	1
+11	2020-01-24 04:43:05.929105+00	2020-01-24 04:43:05.929122+00	2019-09-16 16:00:00+00	3	\N	4	6	1
+12	2020-01-24 04:43:05.942263+00	2020-01-24 04:43:05.942279+00	2019-09-16 16:00:00+00	4	\N	4	6	1
+13	2020-01-24 04:43:06.031988+00	2020-01-24 04:43:06.032004+00	2019-09-17 16:00:00+00	4	\N	5	7	1
+14	2020-01-24 04:43:06.047404+00	2020-01-24 04:43:06.047422+00	2019-09-17 16:00:00+00	5	\N	5	7	1
+15	2020-01-24 04:43:06.115759+00	2020-01-24 04:43:06.115777+00	2019-09-17 16:00:00+00	4	\N	5	8	1
+16	2020-01-24 04:43:06.127792+00	2020-01-24 04:43:06.127807+00	2019-09-17 16:00:00+00	4	\N	5	8	1
+17	2020-01-24 04:43:06.188788+00	2020-01-24 04:43:06.188807+00	2019-09-17 16:00:00+00	4	\N	4	9	1
+18	2020-01-24 04:43:06.203575+00	2020-01-24 04:43:06.203589+00	2019-09-17 16:00:00+00	5	\N	4	9	1
+19	2020-01-24 04:43:06.274766+00	2020-01-24 04:43:06.274785+00	2019-09-17 16:00:00+00	4	\N	4	10	1
+20	2020-01-24 04:43:06.288461+00	2020-01-24 04:43:06.288477+00	2019-09-17 16:00:00+00	4	\N	4	10	1
+21	2020-01-24 04:43:06.345737+00	2020-01-24 04:43:06.345756+00	2019-09-17 16:00:00+00	4	\N	6	11	1
+22	2020-01-24 04:43:06.357488+00	2020-01-24 04:43:06.357504+00	2019-09-17 16:00:00+00	5	\N	6	11	1
+23	2020-01-24 04:43:06.420946+00	2020-01-24 04:43:06.420964+00	2019-09-17 16:00:00+00	5	\N	4	12	1
+24	2020-01-24 04:43:06.432822+00	2020-01-24 04:43:06.432838+00	2019-09-17 16:00:00+00	4	\N	4	12	1
+25	2020-01-24 04:43:06.495386+00	2020-01-24 04:43:06.495405+00	2019-09-17 16:00:00+00	4	\N	4	13	1
+26	2020-01-24 04:43:06.509467+00	2020-01-24 04:43:06.509484+00	2019-09-17 16:00:00+00	4	\N	4	13	1
+27	2020-01-24 04:43:06.584145+00	2020-01-24 04:43:06.584168+00	2019-09-18 16:00:00+00	4	\N	8	14	1
+28	2020-01-24 04:43:06.601704+00	2020-01-24 04:43:06.601723+00	2019-09-18 16:00:00+00	5	\N	8	14	1
+29	2020-01-24 04:43:06.653973+00	2020-01-24 04:43:06.653997+00	2019-09-18 16:00:00+00	4	\N	6	15	1
+30	2020-01-24 04:43:06.665645+00	2020-01-24 04:43:06.665666+00	2019-09-18 16:00:00+00	5	\N	6	15	1
+31	2020-01-24 04:43:06.741731+00	2020-01-24 04:43:06.741751+00	2019-09-18 16:00:00+00	5	\N	6	16	1
+32	2020-01-24 04:43:06.754382+00	2020-01-24 04:43:06.7544+00	2019-09-18 16:00:00+00	5	\N	6	16	1
+33	2020-01-24 04:43:06.833838+00	2020-01-24 04:43:06.833857+00	2019-09-18 16:00:00+00	5	\N	6	17	1
+34	2020-01-24 04:43:06.842279+00	2020-01-24 04:43:06.842291+00	2019-09-18 16:00:00+00	5	\N	6	17	1
+35	2020-01-24 04:43:06.898003+00	2020-01-24 04:43:06.898025+00	2019-09-18 16:00:00+00	4	\N	6	18	1
+36	2020-01-24 04:43:06.906319+00	2020-01-24 04:43:06.906333+00	2019-09-18 16:00:00+00	5	\N	6	18	1
+37	2020-01-24 04:43:06.966862+00	2020-01-24 04:43:06.966881+00	2019-09-18 16:00:00+00	4	\N	4	19	1
+38	2020-01-24 04:43:06.980492+00	2020-01-24 04:43:06.980507+00	2019-09-18 16:00:00+00	5	\N	4	19	1
+39	2020-01-24 04:43:07.033702+00	2020-01-24 04:43:07.033721+00	2019-09-19 16:00:00+00	5	\N	5	20	1
+40	2020-01-24 04:43:07.042055+00	2020-01-24 04:43:07.042068+00	2019-09-19 16:00:00+00	5	\N	5	20	1
+41	2020-01-24 04:43:07.131228+00	2020-01-24 04:43:07.131249+00	2019-09-19 16:00:00+00	5	\N	5	21	1
+42	2020-01-24 04:43:07.144961+00	2020-01-24 04:43:07.144976+00	2019-09-19 16:00:00+00	5	\N	5	21	1
+43	2020-01-24 04:43:07.228296+00	2020-01-24 04:43:07.228315+00	2019-09-19 16:00:00+00	5	\N	8	22	1
+44	2020-01-24 04:43:07.24129+00	2020-01-24 04:43:07.241306+00	2019-09-19 16:00:00+00	5	\N	8	22	1
+45	2020-01-24 04:43:07.299936+00	2020-01-24 04:43:07.299956+00	2019-09-19 16:00:00+00	5	\N	5	23	1
+46	2020-01-24 04:43:07.309645+00	2020-01-24 04:43:07.309658+00	2019-09-19 16:00:00+00	5	\N	5	23	1
+47	2020-01-24 04:43:07.370655+00	2020-01-24 04:43:07.370673+00	2019-09-20 16:00:00+00	5	\N	5	24	1
+48	2020-01-24 04:43:07.386131+00	2020-01-24 04:43:07.386153+00	2019-09-20 16:00:00+00	6	\N	5	24	1
+49	2020-01-24 04:43:07.466039+00	2020-01-24 04:43:07.466057+00	2019-09-22 16:00:00+00	7	\N	4	25	2
+50	2020-01-24 04:43:07.4769+00	2020-01-24 04:43:07.476915+00	2019-09-22 16:00:00+00	7	\N	4	25	2
+51	2020-01-24 04:43:07.542922+00	2020-01-24 04:43:07.542942+00	2019-09-22 16:00:00+00	8	\N	4	26	2
+52	2020-01-24 04:43:07.558269+00	2020-01-24 04:43:07.558321+00	2019-09-22 16:00:00+00	4	\N	4	26	2
+53	2020-01-24 04:43:07.642468+00	2020-01-24 04:43:07.642486+00	2019-09-22 16:00:00+00	6	\N	5	27	2
+54	2020-01-24 04:43:07.652668+00	2020-01-24 04:43:07.652684+00	2019-09-22 16:00:00+00	6	\N	5	27	2
+55	2020-01-24 04:43:07.710457+00	2020-01-24 04:43:07.710475+00	2019-09-22 16:00:00+00	8	\N	8	28	2
+56	2020-01-24 04:43:07.718051+00	2020-01-24 04:43:07.718062+00	2019-09-22 16:00:00+00	4	\N	8	28	2
+57	2020-01-24 04:43:07.766387+00	2020-01-24 04:43:07.766405+00	2019-09-22 16:00:00+00	6	\N	6	29	2
+58	2020-01-24 04:43:07.778839+00	2020-01-24 04:43:07.778855+00	2019-09-22 16:00:00+00	8	\N	6	29	2
+59	2020-01-24 04:43:07.841386+00	2020-01-24 04:43:07.841404+00	2019-09-22 16:00:00+00	6	\N	6	30	2
+60	2020-01-24 04:43:07.849593+00	2020-01-24 04:43:07.849608+00	2019-09-22 16:00:00+00	8	\N	6	30	2
+61	2020-01-24 04:43:07.893848+00	2020-01-24 04:43:07.893866+00	2019-09-22 16:00:00+00	8	\N	6	31	2
+62	2020-01-24 04:43:07.923604+00	2020-01-24 04:43:07.923903+00	2019-09-22 16:00:00+00	9	\N	6	31	2
+63	2020-01-24 04:43:08.027408+00	2020-01-24 04:43:08.027431+00	2019-09-22 16:00:00+00	6	\N	4	32	2
+64	2020-01-24 04:43:08.043889+00	2020-01-24 04:43:08.043911+00	2019-09-22 16:00:00+00	8	\N	4	32	2
+65	2020-01-24 04:43:08.140064+00	2020-01-24 04:43:08.140085+00	2019-09-22 16:00:00+00	6	\N	6	33	2
+66	2020-01-24 04:43:08.149521+00	2020-01-24 04:43:08.149534+00	2019-09-22 16:00:00+00	8	\N	6	33	2
+67	2020-01-24 04:43:08.187902+00	2020-01-24 04:43:08.187921+00	2019-09-22 16:00:00+00	7	\N	4	34	2
+68	2020-01-24 04:43:08.208329+00	2020-01-24 04:43:08.208349+00	2019-09-22 16:00:00+00	7	\N	4	34	2
+69	2020-01-24 04:43:08.277484+00	2020-01-24 04:43:08.277503+00	2019-09-22 16:00:00+00	6	\N	8	35	2
+70	2020-01-24 04:43:08.291094+00	2020-01-24 04:43:08.291116+00	2019-09-22 16:00:00+00	8	\N	8	35	2
+71	2020-01-24 04:43:08.341008+00	2020-01-24 04:43:08.341026+00	2019-09-22 16:00:00+00	6	\N	4	36	2
+72	2020-01-24 04:43:08.348331+00	2020-01-24 04:43:08.348343+00	2019-09-22 16:00:00+00	3	\N	4	36	2
+73	2020-01-24 04:43:08.404503+00	2020-01-24 04:43:08.404523+00	2019-09-22 16:00:00+00	8	\N	4	37	2
+74	2020-01-24 04:43:08.433388+00	2020-01-24 04:43:08.433403+00	2019-09-22 16:00:00+00	8	\N	4	37	2
+75	2020-01-24 04:43:08.504941+00	2020-01-24 04:43:08.504959+00	2019-09-22 16:00:00+00	6	\N	4	38	2
+76	2020-01-24 04:43:08.515872+00	2020-01-24 04:43:08.516115+00	2019-09-22 16:00:00+00	8	\N	4	38	2
+77	2020-01-24 04:43:08.561865+00	2020-01-24 04:43:08.561883+00	2019-09-22 16:00:00+00	8	\N	8	39	2
+78	2020-01-24 04:43:08.571389+00	2020-01-24 04:43:08.571404+00	2019-09-22 16:00:00+00	6	\N	8	39	2
+79	2020-01-24 04:43:08.62797+00	2020-01-24 04:43:08.62799+00	2019-09-22 16:00:00+00	6	\N	6	40	2
+80	2020-01-24 04:43:08.639984+00	2020-01-24 04:43:08.639998+00	2019-09-22 16:00:00+00	9	\N	6	40	2
+81	2020-01-24 04:43:08.680535+00	2020-01-24 04:43:08.680552+00	2019-09-22 16:00:00+00	6	\N	5	41	2
+82	2020-01-24 04:43:08.691435+00	2020-01-24 04:43:08.691549+00	2019-09-22 16:00:00+00	6	\N	5	41	2
+83	2020-01-24 04:43:08.755474+00	2020-01-24 04:43:08.755493+00	2019-09-22 16:00:00+00	6	\N	8	42	2
+84	2020-01-24 04:43:08.768802+00	2020-01-24 04:43:08.768817+00	2019-09-22 16:00:00+00	8	\N	8	42	2
+85	2020-01-24 04:43:08.8481+00	2020-01-24 04:43:08.848135+00	2019-09-22 16:00:00+00	8	\N	8	43	2
+86	2020-01-24 04:43:08.877318+00	2020-01-24 04:43:08.877597+00	2019-09-22 16:00:00+00	4	\N	8	43	2
+87	2020-01-24 04:43:08.955061+00	2020-01-24 04:43:08.955089+00	2019-09-22 16:00:00+00	6	\N	5	44	2
+88	2020-01-24 04:43:08.969206+00	2020-01-24 04:43:08.969224+00	2019-09-22 16:00:00+00	6	\N	5	44	2
+89	2020-01-24 04:43:09.022717+00	2020-01-24 04:43:09.022735+00	2019-09-22 16:00:00+00	7	\N	6	45	2
+90	2020-01-24 04:43:09.032744+00	2020-01-24 04:43:09.032759+00	2019-09-22 16:00:00+00	7	\N	6	45	2
+91	2020-01-24 04:43:09.075523+00	2020-01-24 04:43:09.075542+00	2019-09-22 16:00:00+00	8	\N	8	46	2
+92	2020-01-24 04:43:09.087403+00	2020-01-24 04:43:09.087418+00	2019-09-22 16:00:00+00	4	\N	8	46	2
+93	2020-01-24 04:43:09.14993+00	2020-01-24 04:43:09.149948+00	2019-09-22 16:00:00+00	6	\N	6	47	2
+94	2020-01-24 04:43:09.162606+00	2020-01-24 04:43:09.162619+00	2019-09-22 16:00:00+00	8	\N	6	47	2
+95	2020-01-24 04:43:09.201792+00	2020-01-24 04:43:09.201809+00	2019-09-22 16:00:00+00	6	\N	8	48	2
+96	2020-01-24 04:43:09.208724+00	2020-01-24 04:43:09.208736+00	2019-09-22 16:00:00+00	9	\N	8	48	2
+97	2020-01-24 04:43:09.272217+00	2020-01-24 04:43:09.272235+00	2019-09-22 16:00:00+00	8	\N	6	49	2
+98	2020-01-24 04:43:09.285867+00	2020-01-24 04:43:09.285882+00	2019-09-22 16:00:00+00	4	\N	6	49	2
+99	2020-01-24 04:43:09.344089+00	2020-01-24 04:43:09.344107+00	2019-09-22 16:00:00+00	6	\N	8	50	2
+100	2020-01-24 04:43:09.35552+00	2020-01-24 04:43:09.355533+00	2019-09-22 16:00:00+00	8	\N	8	50	2
+101	2020-01-24 04:43:09.412914+00	2020-01-24 04:43:09.412932+00	2019-09-22 16:00:00+00	6	\N	6	51	2
+102	2020-01-24 04:43:09.428773+00	2020-01-24 04:43:09.42881+00	2019-09-22 16:00:00+00	8	\N	6	51	2
+103	2020-01-24 04:43:09.479431+00	2020-01-24 04:43:09.47945+00	2019-09-22 16:00:00+00	8	\N	8	52	2
+104	2020-01-24 04:43:09.498223+00	2020-01-24 04:43:09.49824+00	2019-09-22 16:00:00+00	9	\N	8	52	2
+105	2020-01-24 04:43:09.554776+00	2020-01-24 04:43:09.554794+00	2019-09-22 16:00:00+00	6	\N	4	53	2
+106	2020-01-24 04:43:09.566946+00	2020-01-24 04:43:09.566962+00	2019-09-22 16:00:00+00	8	\N	4	53	2
+107	2020-01-24 04:43:09.62178+00	2020-01-24 04:43:09.621798+00	2019-09-22 16:00:00+00	6	\N	8	54	2
+108	2020-01-24 04:43:09.634807+00	2020-01-24 04:43:09.634824+00	2019-09-22 16:00:00+00	3	\N	8	54	2
+109	2020-01-24 04:43:09.69463+00	2020-01-24 04:43:09.694649+00	2019-09-22 16:00:00+00	6	\N	4	55	2
+110	2020-01-24 04:43:09.707256+00	2020-01-24 04:43:09.707272+00	2019-09-22 16:00:00+00	9	\N	4	55	2
+111	2020-01-24 04:43:09.765755+00	2020-01-24 04:43:09.765774+00	2019-09-22 16:00:00+00	8	\N	8	56	2
+112	2020-01-24 04:43:09.77661+00	2020-01-24 04:43:09.776623+00	2019-09-22 16:00:00+00	9	\N	8	56	2
+113	2020-01-24 04:43:09.820778+00	2020-01-24 04:43:09.820796+00	2019-09-22 16:00:00+00	8	\N	4	57	2
+114	2020-01-24 04:43:09.833849+00	2020-01-24 04:43:09.833866+00	2019-09-22 16:00:00+00	4	\N	4	57	2
+115	2020-01-24 04:43:09.897409+00	2020-01-24 04:43:09.897427+00	2019-09-22 16:00:00+00	6	\N	6	58	2
+116	2020-01-24 04:43:09.911094+00	2020-01-24 04:43:09.911112+00	2019-09-22 16:00:00+00	6	\N	6	58	2
+117	2020-01-24 04:43:09.965983+00	2020-01-24 04:43:09.966002+00	2019-09-22 16:00:00+00	6	\N	6	59	2
+118	2020-01-24 04:43:09.97443+00	2020-01-24 04:43:09.974446+00	2019-09-22 16:00:00+00	8	\N	6	59	2
+119	2020-01-24 04:43:10.023224+00	2020-01-24 04:43:10.023242+00	2019-09-22 16:00:00+00	6	\N	8	60	2
+120	2020-01-24 04:43:10.03712+00	2020-01-24 04:43:10.037137+00	2019-09-22 16:00:00+00	9	\N	8	60	2
+121	2020-01-24 04:43:10.094109+00	2020-01-24 04:43:10.094128+00	2019-09-22 16:00:00+00	7	\N	6	61	2
+122	2020-01-24 04:43:10.106099+00	2020-01-24 04:43:10.106111+00	2019-09-22 16:00:00+00	7	\N	6	61	2
+123	2020-01-24 04:43:10.18133+00	2020-01-24 04:43:10.181346+00	2019-09-24 16:00:00+00	4	\N	6	62	2
+124	2020-01-24 04:43:10.193568+00	2020-01-24 04:43:10.193583+00	2019-09-24 16:00:00+00	10	\N	6	62	2
+125	2020-01-24 04:43:10.251845+00	2020-01-24 04:43:10.251864+00	2019-09-24 16:00:00+00	3	\N	6	63	2
+126	2020-01-24 04:43:10.264143+00	2020-01-24 04:43:10.264159+00	2019-09-24 16:00:00+00	4	\N	6	63	2
+127	2020-01-24 04:43:10.321678+00	2020-01-24 04:43:10.321697+00	2019-09-24 16:00:00+00	4	\N	6	64	2
+128	2020-01-24 04:43:10.334484+00	2020-01-24 04:43:10.3345+00	2019-09-24 16:00:00+00	10	\N	6	64	2
+129	2020-01-24 04:43:10.403531+00	2020-01-24 04:43:10.403549+00	2019-09-24 16:00:00+00	4	\N	6	65	2
+130	2020-01-24 04:43:10.416593+00	2020-01-24 04:43:10.416607+00	2019-09-24 16:00:00+00	10	\N	6	65	2
+131	2020-01-24 04:43:10.479854+00	2020-01-24 04:43:10.479872+00	2019-09-24 16:00:00+00	4	\N	4	66	2
+132	2020-01-24 04:43:10.49323+00	2020-01-24 04:43:10.493247+00	2019-09-24 16:00:00+00	3	\N	4	66	2
+133	2020-01-24 04:43:10.551055+00	2020-01-24 04:43:10.551086+00	2019-09-24 16:00:00+00	3	\N	5	67	2
+134	2020-01-24 04:43:10.560852+00	2020-01-24 04:43:10.560867+00	2019-09-24 16:00:00+00	10	\N	5	67	2
+135	2020-01-24 04:43:10.618794+00	2020-01-24 04:43:10.618811+00	2019-09-24 16:00:00+00	4	\N	6	68	2
+136	2020-01-24 04:43:10.63177+00	2020-01-24 04:43:10.631797+00	2019-09-24 16:00:00+00	3	\N	6	68	2
+137	2020-01-24 04:43:10.694448+00	2020-01-24 04:43:10.694467+00	2019-09-24 16:00:00+00	4	\N	4	69	2
+138	2020-01-24 04:43:10.706862+00	2020-01-24 04:43:10.706876+00	2019-09-24 16:00:00+00	3	\N	4	69	2
+139	2020-01-24 04:43:10.768754+00	2020-01-24 04:43:10.768773+00	2019-09-25 16:00:00+00	10	\N	6	70	2
+140	2020-01-24 04:43:10.777858+00	2020-01-24 04:43:10.77787+00	2019-09-25 16:00:00+00	3	\N	6	70	2
+141	2020-01-24 04:43:10.835047+00	2020-01-24 04:43:10.835065+00	2019-09-25 16:00:00+00	10	\N	4	71	2
+142	2020-01-24 04:43:10.848418+00	2020-01-24 04:43:10.848431+00	2019-09-25 16:00:00+00	3	\N	4	71	2
+143	2020-01-24 04:43:10.90396+00	2020-01-24 04:43:10.903979+00	2019-09-25 16:00:00+00	10	\N	8	72	2
+144	2020-01-24 04:43:10.920585+00	2020-01-24 04:43:10.920604+00	2019-09-25 16:00:00+00	3	\N	8	72	2
+145	2020-01-24 04:43:10.974085+00	2020-01-24 04:43:10.974102+00	2019-09-25 16:00:00+00	10	\N	8	73	2
+146	2020-01-24 04:43:10.986071+00	2020-01-24 04:43:10.986086+00	2019-09-25 16:00:00+00	3	\N	8	73	2
+147	2020-01-24 04:43:11.039394+00	2020-01-24 04:43:11.039412+00	2019-09-25 16:00:00+00	10	\N	6	74	2
+148	2020-01-24 04:43:11.050562+00	2020-01-24 04:43:11.050577+00	2019-09-25 16:00:00+00	3	\N	6	74	2
+149	2020-01-24 04:43:11.111579+00	2020-01-24 04:43:11.111598+00	2019-09-25 16:00:00+00	5	\N	8	75	2
+150	2020-01-24 04:43:11.124257+00	2020-01-24 04:43:11.124271+00	2019-09-25 16:00:00+00	3	\N	8	75	2
+151	2020-01-24 04:43:11.182404+00	2020-01-24 04:43:11.182423+00	2019-09-26 16:00:00+00	3	\N	8	76	2
+152	2020-01-24 04:43:11.191124+00	2020-01-24 04:43:11.191136+00	2019-09-26 16:00:00+00	10	\N	8	76	2
+153	2020-01-24 04:43:11.239255+00	2020-01-24 04:43:11.239273+00	2019-09-26 16:00:00+00	3	\N	8	77	2
+154	2020-01-24 04:43:11.251366+00	2020-01-24 04:43:11.251381+00	2019-09-26 16:00:00+00	10	\N	8	77	2
+155	2020-01-24 04:43:11.307917+00	2020-01-24 04:43:11.307935+00	2019-09-26 16:00:00+00	3	\N	5	78	2
+156	2020-01-24 04:43:11.317595+00	2020-01-24 04:43:11.317607+00	2019-09-26 16:00:00+00	10	\N	5	78	2
+157	2020-01-24 04:43:11.354315+00	2020-01-24 04:43:11.354333+00	2019-09-26 16:00:00+00	3	\N	5	79	2
+158	2020-01-24 04:43:11.3631+00	2020-01-24 04:43:11.363113+00	2019-09-26 16:00:00+00	10	\N	5	79	2
+159	2020-01-24 04:43:11.413184+00	2020-01-24 04:43:11.413202+00	2019-09-26 16:00:00+00	3	\N	5	80	2
+160	2020-01-24 04:43:11.426074+00	2020-01-24 04:43:11.426094+00	2019-09-26 16:00:00+00	10	\N	5	80	2
+161	2020-01-24 04:43:11.502399+00	2020-01-24 04:43:11.50242+00	2019-09-26 16:00:00+00	3	\N	6	81	2
+162	2020-01-24 04:43:11.51425+00	2020-01-24 04:43:11.514273+00	2019-09-26 16:00:00+00	10	\N	6	81	2
+163	2020-01-24 04:43:11.554414+00	2020-01-24 04:43:11.554433+00	2019-09-27 16:00:00+00	4	\N	6	82	2
+164	2020-01-24 04:43:11.577954+00	2020-01-24 04:43:11.577979+00	2019-09-27 16:00:00+00	3	\N	6	82	2
+165	2020-01-24 04:43:11.631295+00	2020-01-24 04:43:11.631313+00	2019-09-27 16:00:00+00	3	\N	6	83	2
+166	2020-01-24 04:43:11.643899+00	2020-01-24 04:43:11.643915+00	2019-09-27 16:00:00+00	3	\N	6	83	2
+167	2020-01-24 04:43:11.707742+00	2020-01-24 04:43:11.707761+00	2019-09-27 16:00:00+00	5	\N	5	84	2
+168	2020-01-24 04:43:11.718186+00	2020-01-24 04:43:11.7182+00	2019-09-27 16:00:00+00	3	\N	5	84	2
+169	2020-01-24 04:43:11.759735+00	2020-01-24 04:43:11.759754+00	2019-09-27 16:00:00+00	4	\N	6	85	2
+170	2020-01-24 04:43:11.768138+00	2020-01-24 04:43:11.768156+00	2019-09-27 16:00:00+00	3	\N	6	85	2
+171	2020-01-24 04:43:11.851033+00	2020-01-24 04:43:11.851052+00	2019-09-27 16:00:00+00	10	\N	5	86	2
+172	2020-01-24 04:43:11.86504+00	2020-01-24 04:43:11.865056+00	2019-09-27 16:00:00+00	3	\N	5	86	2
+173	2020-01-24 04:43:11.918132+00	2020-01-24 04:43:11.91815+00	2019-09-27 16:00:00+00	3	\N	6	87	2
+174	2020-01-24 04:43:11.926029+00	2020-01-24 04:43:11.926041+00	2019-09-27 16:00:00+00	3	\N	6	87	2
+175	2020-01-24 04:43:11.971204+00	2020-01-24 04:43:11.971225+00	2019-09-28 16:00:00+00	6	\N	6	88	2
+176	2020-01-24 04:43:11.980518+00	2020-01-24 04:43:11.980531+00	2019-09-28 16:00:00+00	8	\N	6	88	2
+177	2020-01-24 04:43:12.048149+00	2020-01-24 04:43:12.048169+00	2019-09-28 16:00:00+00	7	\N	6	89	2
+178	2020-01-24 04:43:12.06057+00	2020-01-24 04:43:12.060588+00	2019-09-28 16:00:00+00	7	\N	6	89	2
+179	2020-01-24 04:43:12.127871+00	2020-01-24 04:43:12.127888+00	2019-09-29 16:00:00+00	6	\N	5	90	3
+180	2020-01-24 04:43:12.135918+00	2020-01-24 04:43:12.135929+00	2019-09-29 16:00:00+00	11	\N	5	90	3
+181	2020-01-24 04:43:12.192992+00	2020-01-24 04:43:12.193012+00	2019-09-29 16:00:00+00	6	\N	8	91	3
+182	2020-01-24 04:43:12.21012+00	2020-01-24 04:43:12.210135+00	2019-09-29 16:00:00+00	11	\N	8	91	3
+183	2020-01-24 04:43:12.262574+00	2020-01-24 04:43:12.262593+00	2019-09-29 16:00:00+00	8	\N	4	92	3
+184	2020-01-24 04:43:12.284185+00	2020-01-24 04:43:12.2842+00	2019-09-29 16:00:00+00	10	\N	4	92	3
+185	2020-01-24 04:43:12.345015+00	2020-01-24 04:43:12.345036+00	2019-09-29 16:00:00+00	8	\N	5	93	3
+186	2020-01-24 04:43:12.353155+00	2020-01-24 04:43:12.353167+00	2019-09-29 16:00:00+00	10	\N	5	93	3
+187	2020-01-24 04:43:12.41519+00	2020-01-24 04:43:12.415209+00	2019-09-29 16:00:00+00	8	\N	6	94	3
+188	2020-01-24 04:43:12.423861+00	2020-01-24 04:43:12.423875+00	2019-09-29 16:00:00+00	10	\N	6	94	3
+189	2020-01-24 04:43:12.493106+00	2020-01-24 04:43:12.493128+00	2019-09-29 16:00:00+00	8	\N	4	95	3
+190	2020-01-24 04:43:12.506564+00	2020-01-24 04:43:12.506582+00	2019-09-29 16:00:00+00	10	\N	4	95	3
+191	2020-01-24 04:43:12.566234+00	2020-01-24 04:43:12.566254+00	2019-09-29 16:00:00+00	8	\N	6	96	3
+192	2020-01-24 04:43:12.587375+00	2020-01-24 04:43:12.587391+00	2019-09-29 16:00:00+00	10	\N	6	96	3
+193	2020-01-24 04:43:12.635975+00	2020-01-24 04:43:12.635993+00	2019-09-29 16:00:00+00	8	\N	6	97	3
+194	2020-01-24 04:43:12.648192+00	2020-01-24 04:43:12.648205+00	2019-09-29 16:00:00+00	8	\N	6	97	3
+195	2020-01-24 04:43:12.716848+00	2020-01-24 04:43:12.716867+00	2019-09-29 16:00:00+00	8	\N	8	98	3
+196	2020-01-24 04:43:12.726904+00	2020-01-24 04:43:12.726924+00	2019-09-29 16:00:00+00	10	\N	8	98	3
+197	2020-01-24 04:43:12.773728+00	2020-01-24 04:43:12.773744+00	2019-09-29 16:00:00+00	6	\N	7	99	3
+198	2020-01-24 04:43:12.784264+00	2020-01-24 04:43:12.784277+00	2019-09-29 16:00:00+00	10	\N	7	99	3
+199	2020-01-24 04:43:12.826329+00	2020-01-24 04:43:12.826348+00	2019-09-29 16:00:00+00	6	\N	6	100	3
+200	2020-01-24 04:43:12.845759+00	2020-01-24 04:43:12.845778+00	2019-09-29 16:00:00+00	11	\N	6	100	3
+201	2020-01-24 04:43:12.89154+00	2020-01-24 04:43:12.891559+00	2019-09-29 16:00:00+00	6	\N	8	101	3
+202	2020-01-24 04:43:12.902869+00	2020-01-24 04:43:12.902883+00	2019-09-29 16:00:00+00	11	\N	8	101	3
+203	2020-01-24 04:43:12.956897+00	2020-01-24 04:43:12.956916+00	2019-09-29 16:00:00+00	6	\N	6	102	3
+204	2020-01-24 04:43:12.969004+00	2020-01-24 04:43:12.969018+00	2019-09-29 16:00:00+00	11	\N	6	102	3
+205	2020-01-24 04:43:13.018743+00	2020-01-24 04:43:13.01876+00	2019-09-29 16:00:00+00	6	\N	6	103	3
+206	2020-01-24 04:43:13.02654+00	2020-01-24 04:43:13.026552+00	2019-09-29 16:00:00+00	11	\N	6	103	3
+207	2020-01-24 04:43:13.068837+00	2020-01-24 04:43:13.068855+00	2019-09-29 16:00:00+00	6	\N	6	104	3
+208	2020-01-24 04:43:13.082633+00	2020-01-24 04:43:13.082645+00	2019-09-29 16:00:00+00	11	\N	6	104	3
+209	2020-01-24 04:43:13.136469+00	2020-01-24 04:43:13.136486+00	2019-09-29 16:00:00+00	6	\N	4	105	3
+210	2020-01-24 04:43:13.147232+00	2020-01-24 04:43:13.147247+00	2019-09-29 16:00:00+00	10	\N	4	105	3
+211	2020-01-24 04:43:13.190891+00	2020-01-24 04:43:13.190909+00	2019-09-29 16:00:00+00	6	\N	4	106	3
+212	2020-01-24 04:43:13.203022+00	2020-01-24 04:43:13.203035+00	2019-09-29 16:00:00+00	11	\N	4	106	3
+213	2020-01-24 04:43:13.242928+00	2020-01-24 04:43:13.242948+00	2019-09-29 16:00:00+00	8	\N	5	107	3
+214	2020-01-24 04:43:13.251423+00	2020-01-24 04:43:13.251435+00	2019-09-29 16:00:00+00	10	\N	5	107	3
+215	2020-01-24 04:43:13.3092+00	2020-01-24 04:43:13.309218+00	2019-09-29 16:00:00+00	6	\N	4	108	3
+216	2020-01-24 04:43:13.321177+00	2020-01-24 04:43:13.32119+00	2019-09-29 16:00:00+00	11	\N	4	108	3
+217	2020-01-24 04:43:13.379686+00	2020-01-24 04:43:13.379705+00	2019-09-29 16:00:00+00	6	\N	4	109	3
+218	2020-01-24 04:43:13.39252+00	2020-01-24 04:43:13.392537+00	2019-09-29 16:00:00+00	10	\N	4	109	3
+219	2020-01-24 04:43:13.451601+00	2020-01-24 04:43:13.451618+00	2019-09-29 16:00:00+00	6	\N	5	110	3
+220	2020-01-24 04:43:13.462135+00	2020-01-24 04:43:13.462151+00	2019-09-29 16:00:00+00	11	\N	5	110	3
+221	2020-01-24 04:43:13.518042+00	2020-01-24 04:43:13.518062+00	2019-09-29 16:00:00+00	6	\N	4	111	3
+222	2020-01-24 04:43:13.534026+00	2020-01-24 04:43:13.534048+00	2019-09-29 16:00:00+00	11	\N	4	111	3
+223	2020-01-24 04:43:13.602842+00	2020-01-24 04:43:13.602862+00	2019-09-29 16:00:00+00	7	\N	5	112	3
+224	2020-01-24 04:43:13.61629+00	2020-01-24 04:43:13.616305+00	2019-09-29 16:00:00+00	7	\N	5	112	3
+225	2020-01-24 04:43:13.67424+00	2020-01-24 04:43:13.67427+00	2019-09-29 16:00:00+00	6	\N	5	113	3
+226	2020-01-24 04:43:13.683808+00	2020-01-24 04:43:13.683822+00	2019-09-29 16:00:00+00	11	\N	5	113	3
+227	2020-01-24 04:43:13.734309+00	2020-01-24 04:43:13.734327+00	2019-09-29 16:00:00+00	8	\N	6	114	3
+228	2020-01-24 04:43:13.744133+00	2020-01-24 04:43:13.744147+00	2019-09-29 16:00:00+00	10	\N	6	114	3
+229	2020-01-24 04:43:13.801765+00	2020-01-24 04:43:13.801784+00	2019-09-29 16:00:00+00	6	\N	5	115	3
+230	2020-01-24 04:43:13.811161+00	2020-01-24 04:43:13.811173+00	2019-09-29 16:00:00+00	10	\N	5	115	3
+231	2020-01-24 04:43:13.855046+00	2020-01-24 04:43:13.855064+00	2019-09-29 16:00:00+00	7	\N	8	116	3
+232	2020-01-24 04:43:13.863867+00	2020-01-24 04:43:13.86388+00	2019-09-29 16:00:00+00	7	\N	8	116	3
+233	2020-01-24 04:43:13.921262+00	2020-01-24 04:43:13.921281+00	2019-09-29 16:00:00+00	8	\N	5	117	3
+234	2020-01-24 04:43:13.934341+00	2020-01-24 04:43:13.934356+00	2019-09-29 16:00:00+00	10	\N	5	117	3
+235	2020-01-24 04:43:13.981713+00	2020-01-24 04:43:13.981732+00	2019-09-29 16:00:00+00	6	\N	5	118	3
+236	2020-01-24 04:43:13.991636+00	2020-01-24 04:43:13.991653+00	2019-09-29 16:00:00+00	11	\N	5	118	3
+237	2020-01-24 04:43:14.042056+00	2020-01-24 04:43:14.042074+00	2019-09-29 16:00:00+00	6	\N	5	119	3
+238	2020-01-24 04:43:14.054346+00	2020-01-24 04:43:14.054359+00	2019-09-29 16:00:00+00	11	\N	5	119	3
+239	2020-01-24 04:43:14.117358+00	2020-01-24 04:43:14.117377+00	2019-09-29 16:00:00+00	8	\N	5	120	3
+240	2020-01-24 04:43:14.128307+00	2020-01-24 04:43:14.12832+00	2019-09-29 16:00:00+00	10	\N	5	120	3
+241	2020-01-24 04:43:14.187038+00	2020-01-24 04:43:14.187056+00	2019-09-29 16:00:00+00	6	\N	6	121	3
+242	2020-01-24 04:43:14.199748+00	2020-01-24 04:43:14.199762+00	2019-09-29 16:00:00+00	10	\N	6	121	3
+243	2020-01-24 04:43:14.261804+00	2020-01-24 04:43:14.261824+00	2019-09-29 16:00:00+00	8	\N	7	122	3
+244	2020-01-24 04:43:14.280318+00	2020-01-24 04:43:14.280339+00	2019-09-29 16:00:00+00	10	\N	7	122	3
+245	2020-01-24 04:43:14.347334+00	2020-01-24 04:43:14.347353+00	2019-09-29 16:00:00+00	6	\N	5	123	3
+246	2020-01-24 04:43:14.358+00	2020-01-24 04:43:14.358013+00	2019-09-29 16:00:00+00	11	\N	5	123	3
+247	2020-01-24 04:43:14.418013+00	2020-01-24 04:43:14.418032+00	2019-09-29 16:00:00+00	6	\N	4	124	3
+248	2020-01-24 04:43:14.428485+00	2020-01-24 04:43:14.428497+00	2019-09-29 16:00:00+00	11	\N	4	124	3
+249	2020-01-24 04:43:14.476286+00	2020-01-24 04:43:14.476305+00	2019-09-29 16:00:00+00	6	\N	6	125	3
+250	2020-01-24 04:43:14.487047+00	2020-01-24 04:43:14.487063+00	2019-09-29 16:00:00+00	11	\N	6	125	3
+251	2020-01-24 04:43:14.549487+00	2020-01-24 04:43:14.549505+00	2019-09-29 16:00:00+00	6	\N	6	126	3
+252	2020-01-24 04:43:14.557146+00	2020-01-24 04:43:14.55716+00	2019-09-29 16:00:00+00	11	\N	6	126	3
+253	2020-01-24 04:43:14.60889+00	2020-01-24 04:43:14.608909+00	2019-09-29 16:00:00+00	8	\N	4	127	3
+254	2020-01-24 04:43:14.615757+00	2020-01-24 04:43:14.615769+00	2019-09-29 16:00:00+00	10	\N	4	127	3
+255	2020-01-24 04:43:14.680404+00	2020-01-24 04:43:14.680424+00	2019-09-29 16:00:00+00	6	\N	8	128	3
+256	2020-01-24 04:43:14.694323+00	2020-01-24 04:43:14.694347+00	2019-09-29 16:00:00+00	10	\N	8	128	3
+257	2020-01-24 04:43:14.735994+00	2020-01-24 04:43:14.736011+00	2019-09-29 16:00:00+00	6	\N	6	129	3
+258	2020-01-24 04:43:14.743445+00	2020-01-24 04:43:14.743462+00	2019-09-29 16:00:00+00	11	\N	6	129	3
+259	2020-01-24 04:43:14.795325+00	2020-01-24 04:43:14.795343+00	2019-09-29 16:00:00+00	7	\N	6	130	3
+260	2020-01-24 04:43:14.808974+00	2020-01-24 04:43:14.808989+00	2019-09-29 16:00:00+00	7	\N	6	130	3
+261	2020-01-24 04:43:14.855062+00	2020-01-24 04:43:14.855089+00	2019-09-29 16:00:00+00	6	\N	6	131	3
+262	2020-01-24 04:43:14.862721+00	2020-01-24 04:43:14.862732+00	2019-09-29 16:00:00+00	8	\N	6	131	3
+263	2020-01-24 04:43:14.903837+00	2020-01-24 04:43:14.903855+00	2019-09-30 16:00:00+00	10	\N	4	132	3
+264	2020-01-24 04:43:14.916238+00	2020-01-24 04:43:14.916254+00	2019-09-30 16:00:00+00	5	\N	4	132	3
+265	2020-01-24 04:43:14.986869+00	2020-01-24 04:43:14.986888+00	2019-09-30 16:00:00+00	10	\N	6	133	3
+266	2020-01-24 04:43:15.001136+00	2020-01-24 04:43:15.001153+00	2019-09-30 16:00:00+00	11	\N	6	133	3
+267	2020-01-24 04:43:15.054839+00	2020-01-24 04:43:15.054857+00	2019-09-30 16:00:00+00	10	\N	5	134	3
+268	2020-01-24 04:43:15.068077+00	2020-01-24 04:43:15.068098+00	2019-09-30 16:00:00+00	11	\N	5	134	3
+269	2020-01-24 04:43:15.116202+00	2020-01-24 04:43:15.116222+00	2019-09-30 16:00:00+00	10	\N	4	135	3
+270	2020-01-24 04:43:15.124629+00	2020-01-24 04:43:15.124641+00	2019-09-30 16:00:00+00	11	\N	4	135	3
+271	2020-01-24 04:43:15.17143+00	2020-01-24 04:43:15.17145+00	2019-09-30 16:00:00+00	10	\N	4	136	3
+272	2020-01-24 04:43:15.184173+00	2020-01-24 04:43:15.184188+00	2019-09-30 16:00:00+00	5	\N	4	136	3
+273	2020-01-24 04:43:15.239757+00	2020-01-24 04:43:15.239774+00	2019-10-01 16:00:00+00	5	\N	6	137	3
+274	2020-01-24 04:43:15.251786+00	2020-01-24 04:43:15.251802+00	2019-10-01 16:00:00+00	5	\N	6	137	3
+275	2020-01-24 04:43:15.296795+00	2020-01-24 04:43:15.296814+00	2019-10-01 16:00:00+00	11	\N	5	138	3
+276	2020-01-24 04:43:15.30512+00	2020-01-24 04:43:15.305132+00	2019-10-01 16:00:00+00	5	\N	5	138	3
+277	2020-01-24 04:43:15.349865+00	2020-01-24 04:43:15.349885+00	2019-10-01 16:00:00+00	5	\N	6	139	3
+278	2020-01-24 04:43:15.362589+00	2020-01-24 04:43:15.362605+00	2019-10-01 16:00:00+00	5	\N	6	139	3
+279	2020-01-24 04:43:15.426123+00	2020-01-24 04:43:15.426142+00	2019-10-01 16:00:00+00	5	\N	5	140	3
+280	2020-01-24 04:43:15.438119+00	2020-01-24 04:43:15.438133+00	2019-10-01 16:00:00+00	5	\N	5	140	3
+281	2020-01-24 04:43:15.480383+00	2020-01-24 04:43:15.480401+00	2019-10-01 16:00:00+00	5	\N	6	141	3
+282	2020-01-24 04:43:15.489247+00	2020-01-24 04:43:15.489262+00	2019-10-01 16:00:00+00	5	\N	6	141	3
+283	2020-01-24 04:43:15.536585+00	2020-01-24 04:43:15.536604+00	2019-10-01 16:00:00+00	3	\N	8	142	3
+284	2020-01-24 04:43:15.54773+00	2020-01-24 04:43:15.547744+00	2019-10-01 16:00:00+00	5	\N	8	142	3
+285	2020-01-24 04:43:15.592532+00	2020-01-24 04:43:15.592551+00	2019-10-01 16:00:00+00	5	\N	4	143	3
+286	2020-01-24 04:43:15.600508+00	2020-01-24 04:43:15.60052+00	2019-10-01 16:00:00+00	5	\N	4	143	3
+287	2020-01-24 04:43:15.637842+00	2020-01-24 04:43:15.637859+00	2019-10-01 16:00:00+00	5	\N	6	144	3
+288	2020-01-24 04:43:15.651666+00	2020-01-24 04:43:15.65168+00	2019-10-01 16:00:00+00	5	\N	6	144	3
+289	2020-01-24 04:43:15.71409+00	2020-01-24 04:43:15.714114+00	2019-10-02 16:00:00+00	4	\N	8	145	3
+290	2020-01-24 04:43:15.727321+00	2020-01-24 04:43:15.727337+00	2019-10-02 16:00:00+00	3	\N	8	145	3
+291	2020-01-24 04:43:15.764534+00	2020-01-24 04:43:15.76455+00	2019-10-02 16:00:00+00	5	\N	6	146	3
+292	2020-01-24 04:43:15.778617+00	2020-01-24 04:43:15.77863+00	2019-10-02 16:00:00+00	4	\N	6	146	3
+293	2020-01-24 04:43:15.836907+00	2020-01-24 04:43:15.836924+00	2019-10-02 16:00:00+00	5	\N	6	147	3
+294	2020-01-24 04:43:15.849267+00	2020-01-24 04:43:15.849279+00	2019-10-02 16:00:00+00	4	\N	6	147	3
+295	2020-01-24 04:43:15.888475+00	2020-01-24 04:43:15.88849+00	2019-10-02 16:00:00+00	5	\N	8	148	3
+296	2020-01-24 04:43:15.896177+00	2020-01-24 04:43:15.89619+00	2019-10-02 16:00:00+00	4	\N	8	148	3
+297	2020-01-24 04:43:15.938646+00	2020-01-24 04:43:15.938665+00	2019-10-03 16:00:00+00	4	\N	8	149	3
+298	2020-01-24 04:43:15.950706+00	2020-01-24 04:43:15.950718+00	2019-10-03 16:00:00+00	4	\N	8	149	3
+299	2020-01-24 04:43:16.012747+00	2020-01-24 04:43:16.012765+00	2019-10-03 16:00:00+00	4	\N	5	150	3
+300	2020-01-24 04:43:16.023411+00	2020-01-24 04:43:16.023424+00	2019-10-03 16:00:00+00	4	\N	5	150	3
+301	2020-01-24 04:43:16.089628+00	2020-01-24 04:43:16.089646+00	2019-10-03 16:00:00+00	4	\N	5	151	3
+302	2020-01-24 04:43:16.103706+00	2020-01-24 04:43:16.103721+00	2019-10-03 16:00:00+00	4	\N	5	151	3
+303	2020-01-24 04:43:16.156787+00	2020-01-24 04:43:16.156805+00	2019-10-03 16:00:00+00	4	\N	5	152	3
+304	2020-01-24 04:43:16.170585+00	2020-01-24 04:43:16.170602+00	2019-10-03 16:00:00+00	4	\N	5	152	3
+305	2020-01-24 04:43:16.233279+00	2020-01-24 04:43:16.233297+00	2019-10-03 16:00:00+00	3	\N	5	153	3
+306	2020-01-24 04:43:16.247449+00	2020-01-24 04:43:16.247465+00	2019-10-03 16:00:00+00	4	\N	5	153	3
+307	2020-01-24 04:43:16.31182+00	2020-01-24 04:43:16.31184+00	2019-10-04 16:00:00+00	4	\N	8	154	3
+308	2020-01-24 04:43:16.325396+00	2020-01-24 04:43:16.32541+00	2019-10-04 16:00:00+00	3	\N	8	154	3
+309	2020-01-24 04:43:16.371494+00	2020-01-24 04:43:16.371513+00	2019-10-04 16:00:00+00	4	\N	6	155	3
+310	2020-01-24 04:43:16.384731+00	2020-01-24 04:43:16.384746+00	2019-10-04 16:00:00+00	3	\N	6	155	3
+311	2020-01-24 04:43:16.446276+00	2020-01-24 04:43:16.446294+00	2019-10-04 16:00:00+00	5	\N	5	156	3
+312	2020-01-24 04:43:16.459749+00	2020-01-24 04:43:16.459764+00	2019-10-04 16:00:00+00	3	\N	5	156	3
+313	2020-01-24 04:43:16.524416+00	2020-01-24 04:43:16.524434+00	2019-10-04 16:00:00+00	4	\N	5	157	3
+314	2020-01-24 04:43:16.53436+00	2020-01-24 04:43:16.534372+00	2019-10-04 16:00:00+00	3	\N	5	157	3
+315	2020-01-24 04:43:16.596329+00	2020-01-24 04:43:16.596348+00	2019-10-04 16:00:00+00	4	\N	5	158	3
+316	2020-01-24 04:43:16.610338+00	2020-01-24 04:43:16.610353+00	2019-10-04 16:00:00+00	3	\N	5	158	3
+317	2020-01-24 04:43:16.673912+00	2020-01-24 04:43:16.673931+00	2019-10-04 16:00:00+00	4	\N	8	159	3
+318	2020-01-24 04:43:16.686761+00	2020-01-24 04:43:16.686774+00	2019-10-04 16:00:00+00	3	\N	8	159	3
+319	2020-01-24 04:43:16.745417+00	2020-01-24 04:43:16.745436+00	2019-10-04 16:00:00+00	3	\N	6	160	3
+320	2020-01-24 04:43:16.758974+00	2020-01-24 04:43:16.758992+00	2019-10-04 16:00:00+00	3	\N	6	160	3
+321	2020-01-24 04:43:16.830663+00	2020-01-24 04:43:16.830682+00	2019-10-04 16:00:00+00	4	\N	6	161	3
+322	2020-01-24 04:43:16.843224+00	2020-01-24 04:43:16.843241+00	2019-10-04 16:00:00+00	3	\N	6	161	3
+323	2020-01-24 04:43:16.883675+00	2020-01-24 04:43:16.883694+00	2019-10-04 16:00:00+00	4	\N	5	162	3
+324	2020-01-24 04:43:16.891859+00	2020-01-24 04:43:16.891872+00	2019-10-04 16:00:00+00	3	\N	5	162	3
+325	2020-01-24 04:43:16.952585+00	2020-01-24 04:43:16.952603+00	2019-10-04 16:00:00+00	4	\N	5	163	3
+326	2020-01-24 04:43:16.966576+00	2020-01-24 04:43:16.966591+00	2019-10-04 16:00:00+00	3	\N	5	163	3
+327	2020-01-24 04:43:17.027786+00	2020-01-24 04:43:17.027804+00	2019-10-04 16:00:00+00	4	\N	8	164	3
+328	2020-01-24 04:43:17.039388+00	2020-01-24 04:43:17.0394+00	2019-10-04 16:00:00+00	3	\N	8	164	3
+329	2020-01-24 04:43:17.07618+00	2020-01-24 04:43:17.0762+00	2019-10-04 16:00:00+00	4	\N	6	165	3
+330	2020-01-24 04:43:17.083348+00	2020-01-24 04:43:17.08336+00	2019-10-04 16:00:00+00	3	\N	6	165	3
+331	2020-01-24 04:43:17.15332+00	2020-01-24 04:43:17.153337+00	2019-10-06 16:00:00+00	12	\N	5	166	4
+332	2020-01-24 04:43:17.166408+00	2020-01-24 04:43:17.166426+00	2019-10-06 16:00:00+00	12	\N	5	166	4
+333	2020-01-24 04:43:17.212498+00	2020-01-24 04:43:17.212516+00	2019-10-06 16:00:00+00	8	\N	4	167	4
+334	2020-01-24 04:43:17.220002+00	2020-01-24 04:43:17.220015+00	2019-10-06 16:00:00+00	3	\N	4	167	4
+335	2020-01-24 04:43:17.259589+00	2020-01-24 04:43:17.259607+00	2019-10-06 16:00:00+00	6	\N	6	168	4
+336	2020-01-24 04:43:17.273626+00	2020-01-24 04:43:17.273643+00	2019-10-06 16:00:00+00	3	\N	6	168	4
+337	2020-01-24 04:43:17.337492+00	2020-01-24 04:43:17.33751+00	2019-10-06 16:00:00+00	6	\N	6	169	4
+338	2020-01-24 04:43:17.35007+00	2020-01-24 04:43:17.350086+00	2019-10-06 16:00:00+00	3	\N	6	169	4
+339	2020-01-24 04:43:17.395403+00	2020-01-24 04:43:17.395421+00	2019-10-06 16:00:00+00	8	\N	4	170	4
+340	2020-01-24 04:43:17.402681+00	2020-01-24 04:43:17.402693+00	2019-10-06 16:00:00+00	3	\N	4	170	4
+341	2020-01-24 04:43:17.447928+00	2020-01-24 04:43:17.447947+00	2019-10-06 16:00:00+00	3	\N	6	171	4
+342	2020-01-24 04:43:17.461201+00	2020-01-24 04:43:17.461216+00	2019-10-06 16:00:00+00	6	\N	6	171	4
+343	2020-01-24 04:43:17.522905+00	2020-01-24 04:43:17.522923+00	2019-10-06 16:00:00+00	8	\N	6	172	4
+344	2020-01-24 04:43:17.536005+00	2020-01-24 04:43:17.536017+00	2019-10-06 16:00:00+00	3	\N	6	172	4
+345	2020-01-24 04:43:17.591537+00	2020-01-24 04:43:17.591555+00	2019-10-06 16:00:00+00	6	\N	6	173	4
+346	2020-01-24 04:43:17.59928+00	2020-01-24 04:43:17.599297+00	2019-10-06 16:00:00+00	6	\N	6	173	4
+347	2020-01-24 04:43:17.644329+00	2020-01-24 04:43:17.644347+00	2019-10-06 16:00:00+00	3	\N	5	174	4
+348	2020-01-24 04:43:17.657643+00	2020-01-24 04:43:17.657661+00	2019-10-06 16:00:00+00	6	\N	5	174	4
+349	2020-01-24 04:43:17.727376+00	2020-01-24 04:43:17.727395+00	2019-10-06 16:00:00+00	3	\N	5	175	4
+350	2020-01-24 04:43:17.740999+00	2020-01-24 04:43:17.741025+00	2019-10-06 16:00:00+00	6	\N	5	175	4
+351	2020-01-24 04:43:17.784704+00	2020-01-24 04:43:17.784721+00	2019-10-06 16:00:00+00	6	\N	8	176	4
+352	2020-01-24 04:43:17.792515+00	2020-01-24 04:43:17.792528+00	2019-10-06 16:00:00+00	3	\N	8	176	4
+353	2020-01-24 04:43:17.848516+00	2020-01-24 04:43:17.848535+00	2019-10-06 16:00:00+00	12	\N	6	177	4
+354	2020-01-24 04:43:17.862252+00	2020-01-24 04:43:17.862268+00	2019-10-06 16:00:00+00	12	\N	6	177	4
+355	2020-01-24 04:43:17.926385+00	2020-01-24 04:43:17.926403+00	2019-10-06 16:00:00+00	8	\N	4	178	4
+356	2020-01-24 04:43:17.939919+00	2020-01-24 04:43:17.939934+00	2019-10-06 16:00:00+00	6	\N	4	178	4
+357	2020-01-24 04:43:17.989952+00	2020-01-24 04:43:17.989972+00	2019-10-06 16:00:00+00	8	\N	6	179	4
+358	2020-01-24 04:43:18.002459+00	2020-01-24 04:43:18.002474+00	2019-10-06 16:00:00+00	3	\N	6	179	4
+359	2020-01-24 04:43:18.060159+00	2020-01-24 04:43:18.060177+00	2019-10-06 16:00:00+00	6	\N	4	180	4
+360	2020-01-24 04:43:18.07309+00	2020-01-24 04:43:18.073107+00	2019-10-06 16:00:00+00	3	\N	4	180	4
+361	2020-01-24 04:43:18.12968+00	2020-01-24 04:43:18.1297+00	2019-10-06 16:00:00+00	8	\N	4	181	4
+362	2020-01-24 04:43:18.141762+00	2020-01-24 04:43:18.141779+00	2019-10-06 16:00:00+00	3	\N	4	181	4
+363	2020-01-24 04:43:18.194861+00	2020-01-24 04:43:18.194878+00	2019-10-06 16:00:00+00	3	\N	6	182	4
+364	2020-01-24 04:43:18.202462+00	2020-01-24 04:43:18.202473+00	2019-10-06 16:00:00+00	6	\N	6	182	4
+365	2020-01-24 04:43:18.256658+00	2020-01-24 04:43:18.256677+00	2019-10-06 16:00:00+00	6	\N	6	183	4
+366	2020-01-24 04:43:18.27029+00	2020-01-24 04:43:18.270306+00	2019-10-06 16:00:00+00	3	\N	6	183	4
+367	2020-01-24 04:43:18.33064+00	2020-01-24 04:43:18.330658+00	2019-10-06 16:00:00+00	8	\N	6	184	4
+368	2020-01-24 04:43:18.340839+00	2020-01-24 04:43:18.340855+00	2019-10-06 16:00:00+00	6	\N	6	184	4
+369	2020-01-24 04:43:18.395754+00	2020-01-24 04:43:18.395772+00	2019-10-06 16:00:00+00	8	\N	4	185	4
+370	2020-01-24 04:43:18.403014+00	2020-01-24 04:43:18.403025+00	2019-10-06 16:00:00+00	3	\N	4	185	4
+371	2020-01-24 04:43:18.45884+00	2020-01-24 04:43:18.458859+00	2019-10-06 16:00:00+00	6	\N	6	186	4
+372	2020-01-24 04:43:18.471479+00	2020-01-24 04:43:18.471494+00	2019-10-06 16:00:00+00	6	\N	6	186	4
+373	2020-01-24 04:43:18.527585+00	2020-01-24 04:43:18.527601+00	2019-10-06 16:00:00+00	8	\N	4	187	4
+374	2020-01-24 04:43:18.537421+00	2020-01-24 04:43:18.537434+00	2019-10-06 16:00:00+00	3	\N	4	187	4
+375	2020-01-24 04:43:18.598192+00	2020-01-24 04:43:18.598208+00	2019-10-06 16:00:00+00	8	\N	4	188	4
+376	2020-01-24 04:43:18.611464+00	2020-01-24 04:43:18.611478+00	2019-10-06 16:00:00+00	3	\N	4	188	4
+377	2020-01-24 04:43:18.665131+00	2020-01-24 04:43:18.665149+00	2019-10-06 16:00:00+00	6	\N	6	189	4
+378	2020-01-24 04:43:18.678453+00	2020-01-24 04:43:18.678475+00	2019-10-06 16:00:00+00	3	\N	6	189	4
+379	2020-01-24 04:43:18.733611+00	2020-01-24 04:43:18.733631+00	2019-10-06 16:00:00+00	6	\N	6	190	4
+380	2020-01-24 04:43:18.744111+00	2020-01-24 04:43:18.744151+00	2019-10-06 16:00:00+00	3	\N	6	190	4
+381	2020-01-24 04:43:18.819973+00	2020-01-24 04:43:18.819992+00	2019-10-06 16:00:00+00	8	\N	4	191	4
+382	2020-01-24 04:43:18.831514+00	2020-01-24 04:43:18.831534+00	2019-10-06 16:00:00+00	3	\N	4	191	4
+383	2020-01-24 04:43:18.890344+00	2020-01-24 04:43:18.890368+00	2019-10-06 16:00:00+00	8	\N	6	192	4
+384	2020-01-24 04:43:18.898412+00	2020-01-24 04:43:18.898423+00	2019-10-06 16:00:00+00	3	\N	6	192	4
+385	2020-01-24 04:43:18.957634+00	2020-01-24 04:43:18.957652+00	2019-10-06 16:00:00+00	6	\N	4	193	4
+386	2020-01-24 04:43:18.968939+00	2020-01-24 04:43:18.968953+00	2019-10-06 16:00:00+00	3	\N	4	193	4
+387	2020-01-24 04:43:19.026357+00	2020-01-24 04:43:19.026374+00	2019-10-06 16:00:00+00	6	\N	4	194	4
+388	2020-01-24 04:43:19.033698+00	2020-01-24 04:43:19.033709+00	2019-10-06 16:00:00+00	3	\N	4	194	4
+389	2020-01-24 04:43:19.074253+00	2020-01-24 04:43:19.074273+00	2019-10-06 16:00:00+00	3	\N	6	195	4
+390	2020-01-24 04:43:19.083495+00	2020-01-24 04:43:19.083507+00	2019-10-06 16:00:00+00	6	\N	6	195	4
+391	2020-01-24 04:43:19.144991+00	2020-01-24 04:43:19.14501+00	2019-10-06 16:00:00+00	8	\N	6	196	4
+392	2020-01-24 04:43:19.158576+00	2020-01-24 04:43:19.158604+00	2019-10-06 16:00:00+00	3	\N	6	196	4
+393	2020-01-24 04:43:19.228982+00	2020-01-24 04:43:19.229+00	2019-10-06 16:00:00+00	3	\N	5	197	4
+394	2020-01-24 04:43:19.240663+00	2020-01-24 04:43:19.240679+00	2019-10-06 16:00:00+00	6	\N	5	197	4
+395	2020-01-24 04:43:19.295051+00	2020-01-24 04:43:19.29507+00	2019-10-06 16:00:00+00	6	\N	4	198	4
+396	2020-01-24 04:43:19.302867+00	2020-01-24 04:43:19.30288+00	2019-10-06 16:00:00+00	3	\N	4	198	4
+397	2020-01-24 04:43:19.370532+00	2020-01-24 04:43:19.370553+00	2019-10-06 16:00:00+00	8	\N	6	199	4
+398	2020-01-24 04:43:19.385799+00	2020-01-24 04:43:19.385816+00	2019-10-06 16:00:00+00	3	\N	6	199	4
+399	2020-01-24 04:43:19.451635+00	2020-01-24 04:43:19.451653+00	2019-10-06 16:00:00+00	8	\N	4	200	4
+400	2020-01-24 04:43:19.464654+00	2020-01-24 04:43:19.464669+00	2019-10-06 16:00:00+00	6	\N	4	200	4
+401	2020-01-24 04:43:19.52295+00	2020-01-24 04:43:19.522991+00	2019-10-06 16:00:00+00	8	\N	4	201	4
+402	2020-01-24 04:43:19.536639+00	2020-01-24 04:43:19.536656+00	2019-10-06 16:00:00+00	3	\N	4	201	4
+403	2020-01-24 04:43:19.602741+00	2020-01-24 04:43:19.60276+00	2019-10-06 16:00:00+00	8	\N	6	202	4
+404	2020-01-24 04:43:19.617729+00	2020-01-24 04:43:19.617747+00	2019-10-06 16:00:00+00	6	\N	6	202	4
+405	2020-01-24 04:43:19.681456+00	2020-01-24 04:43:19.681476+00	2019-10-06 16:00:00+00	8	\N	6	203	4
+406	2020-01-24 04:43:19.69071+00	2020-01-24 04:43:19.690725+00	2019-10-06 16:00:00+00	3	\N	6	203	4
+407	2020-01-24 04:43:19.730906+00	2020-01-24 04:43:19.730923+00	2019-10-06 16:00:00+00	8	\N	6	204	4
+408	2020-01-24 04:43:19.744975+00	2020-01-24 04:43:19.744989+00	2019-10-06 16:00:00+00	3	\N	6	204	4
+409	2020-01-24 04:43:19.812035+00	2020-01-24 04:43:19.812053+00	2019-10-06 16:00:00+00	12	\N	4	205	4
+410	2020-01-24 04:43:19.822543+00	2020-01-24 04:43:19.822557+00	2019-10-06 16:00:00+00	12	\N	4	205	4
+411	2020-01-24 04:43:19.86632+00	2020-01-24 04:43:19.866338+00	2019-10-06 16:00:00+00	12	\N	6	206	4
+412	2020-01-24 04:43:19.88117+00	2020-01-24 04:43:19.881189+00	2019-10-06 16:00:00+00	12	\N	6	206	4
+413	2020-01-24 04:43:19.942328+00	2020-01-24 04:43:19.942348+00	2019-10-06 16:00:00+00	8	\N	4	207	4
+414	2020-01-24 04:43:19.955826+00	2020-01-24 04:43:19.955842+00	2019-10-06 16:00:00+00	3	\N	4	207	4
+415	2020-01-24 04:43:20.037657+00	2020-01-24 04:43:20.037675+00	2019-10-06 16:00:00+00	8	\N	4	208	4
+416	2020-01-24 04:43:20.049162+00	2020-01-24 04:43:20.049178+00	2019-10-06 16:00:00+00	6	\N	4	208	4
+417	2020-01-24 04:43:20.104611+00	2020-01-24 04:43:20.104631+00	2019-10-06 16:00:00+00	8	\N	4	209	4
+418	2020-01-24 04:43:20.116227+00	2020-01-24 04:43:20.116239+00	2019-10-06 16:00:00+00	3	\N	4	209	4
+419	2020-01-24 04:43:20.207664+00	2020-01-24 04:43:20.207682+00	2019-10-06 16:00:00+00	8	\N	4	210	4
+420	2020-01-24 04:43:20.219998+00	2020-01-24 04:43:20.220013+00	2019-10-06 16:00:00+00	3	\N	4	210	4
+421	2020-01-24 04:43:20.287905+00	2020-01-24 04:43:20.287928+00	2019-10-06 16:00:00+00	8	\N	6	211	4
+422	2020-01-24 04:43:20.299047+00	2020-01-24 04:43:20.299266+00	2019-10-06 16:00:00+00	3	\N	6	211	4
+423	2020-01-24 04:43:20.346523+00	2020-01-24 04:43:20.346545+00	2019-10-06 16:00:00+00	12	\N	6	212	4
+424	2020-01-24 04:43:20.364368+00	2020-01-24 04:43:20.36439+00	2019-10-06 16:00:00+00	12	\N	6	212	4
+425	2020-01-24 04:43:20.44849+00	2020-01-24 04:43:20.448513+00	2019-10-06 16:00:00+00	8	\N	6	213	4
+426	2020-01-24 04:43:20.464358+00	2020-01-24 04:43:20.464379+00	2019-10-06 16:00:00+00	3	\N	6	213	4
+427	2020-01-24 04:43:20.535493+00	2020-01-24 04:43:20.535514+00	2019-10-06 16:00:00+00	8	\N	6	214	4
+428	2020-01-24 04:43:20.546415+00	2020-01-24 04:43:20.546431+00	2019-10-06 16:00:00+00	3	\N	6	214	4
+429	2020-01-24 04:43:20.595312+00	2020-01-24 04:43:20.595332+00	2019-10-06 16:00:00+00	8	\N	6	215	4
+430	2020-01-24 04:43:20.603774+00	2020-01-24 04:43:20.603791+00	2019-10-06 16:00:00+00	3	\N	6	215	4
+431	2020-01-24 04:43:20.667577+00	2020-01-24 04:43:20.667596+00	2019-10-06 16:00:00+00	12	\N	4	216	4
+432	2020-01-24 04:43:20.677547+00	2020-01-24 04:43:20.677564+00	2019-10-06 16:00:00+00	12	\N	4	216	4
+433	2020-01-24 04:43:20.740157+00	2020-01-24 04:43:20.740176+00	2019-10-06 16:00:00+00	8	\N	4	217	4
+434	2020-01-24 04:43:20.747609+00	2020-01-24 04:43:20.747622+00	2019-10-06 16:00:00+00	6	\N	4	217	4
+435	2020-01-24 04:43:20.800669+00	2020-01-24 04:43:20.800687+00	2019-10-06 16:00:00+00	8	\N	6	218	4
+436	2020-01-24 04:43:20.811501+00	2020-01-24 04:43:20.81152+00	2019-10-06 16:00:00+00	6	\N	6	218	4
+437	2020-01-24 04:43:20.873122+00	2020-01-24 04:43:20.873141+00	2019-10-06 16:00:00+00	8	\N	4	219	4
+438	2020-01-24 04:43:20.885981+00	2020-01-24 04:43:20.885998+00	2019-10-06 16:00:00+00	3	\N	4	219	4
+439	2020-01-24 04:43:20.941914+00	2020-01-24 04:43:20.941933+00	2019-10-06 16:00:00+00	8	\N	6	220	4
+440	2020-01-24 04:43:20.950134+00	2020-01-24 04:43:20.950146+00	2019-10-06 16:00:00+00	3	\N	6	220	4
+441	2020-01-24 04:43:21.016217+00	2020-01-24 04:43:21.016238+00	2019-10-06 16:00:00+00	6	\N	4	221	4
+442	2020-01-24 04:43:21.029754+00	2020-01-24 04:43:21.029771+00	2019-10-06 16:00:00+00	3	\N	4	221	4
+443	2020-01-24 04:43:21.110394+00	2020-01-24 04:43:21.110413+00	2019-10-06 16:00:00+00	8	\N	6	222	4
+444	2020-01-24 04:43:21.122179+00	2020-01-24 04:43:21.122192+00	2019-10-06 16:00:00+00	3	\N	6	222	4
+445	2020-01-24 04:43:21.173217+00	2020-01-24 04:43:21.173235+00	2019-10-06 16:00:00+00	3	\N	6	223	4
+446	2020-01-24 04:43:21.182078+00	2020-01-24 04:43:21.182092+00	2019-10-06 16:00:00+00	6	\N	6	223	4
+447	2020-01-24 04:43:21.236789+00	2020-01-24 04:43:21.236809+00	2019-10-06 16:00:00+00	6	\N	6	224	4
+448	2020-01-24 04:43:21.246993+00	2020-01-24 04:43:21.247009+00	2019-10-06 16:00:00+00	3	\N	6	224	4
+449	2020-01-24 04:43:21.304166+00	2020-01-24 04:43:21.304185+00	2019-10-07 16:00:00+00	5	\N	8	225	4
+450	2020-01-24 04:43:21.316065+00	2020-01-24 04:43:21.316078+00	2019-10-07 16:00:00+00	10	\N	8	225	4
+451	2020-01-24 04:43:21.371678+00	2020-01-24 04:43:21.371696+00	2019-10-07 16:00:00+00	5	\N	8	226	4
+452	2020-01-24 04:43:21.386573+00	2020-01-24 04:43:21.386589+00	2019-10-07 16:00:00+00	10	\N	8	226	4
+453	2020-01-24 04:43:21.446449+00	2020-01-24 04:43:21.446467+00	2019-10-07 16:00:00+00	3	\N	8	227	4
+454	2020-01-24 04:43:21.456543+00	2020-01-24 04:43:21.456557+00	2019-10-07 16:00:00+00	10	\N	8	227	4
+455	2020-01-24 04:43:21.512904+00	2020-01-24 04:43:21.512922+00	2019-10-07 16:00:00+00	5	\N	4	228	4
+456	2020-01-24 04:43:21.524958+00	2020-01-24 04:43:21.524975+00	2019-10-07 16:00:00+00	4	\N	4	228	4
+457	2020-01-24 04:43:21.600315+00	2020-01-24 04:43:21.600334+00	2019-10-07 16:00:00+00	3	\N	5	229	4
+458	2020-01-24 04:43:21.617457+00	2020-01-24 04:43:21.617471+00	2019-10-07 16:00:00+00	10	\N	5	229	4
+459	2020-01-24 04:43:21.676416+00	2020-01-24 04:43:21.676436+00	2019-10-07 16:00:00+00	5	\N	4	230	4
+460	2020-01-24 04:43:21.687479+00	2020-01-24 04:43:21.687497+00	2019-10-07 16:00:00+00	10	\N	4	230	4
+461	2020-01-24 04:43:21.740486+00	2020-01-24 04:43:21.740505+00	2019-10-07 16:00:00+00	5	\N	5	231	4
+462	2020-01-24 04:43:21.747495+00	2020-01-24 04:43:21.747508+00	2019-10-07 16:00:00+00	10	\N	5	231	4
+463	2020-01-24 04:43:21.801918+00	2020-01-24 04:43:21.801937+00	2019-10-07 16:00:00+00	3	\N	6	232	4
+464	2020-01-24 04:43:21.814278+00	2020-01-24 04:43:21.814293+00	2019-10-07 16:00:00+00	10	\N	6	232	4
+465	2020-01-24 04:43:21.872073+00	2020-01-24 04:43:21.872092+00	2019-10-07 16:00:00+00	5	\N	8	233	4
+466	2020-01-24 04:43:21.884376+00	2020-01-24 04:43:21.884393+00	2019-10-07 16:00:00+00	5	\N	8	233	4
+467	2020-01-24 04:43:21.939611+00	2020-01-24 04:43:21.93963+00	2019-10-08 16:00:00+00	10	\N	8	234	4
+468	2020-01-24 04:43:21.951908+00	2020-01-24 04:43:21.951922+00	2019-10-08 16:00:00+00	4	\N	8	234	4
+469	2020-01-24 04:43:22.000079+00	2020-01-24 04:43:22.000099+00	2019-10-08 16:00:00+00	5	\N	5	235	4
+470	2020-01-24 04:43:22.013978+00	2020-01-24 04:43:22.013998+00	2019-10-08 16:00:00+00	4	\N	5	235	4
+471	2020-01-24 04:43:22.071931+00	2020-01-24 04:43:22.071949+00	2019-10-09 16:00:00+00	4	\N	5	236	4
+472	2020-01-24 04:43:22.087382+00	2020-01-24 04:43:22.087402+00	2019-10-09 16:00:00+00	4	\N	5	236	4
+473	2020-01-24 04:43:22.146704+00	2020-01-24 04:43:22.146722+00	2019-10-09 16:00:00+00	4	\N	6	237	4
+474	2020-01-24 04:43:22.15881+00	2020-01-24 04:43:22.158829+00	2019-10-09 16:00:00+00	10	\N	6	237	4
+475	2020-01-24 04:43:22.211543+00	2020-01-24 04:43:22.211561+00	2019-10-10 16:00:00+00	10	\N	8	238	4
+476	2020-01-24 04:43:22.224321+00	2020-01-24 04:43:22.22434+00	2019-10-10 16:00:00+00	4	\N	8	238	4
+477	2020-01-24 04:43:22.300376+00	2020-01-24 04:43:22.300396+00	2019-10-10 16:00:00+00	10	\N	4	239	4
+478	2020-01-24 04:43:22.312848+00	2020-01-24 04:43:22.312862+00	2019-10-10 16:00:00+00	4	\N	4	239	4
+479	2020-01-24 04:43:22.378682+00	2020-01-24 04:43:22.3787+00	2019-10-10 16:00:00+00	10	\N	8	240	4
+480	2020-01-24 04:43:22.391881+00	2020-01-24 04:43:22.391898+00	2019-10-10 16:00:00+00	4	\N	8	240	4
 \.
 
 
@@ -4510,149 +3705,7 @@ COPY sows_events_semination (id, created_at, modified_at, date, boar_id, initiat
 -- Data for Name: sows_events_sowfarrow; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY sows_events_sowfarrow (id, created_at, modified_at, date, alive_quantity, dead_quantity, mummy_quantity, initiator_id, new_born_piglets_group_id, sow_id, tour_id) FROM stdin;
-1	2019-10-29 07:29:08.058147+00	2019-10-29 07:29:08.05819+00	2019-10-29 07:29:08.056801+00	12	0	0	4	1	34	2
-2	2019-10-29 07:29:48.875172+00	2019-10-29 07:29:48.875195+00	2019-10-29 07:29:48.874677+00	16	0	0	4	2	50	2
-3	2019-10-29 07:30:28.723572+00	2019-10-29 07:30:28.723586+00	2019-10-29 07:30:28.723275+00	12	0	0	4	3	35	2
-4	2019-10-29 07:31:06.203356+00	2019-10-29 07:31:06.203372+00	2019-10-29 07:31:06.203038+00	15	0	0	4	4	4	2
-5	2019-10-29 07:31:36.880229+00	2019-10-29 07:31:36.880316+00	2019-10-29 07:31:36.879282+00	12	0	0	4	5	37	2
-6	2019-10-29 07:32:05.315755+00	2019-10-29 07:32:05.315778+00	2019-10-29 07:32:05.31521+00	12	0	0	4	6	40	2
-7	2019-10-29 07:32:27.037048+00	2019-10-29 07:32:27.037063+00	2019-10-29 07:32:27.03675+00	11	0	0	4	7	43	2
-8	2019-10-29 07:32:55.957915+00	2019-10-29 07:32:55.957935+00	2019-10-29 07:32:55.956993+00	15	0	0	4	8	21	2
-9	2019-10-29 07:33:21.079306+00	2019-10-29 07:33:21.07932+00	2019-10-29 07:33:21.078987+00	12	0	0	4	9	18	2
-10	2019-10-29 07:33:46.526207+00	2019-10-29 07:33:46.526221+00	2019-10-29 07:33:46.525932+00	12	0	0	4	10	58	2
-11	2019-10-29 07:34:04.460985+00	2019-10-29 07:34:04.461004+00	2019-10-29 07:34:04.460573+00	10	0	0	4	11	64	2
-12	2019-10-29 08:14:38.16403+00	2019-10-29 08:14:38.164107+00	2019-10-29 08:14:38.159045+00	13	0	1	4	12	38	2
-13	2019-10-29 08:16:17.368592+00	2019-10-29 08:16:17.36861+00	2019-10-29 08:16:17.367646+00	3	0	0	4	13	5	2
-14	2019-10-29 08:16:56.730613+00	2019-10-29 08:16:56.730632+00	2019-10-29 08:16:56.7301+00	12	0	0	4	14	28	2
-15	2019-10-29 08:17:14.23826+00	2019-10-29 08:17:14.238279+00	2019-10-29 08:17:14.237839+00	1	0	0	4	14	28	2
-16	2019-10-29 08:18:07.206872+00	2019-10-29 08:18:07.206894+00	2019-10-29 08:18:07.20486+00	12	0	0	4	15	45	2
-17	2019-10-29 08:18:35.14057+00	2019-10-29 08:18:35.140589+00	2019-10-29 08:18:35.140051+00	16	0	0	4	16	3	2
-18	2019-10-29 08:19:42.480866+00	2019-10-29 08:19:42.480884+00	2019-10-29 08:19:42.480304+00	12	0	0	4	17	51	2
-19	2019-10-29 08:19:57.38587+00	2019-10-29 08:19:57.385887+00	2019-10-29 08:19:57.385496+00	17	0	0	4	18	12	2
-20	2019-10-29 08:20:16.565226+00	2019-10-29 08:20:16.56525+00	2019-10-29 08:20:16.56296+00	10	0	0	4	19	23	2
-21	2019-10-29 08:20:35.777171+00	2019-10-29 08:20:35.777193+00	2019-10-29 08:20:35.775588+00	13	2	0	4	20	39	2
-22	2019-10-29 08:21:15.432431+00	2019-10-29 08:21:15.432557+00	2019-10-29 08:21:15.429933+00	10	0	0	4	21	61	2
-23	2019-10-29 08:21:48.670745+00	2019-10-29 08:21:48.670764+00	2019-10-29 08:21:48.669886+00	15	0	0	4	22	16	2
-24	2019-10-29 08:22:20.638005+00	2019-10-29 08:22:20.638042+00	2019-10-29 08:22:20.633914+00	12	0	0	4	23	32	2
-25	2019-10-29 08:22:33.081492+00	2019-10-29 08:22:33.081515+00	2019-10-29 08:22:33.080862+00	9	2	0	4	24	10	2
-26	2019-10-29 08:22:44.989015+00	2019-10-29 08:22:44.989162+00	2019-10-29 08:22:44.9879+00	12	0	0	4	25	33	2
-27	2019-10-29 08:23:06.662989+00	2019-10-29 08:23:06.663026+00	2019-10-29 08:23:06.652526+00	12	0	0	4	26	30	2
-28	2019-10-29 08:23:24.249819+00	2019-10-29 08:23:24.249851+00	2019-10-29 08:23:24.247316+00	7	9	0	4	27	22	2
-29	2019-10-29 08:24:01.575932+00	2019-10-29 08:24:01.575954+00	2019-10-29 08:24:01.575458+00	9	0	0	4	28	27	2
-30	2019-10-29 08:24:19.134621+00	2019-10-29 08:24:19.134638+00	2019-10-29 08:24:19.134277+00	12	2	0	4	29	62	2
-31	2019-10-29 08:25:01.384312+00	2019-10-29 08:25:01.384333+00	2019-10-29 08:25:01.383235+00	16	0	0	4	2	50	2
-32	2019-10-29 08:25:11.443855+00	2019-10-29 08:25:11.443874+00	2019-10-29 08:25:11.443362+00	0	0	0	4	1	34	2
-33	2019-10-29 08:25:24.91137+00	2019-10-29 08:25:24.911394+00	2019-10-29 08:25:24.9104+00	12	0	0	4	1	34	2
-34	2019-10-29 08:25:41.170286+00	2019-10-29 08:25:41.170302+00	2019-10-29 08:25:41.169995+00	15	0	0	4	30	1	1
-35	2019-10-29 08:25:57.298383+00	2019-10-29 08:25:57.298411+00	2019-10-29 08:25:57.296181+00	15	0	0	4	4	4	2
-36	2019-10-29 08:26:11.001709+00	2019-10-29 08:26:11.001827+00	2019-10-29 08:26:11.000763+00	12	0	0	4	5	37	2
-37	2019-10-29 08:27:03.422305+00	2019-10-29 08:27:03.422337+00	2019-10-29 08:27:03.421579+00	12	0	0	4	6	40	2
-38	2019-10-29 08:27:28.200347+00	2019-10-29 08:27:28.200371+00	2019-10-29 08:27:28.199768+00	11	0	0	4	7	43	2
-39	2019-10-29 08:28:21.093388+00	2019-10-29 08:28:21.093412+00	2019-10-29 08:28:21.091785+00	12	0	0	4	31	48	2
-40	2019-10-29 08:29:13.774622+00	2019-10-29 08:29:13.774636+00	2019-10-29 08:29:13.774342+00	15	0	0	4	8	21	2
-41	2019-10-29 08:29:24.195851+00	2019-10-29 08:29:24.195868+00	2019-10-29 08:29:24.195379+00	12	0	0	4	9	18	2
-42	2019-10-29 08:30:07.668706+00	2019-10-29 08:30:07.668724+00	2019-10-29 08:30:07.668302+00	11	0	0	4	10	58	2
-43	2019-10-29 08:30:27.592626+00	2019-10-29 08:30:27.592643+00	2019-10-29 08:30:27.59217+00	-11	0	0	4	10	58	2
-44	2019-10-29 08:30:51.878488+00	2019-10-29 08:30:51.878505+00	2019-10-29 08:30:51.877977+00	10	0	0	4	11	64	2
-45	2019-10-29 08:31:18.91062+00	2019-10-29 08:31:18.910643+00	2019-10-29 08:31:18.909968+00	12	0	0	4	3	35	2
-46	2019-10-29 08:31:36.734214+00	2019-10-29 08:31:36.734227+00	2019-10-29 08:31:36.733939+00	15	0	0	4	32	42	2
-47	2019-10-29 08:32:39.573569+00	2019-10-29 08:32:39.573591+00	2019-10-29 08:32:39.573067+00	12	1	0	4	33	59	2
-48	2019-10-29 08:32:57.221659+00	2019-10-29 08:32:57.221675+00	2019-10-29 08:32:57.221312+00	9	0	0	4	34	60	2
-49	2019-10-29 08:34:12.322468+00	2019-10-29 08:34:12.322482+00	2019-10-29 08:34:12.322147+00	11	0	0	4	35	14	2
-50	2019-10-29 08:37:33.841275+00	2019-10-29 08:37:33.841293+00	2019-10-29 08:37:33.840832+00	10	0	0	4	36	8	2
-51	2019-10-29 08:37:54.012467+00	2019-10-29 08:37:54.012544+00	2019-10-29 08:37:54.010576+00	11	0	0	4	37	44	2
-52	2019-10-29 08:38:11.858727+00	2019-10-29 08:38:11.858742+00	2019-10-29 08:38:11.858431+00	11	0	0	4	38	15	2
-53	2019-10-29 08:38:40.440083+00	2019-10-29 08:38:40.440102+00	2019-10-29 08:38:40.438702+00	15	3	0	4	39	20	2
-54	2019-10-29 08:39:01.067444+00	2019-10-29 08:39:01.067475+00	2019-10-29 08:39:01.066065+00	9	5	0	4	40	52	2
-55	2019-10-29 08:39:26.290556+00	2019-10-29 08:39:26.290575+00	2019-10-29 08:39:26.290113+00	8	0	0	4	41	24	2
-56	2019-10-29 08:39:44.197798+00	2019-10-29 08:39:44.197816+00	2019-10-29 08:39:44.197459+00	14	1	0	4	42	53	2
-57	2019-10-29 08:39:58.347967+00	2019-10-29 08:39:58.347982+00	2019-10-29 08:39:58.347658+00	0	0	0	4	43	2	2
-58	2019-10-29 08:40:09.937508+00	2019-10-29 08:40:09.937529+00	2019-10-29 08:40:09.936596+00	12	0	0	4	43	2	2
-59	2019-10-29 08:40:31.055322+00	2019-10-29 08:40:31.055337+00	2019-10-29 08:40:31.054905+00	15	0	0	4	44	9	2
-60	2019-10-29 08:40:44.74709+00	2019-10-29 08:40:44.74711+00	2019-10-29 08:40:44.746648+00	15	0	0	4	45	6	2
-61	2019-10-29 08:40:54.137622+00	2019-10-29 08:40:54.137667+00	2019-10-29 08:40:54.133737+00	11	0	0	4	46	7	2
-62	2019-10-29 08:41:07.416401+00	2019-10-29 08:41:07.416418+00	2019-10-29 08:41:07.41609+00	8	1	0	4	47	17	2
-63	2019-10-29 08:41:22.668982+00	2019-10-29 08:41:22.669003+00	2019-10-29 08:41:22.668457+00	8	0	0	4	48	19	2
-64	2019-10-29 08:41:36.781702+00	2019-10-29 08:41:36.78172+00	2019-10-29 08:41:36.781371+00	14	0	0	4	49	56	2
-65	2019-11-04 08:46:27.793777+00	2019-11-04 08:46:27.793796+00	2019-11-04 08:46:27.793275+00	12	0	0	9	50	220	2
-66	2019-11-04 08:46:39.315868+00	2019-11-04 08:46:39.315893+00	2019-11-04 08:46:39.315402+00	14	0	0	9	51	253	2
-67	2019-11-04 08:46:49.769471+00	2019-11-04 08:46:49.769486+00	2019-11-04 08:46:49.769217+00	12	0	0	9	52	198	2
-68	2019-11-04 08:47:01.149862+00	2019-11-04 08:47:01.149874+00	2019-11-04 08:47:01.14963+00	12	0	0	9	53	221	2
-69	2019-11-04 08:47:14.244002+00	2019-11-04 08:47:14.244015+00	2019-11-04 08:47:14.243745+00	10	0	0	9	54	210	2
-70	2019-11-04 08:47:27.211733+00	2019-11-04 08:47:27.211758+00	2019-11-04 08:47:27.211402+00	12	0	0	9	55	207	2
-71	2019-11-04 08:47:39.668156+00	2019-11-04 08:47:39.66819+00	2019-11-04 08:47:39.667221+00	14	0	0	9	56	243	2
-72	2019-11-04 08:47:53.540354+00	2019-11-04 08:47:53.540368+00	2019-11-04 08:47:53.540104+00	9	0	0	9	57	212	2
-73	2019-11-04 08:48:10.42759+00	2019-11-04 08:48:10.427611+00	2019-11-04 08:48:10.426884+00	13	0	0	9	58	245	2
-74	2019-11-04 08:48:30.627555+00	2019-11-04 08:48:30.627586+00	2019-11-04 08:48:30.624797+00	14	0	0	9	59	213	2
-75	2019-11-04 08:52:44.413988+00	2019-11-04 08:52:44.414005+00	2019-11-04 08:52:44.413627+00	16	0	0	9	60	255	2
-76	2019-11-04 08:53:03.161594+00	2019-11-04 08:53:03.161614+00	2019-11-04 08:53:03.16119+00	12	0	0	9	61	204	2
-77	2019-11-04 08:53:16.474423+00	2019-11-04 08:53:16.474439+00	2019-11-04 08:53:16.474077+00	5	1	0	9	62	197	2
-78	2019-11-04 08:53:29.847909+00	2019-11-04 08:53:29.847924+00	2019-11-04 08:53:29.847603+00	13	0	0	9	63	246	2
-79	2019-11-04 08:54:21.662175+00	2019-11-04 08:54:21.66219+00	2019-11-04 08:54:21.661876+00	11	2	0	9	64	252	2
-80	2019-11-04 08:54:42.719454+00	2019-11-04 08:54:42.719475+00	2019-11-04 08:54:42.718801+00	5	2	0	9	55	207	2
-81	2019-11-04 08:54:56.585358+00	2019-11-04 08:54:56.585375+00	2019-11-04 08:54:56.584968+00	11	0	0	9	65	203	2
-82	2019-11-04 08:55:12.56171+00	2019-11-04 08:55:12.561724+00	2019-11-04 08:55:12.561446+00	7	2	0	9	66	229	2
-83	2019-11-04 08:55:35.528181+00	2019-11-04 08:55:35.528198+00	2019-11-04 08:55:35.527863+00	12	0	0	9	67	217	2
-84	2019-11-04 08:55:49.718078+00	2019-11-04 08:55:49.718091+00	2019-11-04 08:55:49.717821+00	14	0	0	9	68	247	2
-85	2019-11-04 08:56:07.857451+00	2019-11-04 08:56:07.857466+00	2019-11-04 08:56:07.857166+00	16	0	0	9	69	216	2
-86	2019-11-04 08:56:28.03558+00	2019-11-04 08:56:28.035598+00	2019-11-04 08:56:28.035013+00	10	2	-1	9	70	250	2
-87	2019-11-04 08:56:50.535904+00	2019-11-04 08:56:50.535918+00	2019-11-04 08:56:50.535599+00	13	0	0	9	71	224	2
-88	2019-11-04 08:57:06.906765+00	2019-11-04 08:57:06.906784+00	2019-11-04 08:57:06.90638+00	11	1	0	9	72	249	2
-89	2019-11-04 08:57:22.745966+00	2019-11-04 08:57:22.745983+00	2019-11-04 08:57:22.745631+00	16	0	0	9	73	248	2
-90	2019-11-04 08:57:51.068639+00	2019-11-04 08:57:51.068656+00	2019-11-04 08:57:51.068319+00	9	0	1	9	74	227	2
-91	2019-11-04 08:58:09.727433+00	2019-11-04 08:58:09.727454+00	2019-11-04 08:58:09.726529+00	8	0	0	9	75	202	2
-92	2019-11-04 08:58:24.556017+00	2019-11-04 08:58:24.556032+00	2019-11-04 08:58:24.555683+00	9	0	0	9	76	205	2
-93	2019-11-04 08:58:36.812014+00	2019-11-04 08:58:36.812029+00	2019-11-04 08:58:36.811726+00	9	3	0	9	77	199	2
-94	2019-11-04 08:58:51.567417+00	2019-11-04 08:58:51.567442+00	2019-11-04 08:58:51.566718+00	13	3	0	9	78	215	2
-95	2019-11-04 08:59:06.449555+00	2019-11-04 08:59:06.449578+00	2019-11-04 08:59:06.449015+00	0	0	2	9	78	215	2
-96	2019-11-04 08:59:24.645702+00	2019-11-04 08:59:24.645717+00	2019-11-04 08:59:24.645382+00	16	0	0	9	79	222	2
-97	2019-11-04 08:59:43.301737+00	2019-11-04 08:59:43.301752+00	2019-11-04 08:59:43.301432+00	11	3	0	9	80	228	2
-98	2019-11-04 09:00:05.019459+00	2019-11-04 09:00:05.019482+00	2019-11-04 09:00:05.017824+00	10	6	0	9	81	208	2
-99	2019-11-04 09:00:24.594987+00	2019-11-04 09:00:24.595004+00	2019-11-04 09:00:24.594667+00	8	2	0	9	82	209	2
-100	2019-11-04 09:00:41.899348+00	2019-11-04 09:00:41.89936+00	2019-11-04 09:00:41.899102+00	18	0	0	9	83	214	2
-101	2019-11-04 09:00:57.449258+00	2019-11-04 09:00:57.449274+00	2019-11-04 09:00:57.448764+00	5	1	2	9	84	218	2
-102	2019-11-04 09:01:31.724661+00	2019-11-04 09:01:31.724674+00	2019-11-04 09:01:31.724316+00	7	1	0	9	85	235	2
-103	2019-11-04 09:02:14.845086+00	2019-11-04 09:02:14.845127+00	2019-11-04 09:02:14.844825+00	6	0	0	9	86	200	2
-104	2019-11-04 09:02:27.340418+00	2019-11-04 09:02:27.340442+00	2019-11-04 09:02:27.340071+00	12	0	0	9	87	230	2
-105	2019-11-04 09:02:38.340537+00	2019-11-04 09:02:38.340553+00	2019-11-04 09:02:38.340197+00	5	1	0	9	88	211	2
-106	2019-11-04 09:02:42.148351+00	2019-11-04 09:02:42.14837+00	2019-11-04 09:02:42.147962+00	10	0	0	4	89	41	2
-107	2019-11-04 09:02:56.427743+00	2019-11-04 09:02:56.427764+00	2019-11-04 09:02:56.427171+00	11	0	0	9	90	239	2
-108	2019-11-04 09:03:11.890081+00	2019-11-04 09:03:11.890097+00	2019-11-04 09:03:11.889757+00	3	6	0	9	91	273	4
-109	2019-11-04 09:03:59.628477+00	2019-11-04 09:03:59.628506+00	2019-11-04 09:03:59.627955+00	12	0	0	9	92	201	2
-110	2019-11-04 09:04:18.147847+00	2019-11-04 09:04:18.147875+00	2019-11-04 09:04:18.146965+00	11	1	0	9	93	233	2
-111	2019-11-04 09:04:34.401566+00	2019-11-04 09:04:34.401588+00	2019-11-04 09:04:34.401253+00	12	0	0	9	94	219	2
-112	2019-11-04 09:04:45.699781+00	2019-11-04 09:04:45.699799+00	2019-11-04 09:04:45.699185+00	10	0	0	9	95	237	2
-113	2019-11-04 09:04:48.964934+00	2019-11-04 09:04:48.965001+00	2019-11-04 09:04:48.964234+00	-12	0	0	4	9	18	2
-114	2019-11-04 09:05:02.995344+00	2019-11-04 09:05:02.995369+00	2019-11-04 09:05:02.994431+00	13	0	0	9	96	240	2
-115	2019-11-04 09:05:18.875954+00	2019-11-04 09:05:18.876028+00	2019-11-04 09:05:18.874246+00	8	0	0	9	97	242	2
-116	2019-11-04 09:05:19.778805+00	2019-11-04 09:05:19.778824+00	2019-11-04 09:05:19.778471+00	15	0	0	4	98	47	2
-117	2019-11-04 09:05:39.203619+00	2019-11-04 09:05:39.203645+00	2019-11-04 09:05:39.203181+00	-10	0	0	4	11	64	2
-118	2019-11-04 09:05:54.610428+00	2019-11-04 09:05:54.610452+00	2019-11-04 09:05:54.609771+00	-12	0	0	4	3	35	2
-119	2019-11-04 09:06:21.566344+00	2019-11-04 09:06:21.566363+00	2019-11-04 09:06:21.565648+00	14	0	0	9	99	196	2
-120	2019-11-04 09:06:30.80404+00	2019-11-04 09:06:30.804064+00	2019-11-04 09:06:30.802804+00	2	0	0	4	32	42	2
-121	2019-11-04 09:06:42.650526+00	2019-11-04 09:06:42.650547+00	2019-11-04 09:06:42.650066+00	5	0	0	9	100	231	2
-122	2019-11-04 09:06:49.912283+00	2019-11-04 09:06:49.912316+00	2019-11-04 09:06:49.907633+00	11	0	0	4	101	11	2
-123	2019-11-04 09:07:00.351447+00	2019-11-04 09:07:00.351466+00	2019-11-04 09:07:00.350924+00	12	0	0	9	102	254	2
-124	2019-11-04 09:07:04.527853+00	2019-11-04 09:07:04.52789+00	2019-11-04 09:07:04.527447+00	16	0	0	4	103	49	2
-125	2019-11-04 09:07:10.539951+00	2019-11-04 09:07:10.539964+00	2019-11-04 09:07:10.539714+00	11	0	0	9	104	223	2
-126	2019-11-04 09:07:22.14987+00	2019-11-04 09:07:22.149944+00	2019-11-04 09:07:22.149308+00	17	0	0	9	105	195	2
-127	2019-11-04 09:07:38.224385+00	2019-11-04 09:07:38.2244+00	2019-11-04 09:07:38.224101+00	12	0	0	9	106	225	2
-128	2019-11-04 09:07:48.658593+00	2019-11-04 09:07:48.65861+00	2019-11-04 09:07:48.658309+00	13	0	0	9	107	251	2
-129	2019-11-04 09:08:01.609393+00	2019-11-04 09:08:01.609413+00	2019-11-04 09:08:01.608946+00	10	0	0	9	108	244	2
-130	2019-11-04 09:08:14.071036+00	2019-11-04 09:08:14.071191+00	2019-11-04 09:08:14.070338+00	12	0	0	9	109	226	2
-131	2019-11-04 09:09:56.22487+00	2019-11-04 09:09:56.224886+00	2019-11-04 09:09:56.224523+00	0	1	0	9	33	59	2
-132	2019-11-04 09:11:47.790317+00	2019-11-04 09:11:47.790341+00	2019-11-04 09:11:47.79004+00	14	0	0	9	110	25	2
-133	2019-11-04 09:12:26.958259+00	2019-11-04 09:12:26.958294+00	2019-11-04 09:12:26.957386+00	12	0	0	4	111	54	2
-134	2019-11-04 09:12:50.613551+00	2019-11-04 09:12:50.613565+00	2019-11-04 09:12:50.613262+00	15	0	0	4	112	36	2
-135	2019-11-04 09:12:57.484901+00	2019-11-04 09:12:57.484916+00	2019-11-04 09:12:57.484618+00	15	0	0	9	113	26	2
-136	2019-11-04 09:13:13.660976+00	2019-11-04 09:13:13.66099+00	2019-11-04 09:13:13.6607+00	14	0	0	9	114	29	2
-137	2019-11-04 09:13:16.083094+00	2019-11-04 09:13:16.083116+00	2019-11-04 09:13:16.082331+00	13	0	0	4	115	63	2
-138	2019-11-04 09:13:29.589793+00	2019-11-04 09:13:29.58983+00	2019-11-04 09:13:29.589295+00	15	0	0	4	116	13	2
-139	2019-11-04 09:13:31.947514+00	2019-11-04 09:13:31.947535+00	2019-11-04 09:13:31.947017+00	10	0	0	9	117	57	2
-140	2019-11-04 09:13:42.871049+00	2019-11-04 09:13:42.871069+00	2019-11-04 09:13:42.870605+00	13	0	0	4	118	55	2
-141	2019-11-04 09:13:44.648059+00	2019-11-04 09:13:44.648082+00	2019-11-04 09:13:44.647197+00	6	2	0	9	119	31	2
-142	2019-11-04 09:14:13.977278+00	2019-11-04 09:14:13.977298+00	2019-11-04 09:14:13.976881+00	9	3	0	4	120	46	2
+COPY sows_events_sowfarrow (id, created_at, modified_at, date, alive_quantity, dead_quantity, mummy_quantity, initiator_id, piglets_group_id, sow_id, tour_id) FROM stdin;
 \.
 
 
@@ -4661,494 +3714,486 @@ COPY sows_events_sowfarrow (id, created_at, modified_at, date, alive_quantity, d
 --
 
 COPY sows_events_ultrasound (id, created_at, modified_at, date, result, initiator_id, sow_id, tour_id, u_type_id) FROM stdin;
-1	2019-10-18 03:44:16.409156+00	2019-10-18 03:44:16.409175+00	2019-10-18 03:44:16.409184+00	t	1	1	1	1
-2	2019-10-18 03:44:16.422008+00	2019-10-18 03:44:16.422027+00	2019-10-18 03:44:16.422035+00	t	1	1	1	2
-3	2019-10-18 03:51:17.946135+00	2019-10-18 03:51:17.946161+00	2019-10-18 03:51:17.94617+00	t	1	2	2	1
-4	2019-10-18 03:51:17.946225+00	2019-10-18 03:51:17.946234+00	2019-10-18 03:51:17.946241+00	t	1	3	2	1
-5	2019-10-18 03:51:17.946278+00	2019-10-18 03:51:17.946285+00	2019-10-18 03:51:17.946292+00	t	1	4	2	1
-6	2019-10-18 03:51:17.946327+00	2019-10-18 03:51:17.946335+00	2019-10-18 03:51:17.946341+00	t	1	5	2	1
-7	2019-10-18 03:51:17.946387+00	2019-10-18 03:51:17.946396+00	2019-10-18 03:51:17.946403+00	t	1	6	2	1
-8	2019-10-18 03:51:17.946438+00	2019-10-18 03:51:17.946445+00	2019-10-18 03:51:17.946452+00	t	1	7	2	1
-9	2019-10-18 03:51:17.946487+00	2019-10-18 03:51:17.946495+00	2019-10-18 03:51:17.946502+00	t	1	8	2	1
-10	2019-10-18 03:51:17.946536+00	2019-10-18 03:51:17.946544+00	2019-10-18 03:51:17.946551+00	t	1	9	2	1
-11	2019-10-18 03:51:17.946586+00	2019-10-18 03:51:17.946594+00	2019-10-18 03:51:17.946601+00	t	1	10	2	1
-12	2019-10-18 03:51:17.946635+00	2019-10-18 03:51:17.946643+00	2019-10-18 03:51:17.94665+00	t	1	11	2	1
-13	2019-10-18 03:51:17.946685+00	2019-10-18 03:51:17.946693+00	2019-10-18 03:51:17.946699+00	t	1	12	2	1
-14	2019-10-18 03:51:17.946734+00	2019-10-18 03:51:17.946742+00	2019-10-18 03:51:17.946749+00	t	1	13	2	1
-15	2019-10-18 03:51:17.946783+00	2019-10-18 03:51:17.946791+00	2019-10-18 03:51:17.946798+00	t	1	14	2	1
-16	2019-10-18 03:51:17.946832+00	2019-10-18 03:51:17.94684+00	2019-10-18 03:51:17.946846+00	t	1	15	2	1
-17	2019-10-18 03:51:17.946881+00	2019-10-18 03:51:17.946888+00	2019-10-18 03:51:17.946895+00	t	1	16	2	1
-18	2019-10-18 03:51:17.946929+00	2019-10-18 03:51:17.946937+00	2019-10-18 03:51:17.946944+00	t	1	17	2	1
-19	2019-10-18 03:51:17.946978+00	2019-10-18 03:51:17.946986+00	2019-10-18 03:51:17.946992+00	t	1	18	2	1
-20	2019-10-18 03:51:17.947027+00	2019-10-18 03:51:17.947034+00	2019-10-18 03:51:17.947041+00	t	1	19	2	1
-21	2019-10-18 03:51:17.947076+00	2019-10-18 03:51:17.947083+00	2019-10-18 03:51:17.94709+00	t	1	20	2	1
-22	2019-10-18 03:51:17.947124+00	2019-10-18 03:51:17.947132+00	2019-10-18 03:51:17.947139+00	t	1	21	2	1
-23	2019-10-18 03:51:17.947173+00	2019-10-18 03:51:17.947181+00	2019-10-18 03:51:17.947188+00	t	1	22	2	1
-24	2019-10-18 03:51:17.947222+00	2019-10-18 03:51:17.947229+00	2019-10-18 03:51:17.947236+00	t	1	23	2	1
-25	2019-10-18 03:51:17.947299+00	2019-10-18 03:51:17.94731+00	2019-10-18 03:51:17.947317+00	t	1	24	2	1
-26	2019-10-18 03:51:17.947352+00	2019-10-18 03:51:17.94736+00	2019-10-18 03:51:17.947367+00	t	1	25	2	1
-27	2019-10-18 03:51:17.947401+00	2019-10-18 03:51:17.947408+00	2019-10-18 03:51:17.947415+00	t	1	26	2	1
-28	2019-10-18 03:51:17.947449+00	2019-10-18 03:51:17.947457+00	2019-10-18 03:51:17.947463+00	t	1	27	2	1
-29	2019-10-18 03:51:17.947498+00	2019-10-18 03:51:17.947505+00	2019-10-18 03:51:17.947512+00	t	1	37	2	1
-30	2019-10-18 03:51:17.947547+00	2019-10-18 03:51:17.947554+00	2019-10-18 03:51:17.947561+00	t	1	38	2	1
-31	2019-10-18 03:51:17.947595+00	2019-10-18 03:51:17.947603+00	2019-10-18 03:51:17.947609+00	t	1	39	2	1
-32	2019-10-18 03:51:17.947643+00	2019-10-18 03:51:17.947651+00	2019-10-18 03:51:17.947658+00	t	1	40	2	1
-33	2019-10-18 03:51:17.947692+00	2019-10-18 03:51:17.9477+00	2019-10-18 03:51:17.947706+00	t	1	41	2	1
-34	2019-10-18 03:51:17.947741+00	2019-10-18 03:51:17.947748+00	2019-10-18 03:51:17.947755+00	t	1	42	2	1
-35	2019-10-18 03:51:17.947789+00	2019-10-18 03:51:17.947797+00	2019-10-18 03:51:17.947804+00	t	1	43	2	1
-36	2019-10-18 03:51:17.947838+00	2019-10-18 03:51:17.947845+00	2019-10-18 03:51:17.947852+00	t	1	44	2	1
-37	2019-10-18 03:51:17.947886+00	2019-10-18 03:51:17.947894+00	2019-10-18 03:51:17.9479+00	t	1	45	2	1
-38	2019-10-18 03:51:17.947934+00	2019-10-18 03:51:17.947942+00	2019-10-18 03:51:17.947949+00	t	1	46	2	1
-39	2019-10-18 03:51:17.948014+00	2019-10-18 03:51:17.948023+00	2019-10-18 03:51:17.94803+00	t	1	47	2	1
-40	2019-10-18 03:51:17.948065+00	2019-10-18 03:51:17.948072+00	2019-10-18 03:51:17.948079+00	t	1	48	2	1
-41	2019-10-18 03:51:17.948113+00	2019-10-18 03:51:17.948121+00	2019-10-18 03:51:17.948128+00	t	1	49	2	1
-42	2019-10-18 03:51:17.948162+00	2019-10-18 03:51:17.948169+00	2019-10-18 03:51:17.948176+00	t	1	50	2	1
-43	2019-10-18 03:51:17.94821+00	2019-10-18 03:51:17.948217+00	2019-10-18 03:51:17.948224+00	t	1	51	2	1
-44	2019-10-18 03:51:17.948258+00	2019-10-18 03:51:17.948266+00	2019-10-18 03:51:17.948273+00	t	1	52	2	1
-45	2019-10-18 03:51:17.948307+00	2019-10-18 03:51:17.948315+00	2019-10-18 03:51:17.948321+00	t	1	53	2	1
-46	2019-10-18 03:51:17.948355+00	2019-10-18 03:51:17.948363+00	2019-10-18 03:51:17.94837+00	t	1	54	2	1
-47	2019-10-18 03:51:17.948404+00	2019-10-18 03:51:17.948411+00	2019-10-18 03:51:17.948418+00	t	1	55	2	1
-48	2019-10-18 03:51:17.948452+00	2019-10-18 03:51:17.94846+00	2019-10-18 03:51:17.948466+00	t	1	56	2	1
-49	2019-10-18 03:51:17.948501+00	2019-10-18 03:51:17.948508+00	2019-10-18 03:51:17.948515+00	t	1	57	2	1
-50	2019-10-18 03:51:17.948549+00	2019-10-18 03:51:17.948557+00	2019-10-18 03:51:17.948564+00	t	1	58	2	1
-51	2019-10-18 03:51:17.948598+00	2019-10-18 03:51:17.948605+00	2019-10-18 03:51:17.948612+00	t	1	59	2	1
-52	2019-10-18 03:51:17.948646+00	2019-10-18 03:51:17.948654+00	2019-10-18 03:51:17.948661+00	t	1	60	2	1
-53	2019-10-18 03:51:17.948695+00	2019-10-18 03:51:17.948703+00	2019-10-18 03:51:17.94871+00	t	1	61	2	1
-54	2019-10-18 03:51:17.948744+00	2019-10-18 03:51:17.948751+00	2019-10-18 03:51:17.948758+00	t	1	62	2	1
-55	2019-10-18 03:51:17.948792+00	2019-10-18 03:51:17.9488+00	2019-10-18 03:51:17.948807+00	t	1	63	2	1
-56	2019-10-18 03:51:17.948841+00	2019-10-18 03:51:17.948848+00	2019-10-18 03:51:17.948855+00	t	1	64	2	1
-57	2019-10-18 03:51:17.948895+00	2019-10-18 03:51:17.948902+00	2019-10-18 03:51:17.948909+00	t	1	28	2	1
-58	2019-10-18 03:51:17.94895+00	2019-10-18 03:51:17.948958+00	2019-10-18 03:51:17.948965+00	t	1	29	2	1
-59	2019-10-18 03:51:17.948999+00	2019-10-18 03:51:17.949006+00	2019-10-18 03:51:17.949013+00	t	1	30	2	1
-60	2019-10-18 03:51:17.949047+00	2019-10-18 03:51:17.949054+00	2019-10-18 03:51:17.949061+00	t	1	31	2	1
-61	2019-10-18 03:51:17.949096+00	2019-10-18 03:51:17.949103+00	2019-10-18 03:51:17.94911+00	t	1	32	2	1
-62	2019-10-18 03:51:17.949145+00	2019-10-18 03:51:17.949152+00	2019-10-18 03:51:17.949159+00	t	1	33	2	1
-63	2019-10-18 03:51:17.949194+00	2019-10-18 03:51:17.949201+00	2019-10-18 03:51:17.949208+00	t	1	34	2	1
-64	2019-10-18 03:51:17.949242+00	2019-10-18 03:51:17.94925+00	2019-10-18 03:51:17.949257+00	t	1	35	2	1
-65	2019-10-18 03:51:17.949291+00	2019-10-18 03:51:17.949299+00	2019-10-18 03:51:17.949306+00	t	1	36	2	1
-66	2019-10-18 03:51:18.029302+00	2019-10-18 03:51:18.029342+00	2019-10-18 03:51:18.029351+00	t	1	2	2	2
-67	2019-10-18 03:51:18.029406+00	2019-10-18 03:51:18.029415+00	2019-10-18 03:51:18.029423+00	t	1	3	2	2
-68	2019-10-18 03:51:18.029466+00	2019-10-18 03:51:18.029474+00	2019-10-18 03:51:18.029481+00	t	1	4	2	2
-69	2019-10-18 03:51:18.029516+00	2019-10-18 03:51:18.029523+00	2019-10-18 03:51:18.02953+00	t	1	5	2	2
-70	2019-10-18 03:51:18.029565+00	2019-10-18 03:51:18.029573+00	2019-10-18 03:51:18.02958+00	t	1	6	2	2
-71	2019-10-18 03:51:18.029614+00	2019-10-18 03:51:18.029622+00	2019-10-18 03:51:18.029629+00	t	1	7	2	2
-72	2019-10-18 03:51:18.029663+00	2019-10-18 03:51:18.029672+00	2019-10-18 03:51:18.029678+00	t	1	8	2	2
-73	2019-10-18 03:51:18.029714+00	2019-10-18 03:51:18.029721+00	2019-10-18 03:51:18.029728+00	t	1	9	2	2
-74	2019-10-18 03:51:18.029762+00	2019-10-18 03:51:18.02977+00	2019-10-18 03:51:18.029777+00	t	1	10	2	2
-75	2019-10-18 03:51:18.029822+00	2019-10-18 03:51:18.02983+00	2019-10-18 03:51:18.029837+00	t	1	11	2	2
-76	2019-10-18 03:51:18.029891+00	2019-10-18 03:51:18.0299+00	2019-10-18 03:51:18.029907+00	t	1	12	2	2
-77	2019-10-18 03:51:18.029942+00	2019-10-18 03:51:18.02995+00	2019-10-18 03:51:18.029957+00	t	1	13	2	2
-78	2019-10-18 03:51:18.029991+00	2019-10-18 03:51:18.029999+00	2019-10-18 03:51:18.030006+00	t	1	14	2	2
-79	2019-10-18 03:51:18.03004+00	2019-10-18 03:51:18.030048+00	2019-10-18 03:51:18.030055+00	t	1	15	2	2
-80	2019-10-18 03:51:18.030089+00	2019-10-18 03:51:18.030097+00	2019-10-18 03:51:18.030104+00	t	1	16	2	2
-81	2019-10-18 03:51:18.030156+00	2019-10-18 03:51:18.030165+00	2019-10-18 03:51:18.030172+00	t	1	17	2	2
-82	2019-10-18 03:51:18.030206+00	2019-10-18 03:51:18.030214+00	2019-10-18 03:51:18.030221+00	t	1	18	2	2
-83	2019-10-18 03:51:18.030256+00	2019-10-18 03:51:18.030263+00	2019-10-18 03:51:18.03027+00	t	1	19	2	2
-84	2019-10-18 03:51:18.030305+00	2019-10-18 03:51:18.030312+00	2019-10-18 03:51:18.030319+00	t	1	20	2	2
-85	2019-10-18 03:51:18.030375+00	2019-10-18 03:51:18.030385+00	2019-10-18 03:51:18.030392+00	t	1	21	2	2
-86	2019-10-18 03:51:18.030428+00	2019-10-18 03:51:18.030436+00	2019-10-18 03:51:18.030442+00	t	1	22	2	2
-87	2019-10-18 03:51:18.030477+00	2019-10-18 03:51:18.030485+00	2019-10-18 03:51:18.030492+00	t	1	23	2	2
-88	2019-10-18 03:51:18.030526+00	2019-10-18 03:51:18.030534+00	2019-10-18 03:51:18.030541+00	t	1	24	2	2
-89	2019-10-18 03:51:18.030576+00	2019-10-18 03:51:18.030583+00	2019-10-18 03:51:18.03059+00	t	1	25	2	2
-90	2019-10-18 03:51:18.03065+00	2019-10-18 03:51:18.030661+00	2019-10-18 03:51:18.030668+00	t	1	26	2	2
-91	2019-10-18 03:51:18.030704+00	2019-10-18 03:51:18.030712+00	2019-10-18 03:51:18.030719+00	t	1	27	2	2
-92	2019-10-18 03:51:18.030753+00	2019-10-18 03:51:18.030761+00	2019-10-18 03:51:18.030768+00	t	1	37	2	2
-93	2019-10-18 03:51:18.030802+00	2019-10-18 03:51:18.03081+00	2019-10-18 03:51:18.030817+00	t	1	38	2	2
-94	2019-10-18 03:51:18.030851+00	2019-10-18 03:51:18.030858+00	2019-10-18 03:51:18.030865+00	t	1	39	2	2
-95	2019-10-18 03:51:18.030899+00	2019-10-18 03:51:18.030907+00	2019-10-18 03:51:18.030914+00	t	1	40	2	2
-96	2019-10-18 03:51:18.030948+00	2019-10-18 03:51:18.030955+00	2019-10-18 03:51:18.030962+00	t	1	41	2	2
-97	2019-10-18 03:51:18.030996+00	2019-10-18 03:51:18.031004+00	2019-10-18 03:51:18.03101+00	t	1	42	2	2
-98	2019-10-18 03:51:18.031045+00	2019-10-18 03:51:18.031052+00	2019-10-18 03:51:18.031059+00	t	1	43	2	2
-99	2019-10-18 03:51:18.031094+00	2019-10-18 03:51:18.031101+00	2019-10-18 03:51:18.031108+00	t	1	44	2	2
-100	2019-10-18 03:51:18.031142+00	2019-10-18 03:51:18.03115+00	2019-10-18 03:51:18.031157+00	t	1	45	2	2
-101	2019-10-18 03:51:18.031191+00	2019-10-18 03:51:18.031199+00	2019-10-18 03:51:18.031205+00	t	1	46	2	2
-102	2019-10-18 03:51:18.03124+00	2019-10-18 03:51:18.031248+00	2019-10-18 03:51:18.031285+00	t	1	47	2	2
-103	2019-10-18 03:51:18.031347+00	2019-10-18 03:51:18.031357+00	2019-10-18 03:51:18.031364+00	t	1	48	2	2
-104	2019-10-18 03:51:18.031405+00	2019-10-18 03:51:18.031413+00	2019-10-18 03:51:18.03142+00	t	1	49	2	2
-105	2019-10-18 03:51:18.031458+00	2019-10-18 03:51:18.031466+00	2019-10-18 03:51:18.031473+00	t	1	50	2	2
-106	2019-10-18 03:51:18.031508+00	2019-10-18 03:51:18.031516+00	2019-10-18 03:51:18.031522+00	t	1	51	2	2
-107	2019-10-18 03:51:18.031557+00	2019-10-18 03:51:18.031565+00	2019-10-18 03:51:18.031571+00	t	1	52	2	2
-108	2019-10-18 03:51:18.031605+00	2019-10-18 03:51:18.031613+00	2019-10-18 03:51:18.03162+00	t	1	53	2	2
-109	2019-10-18 03:51:18.031654+00	2019-10-18 03:51:18.031661+00	2019-10-18 03:51:18.031668+00	t	1	54	2	2
-110	2019-10-18 03:51:18.031703+00	2019-10-18 03:51:18.03171+00	2019-10-18 03:51:18.031717+00	t	1	55	2	2
-111	2019-10-18 03:51:18.031751+00	2019-10-18 03:51:18.031759+00	2019-10-18 03:51:18.031766+00	t	1	56	2	2
-112	2019-10-18 03:51:18.0318+00	2019-10-18 03:51:18.031807+00	2019-10-18 03:51:18.031814+00	t	1	57	2	2
-113	2019-10-18 03:51:18.031849+00	2019-10-18 03:51:18.031856+00	2019-10-18 03:51:18.031863+00	t	1	58	2	2
-114	2019-10-18 03:51:18.031898+00	2019-10-18 03:51:18.031905+00	2019-10-18 03:51:18.031912+00	t	1	59	2	2
-115	2019-10-18 03:51:18.031947+00	2019-10-18 03:51:18.031955+00	2019-10-18 03:51:18.031962+00	t	1	60	2	2
-116	2019-10-18 03:51:18.031996+00	2019-10-18 03:51:18.032003+00	2019-10-18 03:51:18.03201+00	t	1	61	2	2
-117	2019-10-18 03:51:18.032045+00	2019-10-18 03:51:18.032053+00	2019-10-18 03:51:18.032059+00	t	1	62	2	2
-118	2019-10-18 03:51:18.032094+00	2019-10-18 03:51:18.032101+00	2019-10-18 03:51:18.032108+00	t	1	63	2	2
-119	2019-10-18 03:51:18.032143+00	2019-10-18 03:51:18.03215+00	2019-10-18 03:51:18.032157+00	t	1	64	2	2
-120	2019-10-18 03:51:18.032192+00	2019-10-18 03:51:18.0322+00	2019-10-18 03:51:18.032207+00	t	1	28	2	2
-121	2019-10-18 03:51:18.032242+00	2019-10-18 03:51:18.032249+00	2019-10-18 03:51:18.032256+00	t	1	29	2	2
-122	2019-10-18 03:51:18.03229+00	2019-10-18 03:51:18.032297+00	2019-10-18 03:51:18.032304+00	t	1	30	2	2
-123	2019-10-18 03:51:18.032339+00	2019-10-18 03:51:18.032346+00	2019-10-18 03:51:18.032353+00	t	1	31	2	2
-124	2019-10-18 03:51:18.032387+00	2019-10-18 03:51:18.032395+00	2019-10-18 03:51:18.032402+00	t	1	32	2	2
-125	2019-10-18 03:51:18.032437+00	2019-10-18 03:51:18.032445+00	2019-10-18 03:51:18.032452+00	t	1	33	2	2
-126	2019-10-18 03:51:18.032486+00	2019-10-18 03:51:18.032494+00	2019-10-18 03:51:18.0325+00	t	1	34	2	2
-127	2019-10-18 03:51:18.032535+00	2019-10-18 03:51:18.032543+00	2019-10-18 03:51:18.03255+00	t	1	35	2	2
-128	2019-10-18 03:51:18.032584+00	2019-10-18 03:51:18.032592+00	2019-10-18 03:51:18.032598+00	t	1	36	2	2
-130	2019-10-25 05:24:15.03589+00	2019-10-25 05:24:15.035913+00	2019-10-25 05:24:15.035922+00	t	4	195	2	1
-131	2019-10-25 05:24:15.035975+00	2019-10-25 05:24:15.035984+00	2019-10-25 05:24:15.035992+00	t	4	196	2	1
-132	2019-10-25 05:24:15.091361+00	2019-10-25 05:24:15.091384+00	2019-10-25 05:24:15.091393+00	t	4	195	2	2
-133	2019-10-25 05:24:15.091448+00	2019-10-25 05:24:15.091457+00	2019-10-25 05:24:15.091465+00	t	4	196	2	2
-134	2019-10-25 05:33:20.863341+00	2019-10-25 05:33:20.863365+00	2019-10-25 05:33:20.863373+00	t	4	208	2	1
-135	2019-10-25 05:33:20.863427+00	2019-10-25 05:33:20.863436+00	2019-10-25 05:33:20.863444+00	t	4	209	2	1
-136	2019-10-25 05:33:20.86348+00	2019-10-25 05:33:20.863489+00	2019-10-25 05:33:20.863496+00	t	4	210	2	1
-137	2019-10-25 05:33:20.863532+00	2019-10-25 05:33:20.86354+00	2019-10-25 05:33:20.863547+00	t	4	211	2	1
-138	2019-10-25 05:33:20.863583+00	2019-10-25 05:33:20.863591+00	2019-10-25 05:33:20.863598+00	t	4	212	2	1
-139	2019-10-25 05:33:20.863633+00	2019-10-25 05:33:20.863641+00	2019-10-25 05:33:20.863648+00	t	4	213	2	1
-140	2019-10-25 05:33:20.863684+00	2019-10-25 05:33:20.863691+00	2019-10-25 05:33:20.863698+00	t	4	214	2	1
-141	2019-10-25 05:33:20.863734+00	2019-10-25 05:33:20.863741+00	2019-10-25 05:33:20.863748+00	t	4	215	2	1
-142	2019-10-25 05:33:20.863783+00	2019-10-25 05:33:20.863791+00	2019-10-25 05:33:20.863798+00	t	4	216	2	1
-143	2019-10-25 05:33:20.863833+00	2019-10-25 05:33:20.863841+00	2019-10-25 05:33:20.863848+00	t	4	217	2	1
-144	2019-10-25 05:33:20.863884+00	2019-10-25 05:33:20.863892+00	2019-10-25 05:33:20.863899+00	t	4	218	2	1
-145	2019-10-25 05:33:20.863935+00	2019-10-25 05:33:20.863942+00	2019-10-25 05:33:20.863949+00	t	4	219	2	1
-146	2019-10-25 05:33:20.863985+00	2019-10-25 05:33:20.863993+00	2019-10-25 05:33:20.864+00	t	4	220	2	1
-147	2019-10-25 05:33:20.864035+00	2019-10-25 05:33:20.864043+00	2019-10-25 05:33:20.86405+00	t	4	197	2	1
-148	2019-10-25 05:33:20.864085+00	2019-10-25 05:33:20.864092+00	2019-10-25 05:33:20.864099+00	t	4	198	2	1
-149	2019-10-25 05:33:20.864135+00	2019-10-25 05:33:20.864142+00	2019-10-25 05:33:20.864149+00	t	4	199	2	1
-150	2019-10-25 05:33:20.864185+00	2019-10-25 05:33:20.864193+00	2019-10-25 05:33:20.864199+00	t	4	200	2	1
-151	2019-10-25 05:33:20.864235+00	2019-10-25 05:33:20.864243+00	2019-10-25 05:33:20.86425+00	t	4	201	2	1
-152	2019-10-25 05:33:20.864285+00	2019-10-25 05:33:20.864293+00	2019-10-25 05:33:20.8643+00	t	4	202	2	1
-153	2019-10-25 05:33:20.864335+00	2019-10-25 05:33:20.864342+00	2019-10-25 05:33:20.864349+00	t	4	203	2	1
-154	2019-10-25 05:33:20.864385+00	2019-10-25 05:33:20.864393+00	2019-10-25 05:33:20.864399+00	t	4	204	2	1
-155	2019-10-25 05:33:20.864434+00	2019-10-25 05:33:20.864442+00	2019-10-25 05:33:20.864449+00	t	4	205	2	1
-156	2019-10-25 05:33:20.864484+00	2019-10-25 05:33:20.864491+00	2019-10-25 05:33:20.864498+00	t	4	206	2	1
-157	2019-10-25 05:33:20.864533+00	2019-10-25 05:33:20.864541+00	2019-10-25 05:33:20.864548+00	t	4	207	2	1
-158	2019-10-25 05:33:20.864597+00	2019-10-25 05:33:20.864606+00	2019-10-25 05:33:20.864613+00	t	4	221	2	1
-159	2019-10-25 05:33:20.864649+00	2019-10-25 05:33:20.864657+00	2019-10-25 05:33:20.864664+00	t	4	222	2	1
-160	2019-10-25 05:33:20.8647+00	2019-10-25 05:33:20.864708+00	2019-10-25 05:33:20.864714+00	t	4	223	2	1
-161	2019-10-25 05:33:20.86475+00	2019-10-25 05:33:20.864758+00	2019-10-25 05:33:20.864765+00	t	4	224	2	1
-162	2019-10-25 05:33:20.8648+00	2019-10-25 05:33:20.864808+00	2019-10-25 05:33:20.864815+00	t	4	225	2	1
-163	2019-10-25 05:33:20.86485+00	2019-10-25 05:33:20.864858+00	2019-10-25 05:33:20.864865+00	t	4	226	2	1
-164	2019-10-25 05:33:20.8649+00	2019-10-25 05:33:20.864908+00	2019-10-25 05:33:20.864915+00	t	4	227	2	1
-165	2019-10-25 05:33:20.864951+00	2019-10-25 05:33:20.864958+00	2019-10-25 05:33:20.864965+00	t	4	228	2	1
-166	2019-10-25 05:33:20.865+00	2019-10-25 05:33:20.865008+00	2019-10-25 05:33:20.865015+00	t	4	229	2	1
-167	2019-10-25 05:33:20.86505+00	2019-10-25 05:33:20.865058+00	2019-10-25 05:33:20.865065+00	t	4	230	2	1
-168	2019-10-25 05:33:20.865132+00	2019-10-25 05:33:20.865143+00	2019-10-25 05:33:20.86515+00	t	4	231	2	1
-169	2019-10-25 05:33:20.865187+00	2019-10-25 05:33:20.865195+00	2019-10-25 05:33:20.865202+00	t	4	232	2	1
-170	2019-10-25 05:33:20.865238+00	2019-10-25 05:33:20.865245+00	2019-10-25 05:33:20.865252+00	t	4	233	2	1
-171	2019-10-25 05:33:20.865287+00	2019-10-25 05:33:20.865295+00	2019-10-25 05:33:20.865302+00	t	4	234	2	1
-172	2019-10-25 05:33:20.865336+00	2019-10-25 05:33:20.865344+00	2019-10-25 05:33:20.865351+00	t	4	235	2	1
-173	2019-10-25 05:33:20.865386+00	2019-10-25 05:33:20.865394+00	2019-10-25 05:33:20.865401+00	t	4	236	2	1
-174	2019-10-25 05:33:20.865436+00	2019-10-25 05:33:20.865444+00	2019-10-25 05:33:20.86545+00	t	4	237	2	1
-175	2019-10-25 05:33:20.865485+00	2019-10-25 05:33:20.865493+00	2019-10-25 05:33:20.8655+00	t	4	238	2	1
-176	2019-10-25 05:33:20.865535+00	2019-10-25 05:33:20.865542+00	2019-10-25 05:33:20.865549+00	t	4	239	2	1
-177	2019-10-25 05:33:20.865585+00	2019-10-25 05:33:20.865592+00	2019-10-25 05:33:20.865599+00	t	4	240	2	1
-178	2019-10-25 05:33:20.865635+00	2019-10-25 05:33:20.865642+00	2019-10-25 05:33:20.865649+00	t	4	241	2	1
-179	2019-10-25 05:33:20.865685+00	2019-10-25 05:33:20.865692+00	2019-10-25 05:33:20.865699+00	t	4	242	2	1
-180	2019-10-25 05:33:20.865734+00	2019-10-25 05:33:20.865742+00	2019-10-25 05:33:20.865749+00	t	4	243	2	1
-181	2019-10-25 05:33:20.865785+00	2019-10-25 05:33:20.865792+00	2019-10-25 05:33:20.865799+00	t	4	244	2	1
-182	2019-10-25 05:33:20.865834+00	2019-10-25 05:33:20.865842+00	2019-10-25 05:33:20.865849+00	t	4	245	2	1
-183	2019-10-25 05:33:20.865884+00	2019-10-25 05:33:20.865892+00	2019-10-25 05:33:20.865899+00	t	4	246	2	1
-184	2019-10-25 05:33:20.865934+00	2019-10-25 05:33:20.865941+00	2019-10-25 05:33:20.865948+00	t	4	247	2	1
-185	2019-10-25 05:33:20.865983+00	2019-10-25 05:33:20.865991+00	2019-10-25 05:33:20.865998+00	t	4	248	2	1
-186	2019-10-25 05:33:20.866033+00	2019-10-25 05:33:20.86604+00	2019-10-25 05:33:20.866047+00	t	4	249	2	1
-187	2019-10-25 05:33:20.866083+00	2019-10-25 05:33:20.86609+00	2019-10-25 05:33:20.866097+00	t	4	250	2	1
-188	2019-10-25 05:33:20.866133+00	2019-10-25 05:33:20.86614+00	2019-10-25 05:33:20.866147+00	t	4	251	2	1
-189	2019-10-25 05:33:20.866183+00	2019-10-25 05:33:20.86619+00	2019-10-25 05:33:20.866197+00	t	4	252	2	1
-190	2019-10-25 05:33:20.866233+00	2019-10-25 05:33:20.866241+00	2019-10-25 05:33:20.866247+00	t	4	253	2	1
-191	2019-10-25 05:33:20.866283+00	2019-10-25 05:33:20.86629+00	2019-10-25 05:33:20.866297+00	t	4	254	2	1
-192	2019-10-25 05:33:20.866333+00	2019-10-25 05:33:20.866341+00	2019-10-25 05:33:20.866347+00	t	4	255	2	1
-193	2019-10-25 05:33:20.947975+00	2019-10-25 05:33:20.947998+00	2019-10-25 05:33:20.948007+00	t	4	208	2	2
-194	2019-10-25 05:33:20.948061+00	2019-10-25 05:33:20.94807+00	2019-10-25 05:33:20.948077+00	t	4	209	2	2
-195	2019-10-25 05:33:20.948114+00	2019-10-25 05:33:20.948122+00	2019-10-25 05:33:20.94813+00	t	4	210	2	2
-196	2019-10-25 05:33:20.948166+00	2019-10-25 05:33:20.948174+00	2019-10-25 05:33:20.948181+00	t	4	211	2	2
-197	2019-10-25 05:33:20.948217+00	2019-10-25 05:33:20.948225+00	2019-10-25 05:33:20.948232+00	t	4	212	2	2
-198	2019-10-25 05:33:20.94833+00	2019-10-25 05:33:20.948338+00	2019-10-25 05:33:20.948345+00	t	4	213	2	2
-199	2019-10-25 05:33:20.948381+00	2019-10-25 05:33:20.948389+00	2019-10-25 05:33:20.948397+00	t	4	214	2	2
-200	2019-10-25 05:33:20.94848+00	2019-10-25 05:33:20.948493+00	2019-10-25 05:33:20.9485+00	t	4	215	2	2
-201	2019-10-25 05:33:20.948539+00	2019-10-25 05:33:20.948547+00	2019-10-25 05:33:20.94856+00	t	4	216	2	2
-202	2019-10-25 05:33:20.948892+00	2019-10-25 05:33:20.948904+00	2019-10-25 05:33:20.948912+00	t	4	217	2	2
-203	2019-10-25 05:33:20.948949+00	2019-10-25 05:33:20.948957+00	2019-10-25 05:33:20.948964+00	t	4	218	2	2
-204	2019-10-25 05:33:20.949+00	2019-10-25 05:33:20.949008+00	2019-10-25 05:33:20.949015+00	t	4	219	2	2
-205	2019-10-25 05:33:20.949051+00	2019-10-25 05:33:20.949059+00	2019-10-25 05:33:20.949066+00	t	4	220	2	2
-206	2019-10-25 05:33:20.949126+00	2019-10-25 05:33:20.949136+00	2019-10-25 05:33:20.949143+00	t	4	197	2	2
-207	2019-10-25 05:33:20.949185+00	2019-10-25 05:33:20.949193+00	2019-10-25 05:33:20.9492+00	t	4	198	2	2
-208	2019-10-25 05:33:20.949236+00	2019-10-25 05:33:20.949244+00	2019-10-25 05:33:20.949251+00	t	4	199	2	2
-209	2019-10-25 05:33:20.949295+00	2019-10-25 05:33:20.949303+00	2019-10-25 05:33:20.94931+00	t	4	200	2	2
-210	2019-10-25 05:33:20.949346+00	2019-10-25 05:33:20.949354+00	2019-10-25 05:33:20.949361+00	t	4	201	2	2
-211	2019-10-25 05:33:20.949396+00	2019-10-25 05:33:20.949404+00	2019-10-25 05:33:20.949411+00	t	4	202	2	2
-212	2019-10-25 05:33:20.949447+00	2019-10-25 05:33:20.949455+00	2019-10-25 05:33:20.949467+00	t	4	203	2	2
-213	2019-10-25 05:33:20.949505+00	2019-10-25 05:33:20.949513+00	2019-10-25 05:33:20.94952+00	t	4	204	2	2
-214	2019-10-25 05:33:20.949556+00	2019-10-25 05:33:20.949564+00	2019-10-25 05:33:20.949571+00	t	4	205	2	2
-215	2019-10-25 05:33:20.949606+00	2019-10-25 05:33:20.949614+00	2019-10-25 05:33:20.949621+00	t	4	206	2	2
-216	2019-10-25 05:33:20.949656+00	2019-10-25 05:33:20.949664+00	2019-10-25 05:33:20.949671+00	t	4	207	2	2
-217	2019-10-25 05:33:20.949706+00	2019-10-25 05:33:20.949714+00	2019-10-25 05:33:20.949721+00	t	4	221	2	2
-218	2019-10-25 05:33:20.949756+00	2019-10-25 05:33:20.949764+00	2019-10-25 05:33:20.949771+00	t	4	222	2	2
-219	2019-10-25 05:33:20.949806+00	2019-10-25 05:33:20.949814+00	2019-10-25 05:33:20.949821+00	t	4	223	2	2
-220	2019-10-25 05:33:20.949857+00	2019-10-25 05:33:20.949865+00	2019-10-25 05:33:20.949872+00	t	4	224	2	2
-221	2019-10-25 05:33:20.949907+00	2019-10-25 05:33:20.949915+00	2019-10-25 05:33:20.949921+00	t	4	225	2	2
-222	2019-10-25 05:33:20.949956+00	2019-10-25 05:33:20.949964+00	2019-10-25 05:33:20.949971+00	t	4	226	2	2
-223	2019-10-25 05:33:20.950006+00	2019-10-25 05:33:20.950014+00	2019-10-25 05:33:20.950021+00	t	4	227	2	2
-224	2019-10-25 05:33:20.950057+00	2019-10-25 05:33:20.950065+00	2019-10-25 05:33:20.950072+00	t	4	228	2	2
-225	2019-10-25 05:33:20.950107+00	2019-10-25 05:33:20.950115+00	2019-10-25 05:33:20.950122+00	t	4	229	2	2
-226	2019-10-25 05:33:20.950157+00	2019-10-25 05:33:20.950165+00	2019-10-25 05:33:20.950172+00	t	4	230	2	2
-227	2019-10-25 05:33:20.950207+00	2019-10-25 05:33:20.950215+00	2019-10-25 05:33:20.950222+00	t	4	231	2	2
-228	2019-10-25 05:33:20.950257+00	2019-10-25 05:33:20.950265+00	2019-10-25 05:33:20.950272+00	t	4	232	2	2
-229	2019-10-25 05:33:20.950308+00	2019-10-25 05:33:20.950316+00	2019-10-25 05:33:20.950322+00	t	4	233	2	2
-230	2019-10-25 05:33:20.950359+00	2019-10-25 05:33:20.950366+00	2019-10-25 05:33:20.950373+00	t	4	234	2	2
-231	2019-10-25 05:33:20.950409+00	2019-10-25 05:33:20.950417+00	2019-10-25 05:33:20.950424+00	t	4	235	2	2
-232	2019-10-25 05:33:20.950459+00	2019-10-25 05:33:20.950467+00	2019-10-25 05:33:20.950474+00	t	4	236	2	2
-233	2019-10-25 05:33:20.95051+00	2019-10-25 05:33:20.950518+00	2019-10-25 05:33:20.950525+00	t	4	237	2	2
-234	2019-10-25 05:33:20.95056+00	2019-10-25 05:33:20.950568+00	2019-10-25 05:33:20.950575+00	t	4	238	2	2
-235	2019-10-25 05:33:20.950611+00	2019-10-25 05:33:20.950618+00	2019-10-25 05:33:20.950625+00	t	4	239	2	2
-236	2019-10-25 05:33:20.950661+00	2019-10-25 05:33:20.950669+00	2019-10-25 05:33:20.950675+00	t	4	240	2	2
-237	2019-10-25 05:33:20.950711+00	2019-10-25 05:33:20.950719+00	2019-10-25 05:33:20.950726+00	t	4	241	2	2
-238	2019-10-25 05:33:20.950761+00	2019-10-25 05:33:20.950769+00	2019-10-25 05:33:20.950776+00	t	4	242	2	2
-239	2019-10-25 05:33:20.950811+00	2019-10-25 05:33:20.950819+00	2019-10-25 05:33:20.950826+00	t	4	243	2	2
-240	2019-10-25 05:33:20.950871+00	2019-10-25 05:33:20.95088+00	2019-10-25 05:33:20.950887+00	t	4	244	2	2
-241	2019-10-25 05:33:20.950922+00	2019-10-25 05:33:20.95093+00	2019-10-25 05:33:20.950937+00	t	4	245	2	2
-242	2019-10-25 05:33:20.950972+00	2019-10-25 05:33:20.950979+00	2019-10-25 05:33:20.950986+00	t	4	246	2	2
-243	2019-10-25 05:33:20.951021+00	2019-10-25 05:33:20.951029+00	2019-10-25 05:33:20.951036+00	t	4	247	2	2
-244	2019-10-25 05:33:20.951071+00	2019-10-25 05:33:20.951078+00	2019-10-25 05:33:20.951085+00	t	4	248	2	2
-245	2019-10-25 05:33:20.95112+00	2019-10-25 05:33:20.951128+00	2019-10-25 05:33:20.951135+00	t	4	249	2	2
-246	2019-10-25 05:33:20.95117+00	2019-10-25 05:33:20.951178+00	2019-10-25 05:33:20.951184+00	t	4	250	2	2
-247	2019-10-25 05:33:20.951219+00	2019-10-25 05:33:20.951227+00	2019-10-25 05:33:20.951234+00	t	4	251	2	2
-248	2019-10-25 05:33:20.951269+00	2019-10-25 05:33:20.951277+00	2019-10-25 05:33:20.951284+00	t	4	252	2	2
-249	2019-10-25 05:33:20.951319+00	2019-10-25 05:33:20.951326+00	2019-10-25 05:33:20.951333+00	t	4	253	2	2
-250	2019-10-25 05:33:20.951369+00	2019-10-25 05:33:20.951376+00	2019-10-25 05:33:20.951383+00	t	4	254	2	2
-251	2019-10-25 05:33:20.951419+00	2019-10-25 05:33:20.951426+00	2019-10-25 05:33:20.951433+00	t	4	255	2	2
-252	2019-11-01 04:33:38.430872+00	2019-11-01 04:33:38.430911+00	2019-11-01 04:33:38.35262+00	t	4	256	4	1
-253	2019-11-01 04:33:38.430996+00	2019-11-01 04:33:38.431002+00	2019-11-01 04:33:38.353671+00	t	4	257	4	1
-254	2019-11-01 04:33:38.431042+00	2019-11-01 04:33:38.431047+00	2019-11-01 04:33:38.354817+00	t	4	258	4	1
-255	2019-11-01 04:33:38.431084+00	2019-11-01 04:33:38.43109+00	2019-11-01 04:33:38.356614+00	t	4	259	4	1
-256	2019-11-01 04:33:38.431126+00	2019-11-01 04:33:38.431132+00	2019-11-01 04:33:38.357681+00	t	4	260	4	1
-257	2019-11-01 04:33:38.431169+00	2019-11-01 04:33:38.431174+00	2019-11-01 04:33:38.358612+00	t	4	261	4	1
-258	2019-11-01 04:33:38.431211+00	2019-11-01 04:33:38.431216+00	2019-11-01 04:33:38.359514+00	t	4	262	4	1
-259	2019-11-01 04:33:38.431253+00	2019-11-01 04:33:38.431258+00	2019-11-01 04:33:38.360542+00	t	4	263	4	1
-260	2019-11-01 04:33:38.431295+00	2019-11-01 04:33:38.431301+00	2019-11-01 04:33:38.361562+00	t	4	264	4	1
-261	2019-11-01 04:33:38.431337+00	2019-11-01 04:33:38.431343+00	2019-11-01 04:33:38.363664+00	t	4	265	4	1
-262	2019-11-01 04:33:38.43138+00	2019-11-01 04:33:38.431385+00	2019-11-01 04:33:38.364642+00	t	4	266	4	1
-263	2019-11-01 04:33:38.431422+00	2019-11-01 04:33:38.431427+00	2019-11-01 04:33:38.365587+00	t	4	267	4	1
-264	2019-11-01 04:33:38.431464+00	2019-11-01 04:33:38.43147+00	2019-11-01 04:33:38.366464+00	t	4	268	4	1
-265	2019-11-01 04:33:38.431506+00	2019-11-01 04:33:38.431511+00	2019-11-01 04:33:38.367494+00	t	4	269	4	1
-266	2019-11-01 04:33:38.431548+00	2019-11-01 04:33:38.431554+00	2019-11-01 04:33:38.368482+00	t	4	270	4	1
-267	2019-11-01 04:33:38.43159+00	2019-11-01 04:33:38.431595+00	2019-11-01 04:33:38.36948+00	t	4	271	4	1
-268	2019-11-01 04:33:38.431632+00	2019-11-01 04:33:38.431638+00	2019-11-01 04:33:38.37033+00	t	4	272	4	1
-269	2019-11-01 04:33:38.431675+00	2019-11-01 04:33:38.43168+00	2019-11-01 04:33:38.371402+00	t	4	273	4	1
-270	2019-11-01 04:33:38.431717+00	2019-11-01 04:33:38.431722+00	2019-11-01 04:33:38.372236+00	t	4	274	4	1
-271	2019-11-01 04:33:38.431758+00	2019-11-01 04:33:38.431764+00	2019-11-01 04:33:38.373153+00	t	4	275	4	1
-272	2019-11-01 04:33:38.431805+00	2019-11-01 04:33:38.431811+00	2019-11-01 04:33:38.374047+00	t	4	276	4	1
-273	2019-11-01 04:33:38.431849+00	2019-11-01 04:33:38.431855+00	2019-11-01 04:33:38.375124+00	t	4	277	4	1
-274	2019-11-01 04:33:38.431892+00	2019-11-01 04:33:38.431897+00	2019-11-01 04:33:38.376188+00	t	4	278	4	1
-275	2019-11-01 04:33:38.431934+00	2019-11-01 04:33:38.431939+00	2019-11-01 04:33:38.377033+00	t	4	279	4	1
-276	2019-11-01 04:33:38.431976+00	2019-11-01 04:33:38.431981+00	2019-11-01 04:33:38.389123+00	t	4	280	4	1
-277	2019-11-01 04:33:38.432018+00	2019-11-01 04:33:38.432023+00	2019-11-01 04:33:38.39015+00	t	4	281	4	1
-278	2019-11-01 04:33:38.432061+00	2019-11-01 04:33:38.432066+00	2019-11-01 04:33:38.391002+00	t	4	282	4	1
-279	2019-11-01 04:33:38.432103+00	2019-11-01 04:33:38.432108+00	2019-11-01 04:33:38.391834+00	t	4	283	4	1
-280	2019-11-01 04:33:38.432145+00	2019-11-01 04:33:38.43215+00	2019-11-01 04:33:38.392766+00	t	4	284	4	1
-281	2019-11-01 04:33:38.432187+00	2019-11-01 04:33:38.432192+00	2019-11-01 04:33:38.393776+00	t	4	285	4	1
-282	2019-11-01 04:33:38.432229+00	2019-11-01 04:33:38.432234+00	2019-11-01 04:33:38.395313+00	t	4	286	4	1
-283	2019-11-01 04:33:38.432271+00	2019-11-01 04:33:38.432276+00	2019-11-01 04:33:38.39631+00	t	4	287	4	1
-284	2019-11-01 04:33:38.432313+00	2019-11-01 04:33:38.432318+00	2019-11-01 04:33:38.397218+00	t	4	288	4	1
-285	2019-11-01 04:33:38.432355+00	2019-11-01 04:33:38.43236+00	2019-11-01 04:33:38.399023+00	t	4	289	4	1
-286	2019-11-01 04:33:38.432398+00	2019-11-01 04:33:38.432403+00	2019-11-01 04:33:38.4007+00	t	4	290	4	1
-287	2019-11-01 04:33:38.43244+00	2019-11-01 04:33:38.432445+00	2019-11-01 04:33:38.401694+00	t	4	291	4	1
-288	2019-11-01 04:33:38.432482+00	2019-11-01 04:33:38.432488+00	2019-11-01 04:33:38.402848+00	t	4	292	4	1
-289	2019-11-01 04:33:38.432525+00	2019-11-01 04:33:38.43253+00	2019-11-01 04:33:38.403759+00	t	4	293	4	1
-290	2019-11-01 04:33:38.432567+00	2019-11-01 04:33:38.432572+00	2019-11-01 04:33:38.404915+00	t	4	294	4	1
-291	2019-11-01 04:33:38.432609+00	2019-11-01 04:33:38.432614+00	2019-11-01 04:33:38.406828+00	t	4	295	4	1
-292	2019-11-01 04:33:38.432651+00	2019-11-01 04:33:38.432657+00	2019-11-01 04:33:38.408827+00	t	4	296	4	1
-293	2019-11-01 04:33:38.432694+00	2019-11-01 04:33:38.432699+00	2019-11-01 04:33:38.410083+00	t	4	297	4	1
-294	2019-11-01 04:33:38.432736+00	2019-11-01 04:33:38.432741+00	2019-11-01 04:33:38.411302+00	t	4	298	4	1
-295	2019-11-01 04:33:38.432779+00	2019-11-01 04:33:38.432784+00	2019-11-01 04:33:38.412212+00	t	4	299	4	1
-296	2019-11-01 04:33:38.432821+00	2019-11-01 04:33:38.432826+00	2019-11-01 04:33:38.413183+00	t	4	300	4	1
-297	2019-11-01 04:33:38.432863+00	2019-11-01 04:33:38.432868+00	2019-11-01 04:33:38.414021+00	t	4	301	4	1
-298	2019-11-01 04:33:38.432905+00	2019-11-01 04:33:38.432911+00	2019-11-01 04:33:38.414992+00	t	4	302	4	1
-299	2019-11-01 04:33:38.432952+00	2019-11-01 04:33:38.432959+00	2019-11-01 04:33:38.41581+00	t	4	303	4	1
-300	2019-11-01 04:33:38.432996+00	2019-11-01 04:33:38.433002+00	2019-11-01 04:33:38.416636+00	t	4	304	4	1
-301	2019-11-01 04:33:38.433038+00	2019-11-01 04:33:38.433043+00	2019-11-01 04:33:38.417467+00	t	4	305	4	1
-302	2019-11-01 04:33:38.433081+00	2019-11-01 04:33:38.433086+00	2019-11-01 04:33:38.418262+00	t	4	306	4	1
-303	2019-11-01 04:33:38.433156+00	2019-11-01 04:33:38.433163+00	2019-11-01 04:33:38.419109+00	t	4	307	4	1
-304	2019-11-01 04:33:38.4332+00	2019-11-01 04:33:38.433205+00	2019-11-01 04:33:38.420072+00	t	4	308	4	1
-305	2019-11-01 04:33:38.433242+00	2019-11-01 04:33:38.433247+00	2019-11-01 04:33:38.421133+00	t	4	309	4	1
-306	2019-11-01 04:33:38.433283+00	2019-11-01 04:33:38.433289+00	2019-11-01 04:33:38.422091+00	t	4	310	4	1
-307	2019-11-01 04:33:38.433326+00	2019-11-01 04:33:38.433331+00	2019-11-01 04:33:38.42319+00	t	4	311	4	1
-308	2019-11-01 04:33:38.433368+00	2019-11-01 04:33:38.433373+00	2019-11-01 04:33:38.42406+00	t	4	312	4	1
-309	2019-11-01 04:33:38.433409+00	2019-11-01 04:33:38.433415+00	2019-11-01 04:33:38.424943+00	t	4	313	4	1
-310	2019-11-01 04:33:38.433451+00	2019-11-01 04:33:38.433457+00	2019-11-01 04:33:38.425819+00	t	4	314	4	1
-311	2019-11-01 04:33:38.433494+00	2019-11-01 04:33:38.433499+00	2019-11-01 04:33:38.42666+00	t	4	315	4	1
-312	2019-11-01 04:33:38.433536+00	2019-11-01 04:33:38.433543+00	2019-11-01 04:33:38.427527+00	t	4	316	4	1
-313	2019-11-01 04:33:38.433589+00	2019-11-01 04:33:38.433596+00	2019-11-01 04:33:38.428354+00	t	4	317	4	1
-314	2019-11-01 04:33:38.433637+00	2019-11-01 04:33:38.433643+00	2019-11-01 04:33:38.429248+00	t	4	318	4	1
-315	2019-11-01 04:33:38.43368+00	2019-11-01 04:33:38.433685+00	2019-11-01 04:33:38.430128+00	t	4	319	4	1
-316	2019-11-01 04:33:38.537835+00	2019-11-01 04:33:38.537854+00	2019-11-01 04:33:38.470737+00	t	4	256	4	2
-317	2019-11-01 04:33:38.537916+00	2019-11-01 04:33:38.537921+00	2019-11-01 04:33:38.471755+00	t	4	257	4	2
-318	2019-11-01 04:33:38.53796+00	2019-11-01 04:33:38.537965+00	2019-11-01 04:33:38.473915+00	t	4	258	4	2
-319	2019-11-01 04:33:38.538002+00	2019-11-01 04:33:38.538007+00	2019-11-01 04:33:38.475476+00	t	4	259	4	2
-320	2019-11-01 04:33:38.538045+00	2019-11-01 04:33:38.53805+00	2019-11-01 04:33:38.476392+00	t	4	260	4	2
-321	2019-11-01 04:33:38.538088+00	2019-11-01 04:33:38.538093+00	2019-11-01 04:33:38.477255+00	t	4	261	4	2
-322	2019-11-01 04:33:38.53813+00	2019-11-01 04:33:38.538135+00	2019-11-01 04:33:38.478145+00	t	4	262	4	2
-323	2019-11-01 04:33:38.538173+00	2019-11-01 04:33:38.538178+00	2019-11-01 04:33:38.479742+00	t	4	263	4	2
-324	2019-11-01 04:33:38.538215+00	2019-11-01 04:33:38.53822+00	2019-11-01 04:33:38.480653+00	t	4	264	4	2
-325	2019-11-01 04:33:38.538257+00	2019-11-01 04:33:38.538263+00	2019-11-01 04:33:38.481565+00	t	4	265	4	2
-326	2019-11-01 04:33:38.5383+00	2019-11-01 04:33:38.538305+00	2019-11-01 04:33:38.482628+00	t	4	266	4	2
-327	2019-11-01 04:33:38.538342+00	2019-11-01 04:33:38.53839+00	2019-11-01 04:33:38.483881+00	t	4	267	4	2
-328	2019-11-01 04:33:38.538436+00	2019-11-01 04:33:38.538442+00	2019-11-01 04:33:38.484922+00	t	4	268	4	2
-329	2019-11-01 04:33:38.53848+00	2019-11-01 04:33:38.538666+00	2019-11-01 04:33:38.486844+00	t	4	269	4	2
-330	2019-11-01 04:33:38.538713+00	2019-11-01 04:33:38.538719+00	2019-11-01 04:33:38.487889+00	t	4	270	4	2
-331	2019-11-01 04:33:38.538756+00	2019-11-01 04:33:38.538785+00	2019-11-01 04:33:38.488914+00	t	4	271	4	2
-332	2019-11-01 04:33:38.538828+00	2019-11-01 04:33:38.538834+00	2019-11-01 04:33:38.490016+00	t	4	272	4	2
-333	2019-11-01 04:33:38.53894+00	2019-11-01 04:33:38.538948+00	2019-11-01 04:33:38.490988+00	t	4	273	4	2
-334	2019-11-01 04:33:38.538989+00	2019-11-01 04:33:38.538994+00	2019-11-01 04:33:38.491849+00	t	4	274	4	2
-335	2019-11-01 04:33:38.539032+00	2019-11-01 04:33:38.539084+00	2019-11-01 04:33:38.492705+00	t	4	282	4	2
-336	2019-11-01 04:33:38.53913+00	2019-11-01 04:33:38.539136+00	2019-11-01 04:33:38.493853+00	t	4	283	4	2
-337	2019-11-01 04:33:38.539173+00	2019-11-01 04:33:38.539179+00	2019-11-01 04:33:38.494957+00	t	4	284	4	2
-338	2019-11-01 04:33:38.539216+00	2019-11-01 04:33:38.539221+00	2019-11-01 04:33:38.495827+00	t	4	285	4	2
-339	2019-11-01 04:33:38.539258+00	2019-11-01 04:33:38.539263+00	2019-11-01 04:33:38.496666+00	t	4	286	4	2
-340	2019-11-01 04:33:38.539354+00	2019-11-01 04:33:38.539361+00	2019-11-01 04:33:38.497548+00	t	4	287	4	2
-341	2019-11-01 04:33:38.539399+00	2019-11-01 04:33:38.539404+00	2019-11-01 04:33:38.498391+00	t	4	288	4	2
-342	2019-11-01 04:33:38.539442+00	2019-11-01 04:33:38.539448+00	2019-11-01 04:33:38.499741+00	t	4	289	4	2
-343	2019-11-01 04:33:38.539485+00	2019-11-01 04:33:38.539491+00	2019-11-01 04:33:38.500634+00	t	4	290	4	2
-344	2019-11-01 04:33:38.539527+00	2019-11-01 04:33:38.539533+00	2019-11-01 04:33:38.501479+00	t	4	291	4	2
-345	2019-11-01 04:33:38.53957+00	2019-11-01 04:33:38.539576+00	2019-11-01 04:33:38.502303+00	t	4	292	4	2
-346	2019-11-01 04:33:38.539613+00	2019-11-01 04:33:38.539618+00	2019-11-01 04:33:38.503349+00	t	4	275	4	2
-347	2019-11-01 04:33:38.539656+00	2019-11-01 04:33:38.539661+00	2019-11-01 04:33:38.504225+00	t	4	276	4	2
-348	2019-11-01 04:33:38.539699+00	2019-11-01 04:33:38.539704+00	2019-11-01 04:33:38.505344+00	t	4	277	4	2
-349	2019-11-01 04:33:38.539741+00	2019-11-01 04:33:38.539747+00	2019-11-01 04:33:38.506292+00	t	4	278	4	2
-350	2019-11-01 04:33:38.539784+00	2019-11-01 04:33:38.53979+00	2019-11-01 04:33:38.507337+00	t	4	279	4	2
-351	2019-11-01 04:33:38.539827+00	2019-11-01 04:33:38.539832+00	2019-11-01 04:33:38.508265+00	t	4	280	4	2
-352	2019-11-01 04:33:38.53987+00	2019-11-01 04:33:38.539875+00	2019-11-01 04:33:38.509142+00	t	4	281	4	2
-353	2019-11-01 04:33:38.539912+00	2019-11-01 04:33:38.539917+00	2019-11-01 04:33:38.510255+00	t	4	293	4	2
-354	2019-11-01 04:33:38.539954+00	2019-11-01 04:33:38.539959+00	2019-11-01 04:33:38.51145+00	t	4	294	4	2
-355	2019-11-01 04:33:38.539996+00	2019-11-01 04:33:38.540002+00	2019-11-01 04:33:38.512415+00	t	4	295	4	2
-356	2019-11-01 04:33:38.540038+00	2019-11-01 04:33:38.540044+00	2019-11-01 04:33:38.513391+00	t	4	296	4	2
-357	2019-11-01 04:33:38.540081+00	2019-11-01 04:33:38.540086+00	2019-11-01 04:33:38.514477+00	t	4	297	4	2
-358	2019-11-01 04:33:38.540123+00	2019-11-01 04:33:38.540129+00	2019-11-01 04:33:38.515366+00	t	4	298	4	2
-359	2019-11-01 04:33:38.540165+00	2019-11-01 04:33:38.540171+00	2019-11-01 04:33:38.516227+00	t	4	299	4	2
-360	2019-11-01 04:33:38.540208+00	2019-11-01 04:33:38.540213+00	2019-11-01 04:33:38.517085+00	t	4	300	4	2
-361	2019-11-01 04:33:38.54025+00	2019-11-01 04:33:38.540255+00	2019-11-01 04:33:38.518208+00	t	4	301	4	2
-362	2019-11-01 04:33:38.540292+00	2019-11-01 04:33:38.540297+00	2019-11-01 04:33:38.519168+00	t	4	302	4	2
-363	2019-11-01 04:33:38.540335+00	2019-11-01 04:33:38.54034+00	2019-11-01 04:33:38.52+00	t	4	303	4	2
-364	2019-11-01 04:33:38.540376+00	2019-11-01 04:33:38.540382+00	2019-11-01 04:33:38.520842+00	t	4	304	4	2
-365	2019-11-01 04:33:38.540419+00	2019-11-01 04:33:38.540424+00	2019-11-01 04:33:38.521731+00	t	4	305	4	2
-366	2019-11-01 04:33:38.54046+00	2019-11-01 04:33:38.540466+00	2019-11-01 04:33:38.522579+00	t	4	306	4	2
-367	2019-11-01 04:33:38.540503+00	2019-11-01 04:33:38.540508+00	2019-11-01 04:33:38.523445+00	t	4	307	4	2
-368	2019-11-01 04:33:38.540545+00	2019-11-01 04:33:38.54055+00	2019-11-01 04:33:38.524426+00	t	4	308	4	2
-369	2019-11-01 04:33:38.540587+00	2019-11-01 04:33:38.540593+00	2019-11-01 04:33:38.52544+00	t	4	309	4	2
-370	2019-11-01 04:33:38.54063+00	2019-11-01 04:33:38.540635+00	2019-11-01 04:33:38.526301+00	t	4	310	4	2
-371	2019-11-01 04:33:38.540672+00	2019-11-01 04:33:38.540678+00	2019-11-01 04:33:38.527196+00	t	4	311	4	2
-372	2019-11-01 04:33:38.540715+00	2019-11-01 04:33:38.54072+00	2019-11-01 04:33:38.528297+00	t	4	312	4	2
-373	2019-11-01 04:33:38.540758+00	2019-11-01 04:33:38.540763+00	2019-11-01 04:33:38.529393+00	t	4	313	4	2
-374	2019-11-01 04:33:38.5408+00	2019-11-01 04:33:38.540805+00	2019-11-01 04:33:38.530453+00	t	4	314	4	2
-375	2019-11-01 04:33:38.540843+00	2019-11-01 04:33:38.540849+00	2019-11-01 04:33:38.53304+00	t	4	315	4	2
-376	2019-11-01 04:33:38.540887+00	2019-11-01 04:33:38.540892+00	2019-11-01 04:33:38.534014+00	t	4	316	4	2
-377	2019-11-01 04:33:38.54093+00	2019-11-01 04:33:38.540935+00	2019-11-01 04:33:38.535564+00	t	4	317	4	2
-378	2019-11-01 04:33:38.540973+00	2019-11-01 04:33:38.540978+00	2019-11-01 04:33:38.536547+00	t	4	318	4	2
-379	2019-11-01 04:33:38.541015+00	2019-11-01 04:33:38.54102+00	2019-11-01 04:33:38.53746+00	t	4	319	4	2
-380	2019-11-09 03:32:56.960372+00	2019-11-09 03:32:56.960389+00	2019-11-09 03:32:56.910463+00	t	4	320	5	1
-381	2019-11-09 03:32:56.960451+00	2019-11-09 03:32:56.960457+00	2019-11-09 03:32:56.911651+00	t	4	321	5	1
-382	2019-11-09 03:32:56.960496+00	2019-11-09 03:32:56.960502+00	2019-11-09 03:32:56.912496+00	t	4	322	5	1
-383	2019-11-09 03:32:56.960539+00	2019-11-09 03:32:56.960545+00	2019-11-09 03:32:56.913394+00	t	4	323	5	1
-384	2019-11-09 03:32:56.960582+00	2019-11-09 03:32:56.960587+00	2019-11-09 03:32:56.914213+00	t	4	324	5	1
-385	2019-11-09 03:32:56.960644+00	2019-11-09 03:32:56.960652+00	2019-11-09 03:32:56.915032+00	t	4	325	5	1
-386	2019-11-09 03:32:56.960692+00	2019-11-09 03:32:56.960697+00	2019-11-09 03:32:56.916024+00	t	4	326	5	1
-387	2019-11-09 03:32:56.960734+00	2019-11-09 03:32:56.960739+00	2019-11-09 03:32:56.916844+00	t	4	327	5	1
-388	2019-11-09 03:32:56.960775+00	2019-11-09 03:32:56.960781+00	2019-11-09 03:32:56.917679+00	t	4	328	5	1
-389	2019-11-09 03:32:56.960817+00	2019-11-09 03:32:56.960823+00	2019-11-09 03:32:56.918489+00	t	4	329	5	1
-390	2019-11-09 03:32:56.960859+00	2019-11-09 03:32:56.960865+00	2019-11-09 03:32:56.919297+00	t	4	330	5	1
-391	2019-11-09 03:32:56.960902+00	2019-11-09 03:32:56.960907+00	2019-11-09 03:32:56.920224+00	t	4	331	5	1
-392	2019-11-09 03:32:56.960944+00	2019-11-09 03:32:56.960949+00	2019-11-09 03:32:56.921043+00	t	4	332	5	1
-393	2019-11-09 03:32:56.960985+00	2019-11-09 03:32:56.960991+00	2019-11-09 03:32:56.921894+00	t	4	333	5	1
-394	2019-11-09 03:32:56.961027+00	2019-11-09 03:32:56.961033+00	2019-11-09 03:32:56.922943+00	t	4	335	5	1
-395	2019-11-09 03:32:56.961069+00	2019-11-09 03:32:56.961074+00	2019-11-09 03:32:56.924077+00	t	4	336	5	1
-396	2019-11-09 03:32:56.961155+00	2019-11-09 03:32:56.961161+00	2019-11-09 03:32:56.924911+00	t	4	337	5	1
-397	2019-11-09 03:32:56.961198+00	2019-11-09 03:32:56.961203+00	2019-11-09 03:32:56.925781+00	t	4	338	5	1
-398	2019-11-09 03:32:56.96124+00	2019-11-09 03:32:56.961245+00	2019-11-09 03:32:56.926593+00	t	4	339	5	1
-399	2019-11-09 03:32:56.961281+00	2019-11-09 03:32:56.961286+00	2019-11-09 03:32:56.927584+00	t	4	340	5	1
-400	2019-11-09 03:32:56.961323+00	2019-11-09 03:32:56.961328+00	2019-11-09 03:32:56.928393+00	t	4	341	5	1
-401	2019-11-09 03:32:56.961364+00	2019-11-09 03:32:56.961369+00	2019-11-09 03:32:56.929277+00	t	4	342	5	1
-402	2019-11-09 03:32:56.961406+00	2019-11-09 03:32:56.961411+00	2019-11-09 03:32:56.930163+00	t	4	343	5	1
-403	2019-11-09 03:32:56.961448+00	2019-11-09 03:32:56.961453+00	2019-11-09 03:32:56.931157+00	t	4	344	5	1
-404	2019-11-09 03:32:56.96149+00	2019-11-09 03:32:56.961495+00	2019-11-09 03:32:56.932289+00	t	4	345	5	1
-405	2019-11-09 03:32:56.961533+00	2019-11-09 03:32:56.961538+00	2019-11-09 03:32:56.933145+00	t	4	346	5	1
-406	2019-11-09 03:32:56.961595+00	2019-11-09 03:32:56.961601+00	2019-11-09 03:32:56.933995+00	t	4	347	5	1
-407	2019-11-09 03:32:56.961638+00	2019-11-09 03:32:56.961643+00	2019-11-09 03:32:56.934812+00	t	4	348	5	1
-408	2019-11-09 03:32:56.96168+00	2019-11-09 03:32:56.961685+00	2019-11-09 03:32:56.935648+00	t	4	349	5	1
-409	2019-11-09 03:32:56.961721+00	2019-11-09 03:32:56.961726+00	2019-11-09 03:32:56.936458+00	t	4	350	5	1
-410	2019-11-09 03:32:56.961763+00	2019-11-09 03:32:56.961769+00	2019-11-09 03:32:56.937311+00	t	4	351	5	1
-411	2019-11-09 03:32:56.961805+00	2019-11-09 03:32:56.96181+00	2019-11-09 03:32:56.938132+00	t	4	352	5	1
-412	2019-11-09 03:32:56.961847+00	2019-11-09 03:32:56.961852+00	2019-11-09 03:32:56.938938+00	t	4	353	5	1
-413	2019-11-09 03:32:56.961888+00	2019-11-09 03:32:56.961893+00	2019-11-09 03:32:56.940536+00	t	4	354	5	1
-414	2019-11-09 03:32:56.961929+00	2019-11-09 03:32:56.961934+00	2019-11-09 03:32:56.94143+00	t	4	355	5	1
-415	2019-11-09 03:32:56.961971+00	2019-11-09 03:32:56.961976+00	2019-11-09 03:32:56.942258+00	t	4	356	5	1
-416	2019-11-09 03:32:56.962032+00	2019-11-09 03:32:56.962038+00	2019-11-09 03:32:56.943148+00	t	4	357	5	1
-417	2019-11-09 03:32:56.962076+00	2019-11-09 03:32:56.962081+00	2019-11-09 03:32:56.944218+00	t	4	358	5	1
-418	2019-11-09 03:32:56.962118+00	2019-11-09 03:32:56.962123+00	2019-11-09 03:32:56.945082+00	t	4	359	5	1
-419	2019-11-09 03:32:56.96216+00	2019-11-09 03:32:56.962166+00	2019-11-09 03:32:56.946055+00	t	4	360	5	1
-420	2019-11-09 03:32:56.962202+00	2019-11-09 03:32:56.962208+00	2019-11-09 03:32:56.946903+00	t	4	361	5	1
-421	2019-11-09 03:32:56.962244+00	2019-11-09 03:32:56.962249+00	2019-11-09 03:32:56.947887+00	t	4	362	5	1
-422	2019-11-09 03:32:56.962286+00	2019-11-09 03:32:56.962291+00	2019-11-09 03:32:56.948915+00	t	4	363	5	1
-423	2019-11-09 03:32:56.962327+00	2019-11-09 03:32:56.962333+00	2019-11-09 03:32:56.949821+00	t	4	364	5	1
-424	2019-11-09 03:32:56.962369+00	2019-11-09 03:32:56.962374+00	2019-11-09 03:32:56.950644+00	t	4	334	5	1
-425	2019-11-09 03:32:56.962411+00	2019-11-09 03:32:56.962416+00	2019-11-09 03:32:56.9517+00	t	4	367	5	1
-426	2019-11-09 03:32:56.962452+00	2019-11-09 03:32:56.962458+00	2019-11-09 03:32:56.952526+00	t	4	368	5	1
-427	2019-11-09 03:32:56.962513+00	2019-11-09 03:32:56.96252+00	2019-11-09 03:32:56.953394+00	t	4	369	5	1
-428	2019-11-09 03:32:56.962557+00	2019-11-09 03:32:56.962562+00	2019-11-09 03:32:56.9543+00	t	4	370	5	1
-429	2019-11-09 03:32:56.962599+00	2019-11-09 03:32:56.962604+00	2019-11-09 03:32:56.955217+00	t	4	371	5	1
-430	2019-11-09 03:32:56.96264+00	2019-11-09 03:32:56.962645+00	2019-11-09 03:32:56.956499+00	t	4	372	5	1
-431	2019-11-09 03:32:56.962681+00	2019-11-09 03:32:56.962687+00	2019-11-09 03:32:56.957385+00	t	4	373	5	1
-432	2019-11-09 03:32:56.962723+00	2019-11-09 03:32:56.962728+00	2019-11-09 03:32:56.958219+00	t	4	374	5	1
-433	2019-11-09 03:32:56.962765+00	2019-11-09 03:32:56.96277+00	2019-11-09 03:32:56.959045+00	t	4	365	5	1
-434	2019-11-09 03:32:56.962807+00	2019-11-09 03:32:56.962812+00	2019-11-09 03:32:56.960031+00	t	4	366	5	1
-435	2019-11-09 03:32:57.045387+00	2019-11-09 03:32:57.045405+00	2019-11-09 03:32:56.989898+00	t	4	320	5	2
-436	2019-11-09 03:32:57.045467+00	2019-11-09 03:32:57.045473+00	2019-11-09 03:32:56.990796+00	t	4	321	5	2
-437	2019-11-09 03:32:57.045511+00	2019-11-09 03:32:57.045517+00	2019-11-09 03:32:56.992149+00	t	4	322	5	2
-438	2019-11-09 03:32:57.045562+00	2019-11-09 03:32:57.045568+00	2019-11-09 03:32:56.993275+00	t	4	323	5	2
-439	2019-11-09 03:32:57.04561+00	2019-11-09 03:32:57.045616+00	2019-11-09 03:32:56.99502+00	t	4	324	5	2
-440	2019-11-09 03:32:57.045654+00	2019-11-09 03:32:57.04566+00	2019-11-09 03:32:56.996265+00	t	4	325	5	2
-441	2019-11-09 03:32:57.045696+00	2019-11-09 03:32:57.045701+00	2019-11-09 03:32:56.99764+00	t	4	326	5	2
-442	2019-11-09 03:32:57.045744+00	2019-11-09 03:32:57.04575+00	2019-11-09 03:32:56.998559+00	t	4	327	5	2
-443	2019-11-09 03:32:57.045787+00	2019-11-09 03:32:57.045792+00	2019-11-09 03:32:56.999585+00	t	4	328	5	2
-444	2019-11-09 03:32:57.045835+00	2019-11-09 03:32:57.045841+00	2019-11-09 03:32:57.000942+00	t	4	329	5	2
-445	2019-11-09 03:32:57.045878+00	2019-11-09 03:32:57.045883+00	2019-11-09 03:32:57.001876+00	t	4	330	5	2
-446	2019-11-09 03:32:57.04592+00	2019-11-09 03:32:57.045926+00	2019-11-09 03:32:57.002745+00	t	4	331	5	2
-447	2019-11-09 03:32:57.045962+00	2019-11-09 03:32:57.045967+00	2019-11-09 03:32:57.003618+00	t	4	332	5	2
-448	2019-11-09 03:32:57.046004+00	2019-11-09 03:32:57.046009+00	2019-11-09 03:32:57.005298+00	t	4	333	5	2
-449	2019-11-09 03:32:57.046046+00	2019-11-09 03:32:57.046051+00	2019-11-09 03:32:57.006329+00	t	4	335	5	2
-450	2019-11-09 03:32:57.046087+00	2019-11-09 03:32:57.046093+00	2019-11-09 03:32:57.007203+00	t	4	336	5	2
-451	2019-11-09 03:32:57.046129+00	2019-11-09 03:32:57.046135+00	2019-11-09 03:32:57.008369+00	t	4	337	5	2
-452	2019-11-09 03:32:57.046171+00	2019-11-09 03:32:57.046177+00	2019-11-09 03:32:57.009301+00	t	4	338	5	2
-453	2019-11-09 03:32:57.046213+00	2019-11-09 03:32:57.046218+00	2019-11-09 03:32:57.010178+00	t	4	339	5	2
-454	2019-11-09 03:32:57.046255+00	2019-11-09 03:32:57.04626+00	2019-11-09 03:32:57.011257+00	t	4	340	5	2
-455	2019-11-09 03:32:57.046296+00	2019-11-09 03:32:57.046302+00	2019-11-09 03:32:57.012332+00	t	4	341	5	2
-456	2019-11-09 03:32:57.046346+00	2019-11-09 03:32:57.046352+00	2019-11-09 03:32:57.01322+00	t	4	342	5	2
-457	2019-11-09 03:32:57.046389+00	2019-11-09 03:32:57.046395+00	2019-11-09 03:32:57.014173+00	t	4	343	5	2
-458	2019-11-09 03:32:57.046431+00	2019-11-09 03:32:57.046436+00	2019-11-09 03:32:57.015054+00	t	4	344	5	2
-459	2019-11-09 03:32:57.046473+00	2019-11-09 03:32:57.046478+00	2019-11-09 03:32:57.015952+00	t	4	345	5	2
-460	2019-11-09 03:32:57.046514+00	2019-11-09 03:32:57.04652+00	2019-11-09 03:32:57.016903+00	t	4	346	5	2
-461	2019-11-09 03:32:57.046565+00	2019-11-09 03:32:57.046571+00	2019-11-09 03:32:57.017937+00	t	4	347	5	2
-462	2019-11-09 03:32:57.046607+00	2019-11-09 03:32:57.046612+00	2019-11-09 03:32:57.019067+00	t	4	348	5	2
-463	2019-11-09 03:32:57.046649+00	2019-11-09 03:32:57.046654+00	2019-11-09 03:32:57.020444+00	t	4	349	5	2
-464	2019-11-09 03:32:57.046691+00	2019-11-09 03:32:57.046696+00	2019-11-09 03:32:57.021625+00	t	4	350	5	2
-465	2019-11-09 03:32:57.046733+00	2019-11-09 03:32:57.046738+00	2019-11-09 03:32:57.022578+00	t	4	351	5	2
-466	2019-11-09 03:32:57.046775+00	2019-11-09 03:32:57.04678+00	2019-11-09 03:32:57.023726+00	t	4	352	5	2
-467	2019-11-09 03:32:57.046833+00	2019-11-09 03:32:57.046839+00	2019-11-09 03:32:57.024681+00	t	4	353	5	2
-468	2019-11-09 03:32:57.046876+00	2019-11-09 03:32:57.046881+00	2019-11-09 03:32:57.025555+00	t	4	354	5	2
-469	2019-11-09 03:32:57.046918+00	2019-11-09 03:32:57.046923+00	2019-11-09 03:32:57.026364+00	t	4	355	5	2
-470	2019-11-09 03:32:57.04696+00	2019-11-09 03:32:57.046965+00	2019-11-09 03:32:57.027204+00	t	4	356	5	2
-471	2019-11-09 03:32:57.047002+00	2019-11-09 03:32:57.047007+00	2019-11-09 03:32:57.028155+00	t	4	357	5	2
-472	2019-11-09 03:32:57.047044+00	2019-11-09 03:32:57.047049+00	2019-11-09 03:32:57.028964+00	t	4	358	5	2
-473	2019-11-09 03:32:57.047086+00	2019-11-09 03:32:57.047091+00	2019-11-09 03:32:57.029808+00	t	4	359	5	2
-474	2019-11-09 03:32:57.047128+00	2019-11-09 03:32:57.047133+00	2019-11-09 03:32:57.030614+00	t	4	360	5	2
-475	2019-11-09 03:32:57.04717+00	2019-11-09 03:32:57.047175+00	2019-11-09 03:32:57.031551+00	t	4	361	5	2
-476	2019-11-09 03:32:57.047212+00	2019-11-09 03:32:57.047217+00	2019-11-09 03:32:57.032375+00	t	4	362	5	2
-477	2019-11-09 03:32:57.047253+00	2019-11-09 03:32:57.047259+00	2019-11-09 03:32:57.033243+00	t	4	363	5	2
-478	2019-11-09 03:32:57.047295+00	2019-11-09 03:32:57.0473+00	2019-11-09 03:32:57.034078+00	t	4	364	5	2
-479	2019-11-09 03:32:57.047347+00	2019-11-09 03:32:57.047352+00	2019-11-09 03:32:57.035024+00	t	4	334	5	2
-480	2019-11-09 03:32:57.047388+00	2019-11-09 03:32:57.047394+00	2019-11-09 03:32:57.035975+00	t	4	367	5	2
-481	2019-11-09 03:32:57.04743+00	2019-11-09 03:32:57.047435+00	2019-11-09 03:32:57.036799+00	t	4	368	5	2
-482	2019-11-09 03:32:57.047472+00	2019-11-09 03:32:57.047477+00	2019-11-09 03:32:57.037654+00	t	4	369	5	2
-483	2019-11-09 03:32:57.047514+00	2019-11-09 03:32:57.047519+00	2019-11-09 03:32:57.038489+00	t	4	370	5	2
-484	2019-11-09 03:32:57.047556+00	2019-11-09 03:32:57.047561+00	2019-11-09 03:32:57.039292+00	t	4	371	5	2
-485	2019-11-09 03:32:57.047598+00	2019-11-09 03:32:57.047604+00	2019-11-09 03:32:57.041147+00	t	4	372	5	2
-486	2019-11-09 03:32:57.04764+00	2019-11-09 03:32:57.047645+00	2019-11-09 03:32:57.042074+00	t	4	373	5	2
-487	2019-11-09 03:32:57.047681+00	2019-11-09 03:32:57.047687+00	2019-11-09 03:32:57.042957+00	t	4	374	5	2
-488	2019-11-09 03:32:57.047732+00	2019-11-09 03:32:57.047737+00	2019-11-09 03:32:57.044083+00	t	4	365	5	2
-489	2019-11-09 03:32:57.047774+00	2019-11-09 03:32:57.047779+00	2019-11-09 03:32:57.045008+00	t	4	366	5	2
+1	2020-01-24 04:43:05.552535+00	2020-01-24 04:43:05.552554+00	2019-10-14 16:00:00+00	t	\N	1	1	1
+2	2020-01-24 04:43:05.577405+00	2020-01-24 04:43:05.577423+00	2019-10-21 16:00:00+00	t	\N	1	1	2
+3	2020-01-24 04:43:05.650146+00	2020-01-24 04:43:05.650165+00	2019-10-14 16:00:00+00	t	\N	2	1	1
+4	2020-01-24 04:43:05.663433+00	2020-01-24 04:43:05.663453+00	2019-10-21 16:00:00+00	t	\N	2	1	2
+5	2020-01-24 04:43:05.738001+00	2020-01-24 04:43:05.73802+00	2019-10-14 16:00:00+00	t	\N	3	1	1
+6	2020-01-24 04:43:05.749218+00	2020-01-24 04:43:05.749235+00	2019-10-21 16:00:00+00	t	\N	3	1	2
+7	2020-01-24 04:43:05.813343+00	2020-01-24 04:43:05.813358+00	2019-10-14 16:00:00+00	t	\N	4	1	1
+8	2020-01-24 04:43:05.822932+00	2020-01-24 04:43:05.822945+00	2019-10-21 16:00:00+00	t	\N	4	1	2
+9	2020-01-24 04:43:05.887997+00	2020-01-24 04:43:05.888016+00	2019-10-14 16:00:00+00	t	\N	5	1	1
+10	2020-01-24 04:43:05.898081+00	2020-01-24 04:43:05.898096+00	2019-10-21 16:00:00+00	t	\N	5	1	2
+11	2020-01-24 04:43:05.956683+00	2020-01-24 04:43:05.956698+00	2019-10-14 16:00:00+00	t	\N	6	1	1
+12	2020-01-24 04:43:05.968087+00	2020-01-24 04:43:05.968168+00	2019-10-21 16:00:00+00	t	\N	6	1	2
+13	2020-01-24 04:43:06.068747+00	2020-01-24 04:43:06.068767+00	2019-10-15 16:00:00+00	t	\N	7	1	1
+14	2020-01-24 04:43:06.079997+00	2020-01-24 04:43:06.080011+00	2019-10-22 16:00:00+00	t	\N	7	1	2
+15	2020-01-24 04:43:06.14067+00	2020-01-24 04:43:06.140685+00	2019-10-15 16:00:00+00	t	\N	8	1	1
+16	2020-01-24 04:43:06.149999+00	2020-01-24 04:43:06.150014+00	2019-10-22 16:00:00+00	t	\N	8	1	2
+17	2020-01-24 04:43:06.228349+00	2020-01-24 04:43:06.228365+00	2019-10-15 16:00:00+00	t	\N	9	1	1
+18	2020-01-24 04:43:06.23846+00	2020-01-24 04:43:06.238476+00	2019-10-22 16:00:00+00	t	\N	9	1	2
+19	2020-01-24 04:43:06.300034+00	2020-01-24 04:43:06.300047+00	2019-10-15 16:00:00+00	t	\N	10	1	1
+20	2020-01-24 04:43:06.305236+00	2020-01-24 04:43:06.305248+00	2019-10-22 16:00:00+00	t	\N	10	1	2
+21	2020-01-24 04:43:06.371833+00	2020-01-24 04:43:06.371851+00	2019-10-15 16:00:00+00	t	\N	11	1	1
+22	2020-01-24 04:43:06.385387+00	2020-01-24 04:43:06.385403+00	2019-10-22 16:00:00+00	t	\N	11	1	2
+23	2020-01-24 04:43:06.446359+00	2020-01-24 04:43:06.446375+00	2019-10-15 16:00:00+00	t	\N	12	1	1
+24	2020-01-24 04:43:06.456379+00	2020-01-24 04:43:06.456394+00	2019-10-22 16:00:00+00	t	\N	12	1	2
+25	2020-01-24 04:43:06.522831+00	2020-01-24 04:43:06.522846+00	2019-10-15 16:00:00+00	t	\N	13	1	1
+26	2020-01-24 04:43:06.534332+00	2020-01-24 04:43:06.534352+00	2019-10-22 16:00:00+00	t	\N	13	1	2
+27	2020-01-24 04:43:06.616638+00	2020-01-24 04:43:06.616655+00	2019-10-16 16:00:00+00	t	\N	14	1	1
+28	2020-01-24 04:43:06.624594+00	2020-01-24 04:43:06.624608+00	2019-10-23 16:00:00+00	t	\N	14	1	2
+29	2020-01-24 04:43:06.693653+00	2020-01-24 04:43:06.693676+00	2019-10-16 16:00:00+00	t	\N	15	1	1
+30	2020-01-24 04:43:06.70233+00	2020-01-24 04:43:06.702344+00	2019-10-23 16:00:00+00	t	\N	15	1	2
+31	2020-01-24 04:43:06.769476+00	2020-01-24 04:43:06.769495+00	2019-10-16 16:00:00+00	t	\N	16	1	1
+32	2020-01-24 04:43:06.789762+00	2020-01-24 04:43:06.790052+00	2019-10-23 16:00:00+00	t	\N	16	1	2
+33	2020-01-24 04:43:06.851317+00	2020-01-24 04:43:06.85133+00	2019-10-16 16:00:00+00	t	\N	17	1	1
+34	2020-01-24 04:43:06.857121+00	2020-01-24 04:43:06.857134+00	2019-10-23 16:00:00+00	t	\N	17	1	2
+35	2020-01-24 04:43:06.92149+00	2020-01-24 04:43:06.921508+00	2019-10-16 16:00:00+00	t	\N	18	1	1
+36	2020-01-24 04:43:06.931376+00	2020-01-24 04:43:06.931391+00	2019-10-23 16:00:00+00	t	\N	18	1	2
+37	2020-01-24 04:43:06.997409+00	2020-01-24 04:43:06.997426+00	2019-10-16 16:00:00+00	t	\N	19	1	1
+38	2020-01-24 04:43:07.008153+00	2020-01-24 04:43:07.008173+00	2019-10-23 16:00:00+00	t	\N	19	1	2
+39	2020-01-24 04:43:07.05293+00	2020-01-24 04:43:07.052945+00	2019-10-17 16:00:00+00	t	\N	20	1	1
+40	2020-01-24 04:43:07.064236+00	2020-01-24 04:43:07.064253+00	2019-10-24 16:00:00+00	t	\N	20	1	2
+41	2020-01-24 04:43:07.160441+00	2020-01-24 04:43:07.160458+00	2019-10-17 16:00:00+00	t	\N	21	1	1
+42	2020-01-24 04:43:07.171291+00	2020-01-24 04:43:07.171337+00	2019-10-24 16:00:00+00	t	\N	21	1	2
+43	2020-01-24 04:43:07.261622+00	2020-01-24 04:43:07.26178+00	2019-10-17 16:00:00+00	t	\N	22	1	1
+44	2020-01-24 04:43:07.268595+00	2020-01-24 04:43:07.26861+00	2019-10-24 16:00:00+00	t	\N	22	1	2
+45	2020-01-24 04:43:07.319019+00	2020-01-24 04:43:07.319033+00	2019-10-17 16:00:00+00	t	\N	23	1	1
+46	2020-01-24 04:43:07.330451+00	2020-01-24 04:43:07.330521+00	2019-10-24 16:00:00+00	t	\N	23	1	2
+47	2020-01-24 04:43:07.410997+00	2020-01-24 04:43:07.411016+00	2019-10-18 16:00:00+00	t	\N	24	1	1
+48	2020-01-24 04:43:07.422388+00	2020-01-24 04:43:07.422405+00	2019-10-25 16:00:00+00	t	\N	24	1	2
+49	2020-01-24 04:43:07.486947+00	2020-01-24 04:43:07.487+00	2019-10-20 16:00:00+00	t	\N	25	2	1
+50	2020-01-24 04:43:07.504173+00	2020-01-24 04:43:07.504194+00	2019-10-27 16:00:00+00	t	\N	25	2	2
+51	2020-01-24 04:43:07.573355+00	2020-01-24 04:43:07.573372+00	2019-10-20 16:00:00+00	t	\N	26	2	1
+52	2020-01-24 04:43:07.591169+00	2020-01-24 04:43:07.59119+00	2019-10-27 16:00:00+00	t	\N	26	2	2
+53	2020-01-24 04:43:07.666554+00	2020-01-24 04:43:07.666569+00	2019-10-20 16:00:00+00	t	\N	27	2	1
+54	2020-01-24 04:43:07.672149+00	2020-01-24 04:43:07.672165+00	2019-10-27 16:00:00+00	t	\N	27	2	2
+55	2020-01-24 04:43:07.726635+00	2020-01-24 04:43:07.726648+00	2019-10-20 16:00:00+00	t	\N	28	2	1
+56	2020-01-24 04:43:07.732682+00	2020-01-24 04:43:07.732694+00	2019-10-27 16:00:00+00	t	\N	28	2	2
+57	2020-01-24 04:43:07.794249+00	2020-01-24 04:43:07.794266+00	2019-10-20 16:00:00+00	t	\N	29	2	1
+58	2020-01-24 04:43:07.80733+00	2020-01-24 04:43:07.807347+00	2019-10-27 16:00:00+00	t	\N	29	2	2
+59	2020-01-24 04:43:07.858478+00	2020-01-24 04:43:07.858494+00	2019-10-20 16:00:00+00	t	\N	30	2	1
+60	2020-01-24 04:43:07.864722+00	2020-01-24 04:43:07.864735+00	2019-10-27 16:00:00+00	t	\N	30	2	2
+61	2020-01-24 04:43:07.945499+00	2020-01-24 04:43:07.945519+00	2019-10-20 16:00:00+00	t	\N	31	2	1
+62	2020-01-24 04:43:07.959389+00	2020-01-24 04:43:07.959414+00	2019-10-27 16:00:00+00	t	\N	31	2	2
+63	2020-01-24 04:43:08.066513+00	2020-01-24 04:43:08.066535+00	2019-10-20 16:00:00+00	t	\N	32	2	1
+64	2020-01-24 04:43:08.080292+00	2020-01-24 04:43:08.080316+00	2019-10-27 16:00:00+00	t	\N	32	2	2
+65	2020-01-24 04:43:08.158822+00	2020-01-24 04:43:08.158835+00	2019-10-20 16:00:00+00	t	\N	33	2	1
+66	2020-01-24 04:43:08.164231+00	2020-01-24 04:43:08.164244+00	2019-10-27 16:00:00+00	t	\N	33	2	2
+67	2020-01-24 04:43:08.220227+00	2020-01-24 04:43:08.220243+00	2019-10-20 16:00:00+00	t	\N	34	2	1
+68	2020-01-24 04:43:08.241135+00	2020-01-24 04:43:08.241156+00	2019-10-27 16:00:00+00	t	\N	34	2	2
+69	2020-01-24 04:43:08.306221+00	2020-01-24 04:43:08.30624+00	2019-10-20 16:00:00+00	t	\N	35	2	1
+70	2020-01-24 04:43:08.317357+00	2020-01-24 04:43:08.317374+00	2019-10-27 16:00:00+00	t	\N	35	2	2
+71	2020-01-24 04:43:08.356134+00	2020-01-24 04:43:08.356147+00	2019-10-20 16:00:00+00	t	\N	36	2	1
+72	2020-01-24 04:43:08.365163+00	2020-01-24 04:43:08.365179+00	2019-10-27 16:00:00+00	t	\N	36	2	2
+73	2020-01-24 04:43:08.460665+00	2020-01-24 04:43:08.460688+00	2019-10-20 16:00:00+00	t	\N	37	2	1
+74	2020-01-24 04:43:08.471753+00	2020-01-24 04:43:08.471769+00	2019-10-27 16:00:00+00	t	\N	37	2	2
+75	2020-01-24 04:43:08.527249+00	2020-01-24 04:43:08.527264+00	2019-10-20 16:00:00+00	t	\N	38	2	1
+76	2020-01-24 04:43:08.533007+00	2020-01-24 04:43:08.533019+00	2019-10-27 16:00:00+00	t	\N	38	2	2
+77	2020-01-24 04:43:08.584399+00	2020-01-24 04:43:08.584414+00	2019-10-20 16:00:00+00	t	\N	39	2	1
+78	2020-01-24 04:43:08.594389+00	2020-01-24 04:43:08.594404+00	2019-10-27 16:00:00+00	t	\N	39	2	2
+79	2020-01-24 04:43:08.652532+00	2020-01-24 04:43:08.652546+00	2019-10-20 16:00:00+00	t	\N	40	2	1
+80	2020-01-24 04:43:08.657621+00	2020-01-24 04:43:08.657633+00	2019-10-27 16:00:00+00	t	\N	40	2	2
+81	2020-01-24 04:43:08.705484+00	2020-01-24 04:43:08.705499+00	2019-10-20 16:00:00+00	t	\N	41	2	1
+82	2020-01-24 04:43:08.722876+00	2020-01-24 04:43:08.722893+00	2019-10-27 16:00:00+00	t	\N	41	2	2
+83	2020-01-24 04:43:08.783479+00	2020-01-24 04:43:08.783494+00	2019-10-20 16:00:00+00	t	\N	42	2	1
+84	2020-01-24 04:43:08.79496+00	2020-01-24 04:43:08.794975+00	2019-10-27 16:00:00+00	t	\N	42	2	2
+85	2020-01-24 04:43:08.909951+00	2020-01-24 04:43:08.909968+00	2019-10-20 16:00:00+00	t	\N	43	2	1
+86	2020-01-24 04:43:08.923555+00	2020-01-24 04:43:08.923569+00	2019-10-27 16:00:00+00	t	\N	43	2	2
+87	2020-01-24 04:43:08.985349+00	2020-01-24 04:43:08.985364+00	2019-10-20 16:00:00+00	t	\N	44	2	1
+88	2020-01-24 04:43:08.994861+00	2020-01-24 04:43:08.994876+00	2019-10-27 16:00:00+00	t	\N	44	2	2
+89	2020-01-24 04:43:09.043437+00	2020-01-24 04:43:09.04345+00	2019-10-20 16:00:00+00	t	\N	45	2	1
+90	2020-01-24 04:43:09.048484+00	2020-01-24 04:43:09.048497+00	2019-10-27 16:00:00+00	t	\N	45	2	2
+91	2020-01-24 04:43:09.101606+00	2020-01-24 04:43:09.101621+00	2019-10-20 16:00:00+00	t	\N	46	2	1
+92	2020-01-24 04:43:09.11365+00	2020-01-24 04:43:09.113665+00	2019-10-27 16:00:00+00	t	\N	46	2	2
+93	2020-01-24 04:43:09.173083+00	2020-01-24 04:43:09.173096+00	2019-10-20 16:00:00+00	t	\N	47	2	1
+94	2020-01-24 04:43:09.177901+00	2020-01-24 04:43:09.177914+00	2019-10-27 16:00:00+00	t	\N	47	2	2
+95	2020-01-24 04:43:09.223591+00	2020-01-24 04:43:09.223898+00	2019-10-20 16:00:00+00	t	\N	48	2	1
+96	2020-01-24 04:43:09.242365+00	2020-01-24 04:43:09.242378+00	2019-10-27 16:00:00+00	t	\N	48	2	2
+97	2020-01-24 04:43:09.300328+00	2020-01-24 04:43:09.300345+00	2019-10-20 16:00:00+00	t	\N	49	2	1
+98	2020-01-24 04:43:09.309378+00	2020-01-24 04:43:09.309488+00	2019-10-27 16:00:00+00	t	\N	49	2	2
+99	2020-01-24 04:43:09.368424+00	2020-01-24 04:43:09.36844+00	2019-10-20 16:00:00+00	t	\N	50	2	1
+100	2020-01-24 04:43:09.378015+00	2020-01-24 04:43:09.37803+00	2019-10-27 16:00:00+00	t	\N	50	2	2
+101	2020-01-24 04:43:09.441715+00	2020-01-24 04:43:09.441731+00	2019-10-20 16:00:00+00	t	\N	51	2	1
+102	2020-01-24 04:43:09.448845+00	2020-01-24 04:43:09.448858+00	2019-10-27 16:00:00+00	t	\N	51	2	2
+103	2020-01-24 04:43:09.51183+00	2020-01-24 04:43:09.511854+00	2019-10-20 16:00:00+00	t	\N	52	2	1
+104	2020-01-24 04:43:09.521745+00	2020-01-24 04:43:09.52176+00	2019-10-27 16:00:00+00	t	\N	52	2	2
+105	2020-01-24 04:43:09.580234+00	2020-01-24 04:43:09.58025+00	2019-10-20 16:00:00+00	t	\N	53	2	1
+106	2020-01-24 04:43:09.590234+00	2020-01-24 04:43:09.590249+00	2019-10-27 16:00:00+00	t	\N	53	2	2
+107	2020-01-24 04:43:09.653592+00	2020-01-24 04:43:09.653743+00	2019-10-20 16:00:00+00	t	\N	54	2	1
+108	2020-01-24 04:43:09.664604+00	2020-01-24 04:43:09.66462+00	2019-10-27 16:00:00+00	t	\N	54	2	2
+109	2020-01-24 04:43:09.72058+00	2020-01-24 04:43:09.720596+00	2019-10-20 16:00:00+00	t	\N	55	2	1
+110	2020-01-24 04:43:09.732862+00	2020-01-24 04:43:09.732881+00	2019-10-27 16:00:00+00	t	\N	55	2	2
+111	2020-01-24 04:43:09.785456+00	2020-01-24 04:43:09.785469+00	2019-10-20 16:00:00+00	t	\N	56	2	1
+112	2020-01-24 04:43:09.793059+00	2020-01-24 04:43:09.793074+00	2019-10-27 16:00:00+00	t	\N	56	2	2
+113	2020-01-24 04:43:09.847202+00	2020-01-24 04:43:09.847219+00	2019-10-20 16:00:00+00	t	\N	57	2	1
+114	2020-01-24 04:43:09.858035+00	2020-01-24 04:43:09.858052+00	2019-10-27 16:00:00+00	t	\N	57	2	2
+115	2020-01-24 04:43:09.924009+00	2020-01-24 04:43:09.924025+00	2019-10-20 16:00:00+00	t	\N	58	2	1
+116	2020-01-24 04:43:09.934749+00	2020-01-24 04:43:09.934766+00	2019-10-27 16:00:00+00	t	\N	58	2	2
+117	2020-01-24 04:43:09.98507+00	2020-01-24 04:43:09.985086+00	2019-10-20 16:00:00+00	t	\N	59	2	1
+118	2020-01-24 04:43:09.993503+00	2020-01-24 04:43:09.993519+00	2019-10-27 16:00:00+00	t	\N	59	2	2
+119	2020-01-24 04:43:10.051523+00	2020-01-24 04:43:10.05154+00	2019-10-20 16:00:00+00	t	\N	60	2	1
+120	2020-01-24 04:43:10.062087+00	2020-01-24 04:43:10.062102+00	2019-10-27 16:00:00+00	t	\N	60	2	2
+121	2020-01-24 04:43:10.118938+00	2020-01-24 04:43:10.118953+00	2019-10-20 16:00:00+00	t	\N	61	2	1
+122	2020-01-24 04:43:10.141542+00	2020-01-24 04:43:10.141564+00	2019-10-27 16:00:00+00	t	\N	61	2	2
+123	2020-01-24 04:43:10.206439+00	2020-01-24 04:43:10.206453+00	2019-10-22 16:00:00+00	t	\N	62	2	1
+124	2020-01-24 04:43:10.216488+00	2020-01-24 04:43:10.216501+00	2019-10-29 16:00:00+00	t	\N	62	2	2
+125	2020-01-24 04:43:10.277429+00	2020-01-24 04:43:10.277444+00	2019-10-22 16:00:00+00	t	\N	63	2	1
+126	2020-01-24 04:43:10.288625+00	2020-01-24 04:43:10.28864+00	2019-10-29 16:00:00+00	t	\N	63	2	2
+127	2020-01-24 04:43:10.35108+00	2020-01-24 04:43:10.351097+00	2019-10-22 16:00:00+00	t	\N	64	2	1
+128	2020-01-24 04:43:10.365366+00	2020-01-24 04:43:10.365382+00	2019-10-29 16:00:00+00	t	\N	64	2	2
+129	2020-01-24 04:43:10.430357+00	2020-01-24 04:43:10.430372+00	2019-10-22 16:00:00+00	t	\N	65	2	1
+130	2020-01-24 04:43:10.44232+00	2020-01-24 04:43:10.44234+00	2019-10-29 16:00:00+00	t	\N	65	2	2
+131	2020-01-24 04:43:10.506245+00	2020-01-24 04:43:10.506261+00	2019-10-22 16:00:00+00	t	\N	66	2	1
+132	2020-01-24 04:43:10.516469+00	2020-01-24 04:43:10.516483+00	2019-10-29 16:00:00+00	t	\N	66	2	2
+133	2020-01-24 04:43:10.573529+00	2020-01-24 04:43:10.573543+00	2019-10-22 16:00:00+00	t	\N	67	2	1
+134	2020-01-24 04:43:10.583545+00	2020-01-24 04:43:10.583562+00	2019-10-29 16:00:00+00	t	\N	67	2	2
+135	2020-01-24 04:43:10.651427+00	2020-01-24 04:43:10.651444+00	2019-10-22 16:00:00+00	t	\N	68	2	1
+136	2020-01-24 04:43:10.661557+00	2020-01-24 04:43:10.66157+00	2019-10-29 16:00:00+00	t	\N	68	2	2
+137	2020-01-24 04:43:10.720386+00	2020-01-24 04:43:10.7204+00	2019-10-22 16:00:00+00	t	\N	69	2	1
+138	2020-01-24 04:43:10.730601+00	2020-01-24 04:43:10.730614+00	2019-10-29 16:00:00+00	t	\N	69	2	2
+139	2020-01-24 04:43:10.789072+00	2020-01-24 04:43:10.789086+00	2019-10-23 16:00:00+00	t	\N	70	2	1
+140	2020-01-24 04:43:10.800921+00	2020-01-24 04:43:10.800944+00	2019-10-30 16:00:00+00	t	\N	70	2	2
+141	2020-01-24 04:43:10.861472+00	2020-01-24 04:43:10.861486+00	2019-10-23 16:00:00+00	t	\N	71	2	1
+142	2020-01-24 04:43:10.870917+00	2020-01-24 04:43:10.87093+00	2019-10-30 16:00:00+00	t	\N	71	2	2
+143	2020-01-24 04:43:10.933623+00	2020-01-24 04:43:10.933636+00	2019-10-23 16:00:00+00	t	\N	72	2	1
+144	2020-01-24 04:43:10.943609+00	2020-01-24 04:43:10.943625+00	2019-10-30 16:00:00+00	t	\N	72	2	2
+145	2020-01-24 04:43:10.99919+00	2020-01-24 04:43:10.999204+00	2019-10-23 16:00:00+00	t	\N	73	2	1
+146	2020-01-24 04:43:11.00913+00	2020-01-24 04:43:11.009144+00	2019-10-30 16:00:00+00	t	\N	73	2	2
+147	2020-01-24 04:43:11.066158+00	2020-01-24 04:43:11.066176+00	2019-10-23 16:00:00+00	t	\N	74	2	1
+148	2020-01-24 04:43:11.076403+00	2020-01-24 04:43:11.076419+00	2019-10-30 16:00:00+00	t	\N	74	2	2
+149	2020-01-24 04:43:11.137896+00	2020-01-24 04:43:11.137911+00	2019-10-23 16:00:00+00	t	\N	75	2	1
+150	2020-01-24 04:43:11.148409+00	2020-01-24 04:43:11.148423+00	2019-10-30 16:00:00+00	t	\N	75	2	2
+151	2020-01-24 04:43:11.20002+00	2020-01-24 04:43:11.200032+00	2019-10-24 16:00:00+00	t	\N	76	2	1
+152	2020-01-24 04:43:11.207816+00	2020-01-24 04:43:11.20783+00	2019-10-31 16:00:00+00	t	\N	76	2	2
+153	2020-01-24 04:43:11.265216+00	2020-01-24 04:43:11.265231+00	2019-10-24 16:00:00+00	t	\N	77	2	1
+154	2020-01-24 04:43:11.275013+00	2020-01-24 04:43:11.275029+00	2019-10-31 16:00:00+00	t	\N	77	2	2
+155	2020-01-24 04:43:11.325853+00	2020-01-24 04:43:11.325866+00	2019-10-24 16:00:00+00	t	\N	78	2	1
+156	2020-01-24 04:43:11.331346+00	2020-01-24 04:43:11.331487+00	2019-10-31 16:00:00+00	t	\N	78	2	2
+157	2020-01-24 04:43:11.373129+00	2020-01-24 04:43:11.373144+00	2019-10-24 16:00:00+00	t	\N	79	2	1
+158	2020-01-24 04:43:11.378693+00	2020-01-24 04:43:11.378715+00	2019-10-31 16:00:00+00	t	\N	79	2	2
+159	2020-01-24 04:43:11.440856+00	2020-01-24 04:43:11.440878+00	2019-10-24 16:00:00+00	t	\N	80	2	1
+160	2020-01-24 04:43:11.451488+00	2020-01-24 04:43:11.451504+00	2019-10-31 16:00:00+00	t	\N	80	2	2
+161	2020-01-24 04:43:11.522829+00	2020-01-24 04:43:11.522843+00	2019-10-24 16:00:00+00	t	\N	81	2	1
+162	2020-01-24 04:43:11.528625+00	2020-01-24 04:43:11.528637+00	2019-10-31 16:00:00+00	t	\N	81	2	2
+163	2020-01-24 04:43:11.586893+00	2020-01-24 04:43:11.586906+00	2019-10-25 16:00:00+00	t	\N	82	2	1
+164	2020-01-24 04:43:11.597921+00	2020-01-24 04:43:11.597942+00	2019-11-01 16:00:00+00	t	\N	82	2	2
+165	2020-01-24 04:43:11.658048+00	2020-01-24 04:43:11.658066+00	2019-10-25 16:00:00+00	t	\N	83	2	1
+166	2020-01-24 04:43:11.674418+00	2020-01-24 04:43:11.674439+00	2019-11-01 16:00:00+00	t	\N	83	2	2
+167	2020-01-24 04:43:11.727367+00	2020-01-24 04:43:11.727383+00	2019-10-25 16:00:00+00	t	\N	84	2	1
+168	2020-01-24 04:43:11.733107+00	2020-01-24 04:43:11.73312+00	2019-11-01 16:00:00+00	t	\N	84	2	2
+169	2020-01-24 04:43:11.801169+00	2020-01-24 04:43:11.801432+00	2019-10-25 16:00:00+00	t	\N	85	2	1
+170	2020-01-24 04:43:11.814143+00	2020-01-24 04:43:11.814157+00	2019-11-01 16:00:00+00	t	\N	85	2	2
+171	2020-01-24 04:43:11.881209+00	2020-01-24 04:43:11.881225+00	2019-10-25 16:00:00+00	t	\N	86	2	1
+172	2020-01-24 04:43:11.887554+00	2020-01-24 04:43:11.887567+00	2019-11-01 16:00:00+00	t	\N	86	2	2
+173	2020-01-24 04:43:11.938894+00	2020-01-24 04:43:11.938912+00	2019-10-25 16:00:00+00	t	\N	87	2	1
+174	2020-01-24 04:43:11.945732+00	2020-01-24 04:43:11.945752+00	2019-11-01 16:00:00+00	t	\N	87	2	2
+175	2020-01-24 04:43:11.993787+00	2020-01-24 04:43:11.993806+00	2019-10-26 16:00:00+00	t	\N	88	2	1
+176	2020-01-24 04:43:12.000071+00	2020-01-24 04:43:12.000087+00	2019-11-02 16:00:00+00	t	\N	88	2	2
+177	2020-01-24 04:43:12.076431+00	2020-01-24 04:43:12.076449+00	2019-10-26 16:00:00+00	t	\N	89	2	1
+178	2020-01-24 04:43:12.086085+00	2020-01-24 04:43:12.086099+00	2019-11-02 16:00:00+00	t	\N	89	2	2
+179	2020-01-24 04:43:12.144781+00	2020-01-24 04:43:12.144795+00	2019-10-27 16:00:00+00	t	\N	90	3	1
+180	2020-01-24 04:43:12.150571+00	2020-01-24 04:43:12.150583+00	2019-11-03 16:00:00+00	t	\N	90	3	2
+181	2020-01-24 04:43:12.219967+00	2020-01-24 04:43:12.219984+00	2019-10-27 16:00:00+00	t	\N	91	3	1
+182	2020-01-24 04:43:12.227953+00	2020-01-24 04:43:12.227973+00	2019-11-03 16:00:00+00	t	\N	91	3	2
+183	2020-01-24 04:43:12.298714+00	2020-01-24 04:43:12.298728+00	2019-10-27 16:00:00+00	t	\N	92	3	1
+184	2020-01-24 04:43:12.309741+00	2020-01-24 04:43:12.309763+00	2019-11-03 16:00:00+00	t	\N	92	3	2
+185	2020-01-24 04:43:12.375161+00	2020-01-24 04:43:12.375185+00	2019-10-27 16:00:00+00	t	\N	93	3	1
+186	2020-01-24 04:43:12.382512+00	2020-01-24 04:43:12.382525+00	2019-11-03 16:00:00+00	t	\N	93	3	2
+187	2020-01-24 04:43:12.433612+00	2020-01-24 04:43:12.433624+00	2019-10-27 16:00:00+00	t	\N	94	3	1
+188	2020-01-24 04:43:12.443744+00	2020-01-24 04:43:12.443758+00	2019-11-03 16:00:00+00	t	\N	94	3	2
+189	2020-01-24 04:43:12.521112+00	2020-01-24 04:43:12.521128+00	2019-10-27 16:00:00+00	t	\N	95	3	1
+190	2020-01-24 04:43:12.53215+00	2020-01-24 04:43:12.532166+00	2019-11-03 16:00:00+00	t	\N	95	3	2
+191	2020-01-24 04:43:12.59852+00	2020-01-24 04:43:12.598532+00	2019-10-27 16:00:00+00	t	\N	96	3	1
+192	2020-01-24 04:43:12.604051+00	2020-01-24 04:43:12.604064+00	2019-11-03 16:00:00+00	t	\N	96	3	2
+193	2020-01-24 04:43:12.66569+00	2020-01-24 04:43:12.665708+00	2019-10-27 16:00:00+00	t	\N	97	3	1
+194	2020-01-24 04:43:12.68225+00	2020-01-24 04:43:12.682266+00	2019-11-03 16:00:00+00	t	\N	97	3	2
+195	2020-01-24 04:43:12.736736+00	2020-01-24 04:43:12.736748+00	2019-10-27 16:00:00+00	t	\N	98	3	1
+196	2020-01-24 04:43:12.742598+00	2020-01-24 04:43:12.742618+00	2019-11-03 16:00:00+00	t	\N	98	3	2
+197	2020-01-24 04:43:12.796204+00	2020-01-24 04:43:12.796217+00	2019-10-27 16:00:00+00	t	\N	99	3	1
+198	2020-01-24 04:43:12.801964+00	2020-01-24 04:43:12.801977+00	2019-11-03 16:00:00+00	t	\N	99	3	2
+199	2020-01-24 04:43:12.854798+00	2020-01-24 04:43:12.854811+00	2019-10-27 16:00:00+00	t	\N	100	3	1
+200	2020-01-24 04:43:12.860441+00	2020-01-24 04:43:12.860453+00	2019-11-03 16:00:00+00	t	\N	100	3	2
+201	2020-01-24 04:43:12.915821+00	2020-01-24 04:43:12.915836+00	2019-10-27 16:00:00+00	t	\N	101	3	1
+202	2020-01-24 04:43:12.925333+00	2020-01-24 04:43:12.925346+00	2019-11-03 16:00:00+00	t	\N	101	3	2
+203	2020-01-24 04:43:12.989246+00	2020-01-24 04:43:12.989259+00	2019-10-27 16:00:00+00	t	\N	102	3	1
+204	2020-01-24 04:43:12.995463+00	2020-01-24 04:43:12.995475+00	2019-11-03 16:00:00+00	t	\N	102	3	2
+205	2020-01-24 04:43:13.035536+00	2020-01-24 04:43:13.035549+00	2019-10-27 16:00:00+00	t	\N	103	3	1
+206	2020-01-24 04:43:13.040908+00	2020-01-24 04:43:13.04092+00	2019-11-03 16:00:00+00	t	\N	103	3	2
+207	2020-01-24 04:43:13.096297+00	2020-01-24 04:43:13.096311+00	2019-10-27 16:00:00+00	t	\N	104	3	1
+208	2020-01-24 04:43:13.105427+00	2020-01-24 04:43:13.10544+00	2019-11-03 16:00:00+00	t	\N	104	3	2
+209	2020-01-24 04:43:13.157899+00	2020-01-24 04:43:13.157912+00	2019-10-27 16:00:00+00	t	\N	105	3	1
+210	2020-01-24 04:43:13.16339+00	2020-01-24 04:43:13.163402+00	2019-11-03 16:00:00+00	t	\N	105	3	2
+211	2020-01-24 04:43:13.211627+00	2020-01-24 04:43:13.211639+00	2019-10-27 16:00:00+00	t	\N	106	3	1
+212	2020-01-24 04:43:13.21704+00	2020-01-24 04:43:13.217053+00	2019-11-03 16:00:00+00	t	\N	106	3	2
+213	2020-01-24 04:43:13.260293+00	2020-01-24 04:43:13.260306+00	2019-10-27 16:00:00+00	t	\N	107	3	1
+214	2020-01-24 04:43:13.265743+00	2020-01-24 04:43:13.265754+00	2019-11-03 16:00:00+00	t	\N	107	3	2
+215	2020-01-24 04:43:13.334523+00	2020-01-24 04:43:13.334536+00	2019-10-27 16:00:00+00	t	\N	108	3	1
+216	2020-01-24 04:43:13.344244+00	2020-01-24 04:43:13.344257+00	2019-11-03 16:00:00+00	t	\N	108	3	2
+217	2020-01-24 04:43:13.405053+00	2020-01-24 04:43:13.405068+00	2019-10-27 16:00:00+00	t	\N	109	3	1
+218	2020-01-24 04:43:13.412216+00	2020-01-24 04:43:13.412228+00	2019-11-03 16:00:00+00	t	\N	109	3	2
+219	2020-01-24 04:43:13.476609+00	2020-01-24 04:43:13.476675+00	2019-10-27 16:00:00+00	t	\N	110	3	1
+220	2020-01-24 04:43:13.483607+00	2020-01-24 04:43:13.483621+00	2019-11-03 16:00:00+00	t	\N	110	3	2
+221	2020-01-24 04:43:13.550197+00	2020-01-24 04:43:13.550216+00	2019-10-27 16:00:00+00	t	\N	111	3	1
+222	2020-01-24 04:43:13.56149+00	2020-01-24 04:43:13.561509+00	2019-11-03 16:00:00+00	t	\N	111	3	2
+223	2020-01-24 04:43:13.636912+00	2020-01-24 04:43:13.636927+00	2019-10-27 16:00:00+00	t	\N	112	3	1
+224	2020-01-24 04:43:13.644552+00	2020-01-24 04:43:13.644565+00	2019-11-03 16:00:00+00	t	\N	112	3	2
+225	2020-01-24 04:43:13.69515+00	2020-01-24 04:43:13.695163+00	2019-10-27 16:00:00+00	t	\N	113	3	1
+226	2020-01-24 04:43:13.701748+00	2020-01-24 04:43:13.70176+00	2019-11-03 16:00:00+00	t	\N	113	3	2
+227	2020-01-24 04:43:13.756828+00	2020-01-24 04:43:13.756843+00	2019-10-27 16:00:00+00	t	\N	114	3	1
+228	2020-01-24 04:43:13.766133+00	2020-01-24 04:43:13.766146+00	2019-11-03 16:00:00+00	t	\N	114	3	2
+229	2020-01-24 04:43:13.821149+00	2020-01-24 04:43:13.821162+00	2019-10-27 16:00:00+00	t	\N	115	3	1
+230	2020-01-24 04:43:13.828494+00	2020-01-24 04:43:13.828507+00	2019-11-03 16:00:00+00	t	\N	115	3	2
+231	2020-01-24 04:43:13.87783+00	2020-01-24 04:43:13.877845+00	2019-10-27 16:00:00+00	t	\N	116	3	1
+232	2020-01-24 04:43:13.887999+00	2020-01-24 04:43:13.888012+00	2019-11-03 16:00:00+00	t	\N	116	3	2
+233	2020-01-24 04:43:13.944601+00	2020-01-24 04:43:13.944615+00	2019-10-27 16:00:00+00	t	\N	117	3	1
+234	2020-01-24 04:43:13.951717+00	2020-01-24 04:43:13.95173+00	2019-11-03 16:00:00+00	t	\N	117	3	2
+235	2020-01-24 04:43:14.002366+00	2020-01-24 04:43:14.002379+00	2019-10-27 16:00:00+00	t	\N	118	3	1
+236	2020-01-24 04:43:14.009225+00	2020-01-24 04:43:14.009238+00	2019-11-03 16:00:00+00	t	\N	118	3	2
+237	2020-01-24 04:43:14.068565+00	2020-01-24 04:43:14.068585+00	2019-10-27 16:00:00+00	t	\N	119	3	1
+238	2020-01-24 04:43:14.083318+00	2020-01-24 04:43:14.083336+00	2019-11-03 16:00:00+00	t	\N	119	3	2
+239	2020-01-24 04:43:14.138241+00	2020-01-24 04:43:14.138254+00	2019-10-27 16:00:00+00	t	\N	120	3	1
+240	2020-01-24 04:43:14.155388+00	2020-01-24 04:43:14.155407+00	2019-11-03 16:00:00+00	t	\N	120	3	2
+241	2020-01-24 04:43:14.215377+00	2020-01-24 04:43:14.215393+00	2019-10-27 16:00:00+00	t	\N	121	3	1
+242	2020-01-24 04:43:14.223436+00	2020-01-24 04:43:14.223452+00	2019-11-03 16:00:00+00	t	\N	121	3	2
+243	2020-01-24 04:43:14.296722+00	2020-01-24 04:43:14.296741+00	2019-10-27 16:00:00+00	t	\N	122	3	1
+244	2020-01-24 04:43:14.311551+00	2020-01-24 04:43:14.31157+00	2019-11-03 16:00:00+00	t	\N	122	3	2
+245	2020-01-24 04:43:14.371921+00	2020-01-24 04:43:14.37194+00	2019-10-27 16:00:00+00	t	\N	123	3	1
+246	2020-01-24 04:43:14.382729+00	2020-01-24 04:43:14.382746+00	2019-11-03 16:00:00+00	t	\N	123	3	2
+247	2020-01-24 04:43:14.437538+00	2020-01-24 04:43:14.437551+00	2019-10-27 16:00:00+00	t	\N	124	3	1
+248	2020-01-24 04:43:14.443739+00	2020-01-24 04:43:14.443752+00	2019-11-03 16:00:00+00	t	\N	124	3	2
+249	2020-01-24 04:43:14.501675+00	2020-01-24 04:43:14.501689+00	2019-10-27 16:00:00+00	t	\N	125	3	1
+250	2020-01-24 04:43:14.513014+00	2020-01-24 04:43:14.51303+00	2019-11-03 16:00:00+00	t	\N	125	3	2
+251	2020-01-24 04:43:14.56701+00	2020-01-24 04:43:14.567026+00	2019-10-27 16:00:00+00	t	\N	126	3	1
+252	2020-01-24 04:43:14.575873+00	2020-01-24 04:43:14.575887+00	2019-11-03 16:00:00+00	t	\N	126	3	2
+253	2020-01-24 04:43:14.629456+00	2020-01-24 04:43:14.629472+00	2019-10-27 16:00:00+00	t	\N	127	3	1
+254	2020-01-24 04:43:14.639412+00	2020-01-24 04:43:14.639426+00	2019-11-03 16:00:00+00	t	\N	127	3	2
+255	2020-01-24 04:43:14.703303+00	2020-01-24 04:43:14.703318+00	2019-10-27 16:00:00+00	t	\N	128	3	1
+256	2020-01-24 04:43:14.708863+00	2020-01-24 04:43:14.708878+00	2019-11-03 16:00:00+00	t	\N	128	3	2
+257	2020-01-24 04:43:14.754178+00	2020-01-24 04:43:14.75419+00	2019-10-27 16:00:00+00	t	\N	129	3	1
+258	2020-01-24 04:43:14.760945+00	2020-01-24 04:43:14.760958+00	2019-11-03 16:00:00+00	t	\N	129	3	2
+259	2020-01-24 04:43:14.822192+00	2020-01-24 04:43:14.822207+00	2019-10-27 16:00:00+00	t	\N	130	3	1
+260	2020-01-24 04:43:14.830617+00	2020-01-24 04:43:14.830629+00	2019-11-03 16:00:00+00	t	\N	130	3	2
+261	2020-01-24 04:43:14.872341+00	2020-01-24 04:43:14.872355+00	2019-10-27 16:00:00+00	t	\N	131	3	1
+262	2020-01-24 04:43:14.877572+00	2020-01-24 04:43:14.877585+00	2019-11-03 16:00:00+00	t	\N	131	3	2
+263	2020-01-24 04:43:14.929473+00	2020-01-24 04:43:14.929487+00	2019-10-28 16:00:00+00	t	\N	132	3	1
+264	2020-01-24 04:43:14.939927+00	2020-01-24 04:43:14.939942+00	2019-11-04 16:00:00+00	t	\N	132	3	2
+265	2020-01-24 04:43:15.015059+00	2020-01-24 04:43:15.015203+00	2019-10-28 16:00:00+00	t	\N	133	3	1
+266	2020-01-24 04:43:15.023883+00	2020-01-24 04:43:15.023898+00	2019-11-04 16:00:00+00	t	\N	133	3	2
+267	2020-01-24 04:43:15.080704+00	2020-01-24 04:43:15.080721+00	2019-10-28 16:00:00+00	t	\N	134	3	1
+268	2020-01-24 04:43:15.086865+00	2020-01-24 04:43:15.086878+00	2019-11-04 16:00:00+00	t	\N	134	3	2
+269	2020-01-24 04:43:15.134003+00	2020-01-24 04:43:15.134016+00	2019-10-28 16:00:00+00	t	\N	135	3	1
+270	2020-01-24 04:43:15.140355+00	2020-01-24 04:43:15.14037+00	2019-11-04 16:00:00+00	t	\N	135	3	2
+271	2020-01-24 04:43:15.197844+00	2020-01-24 04:43:15.197859+00	2019-10-28 16:00:00+00	t	\N	136	3	1
+272	2020-01-24 04:43:15.207791+00	2020-01-24 04:43:15.207806+00	2019-11-04 16:00:00+00	t	\N	136	3	2
+273	2020-01-24 04:43:15.260584+00	2020-01-24 04:43:15.260597+00	2019-10-29 16:00:00+00	t	\N	137	3	1
+274	2020-01-24 04:43:15.269823+00	2020-01-24 04:43:15.269842+00	2019-11-05 16:00:00+00	t	\N	137	3	2
+275	2020-01-24 04:43:15.314274+00	2020-01-24 04:43:15.314287+00	2019-10-29 16:00:00+00	t	\N	138	3	1
+276	2020-01-24 04:43:15.320261+00	2020-01-24 04:43:15.320275+00	2019-11-05 16:00:00+00	t	\N	138	3	2
+277	2020-01-24 04:43:15.38053+00	2020-01-24 04:43:15.380548+00	2019-10-29 16:00:00+00	t	\N	139	3	1
+278	2020-01-24 04:43:15.390756+00	2020-01-24 04:43:15.390775+00	2019-11-05 16:00:00+00	t	\N	139	3	2
+279	2020-01-24 04:43:15.446989+00	2020-01-24 04:43:15.447002+00	2019-10-29 16:00:00+00	t	\N	140	3	1
+280	2020-01-24 04:43:15.452707+00	2020-01-24 04:43:15.452721+00	2019-11-05 16:00:00+00	t	\N	140	3	2
+281	2020-01-24 04:43:15.500568+00	2020-01-24 04:43:15.500583+00	2019-10-29 16:00:00+00	t	\N	141	3	1
+282	2020-01-24 04:43:15.505972+00	2020-01-24 04:43:15.505985+00	2019-11-05 16:00:00+00	t	\N	141	3	2
+283	2020-01-24 04:43:15.561161+00	2020-01-24 04:43:15.561177+00	2019-10-29 16:00:00+00	t	\N	142	3	1
+284	2020-01-24 04:43:15.569049+00	2020-01-24 04:43:15.569064+00	2019-11-05 16:00:00+00	t	\N	142	3	2
+285	2020-01-24 04:43:15.609293+00	2020-01-24 04:43:15.609305+00	2019-10-29 16:00:00+00	t	\N	143	3	1
+286	2020-01-24 04:43:15.61528+00	2020-01-24 04:43:15.615293+00	2019-11-05 16:00:00+00	t	\N	143	3	2
+287	2020-01-24 04:43:15.666294+00	2020-01-24 04:43:15.666311+00	2019-10-29 16:00:00+00	t	\N	144	3	1
+288	2020-01-24 04:43:15.678704+00	2020-01-24 04:43:15.67872+00	2019-11-05 16:00:00+00	t	\N	144	3	2
+289	2020-01-24 04:43:15.736046+00	2020-01-24 04:43:15.736058+00	2019-10-30 16:00:00+00	t	\N	145	3	1
+290	2020-01-24 04:43:15.741877+00	2020-01-24 04:43:15.741892+00	2019-11-06 16:00:00+00	t	\N	145	3	2
+291	2020-01-24 04:43:15.791459+00	2020-01-24 04:43:15.791475+00	2019-10-30 16:00:00+00	t	\N	146	3	1
+292	2020-01-24 04:43:15.802319+00	2020-01-24 04:43:15.802332+00	2019-11-06 16:00:00+00	t	\N	146	3	2
+293	2020-01-24 04:43:15.860507+00	2020-01-24 04:43:15.86052+00	2019-10-30 16:00:00+00	t	\N	147	3	1
+294	2020-01-24 04:43:15.865712+00	2020-01-24 04:43:15.865723+00	2019-11-06 16:00:00+00	t	\N	147	3	2
+295	2020-01-24 04:43:15.904137+00	2020-01-24 04:43:15.904154+00	2019-10-30 16:00:00+00	t	\N	148	3	1
+296	2020-01-24 04:43:15.909364+00	2020-01-24 04:43:15.909378+00	2019-11-06 16:00:00+00	t	\N	148	3	2
+297	2020-01-24 04:43:15.966156+00	2020-01-24 04:43:15.96617+00	2019-10-31 16:00:00+00	t	\N	149	3	1
+298	2020-01-24 04:43:15.974963+00	2020-01-24 04:43:15.974976+00	2019-11-07 16:00:00+00	t	\N	149	3	2
+299	2020-01-24 04:43:16.038234+00	2020-01-24 04:43:16.038249+00	2019-10-31 16:00:00+00	t	\N	150	3	1
+300	2020-01-24 04:43:16.049565+00	2020-01-24 04:43:16.04958+00	2019-11-07 16:00:00+00	t	\N	150	3	2
+301	2020-01-24 04:43:16.118354+00	2020-01-24 04:43:16.118369+00	2019-10-31 16:00:00+00	t	\N	151	3	1
+302	2020-01-24 04:43:16.127097+00	2020-01-24 04:43:16.127109+00	2019-11-07 16:00:00+00	t	\N	151	3	2
+303	2020-01-24 04:43:16.185671+00	2020-01-24 04:43:16.185687+00	2019-10-31 16:00:00+00	t	\N	152	3	1
+304	2020-01-24 04:43:16.197679+00	2020-01-24 04:43:16.197695+00	2019-11-07 16:00:00+00	t	\N	152	3	2
+305	2020-01-24 04:43:16.26249+00	2020-01-24 04:43:16.262505+00	2019-10-31 16:00:00+00	t	\N	153	3	1
+306	2020-01-24 04:43:16.274262+00	2020-01-24 04:43:16.274278+00	2019-11-07 16:00:00+00	t	\N	153	3	2
+307	2020-01-24 04:43:16.337314+00	2020-01-24 04:43:16.337327+00	2019-11-01 16:00:00+00	t	\N	154	3	1
+308	2020-01-24 04:43:16.342436+00	2020-01-24 04:43:16.342448+00	2019-11-08 16:00:00+00	t	\N	154	3	2
+309	2020-01-24 04:43:16.399243+00	2020-01-24 04:43:16.399258+00	2019-11-01 16:00:00+00	t	\N	155	3	1
+310	2020-01-24 04:43:16.410749+00	2020-01-24 04:43:16.410765+00	2019-11-08 16:00:00+00	t	\N	155	3	2
+311	2020-01-24 04:43:16.478223+00	2020-01-24 04:43:16.478243+00	2019-11-01 16:00:00+00	t	\N	156	3	1
+312	2020-01-24 04:43:16.492045+00	2020-01-24 04:43:16.492063+00	2019-11-08 16:00:00+00	t	\N	156	3	2
+313	2020-01-24 04:43:16.549244+00	2020-01-24 04:43:16.549261+00	2019-11-01 16:00:00+00	t	\N	157	3	1
+314	2020-01-24 04:43:16.558733+00	2020-01-24 04:43:16.558749+00	2019-11-08 16:00:00+00	t	\N	157	3	2
+315	2020-01-24 04:43:16.624884+00	2020-01-24 04:43:16.624898+00	2019-11-01 16:00:00+00	t	\N	158	3	1
+316	2020-01-24 04:43:16.636578+00	2020-01-24 04:43:16.636591+00	2019-11-08 16:00:00+00	t	\N	158	3	2
+317	2020-01-24 04:43:16.697123+00	2020-01-24 04:43:16.697136+00	2019-11-01 16:00:00+00	t	\N	159	3	1
+318	2020-01-24 04:43:16.706134+00	2020-01-24 04:43:16.706153+00	2019-11-08 16:00:00+00	t	\N	159	3	2
+319	2020-01-24 04:43:16.777505+00	2020-01-24 04:43:16.777525+00	2019-11-01 16:00:00+00	t	\N	160	3	1
+320	2020-01-24 04:43:16.790297+00	2020-01-24 04:43:16.790316+00	2019-11-08 16:00:00+00	t	\N	160	3	2
+321	2020-01-24 04:43:16.854254+00	2020-01-24 04:43:16.854267+00	2019-11-01 16:00:00+00	t	\N	161	3	1
+322	2020-01-24 04:43:16.859264+00	2020-01-24 04:43:16.859276+00	2019-11-08 16:00:00+00	t	\N	161	3	2
+323	2020-01-24 04:43:16.899861+00	2020-01-24 04:43:16.899873+00	2019-11-01 16:00:00+00	t	\N	162	3	1
+324	2020-01-24 04:43:16.908805+00	2020-01-24 04:43:16.908822+00	2019-11-08 16:00:00+00	t	\N	162	3	2
+325	2020-01-24 04:43:16.982267+00	2020-01-24 04:43:16.982282+00	2019-11-01 16:00:00+00	t	\N	163	3	1
+326	2020-01-24 04:43:16.994055+00	2020-01-24 04:43:16.994073+00	2019-11-08 16:00:00+00	t	\N	163	3	2
+327	2020-01-24 04:43:17.047701+00	2020-01-24 04:43:17.047713+00	2019-11-01 16:00:00+00	t	\N	164	3	1
+328	2020-01-24 04:43:17.052675+00	2020-01-24 04:43:17.052687+00	2019-11-08 16:00:00+00	t	\N	164	3	2
+329	2020-01-24 04:43:17.098233+00	2020-01-24 04:43:17.098248+00	2019-11-01 16:00:00+00	t	\N	165	3	1
+330	2020-01-24 04:43:17.109326+00	2020-01-24 04:43:17.109343+00	2019-11-08 16:00:00+00	t	\N	165	3	2
+331	2020-01-24 04:43:17.180836+00	2020-01-24 04:43:17.180851+00	2019-11-03 16:00:00+00	t	\N	166	4	1
+332	2020-01-24 04:43:17.189892+00	2020-01-24 04:43:17.189922+00	2019-11-10 16:00:00+00	t	\N	166	4	2
+333	2020-01-24 04:43:17.228501+00	2020-01-24 04:43:17.228514+00	2019-11-03 16:00:00+00	t	\N	167	4	1
+334	2020-01-24 04:43:17.233927+00	2020-01-24 04:43:17.23394+00	2019-11-10 16:00:00+00	t	\N	167	4	2
+335	2020-01-24 04:43:17.288581+00	2020-01-24 04:43:17.288597+00	2019-11-03 16:00:00+00	t	\N	168	4	1
+336	2020-01-24 04:43:17.299902+00	2020-01-24 04:43:17.299915+00	2019-11-10 16:00:00+00	t	\N	168	4	2
+337	2020-01-24 04:43:17.364401+00	2020-01-24 04:43:17.364416+00	2019-11-03 16:00:00+00	t	\N	169	4	1
+338	2020-01-24 04:43:17.371484+00	2020-01-24 04:43:17.3715+00	2019-11-10 16:00:00+00	t	\N	169	4	2
+339	2020-01-24 04:43:17.410881+00	2020-01-24 04:43:17.410893+00	2019-11-03 16:00:00+00	t	\N	170	4	1
+340	2020-01-24 04:43:17.415682+00	2020-01-24 04:43:17.415693+00	2019-11-10 16:00:00+00	t	\N	170	4	2
+341	2020-01-24 04:43:17.477549+00	2020-01-24 04:43:17.477565+00	2019-11-03 16:00:00+00	t	\N	171	4	1
+342	2020-01-24 04:43:17.488731+00	2020-01-24 04:43:17.488767+00	2019-11-10 16:00:00+00	t	\N	171	4	2
+343	2020-01-24 04:43:17.549613+00	2020-01-24 04:43:17.549628+00	2019-11-03 16:00:00+00	t	\N	172	4	1
+344	2020-01-24 04:43:17.556474+00	2020-01-24 04:43:17.556489+00	2019-11-10 16:00:00+00	t	\N	172	4	2
+345	2020-01-24 04:43:17.607699+00	2020-01-24 04:43:17.607712+00	2019-11-03 16:00:00+00	t	\N	173	4	1
+346	2020-01-24 04:43:17.612553+00	2020-01-24 04:43:17.612565+00	2019-11-10 16:00:00+00	t	\N	173	4	2
+347	2020-01-24 04:43:17.68064+00	2020-01-24 04:43:17.680657+00	2019-11-03 16:00:00+00	t	\N	174	4	1
+348	2020-01-24 04:43:17.692296+00	2020-01-24 04:43:17.692313+00	2019-11-10 16:00:00+00	t	\N	174	4	2
+349	2020-01-24 04:43:17.755857+00	2020-01-24 04:43:17.755873+00	2019-11-03 16:00:00+00	t	\N	175	4	1
+350	2020-01-24 04:43:17.761004+00	2020-01-24 04:43:17.761018+00	2019-11-10 16:00:00+00	t	\N	175	4	2
+351	2020-01-24 04:43:17.805347+00	2020-01-24 04:43:17.805362+00	2019-11-03 16:00:00+00	t	\N	176	4	1
+352	2020-01-24 04:43:17.814678+00	2020-01-24 04:43:17.814692+00	2019-11-10 16:00:00+00	t	\N	176	4	2
+353	2020-01-24 04:43:17.876908+00	2020-01-24 04:43:17.876923+00	2019-11-03 16:00:00+00	t	\N	177	4	1
+354	2020-01-24 04:43:17.888302+00	2020-01-24 04:43:17.888318+00	2019-11-10 16:00:00+00	t	\N	177	4	2
+355	2020-01-24 04:43:17.949069+00	2020-01-24 04:43:17.949084+00	2019-11-03 16:00:00+00	t	\N	178	4	1
+356	2020-01-24 04:43:17.957149+00	2020-01-24 04:43:17.957163+00	2019-11-10 16:00:00+00	t	\N	178	4	2
+357	2020-01-24 04:43:18.016405+00	2020-01-24 04:43:18.016419+00	2019-11-03 16:00:00+00	t	\N	179	4	1
+358	2020-01-24 04:43:18.026238+00	2020-01-24 04:43:18.026253+00	2019-11-10 16:00:00+00	t	\N	179	4	2
+359	2020-01-24 04:43:18.084643+00	2020-01-24 04:43:18.084656+00	2019-11-03 16:00:00+00	t	\N	180	4	1
+360	2020-01-24 04:43:18.096153+00	2020-01-24 04:43:18.096171+00	2019-11-10 16:00:00+00	t	\N	180	4	2
+361	2020-01-24 04:43:18.154816+00	2020-01-24 04:43:18.154829+00	2019-11-03 16:00:00+00	t	\N	181	4	1
+362	2020-01-24 04:43:18.165017+00	2020-01-24 04:43:18.16503+00	2019-11-10 16:00:00+00	t	\N	181	4	2
+363	2020-01-24 04:43:18.210456+00	2020-01-24 04:43:18.210468+00	2019-11-03 16:00:00+00	t	\N	182	4	1
+364	2020-01-24 04:43:18.221123+00	2020-01-24 04:43:18.221137+00	2019-11-10 16:00:00+00	t	\N	182	4	2
+365	2020-01-24 04:43:18.285149+00	2020-01-24 04:43:18.285164+00	2019-11-03 16:00:00+00	t	\N	183	4	1
+366	2020-01-24 04:43:18.296724+00	2020-01-24 04:43:18.296739+00	2019-11-10 16:00:00+00	t	\N	183	4	2
+367	2020-01-24 04:43:18.353992+00	2020-01-24 04:43:18.354005+00	2019-11-03 16:00:00+00	t	\N	184	4	1
+368	2020-01-24 04:43:18.363881+00	2020-01-24 04:43:18.363894+00	2019-11-10 16:00:00+00	t	\N	184	4	2
+369	2020-01-24 04:43:18.414046+00	2020-01-24 04:43:18.414059+00	2019-11-03 16:00:00+00	t	\N	185	4	1
+370	2020-01-24 04:43:18.424878+00	2020-01-24 04:43:18.424894+00	2019-11-10 16:00:00+00	t	\N	185	4	2
+371	2020-01-24 04:43:18.486167+00	2020-01-24 04:43:18.486183+00	2019-11-03 16:00:00+00	t	\N	186	4	1
+372	2020-01-24 04:43:18.497112+00	2020-01-24 04:43:18.497126+00	2019-11-10 16:00:00+00	t	\N	186	4	2
+373	2020-01-24 04:43:18.553394+00	2020-01-24 04:43:18.553409+00	2019-11-03 16:00:00+00	t	\N	187	4	1
+374	2020-01-24 04:43:18.562463+00	2020-01-24 04:43:18.562476+00	2019-11-10 16:00:00+00	t	\N	187	4	2
+375	2020-01-24 04:43:18.62533+00	2020-01-24 04:43:18.625345+00	2019-11-03 16:00:00+00	t	\N	188	4	1
+376	2020-01-24 04:43:18.63331+00	2020-01-24 04:43:18.633322+00	2019-11-10 16:00:00+00	t	\N	188	4	2
+377	2020-01-24 04:43:18.692614+00	2020-01-24 04:43:18.692635+00	2019-11-03 16:00:00+00	t	\N	189	4	1
+378	2020-01-24 04:43:18.702181+00	2020-01-24 04:43:18.702195+00	2019-11-10 16:00:00+00	t	\N	189	4	2
+379	2020-01-24 04:43:18.756534+00	2020-01-24 04:43:18.756547+00	2019-11-03 16:00:00+00	t	\N	190	4	1
+380	2020-01-24 04:43:18.767646+00	2020-01-24 04:43:18.767661+00	2019-11-10 16:00:00+00	t	\N	190	4	2
+381	2020-01-24 04:43:18.844842+00	2020-01-24 04:43:18.844865+00	2019-11-03 16:00:00+00	t	\N	191	4	1
+382	2020-01-24 04:43:18.854257+00	2020-01-24 04:43:18.854271+00	2019-11-10 16:00:00+00	t	\N	191	4	2
+383	2020-01-24 04:43:18.909677+00	2020-01-24 04:43:18.909691+00	2019-11-03 16:00:00+00	t	\N	192	4	1
+384	2020-01-24 04:43:18.920985+00	2020-01-24 04:43:18.921002+00	2019-11-10 16:00:00+00	t	\N	192	4	2
+385	2020-01-24 04:43:18.985023+00	2020-01-24 04:43:18.985037+00	2019-11-03 16:00:00+00	t	\N	193	4	1
+386	2020-01-24 04:43:18.998409+00	2020-01-24 04:43:18.998423+00	2019-11-10 16:00:00+00	t	\N	193	4	2
+387	2020-01-24 04:43:19.041557+00	2020-01-24 04:43:19.04157+00	2019-11-03 16:00:00+00	t	\N	194	4	1
+388	2020-01-24 04:43:19.046674+00	2020-01-24 04:43:19.046685+00	2019-11-10 16:00:00+00	t	\N	194	4	2
+389	2020-01-24 04:43:19.099455+00	2020-01-24 04:43:19.099469+00	2019-11-03 16:00:00+00	t	\N	195	4	1
+390	2020-01-24 04:43:19.108056+00	2020-01-24 04:43:19.108072+00	2019-11-10 16:00:00+00	t	\N	195	4	2
+391	2020-01-24 04:43:19.1757+00	2020-01-24 04:43:19.175723+00	2019-11-03 16:00:00+00	t	\N	196	4	1
+392	2020-01-24 04:43:19.18806+00	2020-01-24 04:43:19.188077+00	2019-11-10 16:00:00+00	t	\N	196	4	2
+393	2020-01-24 04:43:19.253688+00	2020-01-24 04:43:19.253702+00	2019-11-03 16:00:00+00	t	\N	197	4	1
+394	2020-01-24 04:43:19.265845+00	2020-01-24 04:43:19.265865+00	2019-11-10 16:00:00+00	t	\N	197	4	2
+395	2020-01-24 04:43:19.318085+00	2020-01-24 04:43:19.31811+00	2019-11-03 16:00:00+00	t	\N	198	4	1
+396	2020-01-24 04:43:19.329664+00	2020-01-24 04:43:19.32968+00	2019-11-10 16:00:00+00	t	\N	198	4	2
+397	2020-01-24 04:43:19.405126+00	2020-01-24 04:43:19.405145+00	2019-11-03 16:00:00+00	t	\N	199	4	1
+398	2020-01-24 04:43:19.417041+00	2020-01-24 04:43:19.417058+00	2019-11-10 16:00:00+00	t	\N	199	4	2
+399	2020-01-24 04:43:19.480395+00	2020-01-24 04:43:19.480412+00	2019-11-03 16:00:00+00	t	\N	200	4	1
+400	2020-01-24 04:43:19.490523+00	2020-01-24 04:43:19.490539+00	2019-11-10 16:00:00+00	t	\N	200	4	2
+401	2020-01-24 04:43:19.552428+00	2020-01-24 04:43:19.552445+00	2019-11-03 16:00:00+00	t	\N	201	4	1
+402	2020-01-24 04:43:19.564037+00	2020-01-24 04:43:19.564053+00	2019-11-10 16:00:00+00	t	\N	201	4	2
+403	2020-01-24 04:43:19.632826+00	2020-01-24 04:43:19.632844+00	2019-11-03 16:00:00+00	t	\N	202	4	1
+404	2020-01-24 04:43:19.643923+00	2020-01-24 04:43:19.64394+00	2019-11-10 16:00:00+00	t	\N	202	4	2
+405	2020-01-24 04:43:19.700377+00	2020-01-24 04:43:19.700391+00	2019-11-03 16:00:00+00	t	\N	203	4	1
+406	2020-01-24 04:43:19.70642+00	2020-01-24 04:43:19.706438+00	2019-11-10 16:00:00+00	t	\N	203	4	2
+407	2020-01-24 04:43:19.759019+00	2020-01-24 04:43:19.759035+00	2019-11-03 16:00:00+00	t	\N	204	4	1
+408	2020-01-24 04:43:19.775267+00	2020-01-24 04:43:19.775287+00	2019-11-10 16:00:00+00	t	\N	204	4	2
+409	2020-01-24 04:43:19.83157+00	2020-01-24 04:43:19.831583+00	2019-11-03 16:00:00+00	t	\N	205	4	1
+410	2020-01-24 04:43:19.836997+00	2020-01-24 04:43:19.83701+00	2019-11-10 16:00:00+00	t	\N	205	4	2
+411	2020-01-24 04:43:19.895862+00	2020-01-24 04:43:19.895879+00	2019-11-03 16:00:00+00	t	\N	206	4	1
+412	2020-01-24 04:43:19.905469+00	2020-01-24 04:43:19.905485+00	2019-11-10 16:00:00+00	t	\N	206	4	2
+413	2020-01-24 04:43:19.972084+00	2020-01-24 04:43:19.972104+00	2019-11-03 16:00:00+00	t	\N	207	4	1
+414	2020-01-24 04:43:19.986426+00	2020-01-24 04:43:19.986441+00	2019-11-10 16:00:00+00	t	\N	207	4	2
+415	2020-01-24 04:43:20.058136+00	2020-01-24 04:43:20.058151+00	2019-11-03 16:00:00+00	t	\N	208	4	1
+416	2020-01-24 04:43:20.063518+00	2020-01-24 04:43:20.063532+00	2019-11-10 16:00:00+00	t	\N	208	4	2
+417	2020-01-24 04:43:20.130674+00	2020-01-24 04:43:20.130691+00	2019-11-03 16:00:00+00	t	\N	209	4	1
+418	2020-01-24 04:43:20.140327+00	2020-01-24 04:43:20.140339+00	2019-11-10 16:00:00+00	t	\N	209	4	2
+419	2020-01-24 04:43:20.2336+00	2020-01-24 04:43:20.233618+00	2019-11-03 16:00:00+00	t	\N	210	4	1
+420	2020-01-24 04:43:20.244161+00	2020-01-24 04:43:20.24418+00	2019-11-10 16:00:00+00	t	\N	210	4	2
+421	2020-01-24 04:43:20.310132+00	2020-01-24 04:43:20.310147+00	2019-11-03 16:00:00+00	t	\N	211	4	1
+422	2020-01-24 04:43:20.317157+00	2020-01-24 04:43:20.317173+00	2019-11-10 16:00:00+00	t	\N	211	4	2
+423	2020-01-24 04:43:20.39417+00	2020-01-24 04:43:20.394194+00	2019-11-03 16:00:00+00	t	\N	212	4	1
+424	2020-01-24 04:43:20.406971+00	2020-01-24 04:43:20.406991+00	2019-11-10 16:00:00+00	t	\N	212	4	2
+425	2020-01-24 04:43:20.487326+00	2020-01-24 04:43:20.487342+00	2019-11-03 16:00:00+00	t	\N	213	4	1
+426	2020-01-24 04:43:20.499865+00	2020-01-24 04:43:20.499891+00	2019-11-10 16:00:00+00	t	\N	213	4	2
+427	2020-01-24 04:43:20.556553+00	2020-01-24 04:43:20.556571+00	2019-11-03 16:00:00+00	t	\N	214	4	1
+428	2020-01-24 04:43:20.563489+00	2020-01-24 04:43:20.563507+00	2019-11-10 16:00:00+00	t	\N	214	4	2
+429	2020-01-24 04:43:20.621664+00	2020-01-24 04:43:20.621682+00	2019-11-03 16:00:00+00	t	\N	215	4	1
+430	2020-01-24 04:43:20.632958+00	2020-01-24 04:43:20.632975+00	2019-11-10 16:00:00+00	t	\N	215	4	2
+431	2020-01-24 04:43:20.691302+00	2020-01-24 04:43:20.69132+00	2019-11-03 16:00:00+00	t	\N	216	4	1
+432	2020-01-24 04:43:20.703686+00	2020-01-24 04:43:20.703706+00	2019-11-10 16:00:00+00	t	\N	216	4	2
+433	2020-01-24 04:43:20.757373+00	2020-01-24 04:43:20.75739+00	2019-11-03 16:00:00+00	t	\N	217	4	1
+434	2020-01-24 04:43:20.762591+00	2020-01-24 04:43:20.762604+00	2019-11-10 16:00:00+00	t	\N	217	4	2
+435	2020-01-24 04:43:20.825777+00	2020-01-24 04:43:20.825795+00	2019-11-03 16:00:00+00	t	\N	218	4	1
+436	2020-01-24 04:43:20.836602+00	2020-01-24 04:43:20.836619+00	2019-11-10 16:00:00+00	t	\N	218	4	2
+437	2020-01-24 04:43:20.900992+00	2020-01-24 04:43:20.901008+00	2019-11-03 16:00:00+00	t	\N	219	4	1
+438	2020-01-24 04:43:20.911063+00	2020-01-24 04:43:20.911348+00	2019-11-10 16:00:00+00	t	\N	219	4	2
+439	2020-01-24 04:43:20.961153+00	2020-01-24 04:43:20.96117+00	2019-11-03 16:00:00+00	t	\N	220	4	1
+440	2020-01-24 04:43:20.972437+00	2020-01-24 04:43:20.972455+00	2019-11-10 16:00:00+00	t	\N	220	4	2
+441	2020-01-24 04:43:21.044182+00	2020-01-24 04:43:21.044201+00	2019-11-03 16:00:00+00	t	\N	221	4	1
+442	2020-01-24 04:43:21.05476+00	2020-01-24 04:43:21.054777+00	2019-11-10 16:00:00+00	t	\N	221	4	2
+443	2020-01-24 04:43:21.135366+00	2020-01-24 04:43:21.13538+00	2019-11-03 16:00:00+00	t	\N	222	4	1
+444	2020-01-24 04:43:21.145305+00	2020-01-24 04:43:21.14532+00	2019-11-10 16:00:00+00	t	\N	222	4	2
+445	2020-01-24 04:43:21.193248+00	2020-01-24 04:43:21.193263+00	2019-11-03 16:00:00+00	t	\N	223	4	1
+446	2020-01-24 04:43:21.203604+00	2020-01-24 04:43:21.203622+00	2019-11-10 16:00:00+00	t	\N	223	4	2
+447	2020-01-24 04:43:21.260486+00	2020-01-24 04:43:21.2605+00	2019-11-03 16:00:00+00	t	\N	224	4	1
+448	2020-01-24 04:43:21.270487+00	2020-01-24 04:43:21.270501+00	2019-11-10 16:00:00+00	t	\N	224	4	2
+449	2020-01-24 04:43:21.328673+00	2020-01-24 04:43:21.328687+00	2019-11-04 16:00:00+00	t	\N	225	4	1
+450	2020-01-24 04:43:21.338496+00	2020-01-24 04:43:21.33851+00	2019-11-11 16:00:00+00	t	\N	225	4	2
+451	2020-01-24 04:43:21.402536+00	2020-01-24 04:43:21.402554+00	2019-11-04 16:00:00+00	t	\N	226	4	1
+452	2020-01-24 04:43:21.41375+00	2020-01-24 04:43:21.413765+00	2019-11-11 16:00:00+00	t	\N	226	4	2
+453	2020-01-24 04:43:21.469223+00	2020-01-24 04:43:21.469239+00	2019-11-04 16:00:00+00	t	\N	227	4	1
+454	2020-01-24 04:43:21.480996+00	2020-01-24 04:43:21.481014+00	2019-11-11 16:00:00+00	t	\N	227	4	2
+455	2020-01-24 04:43:21.553412+00	2020-01-24 04:43:21.553432+00	2019-11-04 16:00:00+00	t	\N	228	4	1
+456	2020-01-24 04:43:21.564519+00	2020-01-24 04:43:21.564536+00	2019-11-11 16:00:00+00	t	\N	228	4	2
+457	2020-01-24 04:43:21.631494+00	2020-01-24 04:43:21.631513+00	2019-11-04 16:00:00+00	t	\N	229	4	1
+458	2020-01-24 04:43:21.642876+00	2020-01-24 04:43:21.642896+00	2019-11-11 16:00:00+00	t	\N	229	4	2
+459	2020-01-24 04:43:21.69875+00	2020-01-24 04:43:21.698762+00	2019-11-04 16:00:00+00	t	\N	230	4	1
+460	2020-01-24 04:43:21.708876+00	2020-01-24 04:43:21.708891+00	2019-11-11 16:00:00+00	t	\N	230	4	2
+461	2020-01-24 04:43:21.760734+00	2020-01-24 04:43:21.760751+00	2019-11-04 16:00:00+00	t	\N	231	4	1
+462	2020-01-24 04:43:21.770623+00	2020-01-24 04:43:21.77064+00	2019-11-11 16:00:00+00	t	\N	231	4	2
+463	2020-01-24 04:43:21.82748+00	2020-01-24 04:43:21.827496+00	2019-11-04 16:00:00+00	t	\N	232	4	1
+464	2020-01-24 04:43:21.837411+00	2020-01-24 04:43:21.837426+00	2019-11-11 16:00:00+00	t	\N	232	4	2
+465	2020-01-24 04:43:21.897571+00	2020-01-24 04:43:21.897588+00	2019-11-04 16:00:00+00	t	\N	233	4	1
+466	2020-01-24 04:43:21.906966+00	2020-01-24 04:43:21.906983+00	2019-11-11 16:00:00+00	t	\N	233	4	2
+467	2020-01-24 04:43:21.963354+00	2020-01-24 04:43:21.963369+00	2019-11-05 16:00:00+00	t	\N	234	4	1
+468	2020-01-24 04:43:21.969482+00	2020-01-24 04:43:21.969498+00	2019-11-12 16:00:00+00	t	\N	234	4	2
+469	2020-01-24 04:43:22.027839+00	2020-01-24 04:43:22.027856+00	2019-11-05 16:00:00+00	t	\N	235	4	1
+470	2020-01-24 04:43:22.037622+00	2020-01-24 04:43:22.037636+00	2019-11-12 16:00:00+00	t	\N	235	4	2
+471	2020-01-24 04:43:22.103672+00	2020-01-24 04:43:22.103691+00	2019-11-06 16:00:00+00	t	\N	236	4	1
+472	2020-01-24 04:43:22.113871+00	2020-01-24 04:43:22.113888+00	2019-11-13 16:00:00+00	t	\N	236	4	2
+473	2020-01-24 04:43:22.171947+00	2020-01-24 04:43:22.172007+00	2019-11-06 16:00:00+00	t	\N	237	4	1
+474	2020-01-24 04:43:22.180667+00	2020-01-24 04:43:22.180683+00	2019-11-13 16:00:00+00	t	\N	237	4	2
+475	2020-01-24 04:43:22.25578+00	2020-01-24 04:43:22.255799+00	2019-11-07 16:00:00+00	t	\N	238	4	1
+476	2020-01-24 04:43:22.266148+00	2020-01-24 04:43:22.266165+00	2019-11-14 16:00:00+00	t	\N	238	4	2
+477	2020-01-24 04:43:22.326467+00	2020-01-24 04:43:22.326487+00	2019-11-07 16:00:00+00	t	\N	239	4	1
+478	2020-01-24 04:43:22.34081+00	2020-01-24 04:43:22.340829+00	2019-11-14 16:00:00+00	t	\N	239	4	2
+479	2020-01-24 04:43:22.402371+00	2020-01-24 04:43:22.402385+00	2019-11-07 16:00:00+00	t	\N	240	4	1
+480	2020-01-24 04:43:22.407559+00	2020-01-24 04:43:22.407574+00	2019-11-14 16:00:00+00	t	\N	240	4	2
 \.
 
 
@@ -5157,8 +4202,8 @@ COPY sows_events_ultrasound (id, created_at, modified_at, date, result, initiato
 --
 
 COPY sows_events_ultrasoundtype (id, created_at, modified_at, title, days, final) FROM stdin;
-1	2019-10-17 13:28:57.962697+00	2019-10-17 13:28:57.962714+00	\N	30	f
-2	2019-10-17 13:28:57.962737+00	2019-10-17 13:28:57.962745+00	\N	60	t
+1	2020-01-24 04:41:26.315814+00	2020-01-24 04:41:26.315831+00	\N	30	f
+2	2020-01-24 04:41:26.31586+00	2020-01-24 04:41:26.315865+00	\N	60	t
 \.
 
 
@@ -5166,7 +4211,7 @@ COPY sows_events_ultrasoundtype (id, created_at, modified_at, title, days, final
 -- Data for Name: sows_events_weaningsow; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY sows_events_weaningsow (id, created_at, modified_at, date, initiator_id, sow_id, tour_id, transaction_id) FROM stdin;
+COPY sows_events_weaningsow (id, created_at, modified_at, date, quantity, initiator_id, piglets_id, sow_id, tour_id) FROM stdin;
 \.
 
 
@@ -5174,15 +4219,7 @@ COPY sows_events_weaningsow (id, created_at, modified_at, date, initiator_id, so
 -- Data for Name: sows_gilt; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY sows_gilt (id, created_at, modified_at, birth_id, casting_list_to_seven_five_id, location_id, merger_id, mother_sow_id, new_born_group_id, status_id, tour_id) FROM stdin;
-\.
-
-
---
--- Data for Name: sows_giltstatus; Type: TABLE DATA; Schema: public; Owner: postgres
---
-
-COPY sows_giltstatus (id, created_at, modified_at, title) FROM stdin;
+COPY sows_gilt (id, created_at, modified_at, birth_id, farrow_id, location_id, mother_sow_id, tour_id) FROM stdin;
 \.
 
 
@@ -5191,250 +4228,246 @@ COPY sows_giltstatus (id, created_at, modified_at, title) FROM stdin;
 --
 
 COPY sows_sow (id, created_at, modified_at, birth_id, farm_id, alive, location_id, status_id, tour_id) FROM stdin;
-325	2019-11-09 03:32:56.616798+00	2019-11-11 07:13:04.988225+00	\N	19084	t	62	4	5
-333	2019-11-09 03:32:56.646169+00	2019-11-11 07:13:56.507618+00	\N	5020	t	64	4	5
-9	2019-10-18 03:51:17.589518+00	2019-10-29 08:40:31.03284+00	\N	18724	t	157	9	2
-324	2019-11-09 03:32:56.612971+00	2019-11-11 07:14:26.993158+00	\N	19595	t	65	4	5
-320	2019-11-09 03:32:56.580882+00	2019-11-11 07:15:06.413736+00	\N	5122	t	66	4	5
-322	2019-11-09 03:32:56.604439+00	2019-11-11 07:16:21.651566+00	\N	19593	t	67	4	5
-326	2019-11-09 03:32:56.620658+00	2019-11-11 07:16:42.573047+00	\N	19341	t	68	4	5
-327	2019-11-09 03:32:56.624383+00	2019-11-11 07:16:58.942656+00	\N	18956	t	69	4	5
-332	2019-11-09 03:32:56.642113+00	2019-11-11 07:18:25.34317+00	\N	19603	t	76	4	5
-5	2019-10-18 03:51:17.572087+00	2019-10-29 08:16:17.351469+00	\N	18195	t	170	9	2
-258	2019-11-01 04:33:37.927625+00	2019-11-04 07:13:47.234595+00	\N	2568	t	278	4	4
-260	2019-11-01 04:33:37.936655+00	2019-11-04 07:16:43.710371+00	\N	19218	t	284	4	4
-257	2019-11-01 04:33:37.923331+00	2019-11-04 07:36:17.026966+00	\N	18951	t	298	4	4
-6	2019-10-18 03:51:17.576303+00	2019-10-29 08:40:44.715918+00	\N	5144	t	156	9	2
-7	2019-10-18 03:51:17.580569+00	2019-10-29 08:40:54.114262+00	\N	18456	t	155	9	2
-261	2019-11-01 04:33:37.941016+00	2019-11-04 07:54:59.612781+00	\N	19223	t	35	4	4
-259	2019-11-01 04:33:37.932239+00	2019-11-04 08:00:04.817987+00	\N	18702	t	58	4	4
-217	2019-10-25 05:33:20.494587+00	2019-11-04 08:55:35.51619+00	\N	19263	t	232	9	2
-256	2019-11-01 04:33:37.907456+00	2019-11-04 08:29:50.846745+00	B0675	19465	t	55	4	4
-220	2019-10-25 05:33:20.501039+00	2019-11-04 08:46:27.772277+00	\N	18128	t	214	9	2
-210	2019-10-25 05:33:20.47104+00	2019-11-04 08:47:14.230093+00	\N	18595	t	218	9	2
-329	2019-11-09 03:32:56.63179+00	2019-11-11 07:18:52.481256+00	\N	19599	t	78	4	5
-3	2019-10-18 03:51:17.5631+00	2019-10-29 08:18:35.088628+00	\N	19076	t	173	9	2
-12	2019-10-18 03:51:17.602621+00	2019-10-29 08:19:57.369853+00	\N	19241	t	175	9	2
-10	2019-10-18 03:51:17.594071+00	2019-10-29 08:22:33.051454+00	\N	2598	t	183	9	2
-1	2019-10-18 03:44:16.351245+00	2019-10-29 08:25:41.148975+00	\N	911	t	189	9	1
-4	2019-10-18 03:51:17.56745+00	2019-10-29 08:25:57.27839+00	\N	19080	t	190	9	2
-321	2019-11-09 03:32:56.600562+00	2019-11-11 07:26:01.413255+00	\N	19336	t	81	4	5
-8	2019-10-18 03:51:17.584847+00	2019-10-29 08:37:33.82292+00	\N	19105	t	165	9	2
-330	2019-11-09 03:32:56.634681+00	2019-11-11 07:29:31.616917+00	\N	913	t	89	4	5
-2	2019-10-18 03:51:17.559771+00	2019-10-29 08:40:09.905001+00	\N	19200	t	158	9	2
-212	2019-10-25 05:33:20.480319+00	2019-11-04 08:47:53.529188+00	\N	18346	t	221	9	2
-213	2019-10-25 05:33:20.484895+00	2019-11-04 08:48:30.606875+00	\N	18858	t	223	9	2
-216	2019-10-25 05:33:20.491164+00	2019-11-04 08:56:07.844842+00	\N	19003	t	234	9	2
-215	2019-10-25 05:33:20.489251+00	2019-11-04 08:59:06.435118+00	\N	19126	t	243	9	2
-323	2019-11-09 03:32:56.608567+00	2019-11-11 07:29:46.600765+00	\N	19338	t	90	4	5
-208	2019-10-25 05:33:20.4596+00	2019-11-04 09:00:04.765273+00	\N	18590	t	246	9	2
-209	2019-10-25 05:33:20.465797+00	2019-11-04 09:00:24.573817+00	\N	19872	t	247	9	2
-214	2019-10-25 05:33:20.487288+00	2019-11-04 09:00:41.889305+00	\N	19244	t	248	9	2
-218	2019-10-25 05:33:20.497297+00	2019-11-04 09:00:57.43709+00	\N	19137	t	249	9	2
-211	2019-10-25 05:33:20.475858+00	2019-11-04 09:02:38.327967+00	\N	19494	t	254	9	2
-219	2019-10-25 05:33:20.499233+00	2019-11-04 09:04:34.388263+00	\N	19935	t	261	9	2
-196	2019-10-25 05:24:14.965904+00	2019-11-04 09:06:21.54457+00	\N	18524	t	205	9	2
-11	2019-10-18 03:51:17.598302+00	2019-11-04 09:06:49.885998+00	\N	18885	t	203	9	2
-195	2019-10-25 05:24:14.95488+00	2019-11-04 09:07:22.131444+00	\N	5002	t	209	9	2
-331	2019-11-09 03:32:56.638307+00	2019-11-11 07:30:19.276984+00	\N	19601	t	92	4	5
-328	2019-11-09 03:32:56.62807+00	2019-11-09 03:32:57.171937+00	\N	19215	t	3	4	5
-338	2019-11-09 03:32:56.665421+00	2019-11-11 07:17:22.893644+00	\N	19125	t	71	4	5
-38	2019-10-18 03:51:17.696868+00	2019-10-29 08:14:38.121898+00	\N	18643	t	169	9	2
-45	2019-10-18 03:51:17.728887+00	2019-10-29 08:18:07.17747+00	\N	19162	t	172	9	2
-51	2019-10-18 03:51:17.750547+00	2019-10-29 08:19:42.455983+00	\N	2657	t	174	9	2
-39	2019-10-18 03:51:17.701534+00	2019-10-29 08:20:35.756834+00	\N	19284	t	177	9	2
-50	2019-10-18 03:51:17.748284+00	2019-10-29 08:25:01.35188+00	\N	19168	t	187	9	2
-343	2019-11-09 03:32:56.685735+00	2019-11-11 07:19:24.427005+00	\N	19265	t	60	4	5
-272	2019-11-01 04:33:37.992233+00	2019-11-11 07:25:30.846193+00	\N	19514	f	80	8	\N
-341	2019-11-09 03:32:56.678085+00	2019-11-11 07:27:03.420396+00	\N	18749	t	82	4	5
-267	2019-11-01 04:33:37.971368+00	2019-11-04 07:14:46.38723+00	\N	2345	t	280	4	4
-56	2019-10-18 03:51:17.760345+00	2019-10-29 08:41:36.768389+00	\N	19561	t	152	9	2
-271	2019-11-01 04:33:37.987906+00	2019-11-04 07:15:30.329013+00	\N	2359	t	290	4	4
-269	2019-11-01 04:33:37.980296+00	2019-11-04 07:35:50.775487+00	\N	18482	t	296	4	4
-264	2019-11-01 04:33:37.956984+00	2019-11-04 07:45:15.508513+00	\N	2588	t	302	4	4
-268	2019-11-01 04:33:37.976093+00	2019-11-04 07:51:07.994187+00	\N	2606	t	268	4	4
-263	2019-11-01 04:33:37.951987+00	2019-11-04 07:54:51.519661+00	\N	19226	t	34	4	4
-266	2019-11-01 04:33:37.966125+00	2019-11-04 07:55:27.261651+00	\N	2600	t	38	4	4
-274	2019-11-01 04:33:37.999234+00	2019-11-04 07:55:58.879286+00	\N	2628	t	41	4	4
-270	2019-11-01 04:33:37.98458+00	2019-11-04 07:56:06.665491+00	\N	18740	t	42	4	4
-345	2019-11-09 03:32:56.693779+00	2019-11-11 07:28:42.025425+00	\N	17989	t	87	4	5
-262	2019-11-01 04:33:37.946024+00	2019-11-04 07:57:10.045698+00	\N	18967	t	46	4	4
-265	2019-11-01 04:33:37.961525+00	2019-11-04 07:57:31.956181+00	\N	18718	t	48	4	4
-41	2019-10-18 03:51:17.710526+00	2019-11-04 09:02:42.132888+00	\N	19923	t	192	9	2
-342	2019-11-09 03:32:56.681851+00	2019-11-11 07:30:03.866922+00	\N	960	t	91	4	5
-273	2019-11-01 04:33:37.996246+00	2019-11-04 09:03:11.876465+00	\N	2370	t	257	9	4
-37	2019-10-18 03:51:17.692574+00	2019-10-29 08:26:10.986096+00	\N	19921	t	191	9	2
-40	2019-10-18 03:51:17.706007+00	2019-10-29 08:27:03.407207+00	\N	19924	t	193	9	2
-43	2019-10-18 03:51:17.719437+00	2019-10-29 08:27:28.179889+00	\N	19919	t	194	9	2
-48	2019-10-18 03:51:17.742255+00	2019-10-29 08:28:21.07394+00	\N	19927	t	195	9	2
-44	2019-10-18 03:51:17.724431+00	2019-10-29 08:37:53.997749+00	\N	2393	t	164	9	2
-52	2019-10-18 03:51:17.752802+00	2019-10-29 08:39:00.993341+00	\N	18912	t	161	9	2
-53	2019-10-18 03:51:17.75474+00	2019-10-29 08:39:44.186117+00	\N	19296	t	159	9	2
-47	2019-10-18 03:51:17.737704+00	2019-11-04 09:05:19.765596+00	\N	19926	t	198	9	2
-42	2019-10-18 03:51:17.714853+00	2019-11-04 09:06:30.773693+00	\N	19925	t	202	9	2
-49	2019-10-18 03:51:17.745357+00	2019-11-04 09:07:04.498377+00	\N	19023	t	204	9	2
-54	2019-10-18 03:51:17.75655+00	2019-11-04 09:12:26.942839+00	\N	19555	t	150	9	2
-337	2019-11-09 03:32:56.66149+00	2019-11-11 07:30:33.876235+00	\N	19124	t	93	4	5
-55	2019-10-18 03:51:17.758474+00	2019-11-04 09:13:42.854434+00	\N	19558	t	146	9	2
-46	2019-10-18 03:51:17.733243+00	2019-11-04 09:14:13.963695+00	\N	18267	t	139	9	2
-335	2019-11-09 03:32:56.653831+00	2019-11-09 03:32:57.238479+00	\N	19502	t	3	4	5
-336	2019-11-09 03:32:56.657597+00	2019-11-09 03:32:57.247304+00	\N	18735	t	3	4	5
-339	2019-11-09 03:32:56.669848+00	2019-11-09 03:32:57.27653+00	\N	19510	t	3	4	5
-340	2019-11-09 03:32:56.674088+00	2019-11-09 03:32:57.285769+00	\N	18107	t	3	4	5
-344	2019-11-09 03:32:56.689886+00	2019-11-09 03:32:57.336055+00	\N	19269	t	3	4	5
-17	2019-10-18 03:51:17.624012+00	2019-10-29 08:41:07.40074+00	\N	19249	t	154	9	2
-19	2019-10-18 03:51:17.632562+00	2019-10-29 08:41:22.645634+00	\N	2745	t	153	9	2
-363	2019-11-09 03:32:56.76057+00	2019-11-11 07:12:31.259768+00	\N	19181	t	61	4	5
-348	2019-11-09 03:32:56.705338+00	2019-11-11 07:13:36.5579+00	\N	19277	t	63	4	5
-360	2019-11-09 03:32:56.751204+00	2019-11-11 07:17:10.355774+00	\N	19046	t	70	4	5
-206	2019-10-25 05:33:20.443958+00	2019-10-25 06:04:57.484484+00	\N	19229	t	255	4	2
-207	2019-10-25 05:33:20.451213+00	2019-11-04 08:54:42.702856+00	\N	19486	t	219	9	2
-349	2019-11-09 03:32:56.70907+00	2019-11-11 07:17:36.621374+00	\N	18510	t	72	4	5
-286	2019-11-01 04:33:38.055067+00	2019-11-04 07:20:24.321177+00	\N	19568	t	286	4	4
-289	2019-11-01 04:33:38.068883+00	2019-11-04 07:44:53.634631+00	\N	19580	t	300	4	4
-290	2019-11-01 04:33:38.073688+00	2019-11-04 07:49:26.987256+00	\N	19582	t	275	4	4
-203	2019-10-25 05:33:20.426266+00	2019-11-04 08:54:56.568237+00	\N	19480	t	230	9	2
-356	2019-11-09 03:32:56.735637+00	2019-11-11 07:18:14.6934+00	\N	19163	t	75	4	5
-202	2019-10-25 05:33:20.421814+00	2019-11-04 08:58:09.713596+00	\N	2583	t	240	9	2
-353	2019-11-09 03:32:56.724255+00	2019-11-11 07:25:03.513579+00	\N	19672	t	79	4	5
-357	2019-11-09 03:32:56.739512+00	2019-11-11 07:28:01.144882+00	\N	4565	t	85	4	5
-350	2019-11-09 03:32:56.712819+00	2019-11-11 07:29:17.472218+00	\N	19285	t	88	4	5
-205	2019-10-25 05:33:20.437389+00	2019-11-04 08:58:24.540441+00	\N	2586	t	241	9	2
-285	2019-11-01 04:33:38.049729+00	2019-11-04 07:49:55.079369+00	\N	2411	t	273	4	4
-287	2019-11-01 04:33:38.059719+00	2019-11-04 07:50:40.232064+00	\N	19318	t	270	4	4
-288	2019-11-01 04:33:38.06429+00	2019-11-04 07:55:08.819911+00	\N	19578	t	36	4	4
-282	2019-11-01 04:33:38.035265+00	2019-11-04 07:56:40.739273+00	\N	19037	t	43	4	4
-291	2019-11-01 04:33:38.078396+00	2019-11-04 07:56:49.555016+00	\N	19586	t	44	4	4
-292	2019-11-01 04:33:38.084917+00	2019-11-04 07:57:19.149334+00	\N	19588	t	47	4	4
-283	2019-11-01 04:33:38.039555+00	2019-11-04 07:59:55.929995+00	\N	19294	t	57	4	4
-284	2019-11-01 04:33:38.044549+00	2019-11-04 08:34:28.9271+00	\N	19556	t	39	4	4
-198	2019-10-25 05:33:20.404266+00	2019-11-04 08:46:49.755601+00	\N	18443	t	216	9	2
-204	2019-10-25 05:33:20.430931+00	2019-11-04 08:53:03.148437+00	\N	18144	t	225	9	2
-197	2019-10-25 05:33:20.401536+00	2019-11-04 08:53:16.461524+00	\N	2697	t	226	9	2
-199	2019-10-25 05:33:20.409254+00	2019-11-04 08:58:36.799799+00	\N	5004	t	242	9	2
-200	2019-10-25 05:33:20.41336+00	2019-11-04 09:02:14.833896+00	\N	19214	t	252	9	2
-201	2019-10-25 05:33:20.417404+00	2019-11-04 09:03:59.609553+00	\N	19602	t	259	9	2
-18	2019-10-18 03:51:17.628439+00	2019-11-04 09:04:48.939173+00	\N	19636	t	197	9	2
-64	2019-10-18 03:51:17.784222+00	2019-11-04 09:05:39.176074+00	\N	19920	t	200	9	2
-35	2019-10-18 03:51:17.684258+00	2019-11-04 09:05:54.585451+00	\N	19918	t	201	9	2
-59	2019-10-18 03:51:17.766163+00	2019-11-04 09:09:56.215853+00	\N	755	t	168	9	2
-28	2019-10-18 03:51:17.659215+00	2019-10-29 08:17:14.206265+00	\N	18505	t	171	9	2
-23	2019-10-18 03:51:17.64852+00	2019-10-29 08:20:16.493664+00	\N	2497	t	176	9	2
-61	2019-10-18 03:51:17.770737+00	2019-10-29 08:21:15.403121+00	\N	18934	t	186	9	2
-16	2019-10-18 03:51:17.61975+00	2019-10-29 08:21:48.655156+00	\N	19248	t	185	9	2
-32	2019-10-18 03:51:17.670704+00	2019-10-29 08:22:20.599594+00	\N	18381	t	184	9	2
-33	2019-10-18 03:51:17.67552+00	2019-10-29 08:22:44.969206+00	\N	18509	t	182	9	2
-30	2019-10-18 03:51:17.663751+00	2019-10-29 08:23:06.620077+00	\N	19913	t	181	9	2
-22	2019-10-18 03:51:17.644564+00	2019-10-29 08:23:24.22339+00	\N	19006	t	180	9	2
-27	2019-10-18 03:51:17.657097+00	2019-10-29 08:24:01.271824+00	\N	19912	t	179	9	2
-62	2019-10-18 03:51:17.775354+00	2019-10-29 08:24:19.117174+00	\N	18425	t	178	9	2
-25	2019-10-18 03:51:17.652834+00	2019-11-04 09:11:47.76257+00	\N	19909	t	151	9	2
-34	2019-10-18 03:51:17.679941+00	2019-10-29 08:25:24.890165+00	\N	19915	t	188	9	2
-21	2019-10-18 03:51:17.640507+00	2019-10-29 08:29:13.758308+00	\N	19525	t	196	9	2
-36	2019-10-18 03:51:17.68845+00	2019-11-04 09:12:50.598569+00	\N	2385	t	149	9	2
-58	2019-10-18 03:51:17.764234+00	2019-10-29 08:30:27.571005+00	\N	19917	t	199	9	2
-60	2019-10-18 03:51:17.768343+00	2019-10-29 08:32:57.203092+00	\N	18035	t	167	9	2
-14	2019-10-18 03:51:17.611184+00	2019-10-29 08:34:12.304934+00	\N	18731	t	166	9	2
-15	2019-10-18 03:51:17.615421+00	2019-10-29 08:38:11.845997+00	\N	4524	t	163	9	2
-20	2019-10-18 03:51:17.636634+00	2019-10-29 08:38:40.413092+00	\N	2620	t	162	9	2
-24	2019-10-18 03:51:17.650647+00	2019-10-29 08:39:26.273889+00	\N	18501	t	160	9	2
-26	2019-10-18 03:51:17.655022+00	2019-11-04 09:12:57.473569+00	\N	19910	t	142	9	2
-29	2019-10-18 03:51:17.661388+00	2019-11-04 09:13:13.648394+00	\N	19914	t	143	9	2
-63	2019-10-18 03:51:17.779729+00	2019-11-04 09:13:16.067867+00	\N	18941	t	148	9	2
-13	2019-10-18 03:51:17.606866+00	2019-11-04 09:13:29.576322+00	\N	2474	t	147	9	2
-57	2019-10-18 03:51:17.762223+00	2019-11-04 09:13:31.924791+00	\N	19564	t	144	9	2
-31	2019-10-18 03:51:17.666014+00	2019-11-04 09:13:44.624524+00	\N	19916	t	145	9	2
-346	2019-11-09 03:32:56.697588+00	2019-11-09 03:32:57.35705+00	\N	2379	t	3	4	5
-347	2019-11-09 03:32:56.701471+00	2019-11-09 03:32:57.369707+00	\N	19403	t	3	4	5
-351	2019-11-09 03:32:56.716678+00	2019-11-09 03:32:57.416641+00	\N	18902	t	3	4	5
-352	2019-11-09 03:32:56.72056+00	2019-11-09 03:32:57.425761+00	\N	19031	t	3	4	5
-354	2019-11-09 03:32:56.728048+00	2019-11-09 03:32:57.443946+00	\N	19416	t	3	4	5
-355	2019-11-09 03:32:56.731853+00	2019-11-09 03:32:57.455531+00	\N	19963	t	3	4	5
-358	2019-11-09 03:32:56.743473+00	2019-11-09 03:32:57.489404+00	\N	19965	t	3	4	5
-359	2019-11-09 03:32:56.747182+00	2019-11-09 03:32:57.500464+00	\N	19045	t	3	4	5
-361	2019-11-09 03:32:56.754972+00	2019-11-09 03:32:57.525703+00	\N	19559	t	3	4	5
-362	2019-11-09 03:32:56.758712+00	2019-11-09 03:32:57.535791+00	\N	5096	t	3	4	5
-364	2019-11-09 03:32:56.764594+00	2019-11-09 03:32:57.554053+00	\N	19311	t	3	4	5
-372	2019-11-09 03:32:56.796373+00	2019-11-11 07:17:48.99973+00	\N	2683	t	73	4	5
-365	2019-11-09 03:32:56.768907+00	2019-11-11 07:18:03.398064+00	\N	19313	t	74	4	5
-368	2019-11-09 03:32:56.781046+00	2019-11-11 07:27:21.182776+00	\N	19959	t	83	4	5
-366	2019-11-09 03:32:56.773002+00	2019-11-11 07:27:46.924523+00	\N	19059	t	84	4	5
-236	2019-10-25 05:33:20.577759+00	2019-10-25 06:03:43.906578+00	\N	19941	t	251	4	2
-373	2019-11-09 03:32:56.800191+00	2019-11-11 07:28:21.460416+00	\N	19197	t	86	4	5
-229	2019-10-25 05:33:20.525713+00	2019-11-04 08:55:12.547922+00	\N	18270	t	231	9	2
-238	2019-10-25 05:33:20.586692+00	2019-10-25 06:06:21.035808+00	\N	19943	t	258	4	2
-224	2019-10-25 05:33:20.510124+00	2019-11-04 08:56:50.520353+00	\N	19929	t	236	9	2
-227	2019-10-25 05:33:20.517756+00	2019-11-04 08:57:51.057159+00	\N	2396	t	239	9	2
-232	2019-10-25 05:33:20.554553+00	2019-10-29 07:17:20.833258+00	\N	19553	t	229	4	2
-241	2019-10-25 05:33:20.602186+00	2019-10-29 07:43:04.485923+00	\N	19946	t	265	4	2
-281	2019-11-01 04:33:38.031323+00	2019-11-04 07:13:10.668142+00	\N	19549	t	277	4	4
-297	2019-11-01 04:33:38.111313+00	2019-11-04 07:13:33.566008+00	\N	19090	t	294	4	4
-305	2019-11-01 04:33:38.14291+00	2019-11-04 07:13:59.373986+00	\N	4573	t	293	4	4
-298	2019-11-01 04:33:38.116186+00	2019-11-04 07:14:18.17949+00	\N	19106	t	279	4	4
-316	2019-11-01 04:33:38.184266+00	2019-11-04 07:14:31.439925+00	\N	19443	t	292	4	4
-222	2019-10-25 05:33:20.505951+00	2019-11-04 08:59:24.63099+00	\N	18769	t	244	9	2
-301	2019-11-01 04:33:38.127244+00	2019-11-04 07:15:19.81618+00	\N	707	t	281	4	4
-299	2019-11-01 04:33:38.119183+00	2019-11-04 07:15:42.51314+00	\N	18340	t	282	4	4
-276	2019-11-01 04:33:38.01412+00	2019-11-04 07:15:56.18853+00	\N	19024	t	289	4	4
-279	2019-11-01 04:33:38.024031+00	2019-11-04 07:16:08.609364+00	\N	18261	t	283	4	4
-309	2019-11-01 04:33:38.154885+00	2019-11-04 07:16:19.61671+00	\N	5094	t	288	4	4
-308	2019-11-01 04:33:38.1516+00	2019-11-04 07:18:34.91966+00	\N	18915	t	291	4	4
-278	2019-11-01 04:33:38.021148+00	2019-11-04 07:19:35.474501+00	\N	19541	t	287	4	4
-300	2019-11-01 04:33:38.122255+00	2019-11-04 07:19:50.915107+00	\N	19120	t	285	4	4
-304	2019-11-01 04:33:38.139728+00	2019-11-04 07:35:34.652511+00	\N	19161	t	295	4	4
-277	2019-11-01 04:33:38.017531+00	2019-11-04 07:36:04.373724+00	\N	19025	t	297	4	4
-312	2019-11-01 04:33:38.166674+00	2019-11-04 07:44:41.881961+00	\N	19951	t	299	4	4
-306	2019-11-01 04:33:38.145647+00	2019-11-04 07:45:02.522615+00	\N	18913	t	301	4	4
-313	2019-11-01 04:33:38.171117+00	2019-11-04 07:45:30.279122+00	\N	19952	t	303	4	4
-307	2019-11-01 04:33:38.14865+00	2019-11-04 07:49:11.214129+00	\N	18146	t	276	4	4
-302	2019-11-01 04:33:38.130087+00	2019-11-04 07:49:38.259775+00	\N	18373	t	274	4	4
-275	2019-11-01 04:33:38.002239+00	2019-11-04 07:50:11.407055+00	\N	18766	t	272	4	4
-294	2019-11-01 04:33:38.095828+00	2019-11-04 07:50:28.619493+00	\N	2701	t	271	4	4
-310	2019-11-01 04:33:38.157612+00	2019-11-04 07:50:56.036949+00	\N	19949	t	269	4	4
-311	2019-11-01 04:33:38.162422+00	2019-11-04 07:51:22.90408+00	\N	19950	t	267	4	4
-303	2019-11-01 04:33:38.135918+00	2019-11-04 07:55:18.692657+00	\N	4557	t	37	4	4
-228	2019-10-25 05:33:20.521649+00	2019-11-04 08:59:43.288293+00	\N	19933	t	245	9	2
-280	2019-11-01 04:33:38.02699+00	2019-11-04 07:55:50.526214+00	\N	19546	t	40	4	4
-296	2019-11-01 04:33:38.10535+00	2019-11-04 07:56:59.640012+00	\N	18321	t	45	4	4
-317	2019-11-01 04:33:38.188761+00	2019-11-04 07:57:41.495411+00	\N	19955	t	49	4	4
-314	2019-11-01 04:33:38.175747+00	2019-11-04 07:57:59.831647+00	\N	19953	t	50	4	4
-318	2019-11-01 04:33:38.202371+00	2019-11-04 07:58:11.101505+00	\N	19957	t	52	4	4
-295	2019-11-01 04:33:38.100324+00	2019-11-04 07:58:19.871793+00	\N	19854	t	53	4	4
-315	2019-11-01 04:33:38.18005+00	2019-11-04 07:58:36.568703+00	\N	19954	t	54	4	4
-293	2019-11-01 04:33:38.09141+00	2019-11-04 08:00:17.969189+00	\N	19590	t	59	4	4
-234	2019-10-25 05:33:20.566675+00	2019-11-04 08:21:50.011094+00	\N	19939	t	124	4	2
-319	2019-11-01 04:33:38.211939+00	2019-11-04 08:34:17.271443+00	\N	19956	t	56	4	4
-221	2019-10-25 05:33:20.503509+00	2019-11-04 08:47:01.14082+00	\N	19408	t	217	9	2
-243	2019-10-25 05:33:20.611118+00	2019-11-04 08:47:39.653747+00	\N	19309	t	220	9	2
-235	2019-10-25 05:33:20.571432+00	2019-11-04 09:01:31.711497+00	\N	19940	t	250	9	2
-230	2019-10-25 05:33:20.531886+00	2019-11-04 09:02:27.324666+00	\N	19934	t	253	9	2
-239	2019-10-25 05:33:20.591356+00	2019-11-04 09:02:56.415114+00	\N	19944	t	256	9	2
-233	2019-10-25 05:33:20.561063+00	2019-11-04 09:04:18.127934+00	\N	19837	t	260	9	2
-237	2019-10-25 05:33:20.582422+00	2019-11-04 09:04:45.68312+00	\N	19937	t	262	9	2
-240	2019-10-25 05:33:20.596051+00	2019-11-04 09:05:02.932635+00	\N	19945	t	263	9	2
-242	2019-10-25 05:33:20.606838+00	2019-11-04 09:05:18.844016+00	\N	19947	t	264	9	2
-231	2019-10-25 05:33:20.547494+00	2019-11-04 09:06:42.630537+00	\N	2656	t	206	9	2
-223	2019-10-25 05:33:20.507913+00	2019-11-04 09:07:10.528879+00	\N	19928	t	208	9	2
-225	2019-10-25 05:33:20.511976+00	2019-11-04 09:07:38.209031+00	\N	19930	t	210	9	2
-244	2019-10-25 05:33:20.613307+00	2019-11-04 09:08:01.592018+00	\N	19566	t	212	9	2
-226	2019-10-25 05:33:20.514002+00	2019-11-04 09:08:14.04238+00	\N	19931	t	213	9	2
-334	2019-11-09 03:32:56.650058+00	2019-11-09 03:32:57.5627+00	\N	5031	t	3	4	5
-367	2019-11-09 03:32:56.777294+00	2019-11-09 03:32:57.5709+00	\N	19315	t	3	4	5
-369	2019-11-09 03:32:56.784796+00	2019-11-09 03:32:57.595261+00	\N	19960	t	3	4	5
-370	2019-11-09 03:32:56.788649+00	2019-11-09 03:32:57.61493+00	\N	19961	t	3	4	5
-371	2019-11-09 03:32:56.792477+00	2019-11-09 03:32:57.627218+00	\N	19962	t	3	4	5
-374	2019-11-09 03:32:56.803894+00	2019-11-09 03:32:57.659851+00	\N	19454	t	3	4	5
-253	2019-10-25 05:33:20.632342+00	2019-11-04 08:46:39.302567+00	\N	19579	t	215	9	2
-252	2019-10-25 05:33:20.630515+00	2019-11-04 08:54:21.646788+00	\N	19577	t	228	9	2
-247	2019-10-25 05:33:20.619588+00	2019-11-04 08:55:49.70138+00	\N	2285	t	233	9	2
-250	2019-10-25 05:33:20.626833+00	2019-11-04 08:56:28.020929+00	\N	19574	t	235	9	2
-249	2019-10-25 05:33:20.624481+00	2019-11-04 08:57:06.89215+00	\N	18285	t	237	9	2
-245	2019-10-25 05:33:20.615753+00	2019-11-04 08:48:10.41487+00	\N	19182	t	222	9	2
-255	2019-10-25 05:33:20.637196+00	2019-11-04 08:52:44.397611+00	\N	5118	t	224	9	2
-246	2019-10-25 05:33:20.617589+00	2019-11-04 08:53:29.835248+00	\N	19567	t	227	9	2
-248	2019-10-25 05:33:20.622337+00	2019-11-04 08:57:22.732768+00	\N	18927	t	238	9	2
-254	2019-10-25 05:33:20.634354+00	2019-11-04 09:07:00.334234+00	\N	18301	t	207	9	2
-251	2019-10-25 05:33:20.628658+00	2019-11-04 09:07:48.65001+00	\N	19576	t	211	9	2
+13	2020-01-24 04:43:06.477223+00	2020-01-24 05:27:58.260298+00	\N	19598	t	39	4	1
+6	2020-01-24 04:43:05.91444+00	2020-01-24 05:47:15.590663+00	\N	2481	t	69	4	1
+18	2020-01-24 04:43:06.868734+00	2020-01-24 06:27:43.420466+00	\N	18834	t	219	4	1
+47	2020-01-24 04:43:09.134749+00	2020-01-24 06:33:51.572018+00	\N	19634	t	263	4	2
+33	2020-01-24 04:43:08.122639+00	2020-01-24 06:35:17.949519+00	\N	18919	t	265	4	2
+48	2020-01-24 04:43:09.187564+00	2020-01-24 06:38:02.752473+00	\N	19170	t	266	4	2
+37	2020-01-24 04:43:08.383999+00	2020-01-24 06:38:16.103753+00	\N	19781	t	267	4	2
+38	2020-01-24 04:43:08.488885+00	2020-01-24 06:39:17.881464+00	\N	19765	t	268	4	2
+44	2020-01-24 04:43:08.941997+00	2020-01-24 06:39:33.648284+00	\N	19721	t	269	4	2
+31	2020-01-24 04:43:07.875697+00	2020-01-24 06:40:44.014597+00	\N	19150	t	273	4	2
+30	2020-01-24 04:43:07.826256+00	2020-01-24 06:41:26.360978+00	\N	20100	t	275	4	2
+28	2020-01-24 04:43:07.684139+00	2020-01-24 06:41:35.650148+00	\N	20099	t	276	4	2
+29	2020-01-24 04:43:07.751209+00	2020-01-24 06:41:59.173536+00	\N	20101	t	277	4	2
+27	2020-01-24 04:43:07.62497+00	2020-01-24 06:42:27.104913+00	\N	20096	t	278	4	2
+43	2020-01-24 04:43:08.828609+00	2020-01-24 06:42:36.049962+00	\N	19743	t	279	4	2
+3	2020-01-24 04:43:05.692806+00	2020-01-24 04:43:05.763154+00	\N	20081	t	3	4	1
+42	2020-01-24 04:43:08.742297+00	2020-01-24 06:43:08.092139+00	\N	19763	t	282	4	2
+35	2020-01-24 04:43:08.262065+00	2020-01-24 06:43:23.024029+00	\N	19761	t	283	4	2
+46	2020-01-24 04:43:09.060782+00	2020-01-24 06:43:48.839825+00	\N	19682	t	284	4	2
+32	2020-01-24 04:43:07.981979+00	2020-01-24 06:43:57.138137+00	\N	19247	t	285	4	2
+39	2020-01-24 04:43:08.549361+00	2020-01-24 06:44:05.709913+00	\N	2510	t	286	4	2
+19	2020-01-24 04:43:06.950675+00	2020-01-24 06:45:38.976211+00	\N	20092	t	248	4	1
+5	2020-01-24 04:43:05.839749+00	2020-01-24 06:45:48.244635+00	\N	20083	t	249	4	1
+16	2020-01-24 04:43:06.725274+00	2020-01-24 06:45:59.7091+00	\N	19706	t	251	4	1
+8	2020-01-24 04:43:06.099903+00	2020-01-24 06:46:09.750326+00	\N	20086	t	252	4	1
+9	2020-01-24 04:43:06.168382+00	2020-01-24 06:46:23.384712+00	\N	20091	t	254	4	1
+14	2020-01-24 04:43:06.557302+00	2020-01-24 06:46:31.199638+00	\N	20093	t	255	4	1
+21	2020-01-24 04:43:07.114166+00	2020-01-24 06:46:59.381795+00	\N	20095	t	258	4	1
+2	2020-01-24 04:43:05.598133+00	2020-01-24 06:47:13.354593+00	\N	20082	t	259	4	1
+1	2020-01-24 04:43:05.481961+00	2020-01-24 06:47:24.011378+00	\N	20084	t	260	4	1
+4	2020-01-24 04:43:05.772692+00	2020-01-24 06:47:33.171652+00	\N	20085	t	261	4	1
+17	2020-01-24 04:43:06.803923+00	2020-01-24 06:48:04.550871+00	\N	19631	t	239	4	1
+15	2020-01-24 04:43:06.636309+00	2020-01-24 06:48:32.046836+00	\N	20008	t	240	4	1
+24	2020-01-24 04:43:07.350148+00	2020-01-24 06:49:13.056441+00	\N	20097	t	241	4	1
+12	2020-01-24 04:43:06.403374+00	2020-01-24 06:49:49.408097+00	\N	20087	t	242	4	1
+22	2020-01-24 04:43:07.210164+00	2020-01-24 06:50:05.843273+00	\N	19698	t	243	4	1
+20	2020-01-24 04:43:07.018932+00	2020-01-24 06:50:29.932379+00	\N	20094	t	244	4	1
+7	2020-01-24 04:43:06.002819+00	2020-01-24 04:43:06.08971+00	\N	20088	t	3	4	1
+23	2020-01-24 04:43:07.281034+00	2020-01-24 06:50:46.236666+00	\N	5120	t	245	4	1
+10	2020-01-24 04:43:06.256679+00	2020-01-24 04:43:06.319682+00	\N	20089	t	3	4	1
+11	2020-01-24 04:43:06.329911+00	2020-01-24 04:43:06.396543+00	\N	20090	t	3	4	1
+25	2020-01-24 04:43:07.440661+00	2020-01-24 04:43:07.51587+00	\N	2634	t	3	4	2
+26	2020-01-24 04:43:07.521273+00	2020-01-24 04:43:07.620543+00	\N	20098	t	3	4	2
+34	2020-01-24 04:43:08.174289+00	2020-01-24 04:43:08.255264+00	\N	2524	t	3	4	2
+36	2020-01-24 04:43:08.328819+00	2020-01-24 04:43:08.377166+00	\N	19767	t	3	4	2
+40	2020-01-24 04:43:08.612465+00	2020-01-24 04:43:08.663012+00	\N	18334	t	3	4	2
+41	2020-01-24 04:43:08.667446+00	2020-01-24 04:43:08.735531+00	\N	19748	t	3	4	2
+45	2020-01-24 04:43:09.008988+00	2020-01-24 04:43:09.054008+00	\N	2543	t	3	4	2
+84	2020-01-24 04:43:11.69238+00	2020-01-24 05:21:18.606036+00	\N	20114	t	30	4	2
+76	2020-01-24 04:43:11.169338+00	2020-01-24 05:21:29.748767+00	\N	20108	t	29	4	2
+49	2020-01-24 04:43:09.25866+00	2020-01-24 04:43:09.315904+00	\N	19581	t	3	4	2
+82	2020-01-24 04:43:11.5407+00	2020-01-24 05:21:59.421526+00	\N	20112	t	27	4	2
+71	2020-01-24 04:43:10.819798+00	2020-01-24 05:22:11.215371+00	\N	20107	t	26	4	2
+62	2020-01-24 04:43:10.162298+00	2020-01-24 05:22:21.085587+00	\N	20104	t	25	4	2
+83	2020-01-24 04:43:11.616975+00	2020-01-24 05:26:39.19583+00	\N	20115	t	35	4	2
+72	2020-01-24 04:43:10.888058+00	2020-01-24 05:26:49.886933+00	\N	20105	t	36	4	2
+56	2020-01-24 04:43:09.750967+00	2020-01-24 06:39:53.425612+00	\N	18405	t	270	4	2
+79	2020-01-24 04:43:11.341836+00	2020-01-24 05:27:18.480903+00	\N	19681	t	37	4	2
+81	2020-01-24 04:43:11.478681+00	2020-01-24 05:28:11.304348+00	\N	20103	t	40	4	2
+78	2020-01-24 04:43:11.29315+00	2020-01-24 05:32:15.495008+00	\N	19786	t	34	4	2
+91	2020-01-24 04:43:12.16973+00	2020-01-24 05:33:34.231945+00	\N	17916	t	48	4	3
+90	2020-01-24 04:43:12.104242+00	2020-01-24 05:36:20.924787+00	\N	19231	t	50	4	3
+51	2020-01-24 04:43:09.395511+00	2020-01-24 04:43:09.456727+00	\N	20102	t	3	4	2
+92	2020-01-24 04:43:12.245194+00	2020-01-24 05:39:00.304916+00	\N	20120	t	54	4	3
+95	2020-01-24 04:43:12.460368+00	2020-01-24 05:42:15.307671+00	\N	20121	t	60	4	3
+96	2020-01-24 04:43:12.549957+00	2020-01-24 05:43:42.593377+00	\N	20119	t	61	4	3
+93	2020-01-24 04:43:12.327983+00	2020-01-24 05:46:16.796036+00	\N	20117	t	67	4	3
+65	2020-01-24 04:43:10.386122+00	2020-01-24 06:32:29.738855+00	\N	19749	t	256	4	2
+52	2020-01-24 04:43:09.464136+00	2020-01-24 04:43:09.533095+00	\N	18087	t	3	4	2
+74	2020-01-24 04:43:11.026225+00	2020-01-24 06:33:36.502012+00	\N	19683	t	262	4	2
+75	2020-01-24 04:43:11.096348+00	2020-01-24 06:35:00.046165+00	\N	18290	t	264	4	2
+63	2020-01-24 04:43:10.234243+00	2020-01-24 06:35:41.206493+00	\N	19823	t	250	4	2
+50	2020-01-24 04:43:09.324589+00	2020-01-24 06:36:06.304263+00	\N	18384	t	253	4	2
+58	2020-01-24 04:43:09.882172+00	2020-01-24 06:40:17.359445+00	\N	19397	t	271	4	2
+57	2020-01-24 04:43:09.806145+00	2020-01-24 06:40:30.630706+00	\N	5075	t	272	4	2
+67	2020-01-24 04:43:10.534014+00	2020-01-24 06:41:03.829344+00	\N	20111	t	274	4	2
+60	2020-01-24 04:43:10.00791+00	2020-01-24 06:42:47.05027+00	\N	19386	t	280	4	2
+87	2020-01-24 04:43:11.905508+00	2020-01-24 06:42:55.377618+00	\N	5107	t	281	4	2
+73	2020-01-24 04:43:10.962104+00	2020-01-24 06:44:12.656653+00	\N	19239	t	287	4	2
+54	2020-01-24 04:43:09.606896+00	2020-01-24 04:43:09.672603+00	\N	19419	t	3	4	2
+68	2020-01-24 04:43:10.602508+00	2020-01-24 06:44:23.238977+00	\N	19069	t	288	4	2
+77	2020-01-24 04:43:11.224591+00	2020-01-24 06:44:39.866014+00	\N	20109	t	290	4	2
+64	2020-01-24 04:43:10.30668+00	2020-01-24 06:44:49.358835+00	\N	2521	t	291	4	2
+80	2020-01-24 04:43:11.398159+00	2020-01-24 06:45:01.414609+00	\N	20110	t	292	4	2
+53	2020-01-24 04:43:09.539924+00	2020-01-24 06:51:22.03983+00	\N	19013	t	246	4	2
+55	2020-01-24 04:43:09.679737+00	2020-01-24 04:43:09.744185+00	\N	18599	t	3	4	2
+59	2020-01-24 04:43:09.952336+00	2020-01-24 04:43:10.00089+00	\N	19431	t	3	4	2
+61	2020-01-24 04:43:10.077721+00	2020-01-24 04:43:10.155371+00	\N	2633	t	3	4	2
+66	2020-01-24 04:43:10.464476+00	2020-01-24 04:43:10.526504+00	\N	19668	t	3	4	2
+69	2020-01-24 04:43:10.679451+00	2020-01-24 04:43:10.741512+00	\N	2735	t	3	4	2
+70	2020-01-24 04:43:10.753782+00	2020-01-24 04:43:10.812495+00	\N	20106	t	3	4	2
+85	2020-01-24 04:43:11.745317+00	2020-01-24 04:43:11.825026+00	\N	20116	t	3	4	2
+86	2020-01-24 04:43:11.832577+00	2020-01-24 04:43:11.900913+00	\N	20113	t	3	4	2
+88	2020-01-24 04:43:11.958161+00	2020-01-24 04:43:12.01508+00	\N	19775	t	3	4	2
+89	2020-01-24 04:43:12.022528+00	2020-01-24 04:43:12.096674+00	\N	2329	t	3	4	2
+94	2020-01-24 04:43:12.400778+00	2020-01-24 04:43:12.452727+00	\N	20052	t	3	4	3
+97	2020-01-24 04:43:12.6194+00	2020-01-24 04:43:12.693957+00	\N	20118	t	3	4	3
+127	2020-01-24 04:43:14.595327+00	2020-01-24 05:21:06.44237+00	\N	19325	t	31	4	3
+125	2020-01-24 04:43:14.4559+00	2020-01-24 05:21:44.865963+00	\N	19464	t	28	4	3
+115	2020-01-24 04:43:13.786787+00	2020-01-24 05:22:33.80736+00	\N	19178	t	24	4	3
+105	2020-01-24 04:43:13.121349+00	2020-01-24 05:22:42.253006+00	\N	19809	t	23	4	3
+104	2020-01-24 04:43:13.0532+00	2020-01-24 05:28:35.782955+00	\N	19783	t	41	4	3
+101	2020-01-24 04:43:12.876032+00	2020-01-24 06:44:30.126377+00	\N	19785	t	289	4	3
+113	2020-01-24 04:43:13.658528+00	2020-01-24 05:28:54.233213+00	\N	18112	t	42	4	3
+131	2020-01-24 04:43:14.842287+00	2020-01-24 05:29:10.165207+00	\N	18878	t	43	4	3
+106	2020-01-24 04:43:13.175401+00	2020-01-24 05:29:24.061285+00	\N	19804	t	44	4	3
+111	2020-01-24 04:43:13.501318+00	2020-01-24 05:30:34.924139+00	\N	19792	t	45	4	3
+110	2020-01-24 04:43:13.43576+00	2020-01-24 05:31:52.439798+00	\N	19707	t	46	4	3
+99	2020-01-24 04:43:12.757546+00	2020-01-24 04:43:12.808347+00	\N	19789	t	3	4	3
+128	2020-01-24 04:43:14.65706+00	2020-01-24 05:33:19.185814+00	\N	18723	t	47	4	3
+129	2020-01-24 04:43:14.719514+00	2020-01-24 05:33:53.959078+00	\N	18625	t	49	4	3
+118	2020-01-24 04:43:13.964629+00	2020-01-24 05:37:32.037783+00	\N	18299	t	51	4	3
+121	2020-01-24 04:43:14.170884+00	2020-01-24 05:38:08.858119+00	\N	18225	t	52	4	3
+108	2020-01-24 04:43:13.284376+00	2020-01-24 05:38:35.876967+00	\N	19776	t	53	4	3
+123	2020-01-24 04:43:14.33082+00	2020-01-24 05:39:52.520596+00	\N	19447	t	55	4	3
+124	2020-01-24 04:43:14.40245+00	2020-01-24 05:40:22.719832+00	\N	19460	t	56	4	3
+98	2020-01-24 04:43:12.701166+00	2020-01-24 05:40:52.000212+00	\N	19822	t	57	4	3
+100	2020-01-24 04:43:12.813265+00	2020-01-24 05:41:23.035324+00	\N	19778	t	58	4	3
+114	2020-01-24 04:43:13.718541+00	2020-01-24 05:41:46.365535+00	\N	19734	t	59	4	3
+122	2020-01-24 04:43:14.242125+00	2020-01-24 05:44:00.13483+00	\N	19794	t	62	4	3
+107	2020-01-24 04:43:13.227952+00	2020-01-24 05:44:15.181838+00	\N	19769	t	63	4	3
+117	2020-01-24 04:43:13.90533+00	2020-01-24 05:45:21.874436+00	\N	19793	t	65	4	3
+109	2020-01-24 04:43:13.360302+00	2020-01-24 05:45:39.679397+00	\N	19777	t	66	4	3
+139	2020-01-24 04:43:15.334601+00	2020-01-24 06:00:54.96145+00	\N	20124	t	94	4	3
+102	2020-01-24 04:43:12.941723+00	2020-01-24 04:43:13.001295+00	\N	19787	t	3	4	3
+143	2020-01-24 04:43:15.580034+00	2020-01-24 06:01:13.950758+00	\N	2463	t	93	4	3
+136	2020-01-24 04:43:15.155174+00	2020-01-24 06:04:04.023394+00	\N	2602	t	95	4	3
+142	2020-01-24 04:43:15.522084+00	2020-01-24 06:04:25.334819+00	\N	18996	t	96	4	3
+138	2020-01-24 04:43:15.282143+00	2020-01-24 06:11:20.1163+00	\N	20123	t	105	4	3
+137	2020-01-24 04:43:15.224313+00	2020-01-24 06:12:07.599039+00	\N	20038	t	109	4	3
+103	2020-01-24 04:43:13.006049+00	2020-01-24 04:43:13.046427+00	\N	19824	t	3	4	3
+141	2020-01-24 04:43:15.464032+00	2020-01-24 06:12:50.002093+00	\N	18597	t	111	4	3
+134	2020-01-24 04:43:15.03933+00	2020-01-24 06:13:03.364276+00	\N	19828	t	112	4	3
+112	2020-01-24 04:43:13.582683+00	2020-01-24 04:43:13.653087+00	\N	2594	t	3	4	3
+116	2020-01-24 04:43:13.841226+00	2020-01-24 04:43:13.898195+00	\N	2487	t	3	4	3
+119	2020-01-24 04:43:14.02642+00	2020-01-24 04:43:14.093603+00	\N	18463	t	3	4	3
+120	2020-01-24 04:43:14.101015+00	2020-01-24 04:43:14.163953+00	\N	19687	t	3	4	3
+126	2020-01-24 04:43:14.531239+00	2020-01-24 04:43:14.586482+00	\N	19451	t	3	4	3
+130	2020-01-24 04:43:14.778597+00	2020-01-24 04:43:14.837618+00	\N	2698	t	3	4	3
+132	2020-01-24 04:43:14.888751+00	2020-01-24 04:43:14.964227+00	\N	20122	t	3	4	3
+133	2020-01-24 04:43:14.971568+00	2020-01-24 04:43:15.032716+00	\N	19172	t	3	4	3
+135	2020-01-24 04:43:15.100043+00	2020-01-24 04:43:15.148591+00	\N	2663	t	3	4	3
+140	2020-01-24 04:43:15.409773+00	2020-01-24 04:43:15.458947+00	\N	2504	t	3	4	3
+144	2020-01-24 04:43:15.62547+00	2020-01-24 04:43:15.690163+00	\N	20070	t	3	4	3
+145	2020-01-24 04:43:15.697845+00	2020-01-24 04:43:15.748492+00	\N	19964	t	3	4	3
+147	2020-01-24 04:43:15.821449+00	2020-01-24 05:25:20.023996+00	\N	19145	t	32	4	3
+154	2020-01-24 04:43:16.295915+00	2020-01-24 05:25:35.099005+00	\N	20134	t	33	4	3
+161	2020-01-24 04:43:16.810242+00	2020-01-24 05:27:40.752224+00	\N	20133	t	38	4	3
+153	2020-01-24 04:43:16.217763+00	2020-01-24 05:44:57.946513+00	\N	20072	t	64	4	3
+189	2020-01-24 04:43:18.650062+00	2020-01-24 05:47:00.035224+00	\N	19810	t	68	4	4
+176	2020-01-24 04:43:17.771065+00	2020-01-24 05:47:36.227981+00	\N	2635	t	70	4	4
+166	2020-01-24 04:43:17.128383+00	2020-01-24 05:51:33.059189+00	\N	2616	t	73	4	4
+174	2020-01-24 04:43:17.628549+00	2020-01-24 05:52:08.559517+00	\N	20143	t	74	4	4
+177	2020-01-24 04:43:17.832944+00	2020-01-24 05:56:56.392023+00	\N	2654	t	81	4	4
+187	2020-01-24 04:43:18.515574+00	2020-01-24 05:57:07.531201+00	\N	19814	t	82	4	4
+178	2020-01-24 04:43:17.910798+00	2020-01-24 06:00:29.691584+00	\N	19811	t	85	4	4
+157	2020-01-24 04:43:16.511712+00	2020-01-24 06:01:25.490469+00	\N	20136	t	92	4	3
+149	2020-01-24 04:43:15.922597+00	2020-01-24 06:01:39.823061+00	\N	20126	t	91	4	3
+155	2020-01-24 04:43:16.355576+00	2020-01-24 06:01:51.225857+00	\N	20130	t	90	4	3
+162	2020-01-24 04:43:16.870958+00	2020-01-24 06:02:01.853747+00	\N	20132	t	89	4	3
+186	2020-01-24 04:43:18.443806+00	2020-01-24 06:02:13.744862+00	\N	19805	t	88	4	4
+152	2020-01-24 04:43:16.141347+00	2020-01-24 06:04:39.275617+00	\N	19716	t	97	4	3
+158	2020-01-24 04:43:16.580238+00	2020-01-24 06:04:52.230951+00	\N	20129	t	98	4	3
+151	2020-01-24 04:43:16.072869+00	2020-01-24 06:05:10.556933+00	\N	19758	t	99	4	3
+159	2020-01-24 04:43:16.656085+00	2020-01-24 06:07:47.787178+00	\N	20135	t	100	4	3
+164	2020-01-24 04:43:17.013354+00	2020-01-24 06:08:27.36695+00	\N	19660	t	101	4	3
+150	2020-01-24 04:43:15.994328+00	2020-01-24 06:08:44.333597+00	\N	20127	t	102	4	3
+148	2020-01-24 04:43:15.876357+00	2020-01-24 06:08:57.747875+00	\N	20125	t	103	4	3
+146	2020-01-24 04:43:15.752824+00	2020-01-24 06:10:01.056097+00	\N	19650	t	104	4	3
+156	2020-01-24 04:43:16.430762+00	2020-01-24 06:11:32.213345+00	\N	20128	t	106	4	3
+160	2020-01-24 04:43:16.729152+00	2020-01-24 06:11:43.881662+00	\N	20131	t	107	4	3
+163	2020-01-24 04:43:16.930111+00	2020-01-24 06:11:54.40971+00	\N	19736	t	108	4	3
+165	2020-01-24 04:43:17.063537+00	2020-01-24 06:12:23.973133+00	\N	5016	t	110	4	3
+167	2020-01-24 04:43:17.200029+00	2020-01-24 04:43:17.239852+00	\N	2643	t	3	4	4
+168	2020-01-24 04:43:17.244104+00	2020-01-24 04:43:17.311951+00	\N	20140	t	3	4	4
+169	2020-01-24 04:43:17.321864+00	2020-01-24 04:43:17.378451+00	\N	20138	t	3	4	4
+170	2020-01-24 04:43:17.382907+00	2020-01-24 04:43:17.425352+00	\N	5048	t	3	4	4
+171	2020-01-24 04:43:17.431703+00	2020-01-24 04:43:17.500151+00	\N	20142	t	3	4	4
+172	2020-01-24 04:43:17.507844+00	2020-01-24 04:43:17.569548+00	\N	19435	t	3	4	4
+173	2020-01-24 04:43:17.578577+00	2020-01-24 04:43:17.622148+00	\N	20139	t	3	4	4
+175	2020-01-24 04:43:17.711655+00	2020-01-24 04:43:17.766479+00	\N	20071	t	3	4	4
+179	2020-01-24 04:43:17.974171+00	2020-01-24 04:43:18.037355+00	\N	18842	t	3	4	4
+180	2020-01-24 04:43:18.04476+00	2020-01-24 04:43:18.106695+00	\N	19813	t	3	4	4
+181	2020-01-24 04:43:18.114384+00	2020-01-24 04:43:18.175531+00	\N	19799	t	3	4	4
+182	2020-01-24 04:43:18.182525+00	2020-01-24 04:43:18.233318+00	\N	19779	t	3	4	4
+183	2020-01-24 04:43:18.241141+00	2020-01-24 04:43:18.308464+00	\N	19797	t	3	4	4
+184	2020-01-24 04:43:18.315985+00	2020-01-24 04:43:18.374579+00	\N	19806	t	3	4	4
+185	2020-01-24 04:43:18.382099+00	2020-01-24 04:43:18.436634+00	\N	19800	t	3	4	4
+188	2020-01-24 04:43:18.582405+00	2020-01-24 04:43:18.642771+00	\N	19219	t	3	4	4
+190	2020-01-24 04:43:18.718707+00	2020-01-24 04:43:18.781708+00	\N	19817	t	3	4	4
+191	2020-01-24 04:43:18.789256+00	2020-01-24 04:43:18.864361+00	\N	19825	t	3	4	4
+192	2020-01-24 04:43:18.873089+00	2020-01-24 04:43:18.932715+00	\N	19798	t	3	4	4
+193	2020-01-24 04:43:18.940656+00	2020-01-24 04:43:19.009727+00	\N	19670	t	3	4	4
+194	2020-01-24 04:43:19.014176+00	2020-01-24 04:43:19.052383+00	\N	19725	t	3	4	4
+216	2020-01-24 04:43:20.651952+00	2020-01-24 05:50:31.90157+00	\N	2729	t	71	4	4
+201	2020-01-24 04:43:19.505894+00	2020-01-24 05:50:48.480202+00	\N	19456	t	72	4	4
+223	2020-01-24 04:43:21.160439+00	2020-01-24 05:52:38.193595+00	\N	19272	t	75	4	4
+214	2020-01-24 04:43:20.51841+00	2020-01-24 05:52:56.306546+00	\N	19410	t	76	4	4
+204	2020-01-24 04:43:19.716948+00	2020-01-24 05:55:15.183096+00	\N	5049	t	77	4	4
+195	2020-01-24 04:43:19.05718+00	2020-01-24 04:43:19.120494+00	\N	19712	t	3	4	4
+202	2020-01-24 04:43:19.585111+00	2020-01-24 05:55:28.551102+00	\N	18422	t	78	4	4
+209	2020-01-24 04:43:20.085426+00	2020-01-24 05:55:40.200198+00	\N	19474	t	79	4	4
+218	2020-01-24 04:43:20.784691+00	2020-01-24 05:56:45.881548+00	\N	18277	t	80	4	4
+210	2020-01-24 04:43:20.160766+00	2020-01-24 05:57:19.25628+00	\N	19423	t	83	4	4
+206	2020-01-24 04:43:19.850252+00	2020-01-24 05:58:37.568274+00	\N	2320	t	84	4	4
+196	2020-01-24 04:43:19.128394+00	2020-01-24 04:43:19.203462+00	\N	17895	t	3	4	4
+203	2020-01-24 04:43:19.661607+00	2020-01-24 06:02:30.237292+00	\N	19455	t	87	4	4
+200	2020-01-24 04:43:19.435979+00	2020-01-24 06:13:42.273658+00	\N	19481	t	113	4	4
+197	2020-01-24 04:43:19.210461+00	2020-01-24 04:43:19.276295+00	\N	19575	t	3	4	4
+198	2020-01-24 04:43:19.281383+00	2020-01-24 04:43:19.342349+00	\N	19478	t	3	4	4
+199	2020-01-24 04:43:19.350243+00	2020-01-24 04:43:19.428806+00	\N	18428	t	3	4	4
+205	2020-01-24 04:43:19.795493+00	2020-01-24 04:43:19.843608+00	\N	2624	t	3	4	4
+207	2020-01-24 04:43:19.925395+00	2020-01-24 04:43:20.012422+00	\N	19467	t	3	4	4
+208	2020-01-24 04:43:20.020358+00	2020-01-24 04:43:20.077979+00	\N	19489	t	3	4	4
+211	2020-01-24 04:43:20.262959+00	2020-01-24 04:43:20.323797+00	\N	2733	t	3	4	4
+212	2020-01-24 04:43:20.330595+00	2020-01-24 04:43:20.421147+00	\N	2736	t	3	4	4
+213	2020-01-24 04:43:20.430601+00	2020-01-24 04:43:20.513287+00	\N	5028	t	3	4	4
+215	2020-01-24 04:43:20.581839+00	2020-01-24 04:43:20.64433+00	\N	5100	t	3	4	4
+217	2020-01-24 04:43:20.724056+00	2020-01-24 04:43:20.776886+00	\N	18839	t	3	4	4
+219	2020-01-24 04:43:20.856948+00	2020-01-24 04:43:20.922828+00	\N	5088	t	3	4	4
+220	2020-01-24 04:43:20.929007+00	2020-01-24 04:43:20.986041+00	\N	5001	t	3	4	4
+221	2020-01-24 04:43:20.998744+00	2020-01-24 04:43:21.068049+00	\N	20137	t	3	4	4
+222	2020-01-24 04:43:21.094894+00	2020-01-24 04:43:21.155553+00	\N	19308	t	3	4	4
+224	2020-01-24 04:43:21.221419+00	2020-01-24 04:43:21.281828+00	\N	19312	t	3	4	4
+225	2020-01-24 04:43:21.288755+00	2020-01-24 04:43:21.348819+00	\N	20144	t	3	4	4
+226	2020-01-24 04:43:21.356057+00	2020-01-24 04:43:21.424626+00	\N	20146	t	3	4	4
+227	2020-01-24 04:43:21.431592+00	2020-01-24 04:43:21.491372+00	\N	19746	t	3	4	4
+228	2020-01-24 04:43:21.498118+00	2020-01-24 04:43:21.576438+00	\N	18322	t	3	4	4
+229	2020-01-24 04:43:21.584485+00	2020-01-24 04:43:21.654385+00	\N	18234	t	3	4	4
+230	2020-01-24 04:43:21.661396+00	2020-01-24 04:43:21.718899+00	\N	19022	t	3	4	4
+231	2020-01-24 04:43:21.7258+00	2020-01-24 04:43:21.77763+00	\N	20145	t	3	4	4
+232	2020-01-24 04:43:21.786336+00	2020-01-24 04:43:21.84897+00	\N	19400	t	3	4	4
+233	2020-01-24 04:43:21.856658+00	2020-01-24 04:43:21.917344+00	\N	2726	t	3	4	4
+234	2020-01-24 04:43:21.92471+00	2020-01-24 04:43:21.97722+00	\N	20147	t	3	4	4
+235	2020-01-24 04:43:21.984266+00	2020-01-24 04:43:22.049002+00	\N	19711	t	3	4	4
+236	2020-01-24 04:43:22.056562+00	2020-01-24 04:43:22.123944+00	\N	20148	t	3	4	4
+237	2020-01-24 04:43:22.131144+00	2020-01-24 04:43:22.188743+00	\N	19679	t	3	4	4
+238	2020-01-24 04:43:22.196593+00	2020-01-24 04:43:22.278215+00	\N	2637	t	3	4	4
+239	2020-01-24 04:43:22.284497+00	2020-01-24 04:43:22.350807+00	\N	20153	t	3	4	4
+240	2020-01-24 04:43:22.362861+00	2020-01-24 04:43:22.418591+00	\N	20150	t	3	4	4
 \.
 
 
@@ -5443,16 +4476,17 @@ COPY sows_sow (id, created_at, modified_at, birth_id, farm_id, alive, location_i
 --
 
 COPY sows_sowstatus (id, created_at, modified_at, title) FROM stdin;
-1	2019-10-17 13:28:57.781045+00	2019-10-17 13:28:57.781063+00	Осеменена 1
-2	2019-10-17 13:28:57.781078+00	2019-10-17 13:28:57.781086+00	Осеменена 2
-5	2019-10-17 13:28:57.78113+00	2019-10-17 13:28:57.781137+00	Прохолост
-6	2019-10-17 13:28:57.781147+00	2019-10-17 13:28:57.781154+00	Аборт
-7	2019-10-17 13:28:57.781164+00	2019-10-17 13:28:57.781171+00	Отъем
-8	2019-10-17 13:28:57.781181+00	2019-10-17 13:28:57.781188+00	Брак
-9	2019-10-17 13:28:57.781197+00	2019-10-17 13:28:57.781204+00	Опоросилась
-10	2019-10-17 13:28:57.781214+00	2019-10-17 13:28:57.781221+00	Ожидает осеменения
-4	2019-10-17 13:28:57.781113+00	2019-10-30 10:09:13.076057+00	Супорос 35
-3	2019-10-17 13:28:57.781096+00	2019-10-30 10:09:20.549586+00	Супорос 28
+1	2020-01-24 04:41:23.589949+00	2020-01-24 04:41:23.590001+00	Осеменена 1
+2	2020-01-24 04:41:23.590015+00	2020-01-24 04:41:23.590021+00	Осеменена 2
+3	2020-01-24 04:41:23.590029+00	2020-01-24 04:41:23.590033+00	Супорос 28
+4	2020-01-24 04:41:23.590041+00	2020-01-24 04:41:23.590045+00	Супорос 35
+5	2020-01-24 04:41:23.590103+00	2020-01-24 04:41:23.590109+00	Прохолост
+6	2020-01-24 04:41:23.590117+00	2020-01-24 04:41:23.590121+00	Аборт
+7	2020-01-24 04:41:23.590129+00	2020-01-24 04:41:23.590134+00	Отъем
+8	2020-01-24 04:41:23.590141+00	2020-01-24 04:41:23.590146+00	Брак
+9	2020-01-24 04:41:23.590153+00	2020-01-24 04:41:23.590158+00	Опоросилась
+10	2020-01-24 04:41:23.590165+00	2020-01-24 04:41:23.59019+00	Кормилица
+11	2020-01-24 04:41:23.590199+00	2020-01-24 04:41:23.590204+00	Ожидает осеменения
 \.
 
 
@@ -5460,14 +4494,38 @@ COPY sows_sowstatus (id, created_at, modified_at, title) FROM stdin;
 -- Data for Name: staff_workshopemployee; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY staff_workshopemployee (id, created_at, modified_at, is_officer, is_seminator, user_id, workshop_id, farm_name) FROM stdin;
-7	2019-10-21 06:19:31.453627+00	2019-10-21 06:19:31.453658+00	f	f	9	3	
-2	2019-10-21 05:48:04.17407+00	2019-10-25 04:33:42.434305+00	t	t	4	1	ШМЫГИ
-3	2019-10-21 05:57:22.594333+00	2019-10-25 04:33:54.644336+00	f	t	5	1	СЕМЕН
-4	2019-10-21 05:57:28.995169+00	2019-10-25 04:34:09.847003+00	f	t	7	1	БОРИС
-5	2019-10-21 05:57:35.75781+00	2019-10-25 04:34:29.275554+00	f	t	6	1	ИВАНО
-8	2019-10-21 07:31:22.123973+00	2019-10-25 04:34:42.033816+00	t	t	10	1	ГАРИ
-6	2019-10-21 06:17:07.377471+00	2019-10-25 10:58:27.770364+00	t	t	8	1	АДМИН
+COPY staff_workshopemployee (id, created_at, modified_at, farm_name, is_officer, is_seminator, user_id, workshop_id) FROM stdin;
+1	2020-01-24 04:41:23.932733+00	2020-01-24 04:41:23.932748+00	АДМ	t	t	2	1
+2	2020-01-24 04:41:24.089967+00	2020-01-24 04:41:24.089981+00	ОФИЦЕР	t	t	3	1
+3	2020-01-24 04:41:24.243368+00	2020-01-24 04:41:24.243384+00	ШМЫГИ	f	t	4	1
+4	2020-01-24 04:41:24.39735+00	2020-01-24 04:41:24.397365+00	БОРИС	f	t	5	1
+5	2020-01-24 04:41:24.555874+00	2020-01-24 04:41:24.55589+00	СЕМЕН	f	t	6	1
+6	2020-01-24 04:41:24.725781+00	2020-01-24 04:41:24.725849+00	ГАРИ	t	t	7	1
+7	2020-01-24 04:41:24.887354+00	2020-01-24 04:41:24.887425+00	ИВАНО	f	t	8	1
+8	2020-01-24 04:41:25.157866+00	2020-01-24 04:41:25.157881+00	СТУДЕ	f	t	9	1
+9	2020-01-24 04:41:25.317544+00	2020-01-24 04:41:25.317563+00	ИВАНО	f	f	10	1
+10	2020-01-24 04:41:25.493777+00	2020-01-24 04:41:25.493801+00	ИВАНО	f	f	11	2
+11	2020-01-24 04:41:25.652563+00	2020-01-24 04:41:25.652579+00	ИВАНО	f	f	12	3
+12	2020-01-24 04:41:25.809308+00	2020-01-24 04:41:25.809325+00	ИВАНО	f	f	13	4
+13	2020-01-24 04:41:25.967902+00	2020-01-24 04:41:25.967919+00	ИВАНО	f	f	14	5
+14	2020-01-24 04:41:26.137629+00	2020-01-24 04:41:26.137645+00	ИВАНО	f	f	15	6
+15	2020-01-24 04:41:26.295815+00	2020-01-24 04:41:26.295832+00	ИВАНО	f	f	16	7
+\.
+
+
+--
+-- Data for Name: tours_metatour; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY tours_metatour (id, created_at, modified_at, piglets_id) FROM stdin;
+\.
+
+
+--
+-- Data for Name: tours_metatourrecord; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY tours_metatourrecord (id, created_at, modified_at, quantity, percentage, metatour_id, tour_id) FROM stdin;
 \.
 
 
@@ -5476,11 +4534,10 @@ COPY staff_workshopemployee (id, created_at, modified_at, is_officer, is_seminat
 --
 
 COPY tours_tour (id, created_at, modified_at, start_date, week_number, year) FROM stdin;
-1	2019-10-18 03:44:16.361511+00	2019-10-18 03:44:16.361531+00	2019-10-18 03:44:16.361143+00	27	2019
-2	2019-10-18 03:51:17.79095+00	2019-10-18 03:51:17.790975+00	2019-10-18 03:51:17.790658+00	28	2019
-3	2019-10-18 03:57:51.456645+00	2019-10-18 03:57:51.456672+00	2019-10-18 03:57:51.456449+00	42	2019
-4	2019-11-01 04:33:38.227316+00	2019-11-01 04:33:38.227336+00	2019-11-01 04:33:38.226782+00	29	2019
-5	2019-11-09 03:32:56.810383+00	2019-11-09 03:32:56.810396+00	2019-11-09 03:32:56.810113+00	30	2019
+1	2020-01-24 04:43:05.485901+00	2020-01-24 04:43:05.485913+00	2020-01-24 04:43:05.485657+00	38	2019
+2	2020-01-24 04:43:07.446364+00	2020-01-24 04:43:07.446377+00	2020-01-24 04:43:07.446148+00	39	2019
+3	2020-01-24 04:43:12.109213+00	2020-01-24 04:43:12.109227+00	2020-01-24 04:43:12.108997+00	40	2019
+4	2020-01-24 04:43:17.133728+00	2020-01-24 04:43:17.133741+00	2020-01-24 04:43:17.133522+00	41	2019
 \.
 
 
@@ -5497,482 +4554,149 @@ COPY transactions_pigletstransaction (id, created_at, modified_at, date, from_lo
 --
 
 COPY transactions_sowtransaction (id, created_at, modified_at, date, from_location_id, initiator_id, sow_id, to_location_id) FROM stdin;
-1	2019-10-18 03:44:16.434474+00	2019-10-18 03:44:16.434495+00	2019-10-18 03:44:16.434505+00	2	1	1	3
-2	2019-10-18 03:51:18.054519+00	2019-10-18 03:51:18.054539+00	2019-10-18 03:51:18.054549+00	2	1	2	3
-3	2019-10-18 03:51:18.065711+00	2019-10-18 03:51:18.065736+00	2019-10-18 03:51:18.065746+00	2	1	3	3
-4	2019-10-18 03:51:18.077127+00	2019-10-18 03:51:18.077145+00	2019-10-18 03:51:18.077154+00	2	1	4	3
-5	2019-10-18 03:51:18.08853+00	2019-10-18 03:51:18.088548+00	2019-10-18 03:51:18.088558+00	2	1	5	3
-6	2019-10-18 03:51:18.099918+00	2019-10-18 03:51:18.099936+00	2019-10-18 03:51:18.099946+00	2	1	6	3
-7	2019-10-18 03:51:18.11114+00	2019-10-18 03:51:18.111158+00	2019-10-18 03:51:18.111167+00	2	1	7	3
-8	2019-10-18 03:51:18.123339+00	2019-10-18 03:51:18.123359+00	2019-10-18 03:51:18.123368+00	2	1	8	3
-9	2019-10-18 03:51:18.134568+00	2019-10-18 03:51:18.134586+00	2019-10-18 03:51:18.134595+00	2	1	9	3
-10	2019-10-18 03:51:18.146124+00	2019-10-18 03:51:18.146142+00	2019-10-18 03:51:18.146151+00	2	1	10	3
-11	2019-10-18 03:51:18.157296+00	2019-10-18 03:51:18.157334+00	2019-10-18 03:51:18.157345+00	2	1	11	3
-12	2019-10-18 03:51:18.170012+00	2019-10-18 03:51:18.170031+00	2019-10-18 03:51:18.17004+00	2	1	12	3
-13	2019-10-18 03:51:18.181463+00	2019-10-18 03:51:18.181482+00	2019-10-18 03:51:18.181491+00	2	1	37	3
-14	2019-10-18 03:51:18.188582+00	2019-10-18 03:51:18.188599+00	2019-10-18 03:51:18.188609+00	2	1	38	3
-15	2019-10-18 03:51:18.195529+00	2019-10-18 03:51:18.195546+00	2019-10-18 03:51:18.195555+00	2	1	39	3
-16	2019-10-18 03:51:18.205307+00	2019-10-18 03:51:18.205324+00	2019-10-18 03:51:18.205333+00	2	1	40	3
-17	2019-10-18 03:51:18.2163+00	2019-10-18 03:51:18.216318+00	2019-10-18 03:51:18.216327+00	2	1	41	3
-18	2019-10-18 03:51:18.228279+00	2019-10-18 03:51:18.228296+00	2019-10-18 03:51:18.228305+00	2	1	42	3
-19	2019-10-18 03:51:18.239465+00	2019-10-18 03:51:18.239484+00	2019-10-18 03:51:18.239493+00	2	1	43	3
-20	2019-10-18 03:51:18.250471+00	2019-10-18 03:51:18.250489+00	2019-10-18 03:51:18.250498+00	2	1	44	3
-21	2019-10-18 03:51:18.261512+00	2019-10-18 03:51:18.26153+00	2019-10-18 03:51:18.261539+00	2	1	45	3
-22	2019-10-18 03:51:18.272641+00	2019-10-18 03:51:18.27266+00	2019-10-18 03:51:18.272686+00	2	1	46	3
-23	2019-10-18 03:51:18.284325+00	2019-10-18 03:51:18.284349+00	2019-10-18 03:51:18.284359+00	2	1	47	3
-24	2019-10-18 03:51:18.295363+00	2019-10-18 03:51:18.295384+00	2019-10-18 03:51:18.295398+00	2	1	48	3
-25	2019-10-18 03:51:18.306622+00	2019-10-18 03:51:18.30664+00	2019-10-18 03:51:18.30665+00	2	1	49	3
-26	2019-10-18 03:51:18.317866+00	2019-10-18 03:51:18.317904+00	2019-10-18 03:51:18.317915+00	2	1	50	3
-27	2019-10-18 03:51:18.330894+00	2019-10-18 03:51:18.330912+00	2019-10-18 03:51:18.330921+00	2	1	51	3
-28	2019-10-18 03:51:18.341945+00	2019-10-18 03:51:18.341963+00	2019-10-18 03:51:18.341972+00	2	1	52	3
-29	2019-10-18 03:51:18.349137+00	2019-10-18 03:51:18.349155+00	2019-10-18 03:51:18.349165+00	2	1	53	3
-30	2019-10-18 03:51:18.356113+00	2019-10-18 03:51:18.356131+00	2019-10-18 03:51:18.35614+00	2	1	54	3
-31	2019-10-18 03:51:18.365417+00	2019-10-18 03:51:18.365435+00	2019-10-18 03:51:18.365444+00	2	1	55	3
-32	2019-10-18 03:51:18.37669+00	2019-10-18 03:51:18.376708+00	2019-10-18 03:51:18.376717+00	2	1	56	3
-33	2019-10-18 03:51:18.387914+00	2019-10-18 03:51:18.387931+00	2019-10-18 03:51:18.38794+00	2	1	13	3
-34	2019-10-18 03:51:18.398928+00	2019-10-18 03:51:18.398945+00	2019-10-18 03:51:18.398954+00	2	1	14	3
-35	2019-10-18 03:51:18.410115+00	2019-10-18 03:51:18.410133+00	2019-10-18 03:51:18.410142+00	2	1	15	3
-36	2019-10-18 03:51:18.421289+00	2019-10-18 03:51:18.421316+00	2019-10-18 03:51:18.421326+00	2	1	16	3
-37	2019-10-18 03:51:18.432324+00	2019-10-18 03:51:18.432342+00	2019-10-18 03:51:18.432351+00	2	1	17	3
-38	2019-10-18 03:51:18.443169+00	2019-10-18 03:51:18.443187+00	2019-10-18 03:51:18.443196+00	2	1	18	3
-39	2019-10-18 03:51:18.454689+00	2019-10-18 03:51:18.454709+00	2019-10-18 03:51:18.454718+00	2	1	19	3
-40	2019-10-18 03:51:18.465873+00	2019-10-18 03:51:18.465891+00	2019-10-18 03:51:18.4659+00	2	1	20	3
-41	2019-10-18 03:51:18.478035+00	2019-10-18 03:51:18.478054+00	2019-10-18 03:51:18.478064+00	2	1	21	3
-42	2019-10-18 03:51:18.491439+00	2019-10-18 03:51:18.491457+00	2019-10-18 03:51:18.491467+00	2	1	22	3
-43	2019-10-18 03:51:18.504216+00	2019-10-18 03:51:18.504234+00	2019-10-18 03:51:18.504244+00	2	1	23	3
-44	2019-10-18 03:51:18.517306+00	2019-10-18 03:51:18.517325+00	2019-10-18 03:51:18.517334+00	2	1	24	3
-45	2019-10-18 03:51:18.530787+00	2019-10-18 03:51:18.530806+00	2019-10-18 03:51:18.530815+00	2	1	25	3
-46	2019-10-18 03:51:18.54316+00	2019-10-18 03:51:18.543178+00	2019-10-18 03:51:18.543188+00	2	1	26	3
-47	2019-10-18 03:51:18.556059+00	2019-10-18 03:51:18.556078+00	2019-10-18 03:51:18.556087+00	2	1	27	3
-48	2019-10-18 03:51:18.569182+00	2019-10-18 03:51:18.5692+00	2019-10-18 03:51:18.569209+00	2	1	57	3
-49	2019-10-18 03:51:18.586615+00	2019-10-18 03:51:18.586634+00	2019-10-18 03:51:18.586643+00	2	1	58	3
-50	2019-10-18 03:51:18.593467+00	2019-10-18 03:51:18.593484+00	2019-10-18 03:51:18.593494+00	2	1	59	3
-51	2019-10-18 03:51:18.60049+00	2019-10-18 03:51:18.600508+00	2019-10-18 03:51:18.600517+00	2	1	60	3
-52	2019-10-18 03:51:18.607393+00	2019-10-18 03:51:18.607411+00	2019-10-18 03:51:18.60742+00	2	1	61	3
-53	2019-10-18 03:51:18.614082+00	2019-10-18 03:51:18.614099+00	2019-10-18 03:51:18.614108+00	2	1	62	3
-54	2019-10-18 03:51:18.62066+00	2019-10-18 03:51:18.620678+00	2019-10-18 03:51:18.620687+00	2	1	63	3
-55	2019-10-18 03:51:18.627427+00	2019-10-18 03:51:18.627444+00	2019-10-18 03:51:18.627454+00	2	1	64	3
-56	2019-10-18 03:51:18.634014+00	2019-10-18 03:51:18.634031+00	2019-10-18 03:51:18.634041+00	2	1	28	3
-57	2019-10-18 03:51:18.650169+00	2019-10-18 03:51:18.650188+00	2019-10-18 03:51:18.650197+00	2	1	29	3
-58	2019-10-18 03:51:18.662769+00	2019-10-18 03:51:18.662787+00	2019-10-18 03:51:18.662797+00	2	1	30	3
-59	2019-10-18 03:51:18.675848+00	2019-10-18 03:51:18.67587+00	2019-10-18 03:51:18.67588+00	2	1	31	3
-60	2019-10-18 03:51:18.688476+00	2019-10-18 03:51:18.688495+00	2019-10-18 03:51:18.688504+00	2	1	32	3
-61	2019-10-18 03:51:18.700398+00	2019-10-18 03:51:18.700417+00	2019-10-18 03:51:18.700426+00	2	1	33	3
-62	2019-10-18 03:51:18.713104+00	2019-10-18 03:51:18.713121+00	2019-10-18 03:51:18.71313+00	2	1	34	3
-63	2019-10-18 03:51:18.727849+00	2019-10-18 03:51:18.727868+00	2019-10-18 03:51:18.727877+00	2	1	35	3
-64	2019-10-18 03:51:18.74032+00	2019-10-18 03:51:18.740337+00	2019-10-18 03:51:18.740346+00	2	1	36	3
-65	2019-10-18 05:18:03.475867+00	2019-10-18 05:18:03.475896+00	2019-10-18 05:18:03.475906+00	3	1	46	139
-66	2019-10-18 05:31:50.175671+00	2019-10-18 05:31:50.175704+00	2019-10-18 05:31:50.175715+00	3	1	26	142
-67	2019-10-18 05:32:08.442522+00	2019-10-18 05:32:08.442552+00	2019-10-18 05:32:08.442563+00	3	1	29	143
-68	2019-10-18 05:32:26.115232+00	2019-10-18 05:32:26.115284+00	2019-10-18 05:32:26.11531+00	3	1	57	144
-69	2019-10-18 05:32:43.706786+00	2019-10-18 05:32:43.706813+00	2019-10-18 05:32:43.706823+00	3	1	31	145
-70	2019-10-18 05:34:21.425045+00	2019-10-18 05:34:21.425085+00	2019-10-18 05:34:21.425095+00	3	1	55	146
-71	2019-10-18 05:34:55.379671+00	2019-10-18 05:34:55.379704+00	2019-10-18 05:34:55.379714+00	3	1	13	147
-72	2019-10-18 05:35:19.014094+00	2019-10-18 05:35:19.014154+00	2019-10-18 05:35:19.014167+00	3	1	63	148
-73	2019-10-18 05:35:48.701247+00	2019-10-18 05:35:48.70129+00	2019-10-18 05:35:48.701301+00	3	1	36	149
-74	2019-10-18 05:36:09.893093+00	2019-10-18 05:36:09.893119+00	2019-10-18 05:36:09.893129+00	3	1	54	150
-75	2019-10-18 05:36:40.477139+00	2019-10-18 05:36:40.477186+00	2019-10-18 05:36:40.477197+00	3	1	25	151
-76	2019-10-18 05:37:12.915171+00	2019-10-18 05:37:12.915198+00	2019-10-18 05:37:12.915208+00	3	1	56	152
-77	2019-10-18 05:38:00.598455+00	2019-10-18 05:38:00.598506+00	2019-10-18 05:38:00.598519+00	3	1	19	153
-78	2019-10-18 05:38:23.887542+00	2019-10-18 05:38:23.887581+00	2019-10-18 05:38:23.887592+00	3	1	17	154
-79	2019-10-18 05:38:44.573977+00	2019-10-18 05:38:44.574004+00	2019-10-18 05:38:44.574014+00	3	1	7	155
-80	2019-10-18 05:39:02.505839+00	2019-10-18 05:39:02.505884+00	2019-10-18 05:39:02.505895+00	3	1	6	156
-81	2019-10-18 05:39:23.693973+00	2019-10-18 05:39:23.694004+00	2019-10-18 05:39:23.694014+00	3	1	9	157
-82	2019-10-18 05:40:03.402174+00	2019-10-18 05:40:03.402227+00	2019-10-18 05:40:03.402239+00	3	1	2	158
-83	2019-10-18 05:40:23.586858+00	2019-10-18 05:40:23.586896+00	2019-10-18 05:40:23.586908+00	3	1	53	159
-84	2019-10-18 05:40:44.240921+00	2019-10-18 05:40:44.240947+00	2019-10-18 05:40:44.240957+00	3	1	24	160
-85	2019-10-18 05:41:12.285121+00	2019-10-18 05:41:12.285148+00	2019-10-18 05:41:12.285158+00	3	1	52	161
-86	2019-10-18 05:41:36.109986+00	2019-10-18 05:41:36.11002+00	2019-10-18 05:41:36.110031+00	3	1	20	162
-87	2019-10-18 05:41:53.80883+00	2019-10-18 05:41:53.808859+00	2019-10-18 05:41:53.808878+00	3	1	15	149
-88	2019-10-18 05:42:20.175457+00	2019-10-18 05:42:20.175488+00	2019-10-18 05:42:20.1755+00	3	1	44	164
-89	2019-10-18 05:46:23.792127+00	2019-10-18 05:46:23.792158+00	2019-10-18 05:46:23.792169+00	3	1	8	165
-90	2019-10-18 05:47:02.09034+00	2019-10-18 05:47:02.090385+00	2019-10-18 05:47:02.090396+00	3	1	14	166
-91	2019-10-18 05:47:19.750179+00	2019-10-18 05:47:19.750216+00	2019-10-18 05:47:19.750227+00	3	1	60	167
-92	2019-10-18 05:47:37.544152+00	2019-10-18 05:47:37.544178+00	2019-10-18 05:47:37.544187+00	3	1	59	168
-93	2019-10-18 05:54:20.49206+00	2019-10-18 05:54:20.492115+00	2019-10-18 05:54:20.492126+00	149	1	36	141
-94	2019-10-18 05:54:40.631567+00	2019-10-18 05:54:40.631617+00	2019-10-18 05:54:40.631633+00	149	1	15	163
-95	2019-10-18 05:54:51.412905+00	2019-10-18 05:54:51.412956+00	2019-10-18 05:54:51.412966+00	141	1	36	149
-96	2019-10-18 05:58:28.562057+00	2019-10-18 05:58:28.562089+00	2019-10-18 05:58:28.5621+00	3	1	38	169
-97	2019-10-18 05:58:54.935395+00	2019-10-18 05:58:54.935482+00	2019-10-18 05:58:54.935496+00	3	1	5	170
-98	2019-10-18 05:59:15.830276+00	2019-10-18 05:59:15.830311+00	2019-10-18 05:59:15.830321+00	3	1	28	171
-99	2019-10-18 05:59:32.176645+00	2019-10-18 05:59:32.176677+00	2019-10-18 05:59:32.176688+00	3	1	45	172
-100	2019-10-18 05:59:55.126579+00	2019-10-18 05:59:55.126621+00	2019-10-18 05:59:55.126632+00	3	1	3	173
-101	2019-10-18 06:00:11.50364+00	2019-10-18 06:00:11.503683+00	2019-10-18 06:00:11.503694+00	3	1	51	174
-102	2019-10-18 06:00:40.648329+00	2019-10-18 06:00:40.648353+00	2019-10-18 06:00:40.648363+00	3	1	12	175
-103	2019-10-18 06:01:08.203539+00	2019-10-18 06:01:08.203571+00	2019-10-18 06:01:08.203582+00	3	1	23	176
-104	2019-10-18 06:01:27.412264+00	2019-10-18 06:01:27.412292+00	2019-10-18 06:01:27.412302+00	3	1	39	177
-105	2019-10-18 06:01:51.222063+00	2019-10-18 06:01:51.222091+00	2019-10-18 06:01:51.222101+00	3	1	61	186
-106	2019-10-18 06:02:13.356533+00	2019-10-18 06:02:13.356559+00	2019-10-18 06:02:13.356569+00	3	1	16	185
-107	2019-10-18 06:02:42.859073+00	2019-10-18 06:02:42.859108+00	2019-10-18 06:02:42.859198+00	3	1	32	184
-108	2019-10-18 06:03:06.187473+00	2019-10-18 06:03:06.187503+00	2019-10-18 06:03:06.187513+00	3	1	10	183
-109	2019-10-18 06:03:19.295645+00	2019-10-18 06:03:19.295677+00	2019-10-18 06:03:19.295688+00	3	1	33	182
-110	2019-10-18 06:04:47.663629+00	2019-10-18 06:04:47.663659+00	2019-10-18 06:04:47.663669+00	3	1	30	181
-111	2019-10-18 06:05:47.718996+00	2019-10-18 06:05:47.719038+00	2019-10-18 06:05:47.71905+00	3	1	22	180
-112	2019-10-18 06:06:04.488179+00	2019-10-18 06:06:04.488208+00	2019-10-18 06:06:04.488218+00	3	1	27	179
-113	2019-10-18 06:06:25.358497+00	2019-10-18 06:06:25.358525+00	2019-10-18 06:06:25.358535+00	3	1	62	178
-114	2019-10-18 06:23:45.993838+00	2019-10-18 06:23:45.993869+00	2019-10-18 06:23:45.99388+00	3	1	50	187
-115	2019-10-18 06:24:05.048984+00	2019-10-18 06:24:05.049033+00	2019-10-18 06:24:05.049044+00	3	1	34	188
-116	2019-10-18 06:24:20.708315+00	2019-10-18 06:24:20.70834+00	2019-10-18 06:24:20.70835+00	3	1	1	189
-117	2019-10-18 06:24:44.985637+00	2019-10-18 06:24:44.985689+00	2019-10-18 06:24:44.9857+00	3	1	4	190
-118	2019-10-18 06:25:09.138312+00	2019-10-18 06:25:09.138356+00	2019-10-18 06:25:09.138367+00	3	1	37	191
-119	2019-10-18 06:25:25.552852+00	2019-10-18 06:25:25.552884+00	2019-10-18 06:25:25.552894+00	3	1	41	192
-120	2019-10-18 06:25:37.405472+00	2019-10-18 06:25:37.405503+00	2019-10-18 06:25:37.405513+00	3	1	40	193
-121	2019-10-18 06:25:49.154257+00	2019-10-18 06:25:49.154286+00	2019-10-18 06:25:49.154296+00	3	1	43	194
-122	2019-10-18 06:26:04.131309+00	2019-10-18 06:26:04.131358+00	2019-10-18 06:26:04.131369+00	3	1	48	195
-123	2019-10-18 06:26:19.525474+00	2019-10-18 06:26:19.525509+00	2019-10-18 06:26:19.52552+00	3	1	21	196
-124	2019-10-18 06:26:34.532719+00	2019-10-18 06:26:34.532752+00	2019-10-18 06:26:34.532764+00	3	1	18	197
-125	2019-10-18 06:26:48.628596+00	2019-10-18 06:26:48.628646+00	2019-10-18 06:26:48.628658+00	3	1	47	198
-126	2019-10-18 06:27:10.735345+00	2019-10-18 06:27:10.735374+00	2019-10-18 06:27:10.735384+00	3	1	58	199
-127	2019-10-18 06:27:27.954391+00	2019-10-18 06:27:27.954421+00	2019-10-18 06:27:27.954431+00	3	1	64	200
-128	2019-10-18 06:27:39.738105+00	2019-10-18 06:27:39.738131+00	2019-10-18 06:27:39.738141+00	3	1	35	201
-129	2019-10-18 06:27:54.787108+00	2019-10-18 06:27:54.787156+00	2019-10-18 06:27:54.787167+00	3	1	42	188
-130	2019-10-18 06:28:32.188388+00	2019-10-18 06:28:32.188415+00	2019-10-18 06:28:32.188425+00	3	1	11	203
-131	2019-10-18 06:28:49.77054+00	2019-10-18 06:28:49.770572+00	2019-10-18 06:28:49.770582+00	3	1	49	204
-132	2019-10-18 06:36:33.070854+00	2019-10-18 06:36:33.070906+00	2019-10-18 06:36:33.070917+00	188	1	42	202
-133	2019-10-25 05:24:15.107057+00	2019-10-25 05:24:15.107081+00	2019-10-25 05:24:15.10709+00	2	4	195	3
-134	2019-10-25 05:24:15.133803+00	2019-10-25 05:24:15.133832+00	2019-10-25 05:24:15.133841+00	2	4	196	3
-135	2019-10-25 05:33:20.978811+00	2019-10-25 05:33:20.978836+00	2019-10-25 05:33:20.978846+00	2	4	208	3
-136	2019-10-25 05:33:20.9904+00	2019-10-25 05:33:20.990418+00	2019-10-25 05:33:20.990427+00	2	4	209	3
-137	2019-10-25 05:33:20.997299+00	2019-10-25 05:33:20.997317+00	2019-10-25 05:33:20.997326+00	2	4	210	3
-138	2019-10-25 05:33:21.005596+00	2019-10-25 05:33:21.00562+00	2019-10-25 05:33:21.00563+00	2	4	211	3
-139	2019-10-25 05:33:21.014785+00	2019-10-25 05:33:21.014804+00	2019-10-25 05:33:21.014814+00	2	4	212	3
-140	2019-10-25 05:33:21.022+00	2019-10-25 05:33:21.022019+00	2019-10-25 05:33:21.022029+00	2	4	213	3
-141	2019-10-25 05:33:21.03035+00	2019-10-25 05:33:21.030369+00	2019-10-25 05:33:21.030378+00	2	4	214	3
-142	2019-10-25 05:33:21.052071+00	2019-10-25 05:33:21.052091+00	2019-10-25 05:33:21.052099+00	2	4	215	3
-143	2019-10-25 05:33:21.064163+00	2019-10-25 05:33:21.064185+00	2019-10-25 05:33:21.064194+00	2	4	216	3
-144	2019-10-25 05:33:21.076461+00	2019-10-25 05:33:21.07648+00	2019-10-25 05:33:21.076489+00	2	4	217	3
-145	2019-10-25 05:33:21.091543+00	2019-10-25 05:33:21.091563+00	2019-10-25 05:33:21.091572+00	2	4	218	3
-146	2019-10-25 05:33:21.106016+00	2019-10-25 05:33:21.106042+00	2019-10-25 05:33:21.106051+00	2	4	219	3
-147	2019-10-25 05:33:21.118951+00	2019-10-25 05:33:21.118971+00	2019-10-25 05:33:21.11898+00	2	4	220	3
-148	2019-10-25 05:33:21.130547+00	2019-10-25 05:33:21.130565+00	2019-10-25 05:33:21.130574+00	2	4	197	3
-149	2019-10-25 05:33:21.146412+00	2019-10-25 05:33:21.146438+00	2019-10-25 05:33:21.146447+00	2	4	198	3
-150	2019-10-25 05:33:21.163859+00	2019-10-25 05:33:21.163881+00	2019-10-25 05:33:21.16389+00	2	4	199	3
-151	2019-10-25 05:33:21.174277+00	2019-10-25 05:33:21.174294+00	2019-10-25 05:33:21.174303+00	2	4	200	3
-152	2019-10-25 05:33:21.182722+00	2019-10-25 05:33:21.182745+00	2019-10-25 05:33:21.182754+00	2	4	201	3
-153	2019-10-25 05:33:21.190469+00	2019-10-25 05:33:21.190486+00	2019-10-25 05:33:21.190495+00	2	4	202	3
-154	2019-10-25 05:33:21.198313+00	2019-10-25 05:33:21.198331+00	2019-10-25 05:33:21.198341+00	2	4	203	3
-155	2019-10-25 05:33:21.206137+00	2019-10-25 05:33:21.206155+00	2019-10-25 05:33:21.206164+00	2	4	204	3
-156	2019-10-25 05:33:21.215693+00	2019-10-25 05:33:21.215712+00	2019-10-25 05:33:21.215721+00	2	4	205	3
-157	2019-10-25 05:33:21.227347+00	2019-10-25 05:33:21.227374+00	2019-10-25 05:33:21.227383+00	2	4	206	3
-158	2019-10-25 05:33:21.245481+00	2019-10-25 05:33:21.245617+00	2019-10-25 05:33:21.245641+00	2	4	207	3
-159	2019-10-25 05:33:21.269284+00	2019-10-25 05:33:21.269305+00	2019-10-25 05:33:21.269314+00	2	4	221	3
-160	2019-10-25 05:33:21.281034+00	2019-10-25 05:33:21.281053+00	2019-10-25 05:33:21.281062+00	2	4	222	3
-161	2019-10-25 05:33:21.292097+00	2019-10-25 05:33:21.292114+00	2019-10-25 05:33:21.292123+00	2	4	223	3
-162	2019-10-25 05:33:21.305928+00	2019-10-25 05:33:21.305948+00	2019-10-25 05:33:21.305957+00	2	4	224	3
-163	2019-10-25 05:33:21.317981+00	2019-10-25 05:33:21.318001+00	2019-10-25 05:33:21.31801+00	2	4	225	3
-164	2019-10-25 05:33:21.330464+00	2019-10-25 05:33:21.330483+00	2019-10-25 05:33:21.330493+00	2	4	226	3
-165	2019-10-25 05:33:21.342519+00	2019-10-25 05:33:21.342539+00	2019-10-25 05:33:21.342548+00	2	4	227	3
-166	2019-10-25 05:33:21.353813+00	2019-10-25 05:33:21.353832+00	2019-10-25 05:33:21.353841+00	2	4	228	3
-167	2019-10-25 05:33:21.362649+00	2019-10-25 05:33:21.362681+00	2019-10-25 05:33:21.36269+00	2	4	229	3
-168	2019-10-25 05:33:21.370376+00	2019-10-25 05:33:21.370394+00	2019-10-25 05:33:21.370402+00	2	4	230	3
-169	2019-10-25 05:33:21.377198+00	2019-10-25 05:33:21.377217+00	2019-10-25 05:33:21.377226+00	2	4	231	3
-170	2019-10-25 05:33:21.384412+00	2019-10-25 05:33:21.38443+00	2019-10-25 05:33:21.384439+00	2	4	232	3
-171	2019-10-25 05:33:21.396192+00	2019-10-25 05:33:21.396219+00	2019-10-25 05:33:21.396228+00	2	4	233	3
-172	2019-10-25 05:33:21.415439+00	2019-10-25 05:33:21.415457+00	2019-10-25 05:33:21.415466+00	2	4	234	3
-173	2019-10-25 05:33:21.427665+00	2019-10-25 05:33:21.427683+00	2019-10-25 05:33:21.427692+00	2	4	235	3
-174	2019-10-25 05:33:21.439754+00	2019-10-25 05:33:21.439775+00	2019-10-25 05:33:21.439784+00	2	4	236	3
-175	2019-10-25 05:33:21.454226+00	2019-10-25 05:33:21.454245+00	2019-10-25 05:33:21.454254+00	2	4	237	3
-176	2019-10-25 05:33:21.46692+00	2019-10-25 05:33:21.466938+00	2019-10-25 05:33:21.466947+00	2	4	238	3
-177	2019-10-25 05:33:21.478628+00	2019-10-25 05:33:21.478649+00	2019-10-25 05:33:21.478657+00	2	4	239	3
-178	2019-10-25 05:33:21.490894+00	2019-10-25 05:33:21.490916+00	2019-10-25 05:33:21.490925+00	2	4	240	3
-179	2019-10-25 05:33:21.502545+00	2019-10-25 05:33:21.502564+00	2019-10-25 05:33:21.502573+00	2	4	241	3
-180	2019-10-25 05:33:21.513932+00	2019-10-25 05:33:21.513951+00	2019-10-25 05:33:21.513959+00	2	4	242	3
-181	2019-10-25 05:33:21.523069+00	2019-10-25 05:33:21.523087+00	2019-10-25 05:33:21.523096+00	2	4	243	3
-182	2019-10-25 05:33:21.529908+00	2019-10-25 05:33:21.529924+00	2019-10-25 05:33:21.529933+00	2	4	244	3
-183	2019-10-25 05:33:21.537855+00	2019-10-25 05:33:21.537879+00	2019-10-25 05:33:21.537888+00	2	4	245	3
-184	2019-10-25 05:33:21.546841+00	2019-10-25 05:33:21.54686+00	2019-10-25 05:33:21.546869+00	2	4	246	3
-185	2019-10-25 05:33:21.560159+00	2019-10-25 05:33:21.560181+00	2019-10-25 05:33:21.560191+00	2	4	247	3
-186	2019-10-25 05:33:21.572532+00	2019-10-25 05:33:21.57255+00	2019-10-25 05:33:21.572559+00	2	4	248	3
-187	2019-10-25 05:33:21.583916+00	2019-10-25 05:33:21.583934+00	2019-10-25 05:33:21.583942+00	2	4	249	3
-188	2019-10-25 05:33:21.594894+00	2019-10-25 05:33:21.594912+00	2019-10-25 05:33:21.594921+00	2	4	250	3
-189	2019-10-25 05:33:21.606627+00	2019-10-25 05:33:21.606648+00	2019-10-25 05:33:21.606657+00	2	4	251	3
-190	2019-10-25 05:33:21.619517+00	2019-10-25 05:33:21.619539+00	2019-10-25 05:33:21.619548+00	2	4	252	3
-191	2019-10-25 05:33:21.632409+00	2019-10-25 05:33:21.632432+00	2019-10-25 05:33:21.632447+00	2	4	253	3
-192	2019-10-25 05:33:21.657757+00	2019-10-25 05:33:21.657783+00	2019-10-25 05:33:21.657792+00	2	4	254	3
-193	2019-10-25 05:33:21.670059+00	2019-10-25 05:33:21.670077+00	2019-10-25 05:33:21.670086+00	2	4	255	3
-194	2019-10-25 05:56:25.413999+00	2019-10-25 05:56:25.414031+00	2019-10-25 05:56:25.414042+00	3	9	217	232
-195	2019-10-25 05:56:43.479234+00	2019-10-25 05:56:43.479266+00	2019-10-25 05:56:43.479277+00	3	9	196	233
-196	2019-10-25 05:57:02.291639+00	2019-10-25 05:57:02.291672+00	2019-10-25 05:57:02.291683+00	3	9	216	234
-197	2019-10-25 05:57:27.980636+00	2019-10-25 05:57:27.980662+00	2019-10-25 05:57:27.980672+00	3	9	250	235
-198	2019-10-25 05:57:51.125531+00	2019-10-25 05:57:51.125565+00	2019-10-25 05:57:51.125576+00	3	9	224	236
-199	2019-10-25 05:58:09.774639+00	2019-10-25 05:58:09.774672+00	2019-10-25 05:58:09.774686+00	3	9	249	237
-200	2019-10-25 05:58:27.288489+00	2019-10-25 05:58:27.288527+00	2019-10-25 05:58:27.288539+00	3	9	248	238
-201	2019-10-25 05:58:44.044856+00	2019-10-25 05:58:44.044882+00	2019-10-25 05:58:44.044892+00	3	9	255	239
-202	2019-10-25 05:58:59.956694+00	2019-10-25 05:58:59.956727+00	2019-10-25 05:58:59.956737+00	3	9	202	240
-203	2019-10-25 05:59:16.453354+00	2019-10-25 05:59:16.453528+00	2019-10-25 05:59:16.453546+00	3	9	205	241
-204	2019-10-25 05:59:43.865917+00	2019-10-25 05:59:43.865942+00	2019-10-25 05:59:43.865952+00	3	9	199	242
-205	2019-10-25 06:00:37.836671+00	2019-10-25 06:00:37.836697+00	2019-10-25 06:00:37.836707+00	3	9	215	243
-206	2019-10-25 06:00:56.128435+00	2019-10-25 06:00:56.128472+00	2019-10-25 06:00:56.128482+00	3	9	222	244
-207	2019-10-25 06:01:41.356337+00	2019-10-25 06:01:41.356364+00	2019-10-25 06:01:41.356374+00	3	9	228	245
-208	2019-10-25 06:02:04.313287+00	2019-10-25 06:02:04.313314+00	2019-10-25 06:02:04.313323+00	3	9	208	246
-209	2019-10-25 06:02:24.721394+00	2019-10-25 06:02:24.721427+00	2019-10-25 06:02:24.721438+00	3	9	209	247
-210	2019-10-25 06:02:43.966689+00	2019-10-25 06:02:43.966714+00	2019-10-25 06:02:43.966724+00	3	9	214	248
-211	2019-10-25 06:02:58.803756+00	2019-10-25 06:02:58.803789+00	2019-10-25 06:02:58.803799+00	3	9	218	249
-212	2019-10-25 06:03:26.802934+00	2019-10-25 06:03:26.80296+00	2019-10-25 06:03:26.80297+00	3	9	235	250
-213	2019-10-25 06:03:43.900274+00	2019-10-25 06:03:43.900299+00	2019-10-25 06:03:43.900309+00	3	9	236	251
-214	2019-10-25 06:04:00.66083+00	2019-10-25 06:04:00.660857+00	2019-10-25 06:04:00.660867+00	3	9	211	252
-215	2019-10-25 06:04:14.213006+00	2019-10-25 06:04:14.213048+00	2019-10-25 06:04:14.213059+00	3	9	230	253
-216	2019-10-25 06:04:57.47844+00	2019-10-25 06:04:57.478482+00	2019-10-25 06:04:57.478493+00	3	9	206	255
-217	2019-10-25 06:05:27.927954+00	2019-10-25 06:05:27.92798+00	2019-10-25 06:05:27.92799+00	3	9	239	256
-218	2019-10-25 06:05:46.568404+00	2019-10-25 06:05:46.56843+00	2019-10-25 06:05:46.56844+00	3	9	234	257
-219	2019-10-25 06:06:21.02953+00	2019-10-25 06:06:21.029558+00	2019-10-25 06:06:21.029568+00	3	9	238	258
-220	2019-10-25 06:10:26.200132+00	2019-10-25 06:10:26.20016+00	2019-10-25 06:10:26.200174+00	252	8	211	254
-221	2019-10-25 06:13:50.816568+00	2019-10-25 06:13:50.816602+00	2019-10-25 06:13:50.816613+00	3	9	219	252
-222	2019-10-25 06:19:54.984042+00	2019-10-25 06:19:54.984075+00	2019-10-25 06:19:54.984086+00	252	9	219	261
-223	2019-10-25 06:22:15.135822+00	2019-10-25 06:22:15.135847+00	2019-10-25 06:22:15.135856+00	3	9	231	206
-224	2019-10-25 06:22:37.767242+00	2019-10-25 06:22:37.767279+00	2019-10-25 06:22:37.76729+00	3	9	254	207
-225	2019-10-25 06:22:59.93033+00	2019-10-25 06:22:59.930359+00	2019-10-25 06:22:59.930387+00	3	9	223	208
-226	2019-10-25 06:23:24.917386+00	2019-10-25 06:23:24.917411+00	2019-10-25 06:23:24.91742+00	3	9	195	209
-227	2019-10-25 06:23:39.622384+00	2019-10-25 06:23:39.622425+00	2019-10-25 06:23:39.622436+00	3	9	225	210
-228	2019-10-25 06:23:55.525518+00	2019-10-25 06:23:55.525545+00	2019-10-25 06:23:55.525555+00	3	9	251	211
-229	2019-10-25 06:24:08.435008+00	2019-10-25 06:24:08.435042+00	2019-10-25 06:24:08.435052+00	3	9	244	212
-230	2019-10-25 06:24:22.272986+00	2019-10-25 06:24:22.273014+00	2019-10-25 06:24:22.273023+00	3	9	226	213
-231	2019-10-25 06:25:10.402924+00	2019-10-25 06:25:10.402952+00	2019-10-25 06:25:10.402962+00	3	9	220	214
-232	2019-10-25 06:25:28.706543+00	2019-10-25 06:25:28.706594+00	2019-10-25 06:25:28.706614+00	3	9	253	215
-233	2019-10-25 06:25:47.770098+00	2019-10-25 06:25:47.77013+00	2019-10-25 06:25:47.77014+00	3	9	198	216
-234	2019-10-25 06:30:55.033414+00	2019-10-25 06:30:55.033438+00	2019-10-25 06:30:55.033447+00	3	9	221	217
-235	2019-10-25 06:31:08.545329+00	2019-10-25 06:31:08.545364+00	2019-10-25 06:31:08.545375+00	3	9	210	218
-236	2019-10-25 06:31:27.20431+00	2019-10-25 06:31:27.204343+00	2019-10-25 06:31:27.204354+00	3	9	207	219
-237	2019-10-25 06:31:40.707822+00	2019-10-25 06:31:40.707867+00	2019-10-25 06:31:40.707879+00	3	9	243	220
-238	2019-10-25 06:32:05.213802+00	2019-10-25 06:32:05.213829+00	2019-10-25 06:32:05.213839+00	3	9	212	221
-239	2019-10-25 06:32:20.808809+00	2019-10-25 06:32:20.80884+00	2019-10-25 06:32:20.80885+00	3	9	245	222
-240	2019-10-25 06:32:35.520924+00	2019-10-25 06:32:35.52095+00	2019-10-25 06:32:35.52096+00	3	9	213	223
-241	2019-10-29 07:16:14.322816+00	2019-10-29 07:16:14.322836+00	2019-10-29 07:16:14.3205+00	3	4	200	252
-242	2019-10-29 07:16:53.530818+00	2019-10-29 07:16:53.530843+00	2019-10-29 07:16:53.529468+00	3	4	229	231
-243	2019-10-29 07:17:05.991045+00	2019-10-29 07:17:05.991068+00	2019-10-29 07:17:05.987551+00	3	4	203	230
-244	2019-10-29 07:17:20.819034+00	2019-10-29 07:17:20.819057+00	2019-10-29 07:17:20.816764+00	3	4	232	229
-245	2019-10-29 07:17:28.231535+00	2019-10-29 07:17:28.231553+00	2019-10-29 07:17:28.229961+00	3	4	252	228
-246	2019-10-29 07:17:42.447633+00	2019-10-29 07:17:42.447651+00	2019-10-29 07:17:42.446326+00	3	4	246	227
-247	2019-10-29 07:17:50.995479+00	2019-10-29 07:17:50.995508+00	2019-10-29 07:17:50.992631+00	3	4	197	226
-248	2019-10-29 07:18:00.10416+00	2019-10-29 07:18:00.104351+00	2019-10-29 07:18:00.085572+00	3	4	204	225
-249	2019-10-29 07:23:49.500755+00	2019-10-29 07:23:49.500786+00	2019-10-29 07:23:49.498848+00	239	4	255	224
-250	2019-10-29 07:24:31.785502+00	2019-10-29 07:24:31.785532+00	2019-10-29 07:24:31.783817+00	3	4	227	239
-251	2019-10-29 07:41:59.588784+00	2019-10-29 07:41:59.588808+00	2019-10-29 07:41:59.587435+00	3	4	201	259
-252	2019-10-29 07:42:12.291494+00	2019-10-29 07:42:12.291514+00	2019-10-29 07:42:12.290191+00	3	4	233	260
-253	2019-10-29 07:42:31.796638+00	2019-10-29 07:42:31.796663+00	2019-10-29 07:42:31.794875+00	3	4	237	262
-254	2019-10-29 07:42:43.721202+00	2019-10-29 07:42:43.721225+00	2019-10-29 07:42:43.719519+00	3	4	240	263
-255	2019-10-29 07:42:52.20622+00	2019-10-29 07:42:52.206241+00	2019-10-29 07:42:52.204978+00	3	4	242	264
-256	2019-10-29 07:43:04.457501+00	2019-10-29 07:43:04.45752+00	2019-10-29 07:43:04.456235+00	3	4	241	265
-257	2019-10-29 07:49:53.438079+00	2019-10-29 07:49:53.438106+00	2019-10-29 07:49:53.4357+00	233	4	196	205
-258	2019-10-29 07:51:22.284256+00	2019-10-29 07:51:22.284285+00	2019-10-29 07:51:22.282821+00	3	4	247	233
-259	2019-11-01 04:33:38.575473+00	2019-11-01 04:33:38.575511+00	2019-11-01 04:33:38.573123+00	2	4	256	3
-260	2019-11-01 04:33:38.599398+00	2019-11-01 04:33:38.59942+00	2019-11-01 04:33:38.596714+00	2	4	257	3
-261	2019-11-01 04:33:38.616194+00	2019-11-01 04:33:38.616223+00	2019-11-01 04:33:38.6148+00	2	4	258	3
-262	2019-11-01 04:33:38.632011+00	2019-11-01 04:33:38.632034+00	2019-11-01 04:33:38.629488+00	2	4	259	3
-263	2019-11-01 04:33:38.64599+00	2019-11-01 04:33:38.646006+00	2019-11-01 04:33:38.644552+00	2	4	260	3
-264	2019-11-01 04:33:38.664314+00	2019-11-01 04:33:38.664338+00	2019-11-01 04:33:38.661808+00	2	4	261	3
-265	2019-11-01 04:33:38.679501+00	2019-11-01 04:33:38.679522+00	2019-11-01 04:33:38.677317+00	2	4	262	3
-266	2019-11-01 04:33:38.694094+00	2019-11-01 04:33:38.694113+00	2019-11-01 04:33:38.692093+00	2	4	263	3
-267	2019-11-01 04:33:38.712176+00	2019-11-01 04:33:38.712197+00	2019-11-01 04:33:38.70856+00	2	4	264	3
-268	2019-11-01 04:33:38.720536+00	2019-11-01 04:33:38.720553+00	2019-11-01 04:33:38.719088+00	2	4	265	3
-269	2019-11-01 04:33:38.72853+00	2019-11-01 04:33:38.728545+00	2019-11-01 04:33:38.727169+00	2	4	266	3
-270	2019-11-01 04:33:38.746385+00	2019-11-01 04:33:38.746404+00	2019-11-01 04:33:38.74463+00	2	4	267	3
-271	2019-11-01 04:33:38.756438+00	2019-11-01 04:33:38.756456+00	2019-11-01 04:33:38.754012+00	2	4	268	3
-272	2019-11-01 04:33:38.770008+00	2019-11-01 04:33:38.770024+00	2019-11-01 04:33:38.76766+00	2	4	269	3
-273	2019-11-01 04:33:38.78546+00	2019-11-01 04:33:38.785483+00	2019-11-01 04:33:38.782753+00	2	4	270	3
-274	2019-11-01 04:33:38.799132+00	2019-11-01 04:33:38.799152+00	2019-11-01 04:33:38.797057+00	2	4	271	3
-275	2019-11-01 04:33:38.818382+00	2019-11-01 04:33:38.818402+00	2019-11-01 04:33:38.816263+00	2	4	272	3
-276	2019-11-01 04:33:38.833973+00	2019-11-01 04:33:38.833988+00	2019-11-01 04:33:38.832572+00	2	4	273	3
-277	2019-11-01 04:33:38.850078+00	2019-11-01 04:33:38.850099+00	2019-11-01 04:33:38.848347+00	2	4	274	3
-278	2019-11-01 04:33:38.863505+00	2019-11-01 04:33:38.863519+00	2019-11-01 04:33:38.862093+00	2	4	282	3
-279	2019-11-01 04:33:38.876527+00	2019-11-01 04:33:38.876544+00	2019-11-01 04:33:38.875083+00	2	4	283	3
-280	2019-11-01 04:33:38.887204+00	2019-11-01 04:33:38.887219+00	2019-11-01 04:33:38.885643+00	2	4	284	3
-281	2019-11-01 04:33:38.897267+00	2019-11-01 04:33:38.897284+00	2019-11-01 04:33:38.895787+00	2	4	285	3
-282	2019-11-01 04:33:38.905569+00	2019-11-01 04:33:38.905582+00	2019-11-01 04:33:38.904267+00	2	4	286	3
-283	2019-11-01 04:33:38.919122+00	2019-11-01 04:33:38.919141+00	2019-11-01 04:33:38.917148+00	2	4	287	3
-284	2019-11-01 04:33:38.933261+00	2019-11-01 04:33:38.933276+00	2019-11-01 04:33:38.931824+00	2	4	288	3
-285	2019-11-01 04:33:38.945796+00	2019-11-01 04:33:38.945813+00	2019-11-01 04:33:38.944284+00	2	4	289	3
-286	2019-11-01 04:33:38.960095+00	2019-11-01 04:33:38.960112+00	2019-11-01 04:33:38.958437+00	2	4	290	3
-287	2019-11-01 04:33:38.975973+00	2019-11-01 04:33:38.975992+00	2019-11-01 04:33:38.974091+00	2	4	291	3
-288	2019-11-01 04:33:38.989731+00	2019-11-01 04:33:38.989748+00	2019-11-01 04:33:38.988264+00	2	4	292	3
-289	2019-11-01 04:33:39.005123+00	2019-11-01 04:33:39.005148+00	2019-11-01 04:33:39.002848+00	2	4	275	3
-290	2019-11-01 04:33:39.023153+00	2019-11-01 04:33:39.023172+00	2019-11-01 04:33:39.021341+00	2	4	276	3
-291	2019-11-01 04:33:39.036289+00	2019-11-01 04:33:39.036305+00	2019-11-01 04:33:39.034786+00	2	4	277	3
-292	2019-11-01 04:33:39.049571+00	2019-11-01 04:33:39.049596+00	2019-11-01 04:33:39.047501+00	2	4	278	3
-293	2019-11-01 04:33:39.063708+00	2019-11-01 04:33:39.06373+00	2019-11-01 04:33:39.061654+00	2	4	279	3
-294	2019-11-01 04:33:39.077295+00	2019-11-01 04:33:39.077314+00	2019-11-01 04:33:39.07548+00	2	4	280	3
-295	2019-11-01 04:33:39.089058+00	2019-11-01 04:33:39.089075+00	2019-11-01 04:33:39.087344+00	2	4	281	3
-296	2019-11-01 04:33:39.102743+00	2019-11-01 04:33:39.102758+00	2019-11-01 04:33:39.101285+00	2	4	293	3
-297	2019-11-01 04:33:39.112563+00	2019-11-01 04:33:39.112581+00	2019-11-01 04:33:39.110451+00	2	4	294	3
-298	2019-11-01 04:33:39.130324+00	2019-11-01 04:33:39.130341+00	2019-11-01 04:33:39.12856+00	2	4	295	3
-299	2019-11-01 04:33:39.146269+00	2019-11-01 04:33:39.146285+00	2019-11-01 04:33:39.144458+00	2	4	296	3
-300	2019-11-01 04:33:39.160154+00	2019-11-01 04:33:39.160167+00	2019-11-01 04:33:39.158868+00	2	4	297	3
-301	2019-11-01 04:33:39.180901+00	2019-11-01 04:33:39.180926+00	2019-11-01 04:33:39.176822+00	2	4	298	3
-302	2019-11-01 04:33:39.197466+00	2019-11-01 04:33:39.197484+00	2019-11-01 04:33:39.195863+00	2	4	299	3
-303	2019-11-01 04:33:39.211218+00	2019-11-01 04:33:39.211242+00	2019-11-01 04:33:39.209544+00	2	4	300	3
-304	2019-11-01 04:33:39.226155+00	2019-11-01 04:33:39.226177+00	2019-11-01 04:33:39.224295+00	2	4	301	3
-305	2019-11-01 04:33:39.239106+00	2019-11-01 04:33:39.239121+00	2019-11-01 04:33:39.237625+00	2	4	302	3
-306	2019-11-01 04:33:39.251443+00	2019-11-01 04:33:39.251457+00	2019-11-01 04:33:39.250179+00	2	4	303	3
-307	2019-11-01 04:33:39.267403+00	2019-11-01 04:33:39.267421+00	2019-11-01 04:33:39.2656+00	2	4	304	3
-308	2019-11-01 04:33:39.279623+00	2019-11-01 04:33:39.279637+00	2019-11-01 04:33:39.27838+00	2	4	305	3
-309	2019-11-01 04:33:39.310251+00	2019-11-01 04:33:39.31027+00	2019-11-01 04:33:39.308491+00	2	4	306	3
-310	2019-11-01 04:33:39.318857+00	2019-11-01 04:33:39.318877+00	2019-11-01 04:33:39.316932+00	2	4	307	3
-311	2019-11-01 04:33:39.330869+00	2019-11-01 04:33:39.330881+00	2019-11-01 04:33:39.329566+00	2	4	308	3
-312	2019-11-01 04:33:39.338154+00	2019-11-01 04:33:39.338167+00	2019-11-01 04:33:39.33695+00	2	4	309	3
-313	2019-11-01 04:33:39.349004+00	2019-11-01 04:33:39.349018+00	2019-11-01 04:33:39.347634+00	2	4	310	3
-314	2019-11-01 04:33:39.361345+00	2019-11-01 04:33:39.361362+00	2019-11-01 04:33:39.359947+00	2	4	311	3
-315	2019-11-01 04:33:39.372867+00	2019-11-01 04:33:39.37288+00	2019-11-01 04:33:39.371721+00	2	4	312	3
-316	2019-11-01 04:33:39.385936+00	2019-11-01 04:33:39.385955+00	2019-11-01 04:33:39.384056+00	2	4	313	3
-317	2019-11-01 04:33:39.399469+00	2019-11-01 04:33:39.399489+00	2019-11-01 04:33:39.397213+00	2	4	314	3
-318	2019-11-01 04:33:39.412384+00	2019-11-01 04:33:39.412399+00	2019-11-01 04:33:39.411088+00	2	4	315	3
-319	2019-11-01 04:33:39.42797+00	2019-11-01 04:33:39.427994+00	2019-11-01 04:33:39.425001+00	2	4	316	3
-320	2019-11-01 04:33:39.441775+00	2019-11-01 04:33:39.441793+00	2019-11-01 04:33:39.440093+00	2	4	317	3
-321	2019-11-01 04:33:39.457716+00	2019-11-01 04:33:39.457736+00	2019-11-01 04:33:39.455454+00	2	4	318	3
-322	2019-11-01 04:33:39.472701+00	2019-11-01 04:33:39.472719+00	2019-11-01 04:33:39.471022+00	2	4	319	3
-323	2019-11-04 07:13:10.651376+00	2019-11-04 07:13:10.651401+00	2019-11-04 07:13:10.649211+00	3	4	281	277
-324	2019-11-04 07:13:33.55947+00	2019-11-04 07:13:33.559491+00	2019-11-04 07:13:33.55799+00	3	4	297	294
-325	2019-11-04 07:13:47.225526+00	2019-11-04 07:13:47.225552+00	2019-11-04 07:13:47.224012+00	3	4	258	278
-326	2019-11-04 07:13:59.362328+00	2019-11-04 07:13:59.362347+00	2019-11-04 07:13:59.360916+00	3	4	305	293
-327	2019-11-04 07:14:18.171241+00	2019-11-04 07:14:18.171266+00	2019-11-04 07:14:18.169173+00	3	4	298	279
-328	2019-11-04 07:14:31.431927+00	2019-11-04 07:14:31.431953+00	2019-11-04 07:14:31.430305+00	3	4	316	292
-329	2019-11-04 07:14:46.378023+00	2019-11-04 07:14:46.378046+00	2019-11-04 07:14:46.376602+00	3	4	267	280
-330	2019-11-04 07:15:00.04889+00	2019-11-04 07:15:00.048914+00	2019-11-04 07:15:00.047526+00	3	4	308	287
-331	2019-11-04 07:15:19.809927+00	2019-11-04 07:15:19.809946+00	2019-11-04 07:15:19.808674+00	3	4	301	281
-332	2019-11-04 07:15:30.317406+00	2019-11-04 07:15:30.317432+00	2019-11-04 07:15:30.315661+00	3	4	271	290
-333	2019-11-04 07:15:42.506508+00	2019-11-04 07:15:42.506526+00	2019-11-04 07:15:42.505197+00	3	4	299	282
-334	2019-11-04 07:15:56.178423+00	2019-11-04 07:15:56.178454+00	2019-11-04 07:15:56.176033+00	3	4	276	289
-335	2019-11-04 07:16:08.60096+00	2019-11-04 07:16:08.601016+00	2019-11-04 07:16:08.598395+00	3	4	279	283
-336	2019-11-04 07:16:19.608985+00	2019-11-04 07:16:19.609005+00	2019-11-04 07:16:19.606551+00	3	4	309	288
-337	2019-11-04 07:16:43.699826+00	2019-11-04 07:16:43.699845+00	2019-11-04 07:16:43.698465+00	3	4	260	284
-338	2019-11-04 07:18:34.9123+00	2019-11-04 07:18:34.912327+00	2019-11-04 07:18:34.910797+00	287	4	308	291
-339	2019-11-04 07:19:35.467796+00	2019-11-04 07:19:35.467827+00	2019-11-04 07:19:35.465692+00	3	4	278	287
-340	2019-11-04 07:19:50.905939+00	2019-11-04 07:19:50.905966+00	2019-11-04 07:19:50.904589+00	3	4	300	285
-341	2019-11-04 07:20:24.304769+00	2019-11-04 07:20:24.304789+00	2019-11-04 07:20:24.303436+00	3	4	286	286
-342	2019-11-04 07:35:34.643277+00	2019-11-04 07:35:34.6433+00	2019-11-04 07:35:34.641535+00	3	9	304	295
-343	2019-11-04 07:35:50.766536+00	2019-11-04 07:35:50.766565+00	2019-11-04 07:35:50.764878+00	3	9	269	296
-344	2019-11-04 07:36:04.36353+00	2019-11-04 07:36:04.363548+00	2019-11-04 07:36:04.361961+00	3	9	277	297
-345	2019-11-04 07:36:17.019088+00	2019-11-04 07:36:17.019117+00	2019-11-04 07:36:17.017489+00	3	9	257	298
-346	2019-11-04 07:44:41.868366+00	2019-11-04 07:44:41.868601+00	2019-11-04 07:44:41.864953+00	3	9	312	299
-347	2019-11-04 07:44:53.621555+00	2019-11-04 07:44:53.621573+00	2019-11-04 07:44:53.620329+00	3	9	289	300
-348	2019-11-04 07:45:02.449854+00	2019-11-04 07:45:02.449938+00	2019-11-04 07:45:02.435917+00	3	9	306	301
-349	2019-11-04 07:45:15.501685+00	2019-11-04 07:45:15.501708+00	2019-11-04 07:45:15.500319+00	3	9	264	302
-350	2019-11-04 07:45:30.269131+00	2019-11-04 07:45:30.269152+00	2019-11-04 07:45:30.267487+00	3	9	313	303
-351	2019-11-04 07:49:11.206169+00	2019-11-04 07:49:11.206195+00	2019-11-04 07:49:11.203351+00	3	9	307	276
-352	2019-11-04 07:49:26.973811+00	2019-11-04 07:49:26.973849+00	2019-11-04 07:49:26.969642+00	3	9	290	275
-353	2019-11-04 07:49:38.25116+00	2019-11-04 07:49:38.251192+00	2019-11-04 07:49:38.249499+00	3	9	302	274
-354	2019-11-04 07:49:55.061877+00	2019-11-04 07:49:55.061905+00	2019-11-04 07:49:55.058014+00	3	9	285	273
-355	2019-11-04 07:50:11.391441+00	2019-11-04 07:50:11.391468+00	2019-11-04 07:50:11.389301+00	3	9	275	272
-356	2019-11-04 07:50:28.612045+00	2019-11-04 07:50:28.612071+00	2019-11-04 07:50:28.61003+00	3	9	294	271
-357	2019-11-04 07:50:40.224496+00	2019-11-04 07:50:40.224521+00	2019-11-04 07:50:40.223143+00	3	9	287	270
-358	2019-11-04 07:50:56.029725+00	2019-11-04 07:50:56.029752+00	2019-11-04 07:50:56.028398+00	3	9	310	269
-359	2019-11-04 07:51:07.985943+00	2019-11-04 07:51:07.985961+00	2019-11-04 07:51:07.983959+00	3	9	268	268
-360	2019-11-04 07:51:22.897467+00	2019-11-04 07:51:22.897485+00	2019-11-04 07:51:22.896251+00	3	9	311	267
-361	2019-11-04 07:54:51.512181+00	2019-11-04 07:54:51.512207+00	2019-11-04 07:54:51.510799+00	3	9	263	34
-362	2019-11-04 07:54:59.602852+00	2019-11-04 07:54:59.602879+00	2019-11-04 07:54:59.601202+00	3	9	261	35
-363	2019-11-04 07:55:08.810142+00	2019-11-04 07:55:08.81016+00	2019-11-04 07:55:08.808926+00	3	9	288	36
-364	2019-11-04 07:55:18.684562+00	2019-11-04 07:55:18.684583+00	2019-11-04 07:55:18.682962+00	3	9	303	37
-365	2019-11-04 07:55:27.251264+00	2019-11-04 07:55:27.251285+00	2019-11-04 07:55:27.249601+00	3	9	266	38
-366	2019-11-04 07:55:37.472492+00	2019-11-04 07:55:37.472515+00	2019-11-04 07:55:37.471269+00	3	9	319	39
-367	2019-11-04 07:55:50.519283+00	2019-11-04 07:55:50.519308+00	2019-11-04 07:55:50.516964+00	3	9	280	40
-368	2019-11-04 07:55:58.869893+00	2019-11-04 07:55:58.869912+00	2019-11-04 07:55:58.868607+00	3	9	274	41
-369	2019-11-04 07:56:06.659425+00	2019-11-04 07:56:06.659445+00	2019-11-04 07:56:06.658156+00	3	9	270	42
-370	2019-11-04 07:56:40.732835+00	2019-11-04 07:56:40.732857+00	2019-11-04 07:56:40.731486+00	3	9	282	43
-371	2019-11-04 07:56:49.547108+00	2019-11-04 07:56:49.547137+00	2019-11-04 07:56:49.545811+00	3	9	291	44
-372	2019-11-04 07:56:59.631777+00	2019-11-04 07:56:59.631795+00	2019-11-04 07:56:59.630279+00	3	9	296	45
-373	2019-11-04 07:57:10.03745+00	2019-11-04 07:57:10.037526+00	2019-11-04 07:57:10.035613+00	3	9	262	46
-374	2019-11-04 07:57:19.142266+00	2019-11-04 07:57:19.142291+00	2019-11-04 07:57:19.140786+00	3	9	292	47
-375	2019-11-04 07:57:31.948316+00	2019-11-04 07:57:31.948342+00	2019-11-04 07:57:31.946939+00	3	9	265	48
-376	2019-11-04 07:57:41.488861+00	2019-11-04 07:57:41.488882+00	2019-11-04 07:57:41.486793+00	3	9	317	49
-377	2019-11-04 07:57:59.824238+00	2019-11-04 07:57:59.824262+00	2019-11-04 07:57:59.822862+00	3	9	314	50
-378	2019-11-04 07:58:11.095166+00	2019-11-04 07:58:11.095185+00	2019-11-04 07:58:11.093967+00	3	9	318	52
-379	2019-11-04 07:58:19.863206+00	2019-11-04 07:58:19.863234+00	2019-11-04 07:58:19.861175+00	3	9	295	53
-380	2019-11-04 07:58:36.557893+00	2019-11-04 07:58:36.557913+00	2019-11-04 07:58:36.556601+00	3	9	315	54
-381	2019-11-04 07:59:55.918194+00	2019-11-04 07:59:55.918219+00	2019-11-04 07:59:55.916462+00	3	9	283	57
-382	2019-11-04 08:00:04.776913+00	2019-11-04 08:00:04.776939+00	2019-11-04 08:00:04.773618+00	3	9	259	58
-383	2019-11-04 08:00:17.948881+00	2019-11-04 08:00:17.9489+00	2019-11-04 08:00:17.947642+00	3	9	293	59
-384	2019-11-04 08:21:49.992533+00	2019-11-04 08:21:49.992562+00	2019-11-04 08:21:49.991123+00	257	9	234	124
-385	2019-11-04 08:22:08.492179+00	2019-11-04 08:22:08.49308+00	2019-11-04 08:22:08.488546+00	3	9	273	257
-386	2019-11-04 08:29:50.827672+00	2019-11-04 08:29:50.827703+00	2019-11-04 08:29:50.82517+00	3	9	256	55
-387	2019-11-04 08:34:17.261173+00	2019-11-04 08:34:17.261205+00	2019-11-04 08:34:17.259543+00	39	9	319	56
-388	2019-11-04 08:34:28.916474+00	2019-11-04 08:34:28.916493+00	2019-11-04 08:34:28.914822+00	3	9	284	39
-389	2019-11-09 03:32:57.072386+00	2019-11-09 03:32:57.072404+00	2019-11-09 03:32:57.07101+00	2	4	320	3
-390	2019-11-09 03:32:57.094699+00	2019-11-09 03:32:57.094716+00	2019-11-09 03:32:57.092989+00	2	4	321	3
-391	2019-11-09 03:32:57.106141+00	2019-11-09 03:32:57.106157+00	2019-11-09 03:32:57.104209+00	2	4	322	3
-392	2019-11-09 03:32:57.116912+00	2019-11-09 03:32:57.11693+00	2019-11-09 03:32:57.114792+00	2	4	323	3
-393	2019-11-09 03:32:57.129772+00	2019-11-09 03:32:57.129787+00	2019-11-09 03:32:57.12823+00	2	4	324	3
-394	2019-11-09 03:32:57.141275+00	2019-11-09 03:32:57.14129+00	2019-11-09 03:32:57.139807+00	2	4	325	3
-395	2019-11-09 03:32:57.150397+00	2019-11-09 03:32:57.15041+00	2019-11-09 03:32:57.149158+00	2	4	326	3
-396	2019-11-09 03:32:57.158292+00	2019-11-09 03:32:57.158306+00	2019-11-09 03:32:57.156794+00	2	4	327	3
-397	2019-11-09 03:32:57.167603+00	2019-11-09 03:32:57.167619+00	2019-11-09 03:32:57.165953+00	2	4	328	3
-398	2019-11-09 03:32:57.175191+00	2019-11-09 03:32:57.175204+00	2019-11-09 03:32:57.173924+00	2	4	329	3
-399	2019-11-09 03:32:57.183159+00	2019-11-09 03:32:57.183244+00	2019-11-09 03:32:57.181432+00	2	4	330	3
-400	2019-11-09 03:32:57.192977+00	2019-11-09 03:32:57.19299+00	2019-11-09 03:32:57.191301+00	2	4	331	3
-401	2019-11-09 03:32:57.20524+00	2019-11-09 03:32:57.205255+00	2019-11-09 03:32:57.203838+00	2	4	332	3
-402	2019-11-09 03:32:57.217152+00	2019-11-09 03:32:57.217167+00	2019-11-09 03:32:57.215763+00	2	4	333	3
-403	2019-11-09 03:32:57.231855+00	2019-11-09 03:32:57.23187+00	2019-11-09 03:32:57.230174+00	2	4	335	3
-404	2019-11-09 03:32:57.242548+00	2019-11-09 03:32:57.242561+00	2019-11-09 03:32:57.241362+00	2	4	336	3
-405	2019-11-09 03:32:57.251915+00	2019-11-09 03:32:57.251929+00	2019-11-09 03:32:57.250174+00	2	4	337	3
-406	2019-11-09 03:32:57.261748+00	2019-11-09 03:32:57.261763+00	2019-11-09 03:32:57.260283+00	2	4	338	3
-407	2019-11-09 03:32:57.271601+00	2019-11-09 03:32:57.271616+00	2019-11-09 03:32:57.269935+00	2	4	339	3
-408	2019-11-09 03:32:57.280389+00	2019-11-09 03:32:57.280402+00	2019-11-09 03:32:57.279125+00	2	4	340	3
-409	2019-11-09 03:32:57.290878+00	2019-11-09 03:32:57.290895+00	2019-11-09 03:32:57.289338+00	2	4	341	3
-410	2019-11-09 03:32:57.301963+00	2019-11-09 03:32:57.301978+00	2019-11-09 03:32:57.300477+00	2	4	342	3
-411	2019-11-09 03:32:57.317878+00	2019-11-09 03:32:57.317895+00	2019-11-09 03:32:57.314905+00	2	4	343	3
-412	2019-11-09 03:32:57.329522+00	2019-11-09 03:32:57.329535+00	2019-11-09 03:32:57.328205+00	2	4	344	3
-413	2019-11-09 03:32:57.341161+00	2019-11-09 03:32:57.341176+00	2019-11-09 03:32:57.339875+00	2	4	345	3
-414	2019-11-09 03:32:57.350974+00	2019-11-09 03:32:57.350987+00	2019-11-09 03:32:57.349832+00	2	4	346	3
-415	2019-11-09 03:32:57.361292+00	2019-11-09 03:32:57.361307+00	2019-11-09 03:32:57.359808+00	2	4	347	3
-416	2019-11-09 03:32:57.377057+00	2019-11-09 03:32:57.377075+00	2019-11-09 03:32:57.375282+00	2	4	348	3
-417	2019-11-09 03:32:57.388478+00	2019-11-09 03:32:57.388492+00	2019-11-09 03:32:57.387037+00	2	4	349	3
-418	2019-11-09 03:32:57.398265+00	2019-11-09 03:32:57.398279+00	2019-11-09 03:32:57.396876+00	2	4	350	3
-419	2019-11-09 03:32:57.410341+00	2019-11-09 03:32:57.410357+00	2019-11-09 03:32:57.408537+00	2	4	351	3
-420	2019-11-09 03:32:57.420924+00	2019-11-09 03:32:57.420938+00	2019-11-09 03:32:57.419677+00	2	4	352	3
-421	2019-11-09 03:32:57.429775+00	2019-11-09 03:32:57.429788+00	2019-11-09 03:32:57.428493+00	2	4	353	3
-422	2019-11-09 03:32:57.438848+00	2019-11-09 03:32:57.438862+00	2019-11-09 03:32:57.437488+00	2	4	354	3
-423	2019-11-09 03:32:57.449517+00	2019-11-09 03:32:57.44953+00	2019-11-09 03:32:57.448105+00	2	4	355	3
-424	2019-11-09 03:32:57.460763+00	2019-11-09 03:32:57.460778+00	2019-11-09 03:32:57.459122+00	2	4	356	3
-425	2019-11-09 03:32:57.472058+00	2019-11-09 03:32:57.472071+00	2019-11-09 03:32:57.470715+00	2	4	357	3
-426	2019-11-09 03:32:57.483457+00	2019-11-09 03:32:57.483473+00	2019-11-09 03:32:57.481941+00	2	4	358	3
-427	2019-11-09 03:32:57.494417+00	2019-11-09 03:32:57.49443+00	2019-11-09 03:32:57.493248+00	2	4	359	3
-428	2019-11-09 03:32:57.506817+00	2019-11-09 03:32:57.506833+00	2019-11-09 03:32:57.504862+00	2	4	360	3
-429	2019-11-09 03:32:57.518827+00	2019-11-09 03:32:57.518842+00	2019-11-09 03:32:57.517412+00	2	4	361	3
-430	2019-11-09 03:32:57.530606+00	2019-11-09 03:32:57.530619+00	2019-11-09 03:32:57.529437+00	2	4	362	3
-431	2019-11-09 03:32:57.540038+00	2019-11-09 03:32:57.540052+00	2019-11-09 03:32:57.538611+00	2	4	363	3
-432	2019-11-09 03:32:57.549152+00	2019-11-09 03:32:57.549168+00	2019-11-09 03:32:57.547862+00	2	4	364	3
-433	2019-11-09 03:32:57.557467+00	2019-11-09 03:32:57.55748+00	2019-11-09 03:32:57.556213+00	2	4	334	3
-434	2019-11-09 03:32:57.566305+00	2019-11-09 03:32:57.566319+00	2019-11-09 03:32:57.56499+00	2	4	367	3
-435	2019-11-09 03:32:57.57702+00	2019-11-09 03:32:57.577035+00	2019-11-09 03:32:57.575627+00	2	4	368	3
-436	2019-11-09 03:32:57.588682+00	2019-11-09 03:32:57.588696+00	2019-11-09 03:32:57.587432+00	2	4	369	3
-437	2019-11-09 03:32:57.608131+00	2019-11-09 03:32:57.608149+00	2019-11-09 03:32:57.606323+00	2	4	370	3
-438	2019-11-09 03:32:57.620916+00	2019-11-09 03:32:57.620931+00	2019-11-09 03:32:57.619272+00	2	4	371	3
-439	2019-11-09 03:32:57.632773+00	2019-11-09 03:32:57.632786+00	2019-11-09 03:32:57.631538+00	2	4	372	3
-440	2019-11-09 03:32:57.645075+00	2019-11-09 03:32:57.645089+00	2019-11-09 03:32:57.643727+00	2	4	373	3
-441	2019-11-09 03:32:57.654752+00	2019-11-09 03:32:57.654764+00	2019-11-09 03:32:57.653617+00	2	4	374	3
-442	2019-11-09 03:32:57.664622+00	2019-11-09 03:32:57.664644+00	2019-11-09 03:32:57.662349+00	2	4	365	3
-443	2019-11-09 03:32:57.672977+00	2019-11-09 03:32:57.67299+00	2019-11-09 03:32:57.671685+00	2	4	366	3
-444	2019-11-11 07:12:31.248383+00	2019-11-11 07:12:31.248414+00	2019-11-11 07:12:31.245766+00	3	4	363	61
-445	2019-11-11 07:13:04.973953+00	2019-11-11 07:13:04.973982+00	2019-11-11 07:13:04.97249+00	3	4	325	62
-446	2019-11-11 07:13:36.550713+00	2019-11-11 07:13:36.550747+00	2019-11-11 07:13:36.54908+00	3	4	348	63
-447	2019-11-11 07:13:56.497285+00	2019-11-11 07:13:56.497309+00	2019-11-11 07:13:56.493335+00	3	4	333	64
-448	2019-11-11 07:14:26.97605+00	2019-11-11 07:14:26.976125+00	2019-11-11 07:14:26.973894+00	3	4	324	65
-449	2019-11-11 07:15:06.396123+00	2019-11-11 07:15:06.396161+00	2019-11-11 07:15:06.394228+00	3	4	320	66
-450	2019-11-11 07:16:21.638979+00	2019-11-11 07:16:21.639017+00	2019-11-11 07:16:21.637385+00	3	4	322	67
-451	2019-11-11 07:16:42.56461+00	2019-11-11 07:16:42.564639+00	2019-11-11 07:16:42.5629+00	3	4	326	68
-452	2019-11-11 07:16:58.936101+00	2019-11-11 07:16:58.93612+00	2019-11-11 07:16:58.93457+00	3	4	327	69
-453	2019-11-11 07:17:10.344753+00	2019-11-11 07:17:10.344775+00	2019-11-11 07:17:10.340569+00	3	4	360	70
-454	2019-11-11 07:17:22.881062+00	2019-11-11 07:17:22.881087+00	2019-11-11 07:17:22.879586+00	3	4	338	71
-455	2019-11-11 07:17:36.613457+00	2019-11-11 07:17:36.61349+00	2019-11-11 07:17:36.611842+00	3	4	349	72
-456	2019-11-11 07:17:48.989139+00	2019-11-11 07:17:48.98916+00	2019-11-11 07:17:48.987049+00	3	4	372	73
-457	2019-11-11 07:18:03.380126+00	2019-11-11 07:18:03.380147+00	2019-11-11 07:18:03.378636+00	3	4	365	74
-458	2019-11-11 07:18:14.684566+00	2019-11-11 07:18:14.684586+00	2019-11-11 07:18:14.683007+00	3	4	356	75
-459	2019-11-11 07:18:25.33597+00	2019-11-11 07:18:25.335992+00	2019-11-11 07:18:25.334427+00	3	4	332	76
-460	2019-11-11 07:18:52.472147+00	2019-11-11 07:18:52.472192+00	2019-11-11 07:18:52.470246+00	3	4	329	78
-461	2019-11-11 07:19:24.416859+00	2019-11-11 07:19:24.41689+00	2019-11-11 07:19:24.410651+00	3	4	343	60
-462	2019-11-11 07:25:03.495695+00	2019-11-11 07:25:03.495729+00	2019-11-11 07:25:03.488946+00	3	4	353	79
-463	2019-11-11 07:25:30.838498+00	2019-11-11 07:25:30.838517+00	2019-11-11 07:25:30.837256+00	3	4	272	80
-464	2019-11-11 07:26:01.405557+00	2019-11-11 07:26:01.405623+00	2019-11-11 07:26:01.404149+00	3	4	321	81
-465	2019-11-11 07:27:03.389276+00	2019-11-11 07:27:03.389296+00	2019-11-11 07:27:03.386161+00	3	4	341	82
-466	2019-11-11 07:27:21.176357+00	2019-11-11 07:27:21.176382+00	2019-11-11 07:27:21.175129+00	3	4	368	83
-467	2019-11-11 07:27:46.909898+00	2019-11-11 07:27:46.909917+00	2019-11-11 07:27:46.908026+00	3	4	366	84
-468	2019-11-11 07:28:01.126204+00	2019-11-11 07:28:01.126232+00	2019-11-11 07:28:01.124805+00	3	4	357	85
-469	2019-11-11 07:28:21.446496+00	2019-11-11 07:28:21.446516+00	2019-11-11 07:28:21.444216+00	3	4	373	86
-470	2019-11-11 07:28:42.017508+00	2019-11-11 07:28:42.017534+00	2019-11-11 07:28:42.015947+00	3	4	345	87
-471	2019-11-11 07:29:17.462176+00	2019-11-11 07:29:17.462211+00	2019-11-11 07:29:17.456487+00	3	4	350	88
-472	2019-11-11 07:29:31.607682+00	2019-11-11 07:29:31.607701+00	2019-11-11 07:29:31.606187+00	3	4	330	89
-473	2019-11-11 07:29:46.587874+00	2019-11-11 07:29:46.5879+00	2019-11-11 07:29:46.58433+00	3	4	323	90
-474	2019-11-11 07:30:03.778925+00	2019-11-11 07:30:03.778952+00	2019-11-11 07:30:03.761971+00	3	4	342	91
-475	2019-11-11 07:30:19.259865+00	2019-11-11 07:30:19.259894+00	2019-11-11 07:30:19.256625+00	3	4	331	92
-476	2019-11-11 07:30:33.863923+00	2019-11-11 07:30:33.863944+00	2019-11-11 07:30:33.862574+00	3	4	337	93
+1	2020-01-24 05:21:06.432753+00	2020-01-24 05:21:06.432772+00	2020-01-24 05:21:06.431297+00	3	12	127	31
+2	2020-01-24 05:21:18.60344+00	2020-01-24 05:21:18.60346+00	2020-01-24 05:21:18.601665+00	3	12	84	30
+3	2020-01-24 05:21:29.743358+00	2020-01-24 05:21:29.743377+00	2020-01-24 05:21:29.741488+00	3	12	76	29
+4	2020-01-24 05:21:44.863261+00	2020-01-24 05:21:44.863282+00	2020-01-24 05:21:44.861918+00	3	12	125	28
+5	2020-01-24 05:21:59.419311+00	2020-01-24 05:21:59.419329+00	2020-01-24 05:21:59.417712+00	3	12	82	27
+6	2020-01-24 05:22:11.211431+00	2020-01-24 05:22:11.211451+00	2020-01-24 05:22:11.209943+00	3	12	71	26
+7	2020-01-24 05:22:21.080812+00	2020-01-24 05:22:21.080878+00	2020-01-24 05:22:21.071577+00	3	12	62	25
+8	2020-01-24 05:22:33.804958+00	2020-01-24 05:22:33.804975+00	2020-01-24 05:22:33.803626+00	3	12	115	24
+9	2020-01-24 05:22:42.250606+00	2020-01-24 05:22:42.250625+00	2020-01-24 05:22:42.249166+00	3	12	105	23
+10	2020-01-24 05:25:20.0214+00	2020-01-24 05:25:20.021417+00	2020-01-24 05:25:20.020153+00	3	12	147	32
+11	2020-01-24 05:25:35.092639+00	2020-01-24 05:25:35.092663+00	2020-01-24 05:25:35.087405+00	3	12	154	33
+12	2020-01-24 05:26:39.189338+00	2020-01-24 05:26:39.189364+00	2020-01-24 05:26:39.187846+00	3	12	83	35
+13	2020-01-24 05:26:49.884312+00	2020-01-24 05:26:49.884331+00	2020-01-24 05:26:49.882789+00	3	12	72	36
+14	2020-01-24 05:27:18.478074+00	2020-01-24 05:27:18.478093+00	2020-01-24 05:27:18.476736+00	3	12	79	37
+15	2020-01-24 05:27:40.741866+00	2020-01-24 05:27:40.741902+00	2020-01-24 05:27:40.733811+00	3	12	161	38
+16	2020-01-24 05:27:58.253773+00	2020-01-24 05:27:58.253791+00	2020-01-24 05:27:58.252485+00	3	12	13	39
+17	2020-01-24 05:28:11.301549+00	2020-01-24 05:28:11.301569+00	2020-01-24 05:28:11.299646+00	3	12	81	40
+18	2020-01-24 05:28:35.778808+00	2020-01-24 05:28:35.778829+00	2020-01-24 05:28:35.776188+00	3	12	104	41
+19	2020-01-24 05:28:54.23082+00	2020-01-24 05:28:54.230838+00	2020-01-24 05:28:54.229544+00	3	12	113	42
+20	2020-01-24 05:29:10.160437+00	2020-01-24 05:29:10.160456+00	2020-01-24 05:29:10.158806+00	3	12	131	43
+21	2020-01-24 05:29:24.057765+00	2020-01-24 05:29:24.057785+00	2020-01-24 05:29:24.055354+00	3	12	106	44
+22	2020-01-24 05:30:34.921295+00	2020-01-24 05:30:34.921316+00	2020-01-24 05:30:34.918563+00	3	12	111	45
+23	2020-01-24 05:31:52.436222+00	2020-01-24 05:31:52.43625+00	2020-01-24 05:31:52.430082+00	3	12	110	46
+24	2020-01-24 05:32:15.491294+00	2020-01-24 05:32:15.491314+00	2020-01-24 05:32:15.489595+00	3	12	78	34
+25	2020-01-24 05:33:19.174921+00	2020-01-24 05:33:19.174941+00	2020-01-24 05:33:19.173351+00	3	12	128	47
+26	2020-01-24 05:33:34.227889+00	2020-01-24 05:33:34.22791+00	2020-01-24 05:33:34.226057+00	3	12	91	48
+27	2020-01-24 05:33:53.956509+00	2020-01-24 05:33:53.956532+00	2020-01-24 05:33:53.947752+00	3	12	129	49
+28	2020-01-24 05:36:20.921823+00	2020-01-24 05:36:20.921841+00	2020-01-24 05:36:20.920469+00	3	12	90	50
+29	2020-01-24 05:37:32.035231+00	2020-01-24 05:37:32.035251+00	2020-01-24 05:37:32.03375+00	3	12	118	51
+30	2020-01-24 05:38:08.855875+00	2020-01-24 05:38:08.855893+00	2020-01-24 05:38:08.85428+00	3	12	121	52
+31	2020-01-24 05:38:35.874347+00	2020-01-24 05:38:35.874365+00	2020-01-24 05:38:35.872978+00	3	12	108	53
+32	2020-01-24 05:39:00.301781+00	2020-01-24 05:39:00.301799+00	2020-01-24 05:39:00.300414+00	3	12	92	54
+33	2020-01-24 05:39:52.517031+00	2020-01-24 05:39:52.517052+00	2020-01-24 05:39:52.515008+00	3	12	123	55
+34	2020-01-24 05:40:22.717176+00	2020-01-24 05:40:22.717199+00	2020-01-24 05:40:22.714561+00	3	12	124	56
+35	2020-01-24 05:40:51.997659+00	2020-01-24 05:40:51.997677+00	2020-01-24 05:40:51.995675+00	3	12	98	57
+36	2020-01-24 05:41:23.0168+00	2020-01-24 05:41:23.01682+00	2020-01-24 05:41:23.01516+00	3	12	100	58
+37	2020-01-24 05:41:46.362546+00	2020-01-24 05:41:46.362566+00	2020-01-24 05:41:46.361184+00	3	12	114	59
+38	2020-01-24 05:42:15.303121+00	2020-01-24 05:42:15.303142+00	2020-01-24 05:42:15.299069+00	3	12	95	60
+39	2020-01-24 05:43:42.583298+00	2020-01-24 05:43:42.583321+00	2020-01-24 05:43:42.579949+00	3	12	96	61
+40	2020-01-24 05:44:00.12853+00	2020-01-24 05:44:00.128671+00	2020-01-24 05:44:00.126896+00	3	12	122	62
+41	2020-01-24 05:44:15.177665+00	2020-01-24 05:44:15.177685+00	2020-01-24 05:44:15.176374+00	3	12	107	63
+42	2020-01-24 05:44:57.943555+00	2020-01-24 05:44:57.943588+00	2020-01-24 05:44:57.94211+00	3	12	153	64
+43	2020-01-24 05:45:21.870025+00	2020-01-24 05:45:21.870144+00	2020-01-24 05:45:21.863442+00	3	12	117	65
+44	2020-01-24 05:45:39.676976+00	2020-01-24 05:45:39.676995+00	2020-01-24 05:45:39.675647+00	3	12	109	66
+45	2020-01-24 05:46:16.792387+00	2020-01-24 05:46:16.792406+00	2020-01-24 05:46:16.790883+00	3	12	93	67
+46	2020-01-24 05:47:00.03032+00	2020-01-24 05:47:00.030345+00	2020-01-24 05:47:00.028734+00	3	12	189	68
+47	2020-01-24 05:47:15.587954+00	2020-01-24 05:47:15.587974+00	2020-01-24 05:47:15.586651+00	3	12	6	69
+48	2020-01-24 05:47:36.21331+00	2020-01-24 05:47:36.21333+00	2020-01-24 05:47:36.209659+00	3	12	176	70
+49	2020-01-24 05:50:31.897795+00	2020-01-24 05:50:31.897819+00	2020-01-24 05:50:31.895797+00	3	12	216	71
+50	2020-01-24 05:50:48.477852+00	2020-01-24 05:50:48.47787+00	2020-01-24 05:50:48.476563+00	3	12	201	72
+51	2020-01-24 05:51:33.056239+00	2020-01-24 05:51:33.05626+00	2020-01-24 05:51:33.054077+00	3	12	166	73
+52	2020-01-24 05:52:08.557293+00	2020-01-24 05:52:08.557311+00	2020-01-24 05:52:08.555945+00	3	12	174	74
+53	2020-01-24 05:52:38.190988+00	2020-01-24 05:52:38.191006+00	2020-01-24 05:52:38.189681+00	3	12	223	75
+54	2020-01-24 05:52:56.30164+00	2020-01-24 05:52:56.301659+00	2020-01-24 05:52:56.299733+00	3	12	214	76
+55	2020-01-24 05:55:15.180588+00	2020-01-24 05:55:15.180608+00	2020-01-24 05:55:15.17924+00	3	12	204	77
+56	2020-01-24 05:55:28.546517+00	2020-01-24 05:55:28.546536+00	2020-01-24 05:55:28.544942+00	3	12	202	78
+57	2020-01-24 05:55:40.194948+00	2020-01-24 05:55:40.194967+00	2020-01-24 05:55:40.1936+00	3	12	209	79
+58	2020-01-24 05:56:45.871649+00	2020-01-24 05:56:45.87168+00	2020-01-24 05:56:45.868979+00	3	12	218	80
+59	2020-01-24 05:56:56.386584+00	2020-01-24 05:56:56.386607+00	2020-01-24 05:56:56.383083+00	3	12	177	81
+60	2020-01-24 05:57:07.526581+00	2020-01-24 05:57:07.526598+00	2020-01-24 05:57:07.525281+00	3	12	187	82
+61	2020-01-24 05:57:19.253673+00	2020-01-24 05:57:19.253692+00	2020-01-24 05:57:19.252049+00	3	12	210	83
+62	2020-01-24 05:58:37.56199+00	2020-01-24 05:58:37.562016+00	2020-01-24 05:58:37.558564+00	3	12	206	84
+63	2020-01-24 06:00:29.689009+00	2020-01-24 06:00:29.689028+00	2020-01-24 06:00:29.687689+00	3	12	178	85
+64	2020-01-24 06:00:54.953551+00	2020-01-24 06:00:54.953573+00	2020-01-24 06:00:54.951146+00	3	12	139	94
+65	2020-01-24 06:01:13.944837+00	2020-01-24 06:01:13.944859+00	2020-01-24 06:01:13.941697+00	3	12	143	93
+66	2020-01-24 06:01:25.487792+00	2020-01-24 06:01:25.487811+00	2020-01-24 06:01:25.4861+00	3	12	157	92
+67	2020-01-24 06:01:39.820535+00	2020-01-24 06:01:39.820556+00	2020-01-24 06:01:39.818927+00	3	12	149	91
+68	2020-01-24 06:01:51.221669+00	2020-01-24 06:01:51.22169+00	2020-01-24 06:01:51.219683+00	3	12	155	90
+69	2020-01-24 06:02:01.841574+00	2020-01-24 06:02:01.8416+00	2020-01-24 06:02:01.835654+00	3	12	162	89
+70	2020-01-24 06:02:13.742572+00	2020-01-24 06:02:13.74259+00	2020-01-24 06:02:13.741311+00	3	12	186	88
+71	2020-01-24 06:02:30.231525+00	2020-01-24 06:02:30.231547+00	2020-01-24 06:02:30.229819+00	3	12	203	87
+72	2020-01-24 06:04:04.020545+00	2020-01-24 06:04:04.020564+00	2020-01-24 06:04:04.018303+00	3	12	136	95
+73	2020-01-24 06:04:25.332517+00	2020-01-24 06:04:25.332535+00	2020-01-24 06:04:25.330832+00	3	12	142	96
+74	2020-01-24 06:04:39.273172+00	2020-01-24 06:04:39.273189+00	2020-01-24 06:04:39.271688+00	3	12	152	97
+75	2020-01-24 06:04:52.228723+00	2020-01-24 06:04:52.228741+00	2020-01-24 06:04:52.227366+00	3	12	158	98
+76	2020-01-24 06:05:10.554543+00	2020-01-24 06:05:10.554561+00	2020-01-24 06:05:10.55325+00	3	12	151	99
+77	2020-01-24 06:07:47.784304+00	2020-01-24 06:07:47.784322+00	2020-01-24 06:07:47.783016+00	3	12	159	100
+78	2020-01-24 06:08:27.364527+00	2020-01-24 06:08:27.364544+00	2020-01-24 06:08:27.362991+00	3	12	164	101
+79	2020-01-24 06:08:44.331117+00	2020-01-24 06:08:44.331134+00	2020-01-24 06:08:44.329801+00	3	12	150	102
+80	2020-01-24 06:08:57.745678+00	2020-01-24 06:08:57.745708+00	2020-01-24 06:08:57.74396+00	3	12	148	103
+81	2020-01-24 06:10:01.05215+00	2020-01-24 06:10:01.052176+00	2020-01-24 06:10:01.049189+00	3	12	146	104
+82	2020-01-24 06:11:20.113378+00	2020-01-24 06:11:20.113396+00	2020-01-24 06:11:20.112093+00	3	12	138	105
+83	2020-01-24 06:11:32.21077+00	2020-01-24 06:11:32.210788+00	2020-01-24 06:11:32.209478+00	3	12	156	106
+84	2020-01-24 06:11:43.876158+00	2020-01-24 06:11:43.876178+00	2020-01-24 06:11:43.874802+00	3	12	160	107
+85	2020-01-24 06:11:54.406383+00	2020-01-24 06:11:54.4064+00	2020-01-24 06:11:54.404959+00	3	12	163	108
+86	2020-01-24 06:12:07.596757+00	2020-01-24 06:12:07.596777+00	2020-01-24 06:12:07.594324+00	3	12	137	109
+87	2020-01-24 06:12:23.969818+00	2020-01-24 06:12:23.969837+00	2020-01-24 06:12:23.96843+00	3	12	165	110
+88	2020-01-24 06:12:49.997922+00	2020-01-24 06:12:49.997945+00	2020-01-24 06:12:49.996077+00	3	12	141	111
+89	2020-01-24 06:13:03.359574+00	2020-01-24 06:13:03.359591+00	2020-01-24 06:13:03.358147+00	3	12	134	112
+90	2020-01-24 06:13:42.270429+00	2020-01-24 06:13:42.270446+00	2020-01-24 06:13:42.269087+00	3	12	200	113
+91	2020-01-24 06:27:43.41554+00	2020-01-24 06:27:43.415558+00	2020-01-24 06:27:43.414092+00	3	12	18	219
+92	2020-01-24 06:32:29.735589+00	2020-01-24 06:32:29.735607+00	2020-01-24 06:32:29.732329+00	3	12	65	256
+93	2020-01-24 06:33:36.499467+00	2020-01-24 06:33:36.499487+00	2020-01-24 06:33:36.498031+00	3	12	74	262
+94	2020-01-24 06:33:51.569188+00	2020-01-24 06:33:51.569218+00	2020-01-24 06:33:51.567625+00	3	12	47	263
+95	2020-01-24 06:35:00.042772+00	2020-01-24 06:35:00.042791+00	2020-01-24 06:35:00.040868+00	3	12	75	264
+96	2020-01-24 06:35:17.945939+00	2020-01-24 06:35:17.945957+00	2020-01-24 06:35:17.944367+00	3	12	33	265
+97	2020-01-24 06:35:41.203953+00	2020-01-24 06:35:41.203976+00	2020-01-24 06:35:41.201837+00	3	12	63	250
+98	2020-01-24 06:36:06.301773+00	2020-01-24 06:36:06.301796+00	2020-01-24 06:36:06.299472+00	3	12	50	253
+99	2020-01-24 06:38:02.747183+00	2020-01-24 06:38:02.747205+00	2020-01-24 06:38:02.738917+00	3	12	48	266
+100	2020-01-24 06:38:16.098899+00	2020-01-24 06:38:16.098988+00	2020-01-24 06:38:16.09559+00	3	12	37	267
+101	2020-01-24 06:39:17.878915+00	2020-01-24 06:39:17.878934+00	2020-01-24 06:39:17.877606+00	3	12	38	268
+102	2020-01-24 06:39:33.643952+00	2020-01-24 06:39:33.644213+00	2020-01-24 06:39:33.639122+00	3	12	44	269
+103	2020-01-24 06:39:53.423239+00	2020-01-24 06:39:53.423281+00	2020-01-24 06:39:53.421293+00	3	12	56	270
+104	2020-01-24 06:40:17.332355+00	2020-01-24 06:40:17.332374+00	2020-01-24 06:40:17.3309+00	3	12	58	271
+105	2020-01-24 06:40:30.628058+00	2020-01-24 06:40:30.628077+00	2020-01-24 06:40:30.626633+00	3	12	57	272
+106	2020-01-24 06:40:44.010639+00	2020-01-24 06:40:44.010655+00	2020-01-24 06:40:44.009375+00	3	12	31	273
+107	2020-01-24 06:41:03.826903+00	2020-01-24 06:41:03.826923+00	2020-01-24 06:41:03.824841+00	3	12	67	274
+108	2020-01-24 06:41:26.35643+00	2020-01-24 06:41:26.356447+00	2020-01-24 06:41:26.355135+00	3	12	30	275
+109	2020-01-24 06:41:35.64404+00	2020-01-24 06:41:35.644061+00	2020-01-24 06:41:35.640939+00	3	12	28	276
+110	2020-01-24 06:41:59.170783+00	2020-01-24 06:41:59.170805+00	2020-01-24 06:41:59.167895+00	3	12	29	277
+111	2020-01-24 06:42:27.102516+00	2020-01-24 06:42:27.102534+00	2020-01-24 06:42:27.10081+00	3	12	27	278
+112	2020-01-24 06:42:36.047285+00	2020-01-24 06:42:36.047302+00	2020-01-24 06:42:36.046046+00	3	12	43	279
+113	2020-01-24 06:42:47.047033+00	2020-01-24 06:42:47.047051+00	2020-01-24 06:42:47.0449+00	3	12	60	280
+114	2020-01-24 06:42:55.374958+00	2020-01-24 06:42:55.374978+00	2020-01-24 06:42:55.371851+00	3	12	87	281
+115	2020-01-24 06:43:08.088954+00	2020-01-24 06:43:08.088975+00	2020-01-24 06:43:08.086384+00	3	12	42	282
+116	2020-01-24 06:43:23.019774+00	2020-01-24 06:43:23.019795+00	2020-01-24 06:43:23.009883+00	3	12	35	283
+117	2020-01-24 06:43:48.833809+00	2020-01-24 06:43:48.833827+00	2020-01-24 06:43:48.832388+00	3	12	46	284
+118	2020-01-24 06:43:57.135491+00	2020-01-24 06:43:57.135511+00	2020-01-24 06:43:57.134126+00	3	12	32	285
+119	2020-01-24 06:44:05.69964+00	2020-01-24 06:44:05.699678+00	2020-01-24 06:44:05.689009+00	3	12	39	286
+120	2020-01-24 06:44:12.653681+00	2020-01-24 06:44:12.653703+00	2020-01-24 06:44:12.651736+00	3	12	73	287
+121	2020-01-24 06:44:23.23458+00	2020-01-24 06:44:23.234599+00	2020-01-24 06:44:23.232961+00	3	12	68	288
+122	2020-01-24 06:44:30.123325+00	2020-01-24 06:44:30.123345+00	2020-01-24 06:44:30.121803+00	3	12	101	289
+123	2020-01-24 06:44:39.862323+00	2020-01-24 06:44:39.862344+00	2020-01-24 06:44:39.860633+00	3	12	77	290
+124	2020-01-24 06:44:49.356311+00	2020-01-24 06:44:49.356327+00	2020-01-24 06:44:49.355002+00	3	12	64	291
+125	2020-01-24 06:45:01.408104+00	2020-01-24 06:45:01.408152+00	2020-01-24 06:45:01.394973+00	3	12	80	292
+126	2020-01-24 06:45:38.973083+00	2020-01-24 06:45:38.973101+00	2020-01-24 06:45:38.97171+00	3	12	19	248
+127	2020-01-24 06:45:48.242219+00	2020-01-24 06:45:48.242236+00	2020-01-24 06:45:48.240715+00	3	12	5	249
+128	2020-01-24 06:45:59.706604+00	2020-01-24 06:45:59.706624+00	2020-01-24 06:45:59.704971+00	3	12	16	251
+129	2020-01-24 06:46:09.74784+00	2020-01-24 06:46:09.747859+00	2020-01-24 06:46:09.746176+00	3	12	8	252
+130	2020-01-24 06:46:23.382539+00	2020-01-24 06:46:23.382559+00	2020-01-24 06:46:23.381258+00	3	12	9	254
+131	2020-01-24 06:46:31.197106+00	2020-01-24 06:46:31.197124+00	2020-01-24 06:46:31.195675+00	3	12	14	255
+132	2020-01-24 06:46:59.378779+00	2020-01-24 06:46:59.378798+00	2020-01-24 06:46:59.376771+00	3	12	21	258
+133	2020-01-24 06:47:13.352173+00	2020-01-24 06:47:13.352192+00	2020-01-24 06:47:13.350801+00	3	12	2	259
+134	2020-01-24 06:47:24.006618+00	2020-01-24 06:47:24.00664+00	2020-01-24 06:47:24.001918+00	3	12	1	260
+135	2020-01-24 06:47:33.169231+00	2020-01-24 06:47:33.169427+00	2020-01-24 06:47:33.167893+00	3	12	4	261
+136	2020-01-24 06:48:04.546696+00	2020-01-24 06:48:04.546723+00	2020-01-24 06:48:04.544681+00	3	12	17	239
+137	2020-01-24 06:48:32.044299+00	2020-01-24 06:48:32.044316+00	2020-01-24 06:48:32.042949+00	3	12	15	240
+138	2020-01-24 06:49:13.054134+00	2020-01-24 06:49:13.054152+00	2020-01-24 06:49:13.052847+00	3	12	24	241
+139	2020-01-24 06:49:49.405905+00	2020-01-24 06:49:49.405923+00	2020-01-24 06:49:49.404394+00	3	12	12	242
+140	2020-01-24 06:50:05.839196+00	2020-01-24 06:50:05.839215+00	2020-01-24 06:50:05.837321+00	3	12	22	243
+141	2020-01-24 06:50:29.928238+00	2020-01-24 06:50:29.928257+00	2020-01-24 06:50:29.926872+00	3	12	20	244
+142	2020-01-24 06:50:46.234332+00	2020-01-24 06:50:46.23435+00	2020-01-24 06:50:46.232708+00	3	12	23	245
+143	2020-01-24 06:51:22.037145+00	2020-01-24 06:51:22.037169+00	2020-01-24 06:51:22.03577+00	3	12	53	246
 \.
 
 
@@ -5994,7 +4718,7 @@ SELECT pg_catalog.setval('auth_group_permissions_id_seq', 1, false);
 -- Name: auth_permission_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_permission_id_seq', 180, true);
+SELECT pg_catalog.setval('auth_permission_id_seq', 148, true);
 
 
 --
@@ -6008,7 +4732,7 @@ SELECT pg_catalog.setval('auth_user_groups_id_seq', 1, false);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('auth_user_id_seq', 10, true);
+SELECT pg_catalog.setval('auth_user_id_seq', 16, true);
 
 
 --
@@ -6022,56 +4746,42 @@ SELECT pg_catalog.setval('auth_user_user_permissions_id_seq', 1, false);
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 56, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 1, false);
 
 
 --
 -- Name: django_content_type_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_content_type_id_seq', 45, true);
+SELECT pg_catalog.setval('django_content_type_id_seq', 37, true);
 
 
 --
 -- Name: django_migrations_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('django_migrations_id_seq', 36, true);
-
-
---
--- Name: gilts_events_castinglisttosevenfiveevent_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('gilts_events_castinglisttosevenfiveevent_id_seq', 1, false);
-
-
---
--- Name: gilts_events_giltmerger_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('gilts_events_giltmerger_id_seq', 1, false);
+SELECT pg_catalog.setval('django_migrations_id_seq', 30, true);
 
 
 --
 -- Name: locations_location_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('locations_location_id_seq', 478, true);
+SELECT pg_catalog.setval('locations_location_id_seq', 425, true);
 
 
 --
 -- Name: locations_pigletsgroupcell_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('locations_pigletsgroupcell_id_seq', 150, true);
+SELECT pg_catalog.setval('locations_pigletsgroupcell_id_seq', 106, true);
 
 
 --
 -- Name: locations_section_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('locations_section_id_seq', 36, true);
+SELECT pg_catalog.setval('locations_section_id_seq', 38, true);
 
 
 --
@@ -6085,7 +4795,7 @@ SELECT pg_catalog.setval('locations_sowandpigletscell_id_seq', 270, true);
 -- Name: locations_sowgroupcell_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('locations_sowgroupcell_id_seq', 12, true);
+SELECT pg_catalog.setval('locations_sowgroupcell_id_seq', 1, false);
 
 
 --
@@ -6106,70 +4816,28 @@ SELECT pg_catalog.setval('locations_sowsinglecell_id_seq', 1, false);
 -- Name: locations_workshop_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('locations_workshop_id_seq', 10, true);
+SELECT pg_catalog.setval('locations_workshop_id_seq', 11, true);
 
 
 --
--- Name: piglets_events_cullingnewbornpiglets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('piglets_events_cullingnewbornpiglets_id_seq', 1, false);
-
-
---
--- Name: piglets_events_cullingnomadpiglets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('piglets_events_cullingnomadpiglets_id_seq', 1, false);
+SELECT pg_catalog.setval('piglets_events_cullingpiglets_id_seq', 1, false);
 
 
 --
--- Name: piglets_events_newbornmergerrecord_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('piglets_events_newbornmergerrecord_id_seq', 1, false);
-
-
---
--- Name: piglets_events_newbornpigletsgrouprecount_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('piglets_events_newbornpigletsgrouprecount_id_seq', 7, true);
+SELECT pg_catalog.setval('piglets_events_pigletsmerger_id_seq', 1, false);
 
 
 --
--- Name: piglets_events_newbornpigletsmerger_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('piglets_events_newbornpigletsmerger_id_seq', 1, false);
-
-
---
--- Name: piglets_events_nomadmergerrecord_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('piglets_events_nomadmergerrecord_id_seq', 1, false);
-
-
---
--- Name: piglets_events_nomadpigletsgroupmerger_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('piglets_events_nomadpigletsgroupmerger_id_seq', 1, false);
-
-
---
--- Name: piglets_events_nomadpigletsgrouprecount_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('piglets_events_nomadpigletsgrouprecount_id_seq', 1, false);
-
-
---
--- Name: piglets_events_splitnomadpigletsgroup_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('piglets_events_splitnomadpigletsgroup_id_seq', 1, false);
+SELECT pg_catalog.setval('piglets_events_pigletssplit_id_seq', 1, false);
 
 
 --
@@ -6180,17 +4848,10 @@ SELECT pg_catalog.setval('piglets_events_weighingpiglets_id_seq', 1, false);
 
 
 --
--- Name: piglets_newbornpigletsgroup_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+-- Name: piglets_piglets_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('piglets_newbornpigletsgroup_id_seq', 120, true);
-
-
---
--- Name: piglets_nomadpigletsgroup_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('piglets_nomadpigletsgroup_id_seq', 1, false);
+SELECT pg_catalog.setval('piglets_piglets_id_seq', 1, false);
 
 
 --
@@ -6204,42 +4865,42 @@ SELECT pg_catalog.setval('piglets_pigletsstatus_id_seq', 5, true);
 -- Name: sows_boar_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sows_boar_id_seq', 18, true);
+SELECT pg_catalog.setval('sows_boar_id_seq', 12, true);
 
 
 --
 -- Name: sows_events_abortionsow_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sows_events_abortionsow_id_seq', 1, true);
+SELECT pg_catalog.setval('sows_events_abortionsow_id_seq', 1, false);
 
 
 --
 -- Name: sows_events_cullingsow_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sows_events_cullingsow_id_seq', 7, true);
+SELECT pg_catalog.setval('sows_events_cullingsow_id_seq', 1, false);
 
 
 --
 -- Name: sows_events_semination_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sows_events_semination_id_seq', 654, true);
+SELECT pg_catalog.setval('sows_events_semination_id_seq', 480, true);
 
 
 --
 -- Name: sows_events_sowfarrow_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sows_events_sowfarrow_id_seq', 142, true);
+SELECT pg_catalog.setval('sows_events_sowfarrow_id_seq', 1, false);
 
 
 --
 -- Name: sows_events_ultrasound_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sows_events_ultrasound_id_seq', 489, true);
+SELECT pg_catalog.setval('sows_events_ultrasound_id_seq', 480, true);
 
 
 --
@@ -6264,38 +4925,45 @@ SELECT pg_catalog.setval('sows_gilt_id_seq', 1, false);
 
 
 --
--- Name: sows_giltstatus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
---
-
-SELECT pg_catalog.setval('sows_giltstatus_id_seq', 1, false);
-
-
---
 -- Name: sows_sow_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sows_sow_id_seq', 374, true);
+SELECT pg_catalog.setval('sows_sow_id_seq', 240, true);
 
 
 --
 -- Name: sows_sowstatus_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('sows_sowstatus_id_seq', 10, true);
+SELECT pg_catalog.setval('sows_sowstatus_id_seq', 11, true);
 
 
 --
 -- Name: staff_workshopemployee_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('staff_workshopemployee_id_seq', 8, true);
+SELECT pg_catalog.setval('staff_workshopemployee_id_seq', 15, true);
+
+
+--
+-- Name: tours_metatour_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('tours_metatour_id_seq', 1, false);
+
+
+--
+-- Name: tours_metatourrecord_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
+--
+
+SELECT pg_catalog.setval('tours_metatourrecord_id_seq', 1, false);
 
 
 --
 -- Name: tours_tour_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('tours_tour_id_seq', 5, true);
+SELECT pg_catalog.setval('tours_tour_id_seq', 4, true);
 
 
 --
@@ -6309,7 +4977,7 @@ SELECT pg_catalog.setval('transactions_pigletstransaction_id_seq', 1, false);
 -- Name: transactions_sowtransaction_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('transactions_sowtransaction_id_seq', 476, true);
+SELECT pg_catalog.setval('transactions_sowtransaction_id_seq', 143, true);
 
 
 --
@@ -6465,30 +5133,6 @@ ALTER TABLE ONLY django_session
 
 
 --
--- Name: gilts_events_castinglisttosevenfiveevent gilts_events_castinglisttosevenfiveevent_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY gilts_events_castinglisttosevenfiveevent
-    ADD CONSTRAINT gilts_events_castinglisttosevenfiveevent_pkey PRIMARY KEY (id);
-
-
---
--- Name: gilts_events_giltmerger gilts_events_giltmerger_nomad_group_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY gilts_events_giltmerger
-    ADD CONSTRAINT gilts_events_giltmerger_nomad_group_id_key UNIQUE (nomad_group_id);
-
-
---
--- Name: gilts_events_giltmerger gilts_events_giltmerger_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY gilts_events_giltmerger
-    ADD CONSTRAINT gilts_events_giltmerger_pkey PRIMARY KEY (id);
-
-
---
 -- Name: locations_location locations_location_pigletsGroupCell_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -6609,107 +5253,43 @@ ALTER TABLE ONLY locations_workshop
 
 
 --
--- Name: piglets_events_cullingnewbornpiglets piglets_events_cullingnewbornpiglets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets piglets_events_cullingpiglets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_cullingnewbornpiglets
-    ADD CONSTRAINT piglets_events_cullingnewbornpiglets_pkey PRIMARY KEY (id);
-
-
---
--- Name: piglets_events_cullingnomadpiglets piglets_events_cullingnomadpiglets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_cullingnomadpiglets
-    ADD CONSTRAINT piglets_events_cullingnomadpiglets_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY piglets_events_cullingpiglets
+    ADD CONSTRAINT piglets_events_cullingpiglets_pkey PRIMARY KEY (id);
 
 
 --
--- Name: piglets_events_newbornmergerrecord piglets_events_newbornmergerrecord_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger piglets_events_pigletsmerger_created_piglets_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_newbornmergerrecord
-    ADD CONSTRAINT piglets_events_newbornmergerrecord_pkey PRIMARY KEY (id);
-
-
---
--- Name: piglets_events_newbornpigletsgrouprecount piglets_events_newbornpigletsgrouprecount_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_newbornpigletsgrouprecount
-    ADD CONSTRAINT piglets_events_newbornpigletsgrouprecount_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY piglets_events_pigletsmerger
+    ADD CONSTRAINT piglets_events_pigletsmerger_created_piglets_id_key UNIQUE (created_piglets_id);
 
 
 --
--- Name: piglets_events_newbornpigletsmerger piglets_events_newbornpigletsmerger_nomad_group_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger piglets_events_pigletsmerger_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_newbornpigletsmerger
-    ADD CONSTRAINT piglets_events_newbornpigletsmerger_nomad_group_id_key UNIQUE (nomad_group_id);
-
-
---
--- Name: piglets_events_newbornpigletsmerger piglets_events_newbornpigletsmerger_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_newbornpigletsmerger
-    ADD CONSTRAINT piglets_events_newbornpigletsmerger_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY piglets_events_pigletsmerger
+    ADD CONSTRAINT piglets_events_pigletsmerger_pkey PRIMARY KEY (id);
 
 
 --
--- Name: piglets_events_nomadmergerrecord piglets_events_nomadmergerrecord_nomad_group_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit piglets_events_pigletssplit_parent_piglets_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_nomadmergerrecord
-    ADD CONSTRAINT piglets_events_nomadmergerrecord_nomad_group_id_key UNIQUE (nomad_group_id);
-
-
---
--- Name: piglets_events_nomadmergerrecord piglets_events_nomadmergerrecord_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadmergerrecord
-    ADD CONSTRAINT piglets_events_nomadmergerrecord_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY piglets_events_pigletssplit
+    ADD CONSTRAINT piglets_events_pigletssplit_parent_piglets_id_key UNIQUE (parent_piglets_id);
 
 
 --
--- Name: piglets_events_nomadpigletsgroupmerger piglets_events_nomadpigletsgroupmerger_nomad_group_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit piglets_events_pigletssplit_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_nomadpigletsgroupmerger
-    ADD CONSTRAINT piglets_events_nomadpigletsgroupmerger_nomad_group_id_key UNIQUE (nomad_group_id);
-
-
---
--- Name: piglets_events_nomadpigletsgroupmerger piglets_events_nomadpigletsgroupmerger_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadpigletsgroupmerger
-    ADD CONSTRAINT piglets_events_nomadpigletsgroupmerger_pkey PRIMARY KEY (id);
-
-
---
--- Name: piglets_events_nomadpigletsgrouprecount piglets_events_nomadpigletsgrouprecount_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadpigletsgrouprecount
-    ADD CONSTRAINT piglets_events_nomadpigletsgrouprecount_pkey PRIMARY KEY (id);
-
-
---
--- Name: piglets_events_splitnomadpigletsgroup piglets_events_splitnomadpigletsgroup_parent_group_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_splitnomadpigletsgroup
-    ADD CONSTRAINT piglets_events_splitnomadpigletsgroup_parent_group_id_key UNIQUE (parent_group_id);
-
-
---
--- Name: piglets_events_splitnomadpigletsgroup piglets_events_splitnomadpigletsgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_splitnomadpigletsgroup
-    ADD CONSTRAINT piglets_events_splitnomadpigletsgroup_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY piglets_events_pigletssplit
+    ADD CONSTRAINT piglets_events_pigletssplit_pkey PRIMARY KEY (id);
 
 
 --
@@ -6721,19 +5301,11 @@ ALTER TABLE ONLY piglets_events_weighingpiglets
 
 
 --
--- Name: piglets_newbornpigletsgroup piglets_newbornpigletsgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_piglets piglets_piglets_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_newbornpigletsgroup
-    ADD CONSTRAINT piglets_newbornpigletsgroup_pkey PRIMARY KEY (id);
-
-
---
--- Name: piglets_nomadpigletsgroup piglets_nomadpigletsgroup_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_nomadpigletsgroup
-    ADD CONSTRAINT piglets_nomadpigletsgroup_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY piglets_piglets
+    ADD CONSTRAINT piglets_piglets_pkey PRIMARY KEY (id);
 
 
 --
@@ -6785,6 +5357,14 @@ ALTER TABLE ONLY sows_events_semination
 
 
 --
+-- Name: sows_events_sowfarrow sows_events_sowfarrow_piglets_group_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY sows_events_sowfarrow
+    ADD CONSTRAINT sows_events_sowfarrow_piglets_group_id_key UNIQUE (piglets_group_id);
+
+
+--
 -- Name: sows_events_sowfarrow sows_events_sowfarrow_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -6809,6 +5389,14 @@ ALTER TABLE ONLY sows_events_ultrasoundtype
 
 
 --
+-- Name: sows_events_weaningsow sows_events_weaningsow_piglets_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY sows_events_weaningsow
+    ADD CONSTRAINT sows_events_weaningsow_piglets_id_key UNIQUE (piglets_id);
+
+
+--
 -- Name: sows_events_weaningsow sows_events_weaningsow_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -6830,14 +5418,6 @@ ALTER TABLE ONLY sows_gilt
 
 ALTER TABLE ONLY sows_gilt
     ADD CONSTRAINT sows_gilt_pkey PRIMARY KEY (id);
-
-
---
--- Name: sows_giltstatus sows_giltstatus_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY sows_giltstatus
-    ADD CONSTRAINT sows_giltstatus_pkey PRIMARY KEY (id);
 
 
 --
@@ -6886,6 +5466,30 @@ ALTER TABLE ONLY staff_workshopemployee
 
 ALTER TABLE ONLY staff_workshopemployee
     ADD CONSTRAINT staff_workshopemployee_user_id_key UNIQUE (user_id);
+
+
+--
+-- Name: tours_metatour tours_metatour_piglets_id_key; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY tours_metatour
+    ADD CONSTRAINT tours_metatour_piglets_id_key UNIQUE (piglets_id);
+
+
+--
+-- Name: tours_metatour tours_metatour_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY tours_metatour
+    ADD CONSTRAINT tours_metatour_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tours_metatourrecord tours_metatourrecord_pkey; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY tours_metatourrecord
+    ADD CONSTRAINT tours_metatourrecord_pkey PRIMARY KEY (id);
 
 
 --
@@ -7011,20 +5615,6 @@ CREATE INDEX django_session_session_key_c0390e0f_like ON django_session USING bt
 
 
 --
--- Name: gilts_events_castinglisttosevenfiveevent_initiator_id_5c06bf5e; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX gilts_events_castinglisttosevenfiveevent_initiator_id_5c06bf5e ON gilts_events_castinglisttosevenfiveevent USING btree (initiator_id);
-
-
---
--- Name: gilts_events_giltmerger_initiator_id_49f4e90a; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX gilts_events_giltmerger_initiator_id_49f4e90a ON gilts_events_giltmerger USING btree (initiator_id);
-
-
---
 -- Name: locations_pigletsgroupcell_section_id_0315849e; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -7102,108 +5692,31 @@ CREATE INDEX locations_sowsinglecell_workshop_id_94626905 ON locations_sowsingle
 
 
 --
--- Name: piglets_events_cullingnewbornpiglets_initiator_id_8bafe4e7; Type: INDEX; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets_initiator_id_0b6011c5; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX piglets_events_cullingnewbornpiglets_initiator_id_8bafe4e7 ON piglets_events_cullingnewbornpiglets USING btree (initiator_id);
-
-
---
--- Name: piglets_events_cullingnewbornpiglets_piglets_group_id_089a7796; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_cullingnewbornpiglets_piglets_group_id_089a7796 ON piglets_events_cullingnewbornpiglets USING btree (piglets_group_id);
+CREATE INDEX piglets_events_cullingpiglets_initiator_id_0b6011c5 ON piglets_events_cullingpiglets USING btree (initiator_id);
 
 
 --
--- Name: piglets_events_cullingnomadpiglets_initiator_id_eec93a2d; Type: INDEX; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets_piglets_group_id_90a9d8b8; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX piglets_events_cullingnomadpiglets_initiator_id_eec93a2d ON piglets_events_cullingnomadpiglets USING btree (initiator_id);
-
-
---
--- Name: piglets_events_cullingnomadpiglets_piglets_group_id_3f9a1f84; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_cullingnomadpiglets_piglets_group_id_3f9a1f84 ON piglets_events_cullingnomadpiglets USING btree (piglets_group_id);
+CREATE INDEX piglets_events_cullingpiglets_piglets_group_id_90a9d8b8 ON piglets_events_cullingpiglets USING btree (piglets_group_id);
 
 
 --
--- Name: piglets_events_newbornmergerrecord_merger_id_fd4326e1; Type: INDEX; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger_initiator_id_7af11e75; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX piglets_events_newbornmergerrecord_merger_id_fd4326e1 ON piglets_events_newbornmergerrecord USING btree (merger_id);
-
-
---
--- Name: piglets_events_newbornmergerrecord_tour_id_36366dbd; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_newbornmergerrecord_tour_id_36366dbd ON piglets_events_newbornmergerrecord USING btree (tour_id);
+CREATE INDEX piglets_events_pigletsmerger_initiator_id_7af11e75 ON piglets_events_pigletsmerger USING btree (initiator_id);
 
 
 --
--- Name: piglets_events_newbornpigl_piglets_group_id_a7336c97; Type: INDEX; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit_initiator_id_f1f2b796; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX piglets_events_newbornpigl_piglets_group_id_a7336c97 ON piglets_events_newbornpigletsgrouprecount USING btree (piglets_group_id);
-
-
---
--- Name: piglets_events_newbornpigletsgrouprecount_initiator_id_8f77e311; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_newbornpigletsgrouprecount_initiator_id_8f77e311 ON piglets_events_newbornpigletsgrouprecount USING btree (initiator_id);
-
-
---
--- Name: piglets_events_newbornpigletsmerger_initiator_id_b1b82d84; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_newbornpigletsmerger_initiator_id_b1b82d84 ON piglets_events_newbornpigletsmerger USING btree (initiator_id);
-
-
---
--- Name: piglets_events_nomadmergerrecord_merger_id_bd71c2d7; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_nomadmergerrecord_merger_id_bd71c2d7 ON piglets_events_nomadmergerrecord USING btree (merger_id);
-
-
---
--- Name: piglets_events_nomadpiglet_piglets_group_id_a85656da; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_nomadpiglet_piglets_group_id_a85656da ON piglets_events_nomadpigletsgrouprecount USING btree (piglets_group_id);
-
-
---
--- Name: piglets_events_nomadpigletsgroupmerger_initiator_id_71c250ff; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_nomadpigletsgroupmerger_initiator_id_71c250ff ON piglets_events_nomadpigletsgroupmerger USING btree (initiator_id);
-
-
---
--- Name: piglets_events_nomadpigletsgroupmerger_new_location_id_3a1b522d; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_nomadpigletsgroupmerger_new_location_id_3a1b522d ON piglets_events_nomadpigletsgroupmerger USING btree (new_location_id);
-
-
---
--- Name: piglets_events_nomadpigletsgrouprecount_initiator_id_64298381; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_nomadpigletsgrouprecount_initiator_id_64298381 ON piglets_events_nomadpigletsgrouprecount USING btree (initiator_id);
-
-
---
--- Name: piglets_events_splitnomadpigletsgroup_initiator_id_5f577a20; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_events_splitnomadpigletsgroup_initiator_id_5f577a20 ON piglets_events_splitnomadpigletsgroup USING btree (initiator_id);
+CREATE INDEX piglets_events_pigletssplit_initiator_id_f1f2b796 ON piglets_events_pigletssplit USING btree (initiator_id);
 
 
 --
@@ -7221,59 +5734,31 @@ CREATE INDEX piglets_events_weighingpiglets_piglets_group_id_e55cd7f7 ON piglets
 
 
 --
--- Name: piglets_newbornpigletsgroup_location_id_32ceba9c; Type: INDEX; Schema: public; Owner: postgres
+-- Name: piglets_piglets_location_id_41c43483; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX piglets_newbornpigletsgroup_location_id_32ceba9c ON piglets_newbornpigletsgroup USING btree (location_id);
-
-
---
--- Name: piglets_newbornpigletsgroup_merger_id_758f45d8; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_newbornpigletsgroup_merger_id_758f45d8 ON piglets_newbornpigletsgroup USING btree (merger_id);
+CREATE INDEX piglets_piglets_location_id_41c43483 ON piglets_piglets USING btree (location_id);
 
 
 --
--- Name: piglets_newbornpigletsgroup_status_id_c51ed2db; Type: INDEX; Schema: public; Owner: postgres
+-- Name: piglets_piglets_merger_as_parent_id_6e0e878e; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX piglets_newbornpigletsgroup_status_id_c51ed2db ON piglets_newbornpigletsgroup USING btree (status_id);
-
-
---
--- Name: piglets_newbornpigletsgroup_tour_id_5dcff7ec; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_newbornpigletsgroup_tour_id_5dcff7ec ON piglets_newbornpigletsgroup USING btree (tour_id);
+CREATE INDEX piglets_piglets_merger_as_parent_id_6e0e878e ON piglets_piglets USING btree (merger_as_parent_id);
 
 
 --
--- Name: piglets_nomadpigletsgroup_groups_merger_id_11a8d0d1; Type: INDEX; Schema: public; Owner: postgres
+-- Name: piglets_piglets_split_as_child_id_67816971; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX piglets_nomadpigletsgroup_groups_merger_id_11a8d0d1 ON piglets_nomadpigletsgroup USING btree (groups_merger_id);
-
-
---
--- Name: piglets_nomadpigletsgroup_location_id_140aacae; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_nomadpigletsgroup_location_id_140aacae ON piglets_nomadpigletsgroup USING btree (location_id);
+CREATE INDEX piglets_piglets_split_as_child_id_67816971 ON piglets_piglets USING btree (split_as_child_id);
 
 
 --
--- Name: piglets_nomadpigletsgroup_split_record_id_25fba887; Type: INDEX; Schema: public; Owner: postgres
+-- Name: piglets_piglets_status_id_f9ba9ddb; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX piglets_nomadpigletsgroup_split_record_id_25fba887 ON piglets_nomadpigletsgroup USING btree (split_record_id);
-
-
---
--- Name: piglets_nomadpigletsgroup_status_id_6190ec1c; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX piglets_nomadpigletsgroup_status_id_6190ec1c ON piglets_nomadpigletsgroup USING btree (status_id);
+CREATE INDEX piglets_piglets_status_id_f9ba9ddb ON piglets_piglets USING btree (status_id);
 
 
 --
@@ -7375,13 +5860,6 @@ CREATE INDEX sows_events_sowfarrow_initiator_id_4105b54e ON sows_events_sowfarro
 
 
 --
--- Name: sows_events_sowfarrow_new_born_piglets_group_id_3ce96d73; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX sows_events_sowfarrow_new_born_piglets_group_id_3ce96d73 ON sows_events_sowfarrow USING btree (new_born_piglets_group_id);
-
-
---
 -- Name: sows_events_sowfarrow_sow_id_ea9c38dc; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -7445,13 +5923,6 @@ CREATE INDEX sows_events_weaningsow_tour_id_4abf0271 ON sows_events_weaningsow U
 
 
 --
--- Name: sows_events_weaningsow_transaction_id_969218f5; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX sows_events_weaningsow_transaction_id_969218f5 ON sows_events_weaningsow USING btree (transaction_id);
-
-
---
 -- Name: sows_gilt_birth_id_a4289b2d_like; Type: INDEX; Schema: public; Owner: postgres
 --
 
@@ -7459,10 +5930,10 @@ CREATE INDEX sows_gilt_birth_id_a4289b2d_like ON sows_gilt USING btree (birth_id
 
 
 --
--- Name: sows_gilt_casting_list_to_seven_five_id_c604ae8f; Type: INDEX; Schema: public; Owner: postgres
+-- Name: sows_gilt_farrow_id_703f6faa; Type: INDEX; Schema: public; Owner: postgres
 --
 
-CREATE INDEX sows_gilt_casting_list_to_seven_five_id_c604ae8f ON sows_gilt USING btree (casting_list_to_seven_five_id);
+CREATE INDEX sows_gilt_farrow_id_703f6faa ON sows_gilt USING btree (farrow_id);
 
 
 --
@@ -7473,31 +5944,10 @@ CREATE INDEX sows_gilt_location_id_6e9d5445 ON sows_gilt USING btree (location_i
 
 
 --
--- Name: sows_gilt_merger_id_874a8dc3; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX sows_gilt_merger_id_874a8dc3 ON sows_gilt USING btree (merger_id);
-
-
---
 -- Name: sows_gilt_mother_sow_id_c2fedd8a; Type: INDEX; Schema: public; Owner: postgres
 --
 
 CREATE INDEX sows_gilt_mother_sow_id_c2fedd8a ON sows_gilt USING btree (mother_sow_id);
-
-
---
--- Name: sows_gilt_new_born_group_id_a94b121e; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX sows_gilt_new_born_group_id_a94b121e ON sows_gilt USING btree (new_born_group_id);
-
-
---
--- Name: sows_gilt_status_id_9bf9b3a4; Type: INDEX; Schema: public; Owner: postgres
---
-
-CREATE INDEX sows_gilt_status_id_9bf9b3a4 ON sows_gilt USING btree (status_id);
 
 
 --
@@ -7540,6 +5990,20 @@ CREATE INDEX sows_sow_tour_id_dd35d078 ON sows_sow USING btree (tour_id);
 --
 
 CREATE INDEX staff_workshopemployee_workshop_id_2e6d9791 ON staff_workshopemployee USING btree (workshop_id);
+
+
+--
+-- Name: tours_metatourrecord_metatour_id_ba0ab56b; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX tours_metatourrecord_metatour_id_ba0ab56b ON tours_metatourrecord USING btree (metatour_id);
+
+
+--
+-- Name: tours_metatourrecord_tour_id_11a5df6e; Type: INDEX; Schema: public; Owner: postgres
+--
+
+CREATE INDEX tours_metatourrecord_tour_id_11a5df6e ON tours_metatourrecord USING btree (tour_id);
 
 
 --
@@ -7679,30 +6143,6 @@ ALTER TABLE ONLY django_admin_log
 
 
 --
--- Name: gilts_events_castinglisttosevenfiveevent gilts_events_casting_initiator_id_5c06bf5e_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY gilts_events_castinglisttosevenfiveevent
-    ADD CONSTRAINT gilts_events_casting_initiator_id_5c06bf5e_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: gilts_events_giltmerger gilts_events_giltmer_nomad_group_id_68bd4e72_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY gilts_events_giltmerger
-    ADD CONSTRAINT gilts_events_giltmer_nomad_group_id_68bd4e72_fk_piglets_n FOREIGN KEY (nomad_group_id) REFERENCES piglets_nomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: gilts_events_giltmerger gilts_events_giltmerger_initiator_id_49f4e90a_fk_auth_user_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY gilts_events_giltmerger
-    ADD CONSTRAINT gilts_events_giltmerger_initiator_id_49f4e90a_fk_auth_user_id FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: locations_location locations_location_pigletsGroupCell_id_9f0ca444_fk_locations; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -7839,155 +6279,51 @@ ALTER TABLE ONLY locations_sowsinglecell
 
 
 --
--- Name: piglets_events_cullingnewbornpiglets piglets_events_culli_initiator_id_8bafe4e7_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets piglets_events_culli_initiator_id_0b6011c5_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_cullingnewbornpiglets
-    ADD CONSTRAINT piglets_events_culli_initiator_id_8bafe4e7_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_cullingnomadpiglets piglets_events_culli_initiator_id_eec93a2d_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_cullingnomadpiglets
-    ADD CONSTRAINT piglets_events_culli_initiator_id_eec93a2d_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_events_cullingpiglets
+    ADD CONSTRAINT piglets_events_culli_initiator_id_0b6011c5_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: piglets_events_cullingnewbornpiglets piglets_events_culli_piglets_group_id_089a7796_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_cullingpiglets piglets_events_culli_piglets_group_id_90a9d8b8_fk_piglets_p; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_cullingnewbornpiglets
-    ADD CONSTRAINT piglets_events_culli_piglets_group_id_089a7796_fk_piglets_n FOREIGN KEY (piglets_group_id) REFERENCES piglets_newbornpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_cullingnomadpiglets piglets_events_culli_piglets_group_id_3f9a1f84_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_cullingnomadpiglets
-    ADD CONSTRAINT piglets_events_culli_piglets_group_id_3f9a1f84_fk_piglets_n FOREIGN KEY (piglets_group_id) REFERENCES piglets_nomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_events_cullingpiglets
+    ADD CONSTRAINT piglets_events_culli_piglets_group_id_90a9d8b8_fk_piglets_p FOREIGN KEY (piglets_group_id) REFERENCES piglets_piglets(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: piglets_events_newbornpigletsgrouprecount piglets_events_newbo_initiator_id_8f77e311_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger piglets_events_pigle_created_piglets_id_ce2a075e_fk_piglets_p; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_newbornpigletsgrouprecount
-    ADD CONSTRAINT piglets_events_newbo_initiator_id_8f77e311_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_newbornpigletsmerger piglets_events_newbo_initiator_id_b1b82d84_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_newbornpigletsmerger
-    ADD CONSTRAINT piglets_events_newbo_initiator_id_b1b82d84_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_events_pigletsmerger
+    ADD CONSTRAINT piglets_events_pigle_created_piglets_id_ce2a075e_fk_piglets_p FOREIGN KEY (created_piglets_id) REFERENCES piglets_piglets(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: piglets_events_newbornmergerrecord piglets_events_newbo_merger_id_fd4326e1_fk_piglets_e; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletsmerger piglets_events_pigle_initiator_id_7af11e75_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_newbornmergerrecord
-    ADD CONSTRAINT piglets_events_newbo_merger_id_fd4326e1_fk_piglets_e FOREIGN KEY (merger_id) REFERENCES piglets_events_newbornpigletsmerger(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_newbornpigletsmerger piglets_events_newbo_nomad_group_id_25804e95_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_newbornpigletsmerger
-    ADD CONSTRAINT piglets_events_newbo_nomad_group_id_25804e95_fk_piglets_n FOREIGN KEY (nomad_group_id) REFERENCES piglets_nomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_events_pigletsmerger
+    ADD CONSTRAINT piglets_events_pigle_initiator_id_7af11e75_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: piglets_events_newbornpigletsgrouprecount piglets_events_newbo_piglets_group_id_a7336c97_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit piglets_events_pigle_initiator_id_f1f2b796_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_newbornpigletsgrouprecount
-    ADD CONSTRAINT piglets_events_newbo_piglets_group_id_a7336c97_fk_piglets_n FOREIGN KEY (piglets_group_id) REFERENCES piglets_newbornpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_newbornmergerrecord piglets_events_newbo_tour_id_36366dbd_fk_tours_tou; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_newbornmergerrecord
-    ADD CONSTRAINT piglets_events_newbo_tour_id_36366dbd_fk_tours_tou FOREIGN KEY (tour_id) REFERENCES tours_tour(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_events_pigletssplit
+    ADD CONSTRAINT piglets_events_pigle_initiator_id_f1f2b796_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: piglets_events_nomadpigletsgrouprecount piglets_events_nomad_initiator_id_64298381_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_pigletssplit piglets_events_pigle_parent_piglets_id_2d39bdd5_fk_piglets_p; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_events_nomadpigletsgrouprecount
-    ADD CONSTRAINT piglets_events_nomad_initiator_id_64298381_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_nomadpigletsgroupmerger piglets_events_nomad_initiator_id_71c250ff_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadpigletsgroupmerger
-    ADD CONSTRAINT piglets_events_nomad_initiator_id_71c250ff_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_nomadmergerrecord piglets_events_nomad_merger_id_bd71c2d7_fk_piglets_e; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadmergerrecord
-    ADD CONSTRAINT piglets_events_nomad_merger_id_bd71c2d7_fk_piglets_e FOREIGN KEY (merger_id) REFERENCES piglets_events_nomadpigletsgroupmerger(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_nomadpigletsgroupmerger piglets_events_nomad_new_location_id_3a1b522d_fk_locations; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadpigletsgroupmerger
-    ADD CONSTRAINT piglets_events_nomad_new_location_id_3a1b522d_fk_locations FOREIGN KEY (new_location_id) REFERENCES locations_location(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_nomadpigletsgroupmerger piglets_events_nomad_nomad_group_id_130bd590_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadpigletsgroupmerger
-    ADD CONSTRAINT piglets_events_nomad_nomad_group_id_130bd590_fk_piglets_n FOREIGN KEY (nomad_group_id) REFERENCES piglets_nomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_nomadmergerrecord piglets_events_nomad_nomad_group_id_2d706dad_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadmergerrecord
-    ADD CONSTRAINT piglets_events_nomad_nomad_group_id_2d706dad_fk_piglets_n FOREIGN KEY (nomad_group_id) REFERENCES piglets_nomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_nomadpigletsgrouprecount piglets_events_nomad_piglets_group_id_a85656da_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_nomadpigletsgrouprecount
-    ADD CONSTRAINT piglets_events_nomad_piglets_group_id_a85656da_fk_piglets_n FOREIGN KEY (piglets_group_id) REFERENCES piglets_nomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_splitnomadpigletsgroup piglets_events_split_initiator_id_5f577a20_fk_auth_user; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_splitnomadpigletsgroup
-    ADD CONSTRAINT piglets_events_split_initiator_id_5f577a20_fk_auth_user FOREIGN KEY (initiator_id) REFERENCES auth_user(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_events_splitnomadpigletsgroup piglets_events_split_parent_group_id_f9f72610_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_events_splitnomadpigletsgroup
-    ADD CONSTRAINT piglets_events_split_parent_group_id_f9f72610_fk_piglets_n FOREIGN KEY (parent_group_id) REFERENCES piglets_nomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_events_pigletssplit
+    ADD CONSTRAINT piglets_events_pigle_parent_piglets_id_2d39bdd5_fk_piglets_p FOREIGN KEY (parent_piglets_id) REFERENCES piglets_piglets(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -7999,75 +6335,43 @@ ALTER TABLE ONLY piglets_events_weighingpiglets
 
 
 --
--- Name: piglets_events_weighingpiglets piglets_events_weigh_piglets_group_id_e55cd7f7_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_events_weighingpiglets piglets_events_weigh_piglets_group_id_e55cd7f7_fk_piglets_p; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY piglets_events_weighingpiglets
-    ADD CONSTRAINT piglets_events_weigh_piglets_group_id_e55cd7f7_fk_piglets_n FOREIGN KEY (piglets_group_id) REFERENCES piglets_nomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT piglets_events_weigh_piglets_group_id_e55cd7f7_fk_piglets_p FOREIGN KEY (piglets_group_id) REFERENCES piglets_piglets(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: piglets_newbornpigletsgroup piglets_newbornpigle_location_id_32ceba9c_fk_locations; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_piglets piglets_piglets_location_id_41c43483_fk_locations_location_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_newbornpigletsgroup
-    ADD CONSTRAINT piglets_newbornpigle_location_id_32ceba9c_fk_locations FOREIGN KEY (location_id) REFERENCES locations_location(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_newbornpigletsgroup piglets_newbornpigle_merger_id_758f45d8_fk_piglets_e; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_newbornpigletsgroup
-    ADD CONSTRAINT piglets_newbornpigle_merger_id_758f45d8_fk_piglets_e FOREIGN KEY (merger_id) REFERENCES piglets_events_newbornpigletsmerger(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_piglets
+    ADD CONSTRAINT piglets_piglets_location_id_41c43483_fk_locations_location_id FOREIGN KEY (location_id) REFERENCES locations_location(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: piglets_newbornpigletsgroup piglets_newbornpigle_status_id_c51ed2db_fk_piglets_p; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_piglets piglets_piglets_merger_as_parent_id_6e0e878e_fk_piglets_e; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_newbornpigletsgroup
-    ADD CONSTRAINT piglets_newbornpigle_status_id_c51ed2db_fk_piglets_p FOREIGN KEY (status_id) REFERENCES piglets_pigletsstatus(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_newbornpigletsgroup piglets_newbornpigletsgroup_tour_id_5dcff7ec_fk_tours_tour_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_newbornpigletsgroup
-    ADD CONSTRAINT piglets_newbornpigletsgroup_tour_id_5dcff7ec_fk_tours_tour_id FOREIGN KEY (tour_id) REFERENCES tours_tour(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_piglets
+    ADD CONSTRAINT piglets_piglets_merger_as_parent_id_6e0e878e_fk_piglets_e FOREIGN KEY (merger_as_parent_id) REFERENCES piglets_events_pigletsmerger(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: piglets_nomadpigletsgroup piglets_nomadpiglets_groups_merger_id_11a8d0d1_fk_piglets_e; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_piglets piglets_piglets_split_as_child_id_67816971_fk_piglets_e; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_nomadpigletsgroup
-    ADD CONSTRAINT piglets_nomadpiglets_groups_merger_id_11a8d0d1_fk_piglets_e FOREIGN KEY (groups_merger_id) REFERENCES piglets_events_nomadpigletsgroupmerger(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_nomadpigletsgroup piglets_nomadpiglets_location_id_140aacae_fk_locations; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_nomadpigletsgroup
-    ADD CONSTRAINT piglets_nomadpiglets_location_id_140aacae_fk_locations FOREIGN KEY (location_id) REFERENCES locations_location(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_piglets
+    ADD CONSTRAINT piglets_piglets_split_as_child_id_67816971_fk_piglets_e FOREIGN KEY (split_as_child_id) REFERENCES piglets_events_pigletssplit(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
--- Name: piglets_nomadpigletsgroup piglets_nomadpiglets_split_record_id_25fba887_fk_piglets_e; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: piglets_piglets piglets_piglets_status_id_f9ba9ddb_fk_piglets_pigletsstatus_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
-ALTER TABLE ONLY piglets_nomadpigletsgroup
-    ADD CONSTRAINT piglets_nomadpiglets_split_record_id_25fba887_fk_piglets_e FOREIGN KEY (split_record_id) REFERENCES piglets_events_splitnomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: piglets_nomadpigletsgroup piglets_nomadpiglets_status_id_6190ec1c_fk_piglets_p; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY piglets_nomadpigletsgroup
-    ADD CONSTRAINT piglets_nomadpiglets_status_id_6190ec1c_fk_piglets_p FOREIGN KEY (status_id) REFERENCES piglets_pigletsstatus(id) DEFERRABLE INITIALLY DEFERRED;
+ALTER TABLE ONLY piglets_piglets
+    ADD CONSTRAINT piglets_piglets_status_id_f9ba9ddb_fk_piglets_pigletsstatus_id FOREIGN KEY (status_id) REFERENCES piglets_pigletsstatus(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -8167,11 +6471,11 @@ ALTER TABLE ONLY sows_events_semination
 
 
 --
--- Name: sows_events_sowfarrow sows_events_sowfarro_new_born_piglets_gro_3ce96d73_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: sows_events_sowfarrow sows_events_sowfarro_piglets_group_id_36c6886e_fk_piglets_p; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY sows_events_sowfarrow
-    ADD CONSTRAINT sows_events_sowfarro_new_born_piglets_gro_3ce96d73_fk_piglets_n FOREIGN KEY (new_born_piglets_group_id) REFERENCES piglets_newbornpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT sows_events_sowfarro_piglets_group_id_36c6886e_fk_piglets_p FOREIGN KEY (piglets_group_id) REFERENCES piglets_piglets(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -8231,11 +6535,11 @@ ALTER TABLE ONLY sows_events_ultrasound
 
 
 --
--- Name: sows_events_weaningsow sows_events_weanings_transaction_id_969218f5_fk_transacti; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: sows_events_weaningsow sows_events_weanings_piglets_id_ebeedc21_fk_piglets_p; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY sows_events_weaningsow
-    ADD CONSTRAINT sows_events_weanings_transaction_id_969218f5_fk_transacti FOREIGN KEY (transaction_id) REFERENCES transactions_sowtransaction(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT sows_events_weanings_piglets_id_ebeedc21_fk_piglets_p FOREIGN KEY (piglets_id) REFERENCES piglets_piglets(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -8263,11 +6567,11 @@ ALTER TABLE ONLY sows_events_weaningsow
 
 
 --
--- Name: sows_gilt sows_gilt_casting_list_to_seve_c604ae8f_fk_gilts_eve; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: sows_gilt sows_gilt_farrow_id_703f6faa_fk_sows_events_sowfarrow_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY sows_gilt
-    ADD CONSTRAINT sows_gilt_casting_list_to_seve_c604ae8f_fk_gilts_eve FOREIGN KEY (casting_list_to_seven_five_id) REFERENCES gilts_events_castinglisttosevenfiveevent(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT sows_gilt_farrow_id_703f6faa_fk_sows_events_sowfarrow_id FOREIGN KEY (farrow_id) REFERENCES sows_events_sowfarrow(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -8279,35 +6583,11 @@ ALTER TABLE ONLY sows_gilt
 
 
 --
--- Name: sows_gilt sows_gilt_merger_id_874a8dc3_fk_gilts_events_giltmerger_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY sows_gilt
-    ADD CONSTRAINT sows_gilt_merger_id_874a8dc3_fk_gilts_events_giltmerger_id FOREIGN KEY (merger_id) REFERENCES gilts_events_giltmerger(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
 -- Name: sows_gilt sows_gilt_mother_sow_id_c2fedd8a_fk_sows_sow_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY sows_gilt
     ADD CONSTRAINT sows_gilt_mother_sow_id_c2fedd8a_fk_sows_sow_id FOREIGN KEY (mother_sow_id) REFERENCES sows_sow(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: sows_gilt sows_gilt_new_born_group_id_a94b121e_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY sows_gilt
-    ADD CONSTRAINT sows_gilt_new_born_group_id_a94b121e_fk_piglets_n FOREIGN KEY (new_born_group_id) REFERENCES piglets_newbornpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
-
-
---
--- Name: sows_gilt sows_gilt_status_id_9bf9b3a4_fk_sows_giltstatus_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
---
-
-ALTER TABLE ONLY sows_gilt
-    ADD CONSTRAINT sows_gilt_status_id_9bf9b3a4_fk_sows_giltstatus_id FOREIGN KEY (status_id) REFERENCES sows_giltstatus(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
@@ -8359,6 +6639,30 @@ ALTER TABLE ONLY staff_workshopemployee
 
 
 --
+-- Name: tours_metatour tours_metatour_piglets_id_9f8a0fb6_fk_piglets_piglets_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY tours_metatour
+    ADD CONSTRAINT tours_metatour_piglets_id_9f8a0fb6_fk_piglets_piglets_id FOREIGN KEY (piglets_id) REFERENCES piglets_piglets(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: tours_metatourrecord tours_metatourrecord_metatour_id_ba0ab56b_fk_tours_metatour_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY tours_metatourrecord
+    ADD CONSTRAINT tours_metatourrecord_metatour_id_ba0ab56b_fk_tours_metatour_id FOREIGN KEY (metatour_id) REFERENCES tours_metatour(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
+-- Name: tours_metatourrecord tours_metatourrecord_tour_id_11a5df6e_fk_tours_tour_id; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY tours_metatourrecord
+    ADD CONSTRAINT tours_metatourrecord_tour_id_11a5df6e_fk_tours_tour_id FOREIGN KEY (tour_id) REFERENCES tours_tour(id) DEFERRABLE INITIALLY DEFERRED;
+
+
+--
 -- Name: transactions_pigletstransaction transactions_piglets_from_location_id_2e739f33_fk_locations; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -8375,11 +6679,11 @@ ALTER TABLE ONLY transactions_pigletstransaction
 
 
 --
--- Name: transactions_pigletstransaction transactions_piglets_piglets_group_id_dd2560ba_fk_piglets_n; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+-- Name: transactions_pigletstransaction transactions_piglets_piglets_group_id_dd2560ba_fk_piglets_p; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
 ALTER TABLE ONLY transactions_pigletstransaction
-    ADD CONSTRAINT transactions_piglets_piglets_group_id_dd2560ba_fk_piglets_n FOREIGN KEY (piglets_group_id) REFERENCES piglets_nomadpigletsgroup(id) DEFERRABLE INITIALLY DEFERRED;
+    ADD CONSTRAINT transactions_piglets_piglets_group_id_dd2560ba_fk_piglets_p FOREIGN KEY (piglets_group_id) REFERENCES piglets_piglets(id) DEFERRABLE INITIALLY DEFERRED;
 
 
 --
