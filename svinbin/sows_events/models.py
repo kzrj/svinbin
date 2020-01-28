@@ -167,7 +167,11 @@ class SowFarrowManager(CoreModelManager):
             raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.')            
 
         if not sow.location.is_piglets_empty:
-            raise DjangoValidationError(message='В клетке есть другие поросята.')            
+            raise DjangoValidationError(message='В клетке есть другие поросята.')
+
+        if alive_quantity == 0 and dead_quantity == 0 and mummy_quantity == 0:
+            raise DjangoValidationError(message='Не может быть 0 поросят.')
+
 
         # We assume that sow has one farrow per tour. Sow there are no piglets in cell
         piglets = Piglets.objects.create(
