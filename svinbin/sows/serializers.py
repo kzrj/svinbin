@@ -14,7 +14,7 @@ class BoarSerializer(serializers.ModelSerializer):
 
 
 class SowSerializer(serializers.ModelSerializer):
-    location = serializers.StringRelatedField()
+    location = serializers.ReadOnlyField(source='get_location')
     status = serializers.StringRelatedField()
     tour = serializers.StringRelatedField()
 
