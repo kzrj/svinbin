@@ -253,6 +253,21 @@ class WorkShopSowViewSet(SowViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    # def move_to_with_resetellment(self, request, pk=None):
+    #     sow = self.get_object()        
+    #     serializer = locations_serializers.LocationPKSerializer(data=request.data)
+    #     if serializer.is_valid():
+    #         transaction = transactions_models.SowTransaction.objects.create_transaction(
+    #             sow, serializer.validated_data['location'], request.user)
+    #         return Response(
+    #             {
+    #                 "transaction": transactions_serializers.SowTransactionSerializer(transaction).data,
+    #                 "sow": sows_serializers.SowSerializer(sow).data, 
+    #             },
+    #             status=status.HTTP_200_OK)
+    #     else:
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @action(methods=['post'], detail=True) # test +  in workshop onetwo
     def culling(self, request, pk=None):
         sow = self.get_object()        

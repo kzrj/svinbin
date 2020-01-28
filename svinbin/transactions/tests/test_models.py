@@ -44,6 +44,16 @@ class SowTransactionManagerTest(TestCase):
     #             sow=sow1
     #             )
 
+    def test_create_transaction_with_resetellment(self):
+        sow_in = sows_testing.create_sow_with_semination_usound(
+            Location.objects.get(workshop__number=3))
+
+        to_location = Location.objects.get(sowAndPigletsCell__number=1, sowAndPigletsCell__section__number=1)
+        sow_out = sows_testing.create_sow_with_semination_usound(to_location)
+
+        transaction = SowTransaction.objects.create_transaction_with_resetellment(sow_in, to_location)
+        self.assertEqual()
+
     def test_create_many_transaction(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         sow2 = sows_testing.create_sow_and_put_in_workshop_one()
@@ -495,4 +505,3 @@ class PigletsTransactionManagerTest(TestCase):
 
     #     self.assertEqual(final_in_cell_piglets2.quantity, 1)
     #     self.assertEqual(final_in_cell_piglets2.location, self.loc_ws4_cell2)
-

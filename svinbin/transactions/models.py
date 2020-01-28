@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from django.conf import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager, Event
 from locations.models import SowAndPigletsCell, Location
@@ -32,6 +32,21 @@ class SowTransactionManager(CoreModelManager):
         sow.change_sow_current_location(to_location)
 
         return transaction
+
+    def create_transaction_with_resetellment(self, sow_in, to_location, initiator=None):
+        sow_out = None
+        if sow_in.status.title != 'Супорос 35':
+            raise DjangoValidationError(message=f'Свинья {sow_out.farm_id} не Супорос 35.') 
+
+        if isinstance(to_location.get_location, SowAndPigletsCell) and not to_location.is_sow_empty:
+            sow_out = location.sow_set.all().first()
+
+        if sow_out:
+            if sow_out.status.title != 'Супорос 35':
+                raise DjangoValidationError(message=f'Свинья {sow_out.farm_id} в клетке не Супорос 35.')
+            self.create_transaction(sow_out, Location.objects.get(workshop__number=3), initiator)
+
+        return self.create_transaction(sow_in, to_location, initiator)
 
     def create_many_transactions(self, sows, to_location, initiator=None):
         transactions_ids = list()
