@@ -183,6 +183,17 @@ class PigletsMergerManager(CoreModelManager):
                         date=date)
 
         return self.create_merger_return_group(parent_piglets_ids, new_location, initiator, date)
+
+    # only for "Piglets" phase
+    def merge_piglets_from_init_list(self, init_list, initiator=None, date=timezone.now()):
+        piglets = list()
+        for init_record in init_list:
+            piglets.append(
+                init_piglets_with_single_tour(init_record['week'], init_record['quantity'])
+            )
+
+        return self.create_merger_return_group(parent_piglets=piglets,
+         new_location=Location.objects.get(workshop__number=3), initiator=initiator, date=date)
                 
 
 class PigletsMerger(PigletsEvent):

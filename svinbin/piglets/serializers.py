@@ -33,6 +33,16 @@ class MergeFromListSerializer(serializers.Serializer):
     records = MergeFromListRecordSerializer(many=True)
 
 
+class MergeFromInitListRecordSerializer(serializers.Serializer):
+    week = serializers.IntegerField()
+    quantity = serializers.IntegerField()
+
+
+class MergeFromInitListSerializer(serializers.Serializer):
+    transfer_part_number = serializers.IntegerField(required=False, allow_null=True)
+    records = MergeFromInitListRecordSerializer(many=True)
+
+
 class MovePigletsSerializer(serializers.Serializer):
     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     new_amount = serializers.IntegerField(required=False)

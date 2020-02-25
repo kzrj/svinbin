@@ -3,7 +3,10 @@ from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
 from piglets.models import Piglets
-from piglets_events.models import PigletsMerger, PigletsSplit, WeighingPiglets, CullingPiglets
+from piglets_events.models import (
+    PigletsMerger, PigletsSplit, WeighingPiglets,
+    CullingPiglets, init_piglets_with_single_tour
+)
 from tours.models import Tour
 from locations.models import Location
 
@@ -316,6 +319,13 @@ class PigletsMergerModelTest(TransactionTestCase):
         piglets2.refresh_from_db()
         self.assertEqual(piglets1.active, False)
 
+    def test_merge_piglets_from_init_list(self):
+        init_list = [{'week': 9, 'quantity': 40}, {'week': 8, 'quantity': 60}]
+        merged_piglets = PigletsMerger.objects.merge_piglets_from_init_list(init_list)
+
+        self.assertEqual(merged_piglets.quantity, 100)
+
+
 class PigletsSplitModelTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
@@ -344,16 +354,19 @@ class PigletsSplitModelTest(TestCase):
 
         self.assertEqual(child_piglets1.split_as_child.parent_piglets, piglets)
         self.assertEqual(piglets.active, False)
+
+        self.assertEqual(child_piglets1.quantity, 200)
+        self.assertEqual(child_piglets2.quantity, 100)
         
         # child_pidlets1 records        
         self.assertEqual(child_piglets1.metatour.records.all().count(), 2)
         self.assertEqual(child_piglets1.metatour.records.all()[0].tour, self.tour1)
-        self.assertEqual(child_piglets1.metatour.records.all()[0].quantity, 33)
-        self.assertEqual(child_piglets1.metatour.records.all()[0].percentage, 33.0)
+        self.assertEqual(child_piglets1.metatour.records.all()[0].quantity, 67)
+        self.assertEqual(child_piglets1.metatour.records.all()[0].percentage, 33.5)
 
         self.assertEqual(child_piglets1.metatour.records.all()[1].tour, self.tour2)
-        self.assertEqual(child_piglets1.metatour.records.all()[1].quantity, 67)
-        self.assertEqual(child_piglets1.metatour.records.all()[1].percentage, 67.0)
+        self.assertEqual(child_piglets1.metatour.records.all()[1].quantity, 133)
+        self.assertEqual(child_piglets1.metatour.records.all()[1].percentage, 66.5)
 
         # child_pidlets2 records
         self.assertEqual(child_piglets2.metatour.records.all().count(), 2)
@@ -467,6 +480,21 @@ class CullingPigletsTest(TestCase):
         self.assertEqual(culling.culling_type, 'padej')
         self.assertEqual(culling.reason, 'xz')
         
+
+class RestPigletsTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        piglets_testing.create_piglets_statuses()
+
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+
+    def test_init_piglets_with_single_tour(self):
+        piglets = init_piglets_with_single_tour(9, 105)
+
+        self.assertEqual(piglets.quantity, 105)
+        self.assertEqual(piglets.location, self.loc_ws3)
+        self.assertEqual(piglets.metatour.records.all().count(), 1)
+        self.assertEqual(piglets.metatour.records.all().first().tour.week_number, 9)
 
 
 # # class RecountManagerTest(TestCase):
