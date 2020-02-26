@@ -161,6 +161,32 @@ class PigletsViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True)
+    def recount_and_weighing_piglets(self, request, pk=None):        
+        serializer = piglets_events_serializers.RecountWeighingPigletsSerializer(data=request.data)
+        if serializer.is_valid():
+            piglets_group = self.get_object()
+
+            if serializer.validated_data.get('new_quantity', None):
+                recount = piglets_events_models.Recount.objects.create_recount(piglets_group, 
+                    serializer.validated_data['new_quantity'], request.user)
+
+            weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
+                piglets_group=piglets_group,
+                total_weight=serializer.validated_data['total_weight'],
+                place=serializer.validated_data['place'],
+                initiator=request.user
+                )
+
+            return Response(
+                {
+                 "weighing_record": piglets_events_serializers.WeighingPigletsSerializer(weighing_record).data,
+                 "message": 'Взвешивание прошло успешно.',
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
     def move_piglets(self, request, pk=None):        
         serializer = piglets_serializers.MovePigletsSerializer(data=request.data)
         if serializer.is_valid():

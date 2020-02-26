@@ -15,7 +15,7 @@ import staff.testing_utils as staff_testing
 
 from piglets.models import Piglets
 from locations.models import Location
-from tours.models import Tour
+from tours.models import Tour, MetaTour
 from piglets_events.models import WeighingPiglets
 from sows.models import Sow
 # from transactions.models import PigletsTransaction, SowTransaction
@@ -237,6 +237,28 @@ class PigletsViewSetTest(APITestCase):
             },
             format='json')
         self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
+
+    def test_recount_and_weighing_piglets(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(1)
+        tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
+        location = Location.objects.get(section__number=1, section__workshop__number=3)
+        piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100,
+            gilts_quantity=0, status=None)
+        meta_tour = MetaTour.objects.create(piglets=piglets)
+
+        record1 = meta_tour.records.create_record(meta_tour, tour, 60, piglets.quantity)
+        record2 = meta_tour.records.create_record(meta_tour, tour2, 40, piglets.quantity)
+
+        response = self.client.post('/api/piglets/%s/recount_and_weighing_piglets/' % piglets.pk, 
+            {'new_quantity': 110, 'total_weight': 500, 'place': '3/4'})
+        self.assertEqual(response.data['message'], 'Взвешивание прошло успешно.')
+        
+        piglets.refresh_from_db()
+        self.assertEqual(piglets.quantity, 110)
+
+        response = self.client.post('/api/piglets/%s/recount_and_weighing_piglets/' % piglets.pk, 
+            {'total_weight': 580, 'place': '3/4'})
+        self.assertEqual(response.data['message'], 'Взвешивание прошло успешно.')
 
 
 class PigletsFilterTest(APITestCase):

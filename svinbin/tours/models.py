@@ -114,6 +114,9 @@ class MetaTourRecordManager(CoreModelManager):
 
         return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage)
 
+    def recount_records_by_total_quantity(self, new_total_quantity):
+        self.get_queryset().update(quantity=(models.F('percentage') * new_total_quantity / 100))
+
 
 class MetaTourRecord(CoreModel):
     metatour = models.ForeignKey(MetaTour, on_delete=models.CASCADE, related_name='records')

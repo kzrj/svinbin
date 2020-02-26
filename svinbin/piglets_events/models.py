@@ -263,40 +263,31 @@ class CullingPiglets(PigletsEvent):
     objects = CullingPigletsManager()
 
 
-# class RecountQuerySet(models.QuerySet):
-#     def get_sum_balance(self):
-#         balance_sum = self.aggregate(models.Sum('balance'))['balance__sum']
-#         if balance_sum:
-#             return balance_sum
-#         return 0
-
-# class RecountManager(CoreModelManager):
-#     def get_queryset(self):
-#         return RecountQuerySet(self.model, using=self._db)
-
-#     def create_recount(self, piglets_group, quantity, initiator=None):
-#         recount = self.create(date=timezone.now(), initiator=initiator, piglets_group=piglets_group,
-#             quantity_after=quantity, quantity_before=piglets_group.quantity,
-#             balance=quantity - piglets_group.quantity)
-#         piglets_group.change_quantity(quantity)
-#         return recount
-
-#     def get_recounts_from_groups(self, piglets_groups_qs):
-#         return self.get_queryset().filter(piglets_group__in=piglets_groups_qs)
-
-#     def get_recounts_with_negative_balance(self, piglets_groups_qs):
-#         return self.get_queryset().filter(piglets_group__in=piglets_groups_qs, balance__lt=0)
-
-#     def get_recounts_with_positive_balance(self, piglets_groups_qs):
-#         return self.get_queryset().filter(piglets_group__in=piglets_groups_qs, balance__gt=0)
+class RecountQuerySet(models.QuerySet):
+    pass
 
 
-# class Recount(PigletsEvent):
-#     quantity_before = models.IntegerField()
-#     quantity_after = models.IntegerField()
-#     balance = models.IntegerField()
+class RecountManager(CoreModelManager):
+    def get_queryset(self):
+        return RecountQuerySet(self.model, using=self._db)
 
-#     objects = RecountManager()
+    def create_recount(self, piglets, new_quantity, initiator=None):
+        recount = self.create(piglets=piglets, quantity_before=piglets.quantity, quantity_after=new_quantity,
+            balance=new_quantity - piglets.quantity, initiator=initiator)
+        piglets.quantity = new_quantity
+        piglets.save()
+        piglets.metatour.records.recount_records_by_total_quantity(new_quantity)
+        
+        return recount
 
-#     class Meta:
-#         abstract = True
+
+class Recount(PigletsEvent):
+    piglets = models.OneToOneField(Piglets, on_delete=models.CASCADE, related_name='recount')
+    quantity_before = models.IntegerField()
+    quantity_after = models.IntegerField()
+    balance = models.IntegerField()
+
+    objects = RecountManager()
+
+    class Meta:
+        pass

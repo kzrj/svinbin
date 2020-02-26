@@ -5,9 +5,9 @@ from django.core.exceptions import ValidationError
 from piglets.models import Piglets
 from piglets_events.models import (
     PigletsMerger, PigletsSplit, WeighingPiglets,
-    CullingPiglets, init_piglets_with_single_tour
+    CullingPiglets, init_piglets_with_single_tour, Recount
 )
-from tours.models import Tour
+from tours.models import Tour, MetaTour
 from locations.models import Location
 
 import locations.testing_utils as locations_testing
@@ -497,75 +497,27 @@ class RestPigletsTest(TestCase):
         self.assertEqual(piglets.metatour.records.all().first().tour.week_number, 9)
 
 
-# # class RecountManagerTest(TestCase):
-# #     def setUp(self):
-# #         locations_testing.create_workshops_sections_and_cells()
-# #         sows_testing.create_statuses()
-# #         piglets_testing.create_piglets_statuses()
+class RecountManagerTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
-# #     def test_create_recount_nomad_group(self):
-# #         # quantity 37
-# #         nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
-# #         recount = piglets_events_models.NomadPigletsGroupRecount.objects. \
-# #             create_recount(nomad_group, 35)
-# #         self.assertEqual(recount.quantity_before, 37)
-# #         self.assertEqual(recount.quantity_after, 35)
-# #         self.assertEqual(recount.balance, -2)
+    def test_create_recount(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(1)
+        tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
+        location = Location.objects.get(section__number=1, section__workshop__number=3)
+        piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100,
+        gilts_quantity=0, status=None)
+        meta_tour = MetaTour.objects.create(piglets=piglets)
 
-# #     def test_create_recount_nomad_group2(self):
-# #         # quantity 37
-# #         nomad_group = piglets_testing.create_nomad_group_from_three_new_born()
-# #         recount = piglets_events_models.NomadPigletsGroupRecount.objects. \
-# #             create_recount(nomad_group, 39)
-# #         self.assertEqual(recount.quantity_before, 37)
-# #         self.assertEqual(recount.quantity_after, 39)
-# #         self.assertEqual(recount.balance, 2)
+        record1 = meta_tour.records.create_record(meta_tour, tour, 60, piglets.quantity)
+        record2 = meta_tour.records.create_record(meta_tour, tour2, 40, piglets.quantity)
 
-# #     def test_create_recount_new_born_group(self):
-# #         # quantity 10
-# #         new_born_group = piglets_testing.create_new_born_group()
-# #         recount = piglets_events_models.NewBornPigletsGroupRecount.objects. \
-# #             create_recount(new_born_group, 8)
-# #         self.assertEqual(recount.quantity_before, 10)
-# #         self.assertEqual(recount.quantity_after, 8)
-# #         self.assertEqual(recount.balance, -2)
+        recount = Recount.objects.create_recount(piglets, 110)
+        self.assertEqual(recount.quantity_before, 100)
+        self.assertEqual(recount.quantity_after, 110)
+        self.assertEqual(recount.balance, 10)
 
-# #     def test_create_recount_new_born_group2(self):
-# #         # quantity 10
-# #         new_born_group = piglets_testing.create_new_born_group()
-# #         recount = piglets_events_models.NewBornPigletsGroupRecount.objects. \
-# #             create_recount(new_born_group, 12)
-# #         self.assertEqual(recount.quantity_before, 10)
-# #         self.assertEqual(recount.quantity_after, 12)
-# #         self.assertEqual(recount.balance, 2)
-
-# #     def test_get_recounts(self):
-# #         # create newborngroups tour=1, qnty=10
-# #         for cell_number in range(1, 11):
-# #             piglets_testing.create_new_born_group(section_number=1, cell_number=cell_number,
-# #                 week=1, quantity=10)
-
-# #         piglets_group_qs = piglets_models.NewBornPigletsGroup.objects.all()
-
-# #         # get 1 piglet from every group. recount -1. negative recount
-# #         for nbgroup in piglets_group_qs:
-# #             piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 9)
-
-# #         # add 1 piglet to every group. recount +1. positive recount
-# #         for nbgroup in piglets_group_qs:
-# #             piglets_events_models.NewBornPigletsGroupRecount.objects.create_recount(nbgroup, 10)
-
-# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-# #                 .get_recounts_from_groups(piglets_group_qs).count(), 20)
-
-# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-# #                 .get_recounts_with_negative_balance(piglets_group_qs).count(), 10)
-
-# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-# #                 .get_recounts_with_positive_balance(piglets_group_qs).count(), 10)
-
-# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-# #                 .get_recounts_with_negative_balance(piglets_group_qs).get_sum_balance(), -10)
-
-# #         self.assertEqual(piglets_events_models.NewBornPigletsGroupRecount.objects \
-# #                 .get_recounts_with_positive_balance(piglets_group_qs).get_sum_balance(), 10)
+        piglets.refresh_from_db()
+        self.assertEqual(piglets.quantity, 110)
