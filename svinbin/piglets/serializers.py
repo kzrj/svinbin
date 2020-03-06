@@ -63,6 +63,6 @@ class InitPigletsSerializer(serializers.Serializer):
     transaction_date = serializers.CharField(required=False, allow_null=True)
 
     def validate_transaction_date(self, value):
-        if isinstance(str, value):
+        if isinstance(value, str):
             return datetime.datetime.strptime(value, '%d-%m-%Y')
         return None
