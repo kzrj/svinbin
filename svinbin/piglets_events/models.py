@@ -11,6 +11,8 @@ from tours.models import MetaTour, MetaTourRecord, Tour
 
 # use only for phase "Piglets". In full version piglets will create at sow_farrow
 def init_piglets_with_single_tour(week, quantity):
+    # init_piglets_one_tour()
+     
     tour = Tour.objects.get_or_create_by_week_in_current_year(week)
     location = Location.objects.get(workshop__number=3)
     piglets = Piglets.objects.create(
@@ -271,9 +273,9 @@ class RecountManager(CoreModelManager):
     def get_queryset(self):
         return RecountQuerySet(self.model, using=self._db)
 
-    def create_recount(self, piglets, new_quantity, initiator=None):
+    def create_recount(self, piglets, new_quantity, comment=None, initiator=None):
         recount = self.create(piglets=piglets, quantity_before=piglets.quantity, quantity_after=new_quantity,
-            balance=new_quantity - piglets.quantity, initiator=initiator)
+            balance=new_quantity - piglets.quantity, initiator=initiator, comment=comment)
         piglets.quantity = new_quantity
         piglets.save()
         piglets.metatour.records.recount_records_by_total_quantity(new_quantity)
@@ -282,12 +284,11 @@ class RecountManager(CoreModelManager):
 
 
 class Recount(PigletsEvent):
-    piglets = models.OneToOneField(Piglets, on_delete=models.CASCADE, related_name='recount')
+    piglets = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name='recount')
     quantity_before = models.IntegerField()
     quantity_after = models.IntegerField()
     balance = models.IntegerField()
 
-    objects = RecountManager()
+    comment = models.TextField(null=True)
 
-    class Meta:
-        pass
+    objects = RecountManager()

@@ -51,6 +51,11 @@ class TourModelManagerTest(TestCase):
         self.assertEqual(tour.week_number, 40)
         self.assertEqual(tour.year, 2019)
 
+    def test_create_tour_from_farrow_date_string(self):
+        tour = Tour.objects.create_tour_from_farrow_date_string(farrow_date='5-03-2020', days=4)
+        self.assertEqual(tour.week_number, 9)
+        self.assertEqual(tour.start_date.day, 1)
+
     
 class TourModelTest(TestCase):
     def setUp(self):

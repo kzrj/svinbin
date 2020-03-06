@@ -4,6 +4,7 @@ from django.db.models import Q
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
+from tours.models import MetaTour, MetaTourRecord, Tour
 
 
 class PigletsStatus(CoreModel):
@@ -43,6 +44,27 @@ class PigletsManager(CoreModelManager):
 
     def get_all(self):
         return PigletsQuerySet(self.model, using=self._db)
+
+    # for init only
+    def init_piglets_with_metatour(self, tour, location, quantity, gilts_quantity=0, created_at=None):
+    	piglets = self.create(location=location,
+                start_quantity=quantity,
+                quantity=quantity,
+                gilts_quantity=gilts_quantity)
+    	metatour = MetaTour.objects.create(piglets=piglets)
+    	MetaTourRecord.objects.create_record(metatour, tour, quantity, quantity)
+    	return piglets
+
+    # test use kwargs
+    def init_piglets_by_week(self, *args, **kwargs):
+    	tour = Tour.objects.get_or_create_by_week_in_current_year(kwargs['week'])
+    	kwargs.pop('week')
+    	kwargs['tour'] = tour
+    	return self.init_piglets_with_metatour(**kwargs)
+
+    def init_piglets_by_farrow_date(self, farrow_date, location, quantity, gilts_quantity=0):
+    	tour = Tour.objects.create_tour_from_farrow_date_string(farrow_date)
+    	return self.init_piglets_with_metatour(tour, location, quantity, gilts_quantity)
 
 
 class Piglets(CoreModel):

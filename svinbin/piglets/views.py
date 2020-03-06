@@ -231,3 +231,49 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False)
+    def init_piglets_from_farrow(self, request, pk=None):        
+        serializer = piglets_serializers.InitPigletsSerializer(data=request.data)
+        if serializer.is_valid():
+            location = serializer.validated_data['location']
+
+            if serializer.validated_data.get('from_location', None):            
+                location = serializer.validated_data['from_location']
+
+            piglets = piglets_models.Piglets.objects.init_piglets_by_farrow_date(
+                serializer.validated_data['farrow_date'],
+                location,
+                serializer.validated_data['quantity'],
+                serializer.validated_data.get('gilts_quantity', 0)
+                )
+
+            if serializer.validated_data.get('from_location', None):
+                transactions_models.PigletsTransaction.objects.create_transaction(
+                    serializer.validated_data['location'], piglets, request.user)
+
+            return Response(
+                {
+                 "message": 'Свиньи успешно созданы.',
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['post'], detail=True)
+    def recount_piglets(self, request, pk=None):        
+        serializer = piglets_events_serializers.RecountPigletsSerializer(data=request.data)
+        if serializer.is_valid():
+            piglets_group = self.get_object()
+            piglets_events_models.Recount.objects.create_recount(piglets_group,
+              serializer.validated_data['new_quantity'],
+              serializer.validated_data.get('comment', None),
+              request.user)
+            return Response(
+                {
+                 "message": 'Пересчет прошел успешно.',
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

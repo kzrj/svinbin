@@ -1,7 +1,7 @@
 # # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from piglets_events.models import CullingPiglets, WeighingPiglets
+from piglets_events.models import CullingPiglets, WeighingPiglets, Recount
 from locations.models import Location
 
 
@@ -40,3 +40,10 @@ class RecountWeighingPigletsSerializer(serializers.ModelSerializer):
     class Meta:
         model = WeighingPiglets
         fields = ['total_weight', 'place', 'new_quantity']
+
+
+class RecountPigletsSerializer(serializers.Serializer):
+    new_quantity = serializers.IntegerField()
+    comment = serializers.CharField(required=False)
+
+    

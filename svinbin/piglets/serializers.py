@@ -48,3 +48,12 @@ class MovePigletsSerializer(serializers.Serializer):
     new_amount = serializers.IntegerField(required=False)
     gilts_contains = serializers.BooleanField(default=False, required=False, allow_null=True)
     merge = serializers.BooleanField(default=False)
+
+
+class InitPigletsSerializer(serializers.Serializer):
+    farrow_date = serializers.CharField()
+    from_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all(),
+     required=False, allow_null=True)
+    location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
+    quantity = serializers.IntegerField()
+    gilts_quantity = serializers.IntegerField(required=False, allow_null=True)

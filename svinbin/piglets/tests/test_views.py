@@ -18,7 +18,7 @@ from locations.models import Location
 from tours.models import Tour, MetaTour
 from piglets_events.models import WeighingPiglets
 from sows.models import Sow
-# from transactions.models import PigletsTransaction, SowTransaction
+from transactions.models import PigletsTransaction, SowTransaction
 
 
 class PigletsViewSetTest(APITestCase):
@@ -259,6 +259,40 @@ class PigletsViewSetTest(APITestCase):
         response = self.client.post('/api/piglets/%s/recount_and_weighing_piglets/' % piglets.pk, 
             {'total_weight': 580, 'place': '3/4'})
         self.assertEqual(response.data['message'], 'Взвешивание прошло успешно.')
+
+    def test_init_piglets_from_farrow(self):
+        location = Location.objects.get(workshop__number=4)
+        from_location = Location.objects.get(workshop__number=3)
+        response = self.client.post('/api/piglets/init_piglets_from_farrow/', 
+            {
+                'farrow_date': '1-03-2020', 'location': location.pk, 'quantity': 102,
+                'from_location': from_location.pk
+            })
+        self.assertEqual(response.data['message'], 'Свиньи успешно созданы.')
+        self.assertEqual(Piglets.objects.filter(quantity=102, location=location).count(), 1)
+        transaction = PigletsTransaction.objects.first()
+        self.assertEqual(transaction.piglets_group.quantity, 102)
+        self.assertEqual(transaction.from_location, from_location)
+        self.assertEqual(transaction.to_location, location)
+
+    def test_recount_piglets(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(1)
+        tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
+        location = Location.objects.get(section__number=1, section__workshop__number=3)
+        piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100,
+            gilts_quantity=0, status=None)
+        meta_tour = MetaTour.objects.create(piglets=piglets)
+
+        record1 = meta_tour.records.create_record(meta_tour, tour, 60, piglets.quantity)
+        record2 = meta_tour.records.create_record(meta_tour, tour2, 40, piglets.quantity)
+
+        response = self.client.post('/api/piglets/%s/recount_piglets/' % piglets.pk, 
+            {'new_quantity': 105, 'comment': 'xz'})
+        self.assertEqual(response.data['message'], 'Пересчет прошел успешно.')
+
+        response = self.client.post('/api/piglets/%s/recount_piglets/' % piglets.pk, 
+            {'new_quantity': 106,})
+        self.assertEqual(response.data['message'], 'Пересчет прошел успешно.')
 
 
 class PigletsFilterTest(APITestCase):

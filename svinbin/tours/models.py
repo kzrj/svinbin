@@ -13,14 +13,15 @@ from piglets import models as piglets_models
 class TourQuerySet(models.QuerySet):
     pass
 
+
 class TourManager(CoreModelManager):
     def get_queryset(self):
         return TourQuerySet(self.model, using=self._db)
 
-    def get_or_create_by_week(self, week_number, year):
+    def get_or_create_by_week(self, week_number, year, start_date=timezone.now()):
         tour = self.get_queryset().filter(week_number=week_number, year=year).first()
         if not tour:
-            tour = self.create(start_date=timezone.now(), week_number=week_number, year=year)
+            tour = self.create(start_date=start_date, week_number=week_number, year=year)
         return tour
 
     def get_or_create_by_week_in_current_year(self, week_number):
@@ -35,10 +36,16 @@ class TourManager(CoreModelManager):
         tours_list = list(set(tours_list))
         return self.get_queryset().filter(pk__in=tours_list).prefetch_related('sows')
 
+    # for Import_From_Farm mechanism
     def create_or_return_by_raw(self, raw_tour):
         week_number = int(raw_tour[2:])
         year = int('20' + raw_tour[:2])
         return self.get_or_create_by_week(week_number, year)
+
+    def create_tour_from_farrow_date_string(self, farrow_date, days=135):
+        semination_date = datetime.datetime.strptime(farrow_date, '%d-%m-%Y') - datetime.timedelta(days)
+        week_number = int(semination_date.strftime("%V"))
+        return self.get_or_create_by_week(week_number, semination_date.year, semination_date)
 
 
 class Tour(CoreModel):
