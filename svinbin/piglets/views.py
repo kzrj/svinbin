@@ -238,7 +238,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             location = serializer.validated_data['location']
 
-            if serializer.validated_data.get('from_location', None):            
+            if serializer.validated_data.get('from_location', None) and 
+              serializer.validated_data.get('transaction_date', None):
                 location = serializer.validated_data['from_location']
 
             piglets = piglets_models.Piglets.objects.init_piglets_by_farrow_date(
@@ -248,9 +249,11 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 serializer.validated_data.get('gilts_quantity', 0)
                 )
 
-            if serializer.validated_data.get('from_location', None):
+            if serializer.validated_data.get('from_location', None) and 
+              serializer.validated_data.get('transaction_date', None):
                 transactions_models.PigletsTransaction.objects.create_transaction(
-                    serializer.validated_data['location'], piglets, request.user)
+                    serializer.validated_data['location'], piglets,
+                    serializer.validated_data.get('transaction_date', None), request.user)
 
             return Response(
                 {

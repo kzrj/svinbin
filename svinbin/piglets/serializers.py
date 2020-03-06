@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import datetime
+
 from rest_framework import serializers
 
 from piglets.models import Piglets
@@ -57,3 +59,10 @@ class InitPigletsSerializer(serializers.Serializer):
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     quantity = serializers.IntegerField()
     gilts_quantity = serializers.IntegerField(required=False, allow_null=True)
+
+    transaction_date = serializers.CharField(required=False, allow_null=True)
+
+    def validate_transaction_date(self, value):
+        if isinstance(str, value):
+            return datetime.datetime.strptime(value, '%d-%m-%Y')
+        return None
