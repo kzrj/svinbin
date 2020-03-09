@@ -8,7 +8,7 @@ from locations.models import Location
 
 class CullingPigletsSerializer(serializers.ModelSerializer):
     is_it_gilt = serializers.BooleanField(default=False)
-    date = serializers.DateTimeField(default=timezone.now())
+    date = serializers.CharField(default=None, required=False)
     quantity = serializers.IntegerField(default=1)
     total_weight = serializers.FloatField(required=False)
 
