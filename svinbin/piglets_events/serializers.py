@@ -10,7 +10,7 @@ class CullingPigletsSerializer(serializers.ModelSerializer):
     is_it_gilt = serializers.BooleanField(default=False)
     date = serializers.CharField(default=None, allow_blank=True)
     quantity = serializers.IntegerField(default=1)
-    total_weight = serializers.FloatField(allow_blank=True)
+    total_weight = serializers.FloatField(deafult=0)
 
     class Meta:
         model = CullingPiglets
