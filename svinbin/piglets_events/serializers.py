@@ -1,5 +1,6 @@
 # # -*- coding: utf-8 -*-
 from rest_framework import serializers
+from django.utils import timezone
 
 from piglets_events.models import CullingPiglets, WeighingPiglets, Recount
 from locations.models import Location
@@ -7,10 +8,12 @@ from locations.models import Location
 
 class CullingPigletsSerializer(serializers.ModelSerializer):
     is_it_gilt = serializers.BooleanField(default=False)
+    date = serializers.DateTimeField(default=timezone.now())
+    quantity = serializers.IntegerField(default=1)
 
     class Meta:
         model = CullingPiglets
-        fields = ['culling_type', 'reason', 'is_it_gilt']
+        fields = ['culling_type', 'reason', 'is_it_gilt', 'quantity', 'date', 'total_weight']
 
 
 class WeighingPigletsCreateSerializer(serializers.ModelSerializer):

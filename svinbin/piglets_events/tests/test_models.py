@@ -471,16 +471,19 @@ class CullingPigletsTest(TestCase):
 
     def test_create_culling_piglets(self):
         culling = CullingPiglets.objects.create_culling_piglets(
-            piglets_group=self.piglets, culling_type='padej', reason='xz'
+            piglets_group=self.piglets, culling_type='padej', reason='xz', quantity=10, 
+            total_weight=100, date='09-03-2020'
             )
 
         self.piglets.refresh_from_db()
-        self.assertEqual(self.piglets.quantity, 100)
+        self.assertEqual(self.piglets.quantity, 91)
         self.assertEqual(culling.piglets_group, self.piglets)
         self.assertEqual(culling.culling_type, 'padej')
         self.assertEqual(culling.reason, 'xz')
+        self.assertEqual(culling.total_weight, 100)
+        self.assertEqual(culling.date.day, 9)
         
-
+        
 class RestPigletsTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()

@@ -108,7 +108,7 @@ class PigletsViewSetTest(APITestCase):
             self.loc_ws3_sec1, 10)
 
         response = self.client.post('/api/piglets/%s/culling/' % piglets1.pk, \
-            {'culling_type': 'padej', 'reason': 'xz'})
+            {'culling_type': 'padej', 'reason': 'xz', 'quantity': 2, 'total_weight': 20})
 
         self.assertEqual(response.data['message'], 'Выбраковка прошла успешно.')
 
@@ -266,11 +266,12 @@ class PigletsViewSetTest(APITestCase):
         response = self.client.post('/api/piglets/init_piglets_from_farrow/', 
             {
                 'farrow_date': '1-03-2020', 'location': location.pk, 'quantity': 102,
-                'from_location': from_location.pk
+                'from_location': from_location.pk, 'transaction_date': '9-03-2020',
             })
         self.assertEqual(response.data['message'], 'Свиньи успешно созданы.')
         self.assertEqual(Piglets.objects.filter(quantity=102, location=location).count(), 1)
-        transaction = PigletsTransaction.objects.first()
+        transaction = PigletsTransaction.objects.all().first()
+
         self.assertEqual(transaction.piglets_group.quantity, 102)
         self.assertEqual(transaction.from_location, from_location)
         self.assertEqual(transaction.to_location, location)

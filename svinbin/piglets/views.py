@@ -89,6 +89,9 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 culling_type=serializer.validated_data['culling_type'],
                 reason=serializer.validated_data['reason'],
                 is_it_gilt=serializer.validated_data['is_it_gilt'],
+                quantity=serializer.validated_data['quantity'],
+                total_weight=serializer.validated_data['total_weight'],
+                date=serializer.validated_data['date'],
                 initiator=request.user
                 )
             return Response(
@@ -253,7 +256,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
               serializer.validated_data.get('transaction_date', None):
                 transactions_models.PigletsTransaction.objects.create_transaction(
                     serializer.validated_data['location'], piglets,
-                    serializer.validated_data.get('transaction_date', None), request.user)
+                    request.user, serializer.validated_data.get('transaction_date', None))
 
             return Response(
                 {

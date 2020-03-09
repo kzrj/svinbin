@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import datetime
+
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -235,21 +237,27 @@ class WeighingPiglets(PigletsEvent):
 
 class CullingPigletsManager(CoreModelManager):
     def create_culling_piglets(self, piglets_group, culling_type, is_it_gilt=False, reason=None,
-         initiator=None):
+         initiator=None, date=timezone.now(), quantity=1, total_weight=None):
+        if isinstance(date, str):
+            date = datetime.datetime.strptime(date, '%d-%m-%Y')
+
         if is_it_gilt:
-            piglets_group.remove_gilts(1)
+            piglets_group.remove_gilts(quantity)
         else:
-            piglets_group.remove_piglets(1)
+            piglets_group.remove_piglets(quantity)
             
         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
-            date=timezone.now(), initiator=initiator, is_it_gilt=is_it_gilt)
+            date=date, initiator=initiator, is_it_gilt=is_it_gilt, quantity=quantity,
+            total_weight=total_weight)
 
         return culling
 
-    def create_culling_gilt(self, piglets_group, culling_type, reason=None, initiator=None):
-        piglets_group.remove_gilts(1)
+    def create_culling_gilt(self, piglets_group, culling_type, reason=None, initiator=None,
+         date=timezone.now(), quantity=1):
+        piglets_group.remove_gilts(quantity)
         return self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
-            date=timezone.now(), initiator=initiator, is_it_gilt=True)      
+            date=date, initiator=initiator, is_it_gilt=True, quantity=quantity,
+            total_weight=total_weight)      
 
 
 class CullingPiglets(PigletsEvent):
@@ -257,10 +265,14 @@ class CullingPiglets(PigletsEvent):
         ('spec', 'spec uboi'), ('padej', 'padej'),
         ('prirezka', 'prirezka'), ('vinuzhd', 'vinuzhdennii uboi')]
 
+    quantity = models.IntegerField(default=1)
+
     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
     reason = models.CharField(max_length=200, null=True)
     piglets_group = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name="cullings")
     is_it_gilt = models.BooleanField(default=False)
+
+    total_weight = models.FloatField(null=True)
 
     objects = CullingPigletsManager()
 

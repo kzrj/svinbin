@@ -67,7 +67,7 @@ class SowTransaction(Transaction):
 
 
 class PigletsTransactionManager(CoreModelManager):
-    def create_transaction(self, to_location, piglets_group, date=timezone.now(), initiator=None):
+    def create_transaction(self, to_location, piglets_group, initiator=None, date=timezone.now()):
         transaction = PigletsTransaction.objects.create(
                 date=date,
                 initiator=initiator,

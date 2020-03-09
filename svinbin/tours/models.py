@@ -99,6 +99,13 @@ class MetaTour(CoreModel):
                 } 
             for record in self.records.all()]
 
+    def days_left(self):
+        return [{
+                    'tour': record.tour.week_number, 
+                    'days_left': record.tour.start_date
+                } 
+            for record in self.records.all()]        
+
 
 class MetaTourRecordQuerySet(models.QuerySet):
     def sum_quantity_by_tour(self, tour):
