@@ -38,7 +38,8 @@ def create_workshop_user(username, password, ws_number, farm_name, is_seminator=
 def create_svinbin_users():
     User.objects.create_superuser(username='kaizerj',email='kzrster@gmail.com', password='jikozfree')
     User.objects.create_superuser(username='smileman',email='r@gmail.com', password='bulatbulat')
-    create_workshop_user('test_admin', 'svinbin123', 1, 'АДМ', True, True)
+    create_workshop_user('test_admin1', 'svinbin123', 1, 'АДМ', True, True)
+    create_workshop_user('test_admin2', 'svinbin123', 1, 'АДМ', True, True)
     create_workshop_user('test_officer', 'svinbin123', 1, 'ОФИЦЕР', True, True)
 
     create_workshop_user('shmigina', '123', 1, 'ШМЫГИ', True)
