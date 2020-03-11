@@ -73,7 +73,7 @@ def create_semination_lists(rows, request_user):
             semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(row[6])
             semination_employee2 = WorkShopEmployee.objects.get_seminator_by_farm_name(row[8])
         except:
-            print(sow.farm_id, '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
+            semination_employee1, semination_employee2 = None, None
 
         sow, seminated = Semination.objects.double_semination_or_not(
             sow=sow, tour=tour, date=row[4], initiator=request_user,
