@@ -68,8 +68,12 @@ def create_semination_lists(rows, request_user):
 
         boar1 = Boar.objects.get_or_create_boar(row[5])
         boar2 = Boar.objects.get_or_create_boar(row[7])
-        semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(row[6])
-        semination_employee2 = WorkShopEmployee.objects.get_seminator_by_farm_name(row[8])
+
+        try:
+            semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(row[6])
+            semination_employee2 = WorkShopEmployee.objects.get_seminator_by_farm_name(row[8])
+        except:
+            print(sow.farm_id, '!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!')
 
         sow, seminated = Semination.objects.double_semination_or_not(
             sow=sow, tour=tour, date=row[4], initiator=request_user,
