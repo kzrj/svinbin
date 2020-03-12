@@ -43,7 +43,7 @@ class TourManager(CoreModelManager):
         return self.get_or_create_by_week(week_number, year)
 
     def create_tour_from_farrow_date_string(self, farrow_date, days=135):
-        semination_date = datetime.datetime.strptime(farrow_date, '%d-%m-%Y') - datetime.timedelta(days)
+        semination_date = datetime.datetime.strptime(farrow_date, '%Y-%m-%d') - datetime.timedelta(days)
         week_number = int(semination_date.strftime("%V"))
         return self.get_or_create_by_week(week_number, semination_date.year, semination_date)
 

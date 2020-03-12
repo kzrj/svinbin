@@ -265,8 +265,8 @@ class PigletsViewSetTest(APITestCase):
         from_location = Location.objects.get(workshop__number=3)
         response = self.client.post('/api/piglets/init_piglets_from_farrow/', 
             {
-                'farrow_date': '1-03-2020', 'location': location.pk, 'quantity': 102,
-                'from_location': from_location.pk, 'transaction_date': '9-03-2020',
+                'farrow_date': '2020-03-1', 'location': location.pk, 'quantity': 102,
+                'from_location': from_location.pk, 'transaction_date': '2020-03-09',
             })
         self.assertEqual(response.data['message'], 'Свиньи успешно созданы.')
         self.assertEqual(Piglets.objects.filter(quantity=102, location=location).count(), 1)

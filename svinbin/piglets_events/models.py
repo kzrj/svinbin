@@ -239,7 +239,9 @@ class CullingPigletsManager(CoreModelManager):
     def create_culling_piglets(self, piglets_group, culling_type, is_it_gilt=False, reason=None,
          initiator=None, date=timezone.now(), quantity=1, total_weight=None):
         if isinstance(date, str):
-            date = datetime.datetime.strptime(date, '%d-%m-%Y')
+        	# 2020-03-12
+            # date = datetime.datetime.strptime(date, '%d-%m-%Y')
+            date = datetime.datetime.strptime(date, '%Y-%m-%d')
 
         if is_it_gilt:
             piglets_group.remove_gilts(quantity)
