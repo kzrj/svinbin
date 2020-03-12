@@ -66,7 +66,8 @@ class PigletsSplitManager(CoreModelManager):
             start_quantity=(parent_piglets.quantity - new_amount),
             quantity=(parent_piglets.quantity - new_amount),
             gilts_quantity=piglets1_group_gilts_quantity,
-            split_as_child=split_record)
+            split_as_child=split_record,
+            transfer_part_number=parent_piglets.transfer_part_number)
         metatour1 = MetaTour.objects.create(piglets=piglets1)
 
         piglets2_new_amount = Piglets.objects.create(location=parent_piglets.location,
@@ -74,7 +75,8 @@ class PigletsSplitManager(CoreModelManager):
             start_quantity=new_amount,
             quantity=new_amount,
             gilts_quantity=piglets2_new_group_gilts_quantity,
-            split_as_child=split_record)
+            split_as_child=split_record,
+            transfer_part_number=parent_piglets.transfer_part_number)
         metatour2 = MetaTour.objects.create(piglets=piglets2_new_amount)
         
         # create metarecodrs
