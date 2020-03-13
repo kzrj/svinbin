@@ -58,9 +58,16 @@ def create_semination_lists(rows, request_user):
     already_seminated_in_tour = list()
     sows_in_another_tour = list()
 
+    count = 0 
+
     for row in rows:
         tour = Tour.objects.create_or_return_by_raw(row[3])
         sow, created = Sow.objects.create_or_return(row[0])
+
+        if tour.week_number == 6:
+            print(sow.farm_id)
+            count += 1
+            print(count)
 
         if sow.tour and sow.tour != tour:
             sows_in_another_tour.append(sow)
