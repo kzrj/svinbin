@@ -1,16 +1,16 @@
-# from django.contrib import admin
+from django.contrib import admin
 
-# from piglets_events import models
-
-
-# @admin.register(models.NewBornPigletsMerger)
-# class NewBornPigletsMergerAdmin(admin.ModelAdmin):
-#     list_display = [f.name for f in models.NewBornPigletsMerger._meta.fields]
+from piglets_events import models
 
 
-# @admin.register(models.SplitNomadPigletsGroup)
-# class SplitNomadPigletsGroupAdmin(admin.ModelAdmin):
-#     list_display = [f.name for f in models.SplitNomadPigletsGroup._meta.fields]
+@admin.register(models.WeighingPiglets)
+class WeighingPigletsAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in models.WeighingPiglets._meta.fields]
+
+
+@admin.register(models.CullingPiglets)
+class CullingPigletsAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in models.CullingPiglets._meta.fields]
 
 
 # @admin.register(models.NewBornPigletsGroupRecount)
