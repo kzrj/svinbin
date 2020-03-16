@@ -4,3 +4,4 @@
 !**/migrations/__init__.py
 **/static
 !**/frontend/static
+**/seminations.xls
