@@ -315,7 +315,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         if serializer.is_valid():
             wb = import_farm.init_wb(serializer.validated_data['file'])
             rows = import_farm.get_semenation_rows(wb)
-            seminated_list, already_seminated_in_tour, sows_in_another_tour = \
+            seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
                 import_farm.create_semination_lists(rows, request.user)
 
             return Response(
@@ -323,6 +323,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                 "seminated_list_count": len(seminated_list),
                 "seminated_list_farm_ids": [sow.farm_id for sow in seminated_list],
                 "already_seminated_in_tour_count": len(already_seminated_in_tour),
+                "proholost_list": len(proholost_list),
                 # "sows_in_another_tour_farm_ids": [sow.farm_id for sow in sows_in_another_tour], 
                 "sows_in_another_tour": sows_serializers.SowSerializer(sows_in_another_tour, \
                 	 many=True).data,

@@ -137,6 +137,9 @@ class SowManager(CoreModelManager):
 
         return sow, False
 
+    # def create_or_return(self, farm_id):
+    #     return self.get_or_create(farm_id=farm_id, location=Location.objects.get(workshop__number=1))[0]
+
     def get_tours_with_count_sows_by_location(self, location):
         # https://medium.com/@hansonkd/the-dramatic-benefits-of-django-subqueries-and-annotations-4195e0dafb16
         sows_query = self.get_queryset() \

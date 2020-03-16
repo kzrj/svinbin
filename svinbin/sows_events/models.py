@@ -100,13 +100,9 @@ class UltrasoundType(CoreModel):
 
 
 class UltrasoundManager(CoreModelManager):
-    def create_ultrasound(self, sow, initiator=None, result=False, days=None, date=None):
-        u_type = None
-        if not date:
-            date=timezone.now()
+    def create_ultrasound(self, sow, initiator=None, result=False, days=30, date=timezone.now()):
+        u_type = UltrasoundType.objects.get(days=days)
 
-        if days:
-            u_type = UltrasoundType.objects.get(days=days)
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
          date=date, result=result, u_type=u_type)
         if result:
@@ -251,8 +247,8 @@ class WeaningSow(SowEvent):
 
 
 class AbortionSowManager(CoreModelManager):
-    def create_abortion(self, sow, initiator=None):
-        abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator)
+    def create_abortion(self, sow, initiator=None, date=timezone.now()):
+        abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date)
         sow.tour = None
         sow.change_status_to(status_title='Аборт')
         return abortion
