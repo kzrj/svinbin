@@ -316,6 +316,7 @@ class WorkShopSowViewSet(SowViewSet):
         return Response(
             {
                 "abortion": sows_events_serializers.AbortionSowSerializer(abortion).data,
-                "sow": sows_serializers.SowSerializer(sow).data, 
+                "sow": sows_serializers.SowSerializer(sow).data,
+                "message": f'Аборт у свиньи №{sow.farm_id}.'
             },
             status=status.HTTP_200_OK)
