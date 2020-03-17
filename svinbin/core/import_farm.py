@@ -82,7 +82,7 @@ def create_semination_lists(rows, request_user):
         boar2 = Boar.objects.get_or_create_boar(row[7])
 
             
-        # if usouded by hand and then file updated. It is to avoid double usound, seminations
+        # if usouded by hand and then file updated. It is to avoid double usound, semination
         if 'Рег. Пов тор' in row or 'Не рег. пов тор' in row \
             and Ultrasound.objects.filter(sow=sow, tour=tour, result=False).first():
             proholost_list.append(sow)

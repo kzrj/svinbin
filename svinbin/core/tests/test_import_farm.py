@@ -152,6 +152,29 @@ class FarmImportXlsTest(TestCase):
 
         self.assertEqual(Ultrasound.objects.filter(sow=sow).count(), 1)
 
+    def test_repeated_seminations_v4(self):
+        # файл с более поздними осеменениями. По факту узи есть в файле нет.
+        wb = open_workbook('../data/seminations2.xls')
+        rows = import_farm.get_semenation_rows(wb)
+        shmigina = staff_testings.create_employee('ШМЫГИ')
+
+        seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
+            import_farm.create_semination_lists(rows, shmigina)
+
+        self.assertEqual(Sow.objects.filter(tour__week_number=6).count(), 75)
+        self.assertEqual(Sow.objects.filter(tour__week_number=7).count(), 75)
+
+        sow = Sow.objects.filter(farm_id=20095).first().delete()
+
+        wb = open_workbook('../data/seminations2.xls')
+        rows = import_farm.get_semenation_rows(wb)
+        shmigina = staff_testings.create_employee('ШМЫГИ')
+
+        seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
+            import_farm.create_semination_lists(rows, shmigina)
+        
+
+        
 # class FarmImportJsonTest(TestCase):
 #     def setUp(self):
 #         locaions_testing.create_workshops_sections_and_cells()
