@@ -222,7 +222,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
 
             return Response(
                 {
-                    "message": "ok"
+                    "message": "Узи проведено."
                 },
                 status=status.HTTP_200_OK)
         else:
