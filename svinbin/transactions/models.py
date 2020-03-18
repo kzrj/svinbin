@@ -39,7 +39,7 @@ class SowTransactionManager(CoreModelManager):
             raise DjangoValidationError(message=f'Свинья {sow_out.farm_id} не Супорос 35.') 
 
         if isinstance(to_location.get_location, SowAndPigletsCell) and not to_location.is_sow_empty:
-            sow_out = location.sow_set.all().first()
+            sow_out = to_location.sow_set.all().first()
 
         if sow_out:
             if sow_out.status.title != 'Супорос 35':
@@ -75,6 +75,10 @@ class PigletsTransactionManager(CoreModelManager):
                 to_location=to_location,
                 piglets_group=piglets_group
                 )
+
+        # we should remove status "взвешены"
+        if piglets_group.location.workshop and to_location.pigletsGroupCell:
+            piglets_group.change_status_to_without_save('Кормятся')
 
         piglets_group.change_location(to_location)
 

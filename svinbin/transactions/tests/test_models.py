@@ -6,19 +6,22 @@ from django.core.exceptions import ValidationError
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
+import sows_events.utils as sows_events_testing
 import piglets.testing_utils as piglets_testing
 
 from locations.models import Location
 from sows.models import Sow
 from piglets.models import Piglets
 from tours.models import Tour
-from piglets_events.models import PigletsSplit, PigletsMerger
+from piglets_events.models import PigletsSplit, PigletsMerger, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
 
 
 class SowTransactionManagerTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_events_testing.create_types()
 
     def test_create_transaction(self):
         sow = sows_testing.create_sow_and_put_in_workshop_one()
@@ -52,7 +55,7 @@ class SowTransactionManagerTest(TestCase):
         sow_out = sows_testing.create_sow_with_semination_usound(to_location)
 
         transaction = SowTransaction.objects.create_transaction_with_resetellment(sow_in, to_location)
-        self.assertEqual()
+        # self.assertEqual()
 
     def test_create_many_transaction(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
@@ -81,6 +84,8 @@ class PigletsTransactionManagerTest(TestCase):
         self.loc_ws4 = Location.objects.get(workshop__number=4)
         self.loc_ws4_cell1 = Location.objects.filter(pigletsGroupCell__isnull=False)[0]
         self.loc_ws4_cell2 = Location.objects.filter(pigletsGroupCell__isnull=False)[1]
+
+        self.loc_ws7 = Location.objects.get(workshop__number=7)
 
     def test_create_transaction(self):
         piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -505,3 +510,21 @@ class PigletsTransactionManagerTest(TestCase):
 
     #     self.assertEqual(final_in_cell_piglets2.quantity, 1)
     #     self.assertEqual(final_in_cell_piglets2.location, self.loc_ws4_cell2)
+    
+    def test_create_transaction_change_piglets_status(self):
+        # if we transfer from workshop to cell we should change status to "Кормятся"
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws7, 50)
+
+        WeighingPiglets.objects.create_weighing(piglets1, 500, '8/7')
+
+        piglets1.refresh_from_db()
+        self.assertEqual(piglets1.status.title, 'Взвешены, готовы к заселению')
+
+        to_location = Location.objects.filter(pigletsGroupCell__number=1,
+         pigletsGroupCell__workshop__number=7).first()
+        print(to_location)
+        PigletsTransaction.objects.create_transaction(to_location, piglets1)
+
+        piglets1.refresh_from_db()
+        self.assertEqual(piglets1.status.title, 'Кормятся')

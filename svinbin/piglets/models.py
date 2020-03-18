@@ -122,6 +122,9 @@ class Piglets(CoreModel):
         self.status = PigletsStatus.objects.get(title=status_title)
         self.save()
 
+    def change_status_to_without_save(self, status_title):
+        self.status = PigletsStatus.objects.get(title=status_title)
+
     def add_piglets(self, quantity):
         self.quantity = self.quantity + quantity
         self.save()
