@@ -20,7 +20,7 @@ services:
     restart: unless-stopped
     image: postgres:10.1-alpine
     ports: 
-      - "8001:5432"
+      - "5432:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql
 
