@@ -468,15 +468,15 @@ class PigletsTransactionManagerTest(TestCase):
             to_location=self.loc_ws4_cell2, 
             new_amount=9, merge=True)
 
-        print(final_in_cell_piglets3.metatour.records_repr())
-        print(final_in_cell_piglets3.metatour.records.all()[0].quantity, 0)
-        print(final_in_cell_piglets3.metatour.records.all()[0].percentage, 0)
-        print(final_in_cell_piglets3.metatour.records.all()[1].quantity, 1)
-        print(final_in_cell_piglets3.metatour.records.all()[1].percentage, 1)
-        print(final_in_cell_piglets3.metatour.records.all()[2].quantity, 2)
-        print(final_in_cell_piglets3.metatour.records.all()[2].percentage, 2)
+        # print(final_in_cell_piglets3.metatour.records_repr())
+        # print(final_in_cell_piglets3.metatour.records.all()[0].quantity, 0)
+        # print(final_in_cell_piglets3.metatour.records.all()[0].percentage, 0)
+        # print(final_in_cell_piglets3.metatour.records.all()[1].quantity, 1)
+        # print(final_in_cell_piglets3.metatour.records.all()[1].percentage, 1)
+        # print(final_in_cell_piglets3.metatour.records.all()[2].quantity, 2)
+        # print(final_in_cell_piglets3.metatour.records.all()[2].percentage, 2)
 
-        print(final_in_cell_piglets3.quantity, 10)
+        # print(final_in_cell_piglets3.quantity, 10)
 
         # self.assertEqual(final_in_cell_piglets3.metatour.records.all()[0].quantity, 75)
         # self.assertEqual(final_in_cell_piglets3.metatour.records.all()[0].percentage, 75)
@@ -510,6 +510,56 @@ class PigletsTransactionManagerTest(TestCase):
 
     #     self.assertEqual(final_in_cell_piglets2.quantity, 1)
     #     self.assertEqual(final_in_cell_piglets2.location, self.loc_ws4_cell2)
+
+    def test_transaction_with_split_and_merge_v8(self):
+        '''
+            Test bug 1
+            при каких обстоятельствах баг:
+            1. Инициализировали в 8 цехе 2 группы поросят 93 и 94 голов. Взвесили. Разместили.
+            2. из клетки где 93 перевели 1 в клетку где 94. Произошла неизвестная ошибка.
+            3. Снова перевели также. в первой клетке осталось 93, во второй стало 189.
+        '''
+        # Init bug
+        loc_ws_8 = Location.objects.get(workshop__number=8)
+        piglets1 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-30',
+         location=loc_ws_8, quantity=93)
+        piglets2 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31',
+         location=loc_ws_8, quantity=94)
+        WeighingPiglets.objects.create_weighing(piglets1, 1000, '8/7')
+        WeighingPiglets.objects.create_weighing(piglets2, 1100, '8/7')
+
+        cell1 = Location.objects.get(
+            pigletsGroupCell__workshop__number=8,
+            pigletsGroupCell__section__number=3,
+            pigletsGroupCell__number=7,
+        )
+        PigletsTransaction.objects.transaction_with_split_and_merge(piglets1, cell1)
+
+        cell2 = Location.objects.get(
+            pigletsGroupCell__workshop__number=8,
+            pigletsGroupCell__section__number=3,
+            pigletsGroupCell__number=9,
+        )
+        PigletsTransaction.objects.transaction_with_split_and_merge(piglets2, cell2)
+
+        # now 93 in 7 cell, 94 in 9 cell
+
+        # transfer 1 from 93 to 94
+        PigletsTransaction.objects.transaction_with_split_and_merge(
+            piglets=piglets1, to_location=cell2, new_amount=1, merge=True)
+        piglets1.refresh_from_db()
+        piglets2.refresh_from_db()
+        # print('piglets1.quantity', piglets1.quantity)
+        # print('piglets2.quantity', piglets2.quantity)
+        # self.assertEqual(piglets2.quantity, 94)
+
+        # merged piglets from 1 + 94
+        piglets3 = piglets2.merger_as_parent.created_piglets
+        self.assertEqual(piglets3.quantity, 95)
+        self.assertEqual(piglets3.metatour.records.all().count(), 1)
+        self.assertEqual(piglets3.metatour.records.all().first().percentage, 100)
+
+
     
     def test_create_transaction_change_piglets_status(self):
         # if we transfer from workshop to cell we should change status to "Кормятся"
@@ -523,7 +573,6 @@ class PigletsTransactionManagerTest(TestCase):
 
         to_location = Location.objects.filter(pigletsGroupCell__number=1,
          pigletsGroupCell__workshop__number=7).first()
-        print(to_location)
         PigletsTransaction.objects.create_transaction(to_location, piglets1)
 
         piglets1.refresh_from_db()
