@@ -13,6 +13,16 @@ class CullingPigletsAdmin(admin.ModelAdmin):
     list_display = [f.name for f in models.CullingPiglets._meta.fields]
 
 
+@admin.register(models.PigletsSplit)
+class PigletsSplitAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in models.PigletsSplit._meta.fields]
+
+
+@admin.register(models.PigletsMerger)
+class PigletsMergerAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in models.PigletsMerger._meta.fields]
+
+
 # @admin.register(models.NewBornPigletsGroupRecount)
 # class NewBornPigletsGroupRecountAdmin(admin.ModelAdmin):
 #     list_display = [f.name for f in models.NewBornPigletsGroupRecount._meta.fields]
