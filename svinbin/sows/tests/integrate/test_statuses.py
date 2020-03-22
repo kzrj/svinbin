@@ -121,10 +121,10 @@ class SowStatusesTest(TestCase):
          semination_employee=None)
 
         Ultrasound.objects.create_ultrasound(sow=sow, result=True, days=30)
-        self.assertEqual(sow.status.title, 'Супорос 30')
+        self.assertEqual(sow.status.title, 'Супорос 28')
 
         Ultrasound.objects.create_ultrasound(sow=sow, result=True, days=60)
-        self.assertEqual(sow.status.title, 'Супорос 60')
+        self.assertEqual(sow.status.title, 'Супорос 35')
 
         Ultrasound.objects.create_ultrasound(sow=sow, result=False, days=30)
         self.assertEqual(sow.status.title, 'Прохолост')
@@ -152,17 +152,17 @@ class SowStatusesTest(TestCase):
         sow1.refresh_from_db()
         sow2.refresh_from_db()
         sow3.refresh_from_db()
-        self.assertEqual(sow1.status.title, 'Супорос 30')
-        self.assertEqual(sow2.status.title, 'Супорос 30')
-        self.assertEqual(sow3.status.title, 'Супорос 30')
+        self.assertEqual(sow1.status.title, 'Супорос 28')
+        self.assertEqual(sow2.status.title, 'Супорос 28')
+        self.assertEqual(sow3.status.title, 'Супорос 28')
 
         Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, result=True, days=60)
         sow1.refresh_from_db()
         sow2.refresh_from_db()
         sow3.refresh_from_db()
-        self.assertEqual(sow1.status.title, 'Супорос 60')
-        self.assertEqual(sow2.status.title, 'Супорос 60')
-        self.assertEqual(sow3.status.title, 'Супорос 60')
+        self.assertEqual(sow1.status.title, 'Супорос 35')
+        self.assertEqual(sow2.status.title, 'Супорос 35')
+        self.assertEqual(sow3.status.title, 'Супорос 35')
 
         Ultrasound.objects.mass_ultrasound(sows_qs=sows_qs, result=False, days=30)
         sow1.refresh_from_db()

@@ -264,6 +264,7 @@ class AbortionSowTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
+        sows_events_testing.create_types()
 
     def test_create_abortion(self):
         sow = sows_testing.create_sow_and_put_in_workshop_one()

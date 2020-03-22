@@ -87,8 +87,8 @@ class LocationModelManagerQuerysetTest(TransactionTestCase):
             print(serializer.data)
 
 
-class WorkshopModelTest(TestCase):
-    def setUp(self):
-        locations_testing.create_workshops_sections_and_cells()
-        sows_testing.create_statuses()
-        piglets_testing.create_piglets_statuses()
+# class WorkshopModelTest(TestCase):
+#     def setUp(self):
+#         locations_testing.create_workshops_sections_and_cells()
+#         sows_testing.create_statuses()
+#         piglets_testing.create_piglets_statuses()

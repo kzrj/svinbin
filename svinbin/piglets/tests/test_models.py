@@ -87,8 +87,11 @@ class PigletsModelmanagerTest(TestCase):
         self.assertEqual(piglets.metatour.records.all().first().tour.week_number, 5)
 
     def test_init_piglets_by_farrow_date(self):
-        piglets = Piglets.objects.init_piglets_by_farrow_date(farrow_date=5, location=self.loc_ws3,
+        piglets = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31', location=self.loc_ws3,
          quantity=100, gilts_quantity=10)
+        self.assertEqual(piglets.quantity, 100)
+        self.assertEqual(piglets.gilts_quantity, 10)        
+        self.assertEqual(piglets.metatour.records.all().first().tour.week_number, 33)
 
 
 class PigletsQueryTest(TransactionTestCase):

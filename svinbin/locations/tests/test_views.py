@@ -52,11 +52,10 @@ class LocationsViewSetTest(APITestCase):
     def test_cells_list_locations(self):
         section = Location.objects.filter(section__number=1, section__workshop__number=3).first()
         response = self.client.get(f'/api/locations/?by_section={section.section.pk}&cells=true')
-        location = response.data['results'][0]
-        self.assertEqual(location['cell'], '1-1')
+        self.assertEqual(len(response.data['results']) > 0, True)
 
     def test_sections_list_locations(self):
         workshop = Location.objects.filter(workshop__number=3).first()
         response = self.client.get(f'/api/locations/?sections_by_workshop_number={workshop.workshop.number}&sections=true')
         location = response.data['results'][0]
-        print(response.data)
+        self.assertEqual(len(response.data['results']) > 0, True)

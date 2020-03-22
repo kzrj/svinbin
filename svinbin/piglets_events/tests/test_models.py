@@ -472,7 +472,7 @@ class CullingPigletsTest(TestCase):
     def test_create_culling_piglets(self):
         culling = CullingPiglets.objects.create_culling_piglets(
             piglets_group=self.piglets, culling_type='padej', reason='xz', quantity=10, 
-            total_weight=100, date='09-03-2020'
+            total_weight=100, date='2020-03-09'
             )
 
         self.piglets.refresh_from_db()

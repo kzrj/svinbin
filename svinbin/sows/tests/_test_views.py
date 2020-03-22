@@ -13,6 +13,7 @@ import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import sows_events.utils as sows_events_testing
 import staff.testing_utils as staff_testing
+import piglets.testing_utils as piglets_testing
 
 from locations.models import Location
 from transactions.models import SowTransaction
@@ -27,6 +28,7 @@ class SowViewSetTest(APITestCase):
         sows_testing.create_statuses()
         sows_testing.create_boars()
         sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
         self.user = staff_testing.create_employee()
         self.boar = Boar.objects.all().first()
         
@@ -52,10 +54,13 @@ class SowViewSetTest(APITestCase):
         response = self.client.get('/api/sows/%s/' % sow.pk)
         self.assertEqual(response.data['tours_info'][0]['ultrasounds'][0]['result'], True)
 
+        location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
+        sow.change_sow_current_location(location)
         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1)
         response = self.client.get('/api/sows/%s/' % sow.pk)
         self.assertEqual(response.data['tours_info'][0]['farrows'][0]['alive_quantity'], 7)
 
+        
         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10, mummy_quantity=1)
         response = self.client.get('/api/sows/%s/' % sow.pk)
         self.assertEqual(response.data['tours_info'][0]['farrows'][1]['alive_quantity'], 10)
