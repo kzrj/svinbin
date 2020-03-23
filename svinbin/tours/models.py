@@ -127,9 +127,11 @@ class MetaTourRecordManager(CoreModelManager):
         if percentage > 100:
             percentage = 100
             note = f'Неверно подсчитались проценты {percentage}, \
-                 у группы с количеством {metatour.piglets.quantity}'
-            # raise DjangoValidationError(message=f'Неверно подсчитались проценты {percentage}, \
-            #     у группы с количеством {metatour.piglets.quantity}')
+                 у группы с количеством {metatour.piglets.quantity}, \
+                 Данные : тур={tour.week_number}, quantity={quantity}, total_quantity={total_quantity}, \
+                 percentage={percentage}'
+            raise DjangoValidationError(message=f'Неверно подсчитались проценты {percentage}, \
+                у группы с количеством {metatour.piglets.quantity}')
 
         return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage, note=note)
 
