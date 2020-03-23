@@ -136,7 +136,7 @@ class MetaTourRecordManager(CoreModelManager):
             raise DjangoValidationError(message=f'Неверно подсчитались проценты {percentage}, \
                  у группы с количеством {metatour.piglets.quantity}, \
                  Данные : тур={tour.week_number}, quantity={quantity}, total_quantity={total_quantity}, \
-                 percentage={percentage}. Проценты изменены на 100. \
+                 percentage={percentage}.  \
                  ID piglets {metatour.piglets.pk}, piglets.quantty={metatour.piglets.quantity}, \
                  piglets.quantty={metatour.piglets.start_quantity},')
 
