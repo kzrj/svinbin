@@ -129,7 +129,7 @@ class MetaTourRecordManager(CoreModelManager):
             note = f'Неверно подсчитались проценты {percentage}, \
                  у группы с количеством {metatour.piglets.quantity}, \
                  Данные : тур={tour.week_number}, quantity={quantity}, total_quantity={total_quantity}, \
-                 percentage={percentage}'
+                 percentage={percentage}. Проценты изменены на 100'
             raise DjangoValidationError(message=f'Неверно подсчитались проценты {percentage}, \
                 у группы с количеством {metatour.piglets.quantity}')
 
@@ -144,7 +144,7 @@ class MetaTourRecord(CoreModel):
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='metatourrecords')
     quantity = models.IntegerField()
     percentage = models.FloatField()
-    note = models.CharField(max_length=100, null=True, blank=True)
+    note = models.TextField(null=True, blank=True)
 
     objects = MetaTourRecordManager()
 
