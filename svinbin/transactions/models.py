@@ -83,6 +83,9 @@ class PigletsTransactionManager(CoreModelManager):
         if piglets_group.location.pigletsGroupCell and to_location.workshop:
             piglets_group.change_status_to_without_save('Готовы ко взвешиванию')
 
+        if piglets_group.location.workshop and to_location.workshop:
+            piglets_group.change_status_to_without_save('Взвешены, готовы к заселению')
+
         piglets_group.change_location(to_location)
 
         return transaction
