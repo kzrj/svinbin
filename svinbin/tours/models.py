@@ -125,7 +125,7 @@ class MetaTourRecordManager(CoreModelManager):
         note = None
         # validate
         if percentage > 100:
-            percentage = 100
+            # percentage = 100
             note = f'Неверно подсчитались проценты {percentage}, \
                  у группы с количеством {metatour.piglets.quantity}, \
                  Данные : тур={tour.week_number}, quantity={quantity}, total_quantity={total_quantity}, \
