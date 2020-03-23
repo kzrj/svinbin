@@ -142,7 +142,7 @@ class MetaTourRecord(CoreModel):
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='metatourrecords')
     quantity = models.IntegerField()
     percentage = models.FloatField()
-    note = models.CharField(null=True, blank=True)
+    note = models.CharField(max_length=100, null=True, blank=True)
 
     objects = MetaTourRecordManager()
 
