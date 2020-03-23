@@ -122,11 +122,16 @@ class MetaTourRecordManager(CoreModelManager):
     def create_record(self, metatour, tour, quantity, total_quantity):
         # total quantity is quantity by all metatour records
         percentage = (quantity * 100) / total_quantity
+        note = None
         # validate
         if percentage > 100:
-            raise DjangoValidationError(message=f'Неверно подсчитались проценты {percentage}')
+            percentage = 100
+            note = f'Неверно подсчитались проценты {percentage}, \
+                 у группы с количеством {metatour.piglets.quantity}'
+            # raise DjangoValidationError(message=f'Неверно подсчитались проценты {percentage}, \
+            #     у группы с количеством {metatour.piglets.quantity}')
 
-        return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage)
+        return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage, note=note)
 
     def recount_records_by_total_quantity(self, new_total_quantity):
         self.get_queryset().update(quantity=(models.F('percentage') * new_total_quantity / 100))
@@ -137,6 +142,7 @@ class MetaTourRecord(CoreModel):
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='metatourrecords')
     quantity = models.IntegerField()
     percentage = models.FloatField()
+    note = models.CharField(null=True, blank=True)
 
     objects = MetaTourRecordManager()
 
