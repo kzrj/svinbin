@@ -182,11 +182,16 @@ class PigletsMergerManager(CoreModelManager):
                 parent_piglets_ids.append(merging_piglets.id)
 
             # sow weaning
-            if hasattr(piglets, 'farrow'):
-                sow = piglets.farrow.sow
-                if sow.status.title == 'Опоросилась':
-                    sow.weaningsow_set.create_weaning(sow=sow, piglets=weaning_piglets, initiator=initiator,
-                        date=date)
+            # if hasattr(piglets, 'farrow') :
+            #     sow = piglets.farrow.sow
+            #     if sow.status.title == 'Опоросилась':
+            #         sow.weaningsow_set.create_weaning(sow=sow, piglets=weaning_piglets, initiator=initiator,
+            #             date=date)
+
+            sow_in_cell = weaning_piglets.location.sow_set.all().first()
+            if sow_in_cell:
+                sow_in_cell.weaningsow_set.create_weaning(sow=sow_in_cell, piglets=weaning_piglets,
+                 initiator=initiator, date=date)
 
         return self.create_merger_return_group(parent_piglets_ids, new_location, initiator, date)
 

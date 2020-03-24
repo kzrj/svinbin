@@ -246,10 +246,10 @@ class PigletsMergerModelTest(TransactionTestCase):
         self.assertEqual(sow1.tour, None)
         self.assertEqual(sow2.tour, None)
         self.assertEqual(sow1.status.title, 'Отъем')
-        self.assertEqual(sow2.status.title, 'Кормилица')
+        self.assertEqual(sow2.status.title, 'Отъем')
 
         self.assertEqual(sow1.weaningsow_set.all().count(), 1)
-        self.assertEqual(sow2.weaningsow_set.all().count(), 0)
+        self.assertEqual(sow2.weaningsow_set.all().count(), 1)
 
     def test_create_from_merging_list_v3(self):
         # with gilts

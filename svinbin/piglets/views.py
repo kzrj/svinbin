@@ -163,53 +163,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # @action(methods=['post'], detail=True)
-    # def weighing_piglets_split_return_v2(self, request, pk=None):        
-    #     serializer = piglets_events_serializers.WeighingReturnPigletsCreateSerializer(data=request.data)
-    #     if serializer.is_valid():
-    #         piglets_group = self.get_object()
-    #         piglets_to_weight = self.get_object()
-    #         message = "Взвешивание прошло успешно"
-            
-    #         # mb to model
-    #         if serializer.validated_data.get('new_amount', None) or serializer.validated_data.get('new_amount', 0):
-    #             moved_piglets, piglets_to_weight = PigletsSplit.objects.split_return_groups( \
-    #                 parent_piglets=piglets_group, new_amount=serializer.validated_data['new_amount'],
-    #                 initiator=initiator, gilts_contains=True)
-
-    #             transaction = self.create_transaction(serializer.validated_data['to_location'],
-    #                 moved_piglets, initiator)
-
-
-    #             # transaction, moved_piglets, piglets_to_weight, split_event, merge_event = \
-    #             #     transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
-    #             #         piglets=piglets_group,
-    #             #         to_location=serializer.validated_data['to_location'],
-    #             #         new_amount=serializer.validated_data['new_amount'],
-    #             #         reverse=True,
-    #             #         merge=False,
-    #             #         gilts_contains=True,
-    #             #         initiator=request.user
-    #             #     )
-    #             # moved_piglets.change_status_to('Взвешены, готовы к заселению')
-    #             message = "Взвешивание прошло успешно. Возврат поросят прошел успешно."
-
-    #         weighing_record = piglets_events_models.WeighingPiglets.objects.create_weighing(
-    #             piglets_group=piglets_to_weight,
-    #             total_weight=serializer.validated_data['total_weight'],
-    #             place=serializer.validated_data['place'],
-    #             initiator=request.user
-    #             )
-
-    #         return Response(
-    #             {
-    #              "weighing_record": piglets_events_serializers.WeighingPigletsSerializer(weighing_record).data,
-    #              "message": message,
-    #              },
-    #             status=status.HTTP_200_OK)
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     @action(methods=['post'], detail=True)
     def recount_and_weighing_piglets(self, request, pk=None):        
         serializer = piglets_events_serializers.RecountWeighingPigletsSerializer(data=request.data)

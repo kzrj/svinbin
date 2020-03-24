@@ -222,15 +222,18 @@ class CullingSow(SowEvent):
 
 
 class WeaningSowManager(CoreModelManager):
-    def create_weaning(self, sow, piglets, initiator=None, date=timezone.now()):
-        # validate
-        if not sow.tour:
-            raise DjangoValidationError(message='У свиньи нет тура.')
-
-        if not sow.location.sowAndPigletsCell:
-            raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.') 
+    def create_weaning(self, sow, piglets, tour=None, initiator=None, date=timezone.now()):
+        # if not tour:
+        #     tour = sow.tour
             
-        weaning = self.create(sow=sow, tour=sow.tour, piglets=piglets, quantity=piglets.quantity,
+        # # validate
+        # if not tour and not sow.tour:
+        #     raise DjangoValidationError(message='У свиньи нет тура.')
+
+        # if not sow.location.sowAndPigletsCell:
+        #     raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.') 
+            
+        weaning = self.create(sow=sow, tour=tour, piglets=piglets, quantity=piglets.quantity,
          initiator=initiator, date=date)
 
         # when set tour to None
