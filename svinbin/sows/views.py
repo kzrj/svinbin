@@ -301,7 +301,7 @@ class WorkShopSowViewSet(SowViewSet):
                     # "transaction_ids": transactions_serializers.SowTransactionSerializer(transaction).data,
                     # "sows": sows_serializers.SowSerializer(sows, many=True).data, 
                     "transaction_ids": transaction_ids,
-                    "message": "ok"
+                    "message": "Успешно переведены."
                 },
                 status=status.HTTP_200_OK)
         else:
