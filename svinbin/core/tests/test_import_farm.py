@@ -44,6 +44,10 @@ class FarmImportXlsTest(TestCase):
 
         print(seminated_list[0].tour.start_date)
         print(seminated_list[0].tour.week_number)
+        monday_24_week = Tour.objects.get_monday_date_by_week_number(week_number=24, year=2019)
+        print(monday_24_week)
+        print(monday_24_week.strftime("%V"))
+        self.assertEqual(seminated_list[0].tour.week_number, 24)
 
         self.assertEqual(len(seminated_list), 4)
         self.assertEqual(len(already_seminated_in_tour), 0)

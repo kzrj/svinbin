@@ -46,6 +46,7 @@ class TourManager(CoreModelManager):
         year = int('20' + raw_tour[:2])
         if not start_date:
             start_date = self.get_monday_date_by_week_number(week_number, year)
+            # print(int(start_date.strftime("%V")))
         return self.get_or_create_by_week(week_number, year, start_date)
 
     def create_tour_from_farrow_date_string(self, farrow_date, days=135):
