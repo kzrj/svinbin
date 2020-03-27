@@ -67,7 +67,7 @@ def create_semination_lists(rows, request_user):
     for row in rows:
         tour = Tour.objects.create_or_return_by_raw(row[3], row[4])
         sow, created = Sow.objects.create_or_return(row[0])
-        
+
         if sow.alive == False:
             continue
 
@@ -78,8 +78,13 @@ def create_semination_lists(rows, request_user):
             semination_employee1, semination_employee2 = None, None
 
         if sow.tour and sow.tour != tour:
-            sows_in_another_tour.append(sow)
-            continue
+            # if we meet sow with tour but row_tour is earlier.
+            if sow.tour.week_number < tour.week_number:
+                # do proholost
+                Ultrasound.objects.create_ultrasound(sow, semination_employee1, False, 30, row[4])
+            else:
+                sows_in_another_tour.append(sow)
+                continue
             
         boar1 = Boar.objects.get_or_create_boar(row[5])
         boar2 = Boar.objects.get_or_create_boar(row[7])
