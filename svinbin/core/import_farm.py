@@ -67,6 +67,9 @@ def create_semination_lists(rows, request_user):
     for row in rows:
         tour = Tour.objects.create_or_return_by_raw(row[3], row[4])
         sow, created = Sow.objects.create_or_return(row[0])
+        
+        if sow.alive == False:
+            continue
 
         try:
             semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(row[6])
