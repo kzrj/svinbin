@@ -94,7 +94,7 @@ class SowManager(CoreModelManager):
             location=Location.objects.get(workshop__number=1))
 
     def get_or_create_by_farm_id(self, farm_id):
-        sow = self.get_queryset_with_not_alive().filter(farm_id=farm_id).first()
+        sow = self.get_queryset().filter(farm_id=farm_id).first()
         if not sow:
             return self.create_new_from_gilt_and_put_in_workshop_one(farm_id)
         return sow
@@ -131,7 +131,7 @@ class SowManager(CoreModelManager):
         return free_farm_ids, exist_farm_ids
 
     def create_or_return(self, farm_id):
-        sow = self.get_queryset().filter(farm_id=farm_id).first()
+        sow = self.get_queryset_with_not_alive().filter(farm_id=farm_id).first()
         if not sow:
             return self.create_new_and_put_in_workshop_one(farm_id), True
 
