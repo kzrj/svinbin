@@ -42,6 +42,9 @@ class FarmImportXlsTest(TestCase):
         seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
             import_farm.create_semination_lists(rows1, shmigina)
 
+        print(seminated_list[0].tour.start_date)
+        print(seminated_list[0].tour.week_number)
+
         self.assertEqual(len(seminated_list), 4)
         self.assertEqual(len(already_seminated_in_tour), 0)
         self.assertEqual(len(sows_in_another_tour), 0)

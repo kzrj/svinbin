@@ -65,7 +65,7 @@ def create_semination_lists(rows, request_user):
     count = 0
 
     for row in rows:
-        tour = Tour.objects.create_or_return_by_raw(row[3])
+        tour = Tour.objects.create_or_return_by_raw(row[3], row[4])
         sow, created = Sow.objects.create_or_return(row[0])
 
         try:
@@ -81,7 +81,6 @@ def create_semination_lists(rows, request_user):
         boar1 = Boar.objects.get_or_create_boar(row[5])
         boar2 = Boar.objects.get_or_create_boar(row[7])
 
-            
         # if usouded by hand and then file updated. It is to avoid double usound, semination
         if 'Рег. Пов тор' in row or 'Не рег. пов тор' in row \
             and Ultrasound.objects.filter(sow=sow, tour=tour, result=False).first():

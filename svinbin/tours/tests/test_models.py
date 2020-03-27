@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
+import datetime
 
 from django.test import TestCase
+from django.utils import timezone
 
 from tours.models import Tour, MetaTour, MetaTourRecord
 from sows.models import Sow
-from sows_events.models import Semination, Ultrasound
+from sows_events.models import Semination, Ultrasound, SowFarrow
 from locations.models import Location
 from piglets.models import Piglets
-# from piglets_events.models import NewBornPigletsGroupRecount
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as pigs_testings
@@ -56,12 +57,20 @@ class TourModelManagerTest(TestCase):
         self.assertEqual(tour.week_number, 9)
         self.assertEqual(tour.start_date.day, 1)
 
+    def test_get_monday_date_by_week_number(self):
+        monday = Tour.objects.get_monday_date_by_week_number(week_number=1, year=2020)
+        self.assertEqual(monday.day, 6)
+        
+        monday2 = Tour.objects.get_monday_date_by_week_number(week_number=2, year=2020)
+        self.assertEqual(monday2.day, 13)
+
     
 class TourModelTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         pigs_testings.create_statuses()
         sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
 
     def test_get_inseminated_sows(self):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
@@ -93,11 +102,28 @@ class TourModelTest(TestCase):
         ultrasounded_sows_in_tour_fail = tour.get_ultrasounded_sows_fail
         self.assertEqual(ultrasounded_sows_in_tour_fail[0], sow1)
 
+    def test_days_left_from_farrow(self):
+        tour1 = Tour.objects.create_tour_from_farrow_date_string('2020-01-01')
+        tour2 = Tour.objects.create_tour_from_farrow_date_string('2020-01-26')
+
+        sow = pigs_testings.create_sow_and_put_in_workshop_three()
+        sow.tour = tour1
+        sow.save()
+        farrow_date = datetime.datetime.strptime('2020-01-02', '%Y-%m-%d')
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10, date=farrow_date)
+
+        t1_days_left_from_farrow_approx = timezone.now() - (tour1.start_date + datetime.timedelta(days=135))
+        self.assertEqual(tour1.days_left_from_farrow_approx.days, t1_days_left_from_farrow_approx.days)
+
+        t1_days_left_from_farrow = timezone.now() - (tour1.sowfarrow_set.all().first().date)
+        self.assertEqual(tour1.days_left_from_farrow.days, t1_days_left_from_farrow.days)
+
 
 class TestMetaTourRecordModel(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         pigs_testings.create_statuses()
+        piglets_testing.create_piglets_statuses()
 
     def test_create_record(self):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
@@ -155,3 +181,31 @@ class TestMetaTourRecordModel(TestCase):
         record2.refresh_from_db()
         self.assertEqual(record1.quantity, 61)
         self.assertEqual(record2.quantity, 40)
+
+    def test_days_left(self):
+        tour1 = Tour.objects.create_tour_from_farrow_date_string('2020-01-01')
+        tour2 = Tour.objects.create_tour_from_farrow_date_string('2020-01-26')
+
+        sow = pigs_testings.create_sow_and_put_in_workshop_three()
+        sow.tour = tour1
+        sow.save()
+        farrow_date = datetime.datetime.strptime('2020-01-02', '%Y-%m-%d')
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10, date=farrow_date)
+        
+        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100,
+        gilts_quantity=0, status=None)
+        meta_tour = MetaTour.objects.create(piglets=piglets)
+
+        record1 = meta_tour.records.create_record(meta_tour, tour1, 60, piglets.quantity)
+        record2 = meta_tour.records.create_record(meta_tour, tour2, 40, piglets.quantity)
+
+        self.assertEqual(
+            isinstance(meta_tour.records_repr()[0]['days_left_from_farrow_approx'], str), True)
+
+        self.assertEqual(isinstance(meta_tour.records_repr()[0]['days_left_from_farrow'], str), True)
+
+        self.assertEqual(
+            isinstance(meta_tour.records_repr()[1]['days_left_from_farrow_approx'], str), True)
+
+        self.assertEqual(isinstance(meta_tour.records_repr()[1]['days_left_from_farrow'], str), False)

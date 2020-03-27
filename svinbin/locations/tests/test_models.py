@@ -62,7 +62,7 @@ class LocationModelManagerQuerysetTest(TransactionTestCase):
     #                 print(piglet.metatour_repr)
 
     def test_location_cell_serializer_queries(self):
-        with self.assertNumQueries(7):
+        with self.assertNumQueries(8):
             data = Location.objects.all() \
                 .select_related(
                     'pigletsGroupCell__section',
@@ -73,7 +73,7 @@ class LocationModelManagerQuerysetTest(TransactionTestCase):
                 .prefetch_related(
                     'sow_set__tour',
                     'sow_set__status',
-                    'piglets__metatour__records__tour',)
+                    'piglets__metatour__records__tour__sowfarrow_set',)
             serializer = LocationCellSerializer(data, many=True)
             print(serializer.data)
 

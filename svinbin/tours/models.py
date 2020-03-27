@@ -18,6 +18,10 @@ class TourManager(CoreModelManager):
     def get_queryset(self):
         return TourQuerySet(self.model, using=self._db)
 
+    def get_monday_date_by_week_number(self, week_number, year):
+        start_week_number_pre = str(year) + '-W' + str(week_number)
+        return datetime.datetime.strptime(start_week_number_pre + '-1', "%Y-W%W-%w")
+
     def get_or_create_by_week(self, week_number, year, start_date=timezone.now()):
         tour = self.get_queryset().filter(week_number=week_number, year=year).first()
         if not tour:
@@ -37,10 +41,12 @@ class TourManager(CoreModelManager):
         return self.get_queryset().filter(pk__in=tours_list).prefetch_related('sows')
 
     # for Import_From_Farm mechanism
-    def create_or_return_by_raw(self, raw_tour):
+    def create_or_return_by_raw(self, raw_tour, start_date=None):
         week_number = int(raw_tour[2:])
         year = int('20' + raw_tour[:2])
-        return self.get_or_create_by_week(week_number, year)
+        if not start_date:
+            start_date = self.get_monday_date_by_week_number(week_number, year)
+        return self.get_or_create_by_week(week_number, year, start_date)
 
     def create_tour_from_farrow_date_string(self, farrow_date, days=135):
         semination_date = datetime.datetime.strptime(farrow_date, '%Y-%m-%d') - datetime.timedelta(days)
@@ -78,6 +84,20 @@ class Tour(CoreModel):
         ultrasounds = events_models.Ultrasound.objects.filter(tour=self, result=False)
         return sows_models.Sow.objects.filter(ultrasound__in=ultrasounds)
 
+    @property
+    def days_left_from_start(self):
+        return timezone.now() - self.start_date
+
+    @property
+    def days_left_from_farrow_approx(self):
+        return timezone.now() - (self.start_date + datetime.timedelta(days=135))
+
+    @property
+    def days_left_from_farrow(self):
+        if self.sowfarrow_set.all().first():
+            return timezone.now() - self.sowfarrow_set.all().first().date
+        return None
+
 
 class MetaTourManager(CoreModelManager):
     pass
@@ -95,16 +115,12 @@ class MetaTour(CoreModel):
         # analog qs.values()
         return [{
                     'tour': record.tour.week_number, 
-                    'percentage': round(record.percentage, 2)
+                    'percentage': round(record.percentage, 2),
+                    'days_left_from_farrow_approx': str((record.tour.days_left_from_farrow_approx).days),
+                    'days_left_from_farrow': str((record.tour.days_left_from_farrow).days) 
+                        if record.tour.days_left_from_farrow else None
                 } 
             for record in self.records.all()]
-
-    def days_left(self):
-        return [{
-                    'tour': record.tour.week_number, 
-                    'days_left': record.tour.start_date
-                } 
-            for record in self.records.all()]        
 
 
 class MetaTourRecordQuerySet(models.QuerySet):

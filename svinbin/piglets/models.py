@@ -133,6 +133,10 @@ class Piglets(CoreModel):
     def metatour_repr(self):
         return self.metatour.records_repr()
 
+    # @property
+    # def metatour_repr(self):
+    #     return self.metatour.records_repr()
+
     def change_location(self, location):
         self.location = location
         self.save()

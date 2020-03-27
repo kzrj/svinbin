@@ -150,7 +150,7 @@ class SowFarrowManager(CoreModelManager):
         return SowFarrowQuerySet(self.model, using=self._db)
 
     def create_sow_farrow(self, sow, initiator=None,
-        alive_quantity=0, dead_quantity=0, mummy_quantity=0):
+        alive_quantity=0, dead_quantity=0, mummy_quantity=0, date=timezone.now()):
         
         # validate
         if not sow.tour:
@@ -180,7 +180,7 @@ class SowFarrowManager(CoreModelManager):
         MetaTourRecord.objects.create_record(metatour, sow.tour, alive_quantity, alive_quantity)
 
         farrow = self.create(sow=sow, tour=sow.tour, initiator=initiator,
-                date=timezone.now(), alive_quantity=alive_quantity,
+                date=date, alive_quantity=alive_quantity,
                 dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
                 piglets_group=piglets
                 )
@@ -198,6 +198,9 @@ class SowFarrow(SowEvent):
     mummy_quantity = models.IntegerField(default=0)
 
     objects = SowFarrowManager()
+
+    class Meta:
+        ordering = ['date']
 
 
 class CullingSowManager(CoreModelManager):
