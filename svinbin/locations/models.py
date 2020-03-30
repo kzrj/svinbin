@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from django.db import models, connection
+from django.db.models import Sum
 
 from core.models import CoreModel, CoreModelManager
 
@@ -246,3 +247,9 @@ class Location(CoreModel):
     @property
     def sows_count_by_tour(self):
         return self.sow_set.get_tours_with_count_sows_by_location(self)
+
+    @property
+    def count_piglets(self):
+        return self.piglets.all().aggregate(piglets_in_section=Sum('quantity'))
+
+

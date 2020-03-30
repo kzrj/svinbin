@@ -74,6 +74,7 @@ class LocationCellSerializer(serializers.ModelSerializer):
 class LocationSectionSerializer(serializers.ModelSerializer):
     section_number = serializers.ReadOnlyField(source='section.number')
     section_id = serializers.ReadOnlyField(source='section.id')
+    count_piglets = serializers.ReadOnlyField()
 
     class Meta:
         model = Location
