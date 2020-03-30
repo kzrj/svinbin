@@ -57,6 +57,12 @@ class Section(CoreModel):
 
         return self.location.sows_count_by_tour
 
+    def count_piglets(self):
+        if self.workshop.number == 3:
+            return None
+
+        return self.location.count_piglets
+
 
 class Cell(CoreModel):
     workshop = models.ForeignKey(WorkShop, on_delete=models.CASCADE)
