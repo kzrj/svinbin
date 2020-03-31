@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from django.db import models, connection
-from django.db.models import Sum
+from django.db.models import Sum, OuterRef, Subquery
 
 from core.models import CoreModel, CoreModelManager
 
@@ -137,6 +137,76 @@ class LocationManager(CoreModelManager):
     def get_sowandpiglets_cells_by_workshop(self, workshop):
             return self.get_queryset().filter(sowAndPigletsCell__workshop=workshop)
 
+    def count_piglets_in_section(self, section):
+        return self.get_queryset().filter(pigletsGroupCell__section=section) \
+            .aggregate(Sum('piglets__quantity'))
+
+    def get_with_count_piglets_in_section(self):
+#       >>> users = User.objects.all()
+#       >>> UserParent.objects.filter(user_id__in=Subquery(users.values('id')))
+        # locs_sections = self.get_queryset().filter(section__isnull=False)
+        # locs_sections = self.get_queryset().filter(section__number=1, section__workshop__number=4)
+        locs_sections = self.get_queryset().filter(section__workshop__number=4)
+        # return self.get_queryset().filter(pigletsGroupCell__section__in=Subquery(locs_sections.values('section')))
+
+        # return self.get_queryset().filter(pigletsGroupCell__section__in=Subquery(locs_sections.values('section'))) \
+        #     .aggregate(Sum('piglets__quantity'))
+
+        # pigs_count for all ws
+        # return locs_sections.annotate(
+        #         pigs_count=models.Value(self.get_queryset() \
+        #             .filter(pigletsGroupCell__section__in=Subquery(locs_sections.values('section'))) \
+        #             .aggregate(pigs_qty=Sum('piglets__quantity'))['pigs_qty'],
+        #             output_field=models.IntegerField()              
+        #             )
+        #     )
+
+        # piglets_cells_query = self.get_queryset().filter(pigletsGroupCell__section=OuterRef('section'))
+
+        # piglets_cells_query2 = self.get_queryset() \
+        #     .filter(pigletsGroupCell__section=OuterRef('section')) \
+        #     .annotate(pigs_qty=Sum('piglets__quantity'))
+
+        # return locs_sections.annotate(
+        #         pigs_count=models.Sum(
+        #             piglets_cells_query2.annotate(p_q=models.Value('pigs_qty', output_field=models.IntegerField()))
+        #             )
+        #     )
+
+        piglets = 
+
+        piglets_cells = self.get_queryset().filter(pigletsGroupCell__section=OuterRef('section')).values('piglets__quantity')[:1]
+        return locs_sections.annotate(
+            pigs_count=models.ExpressionWrapper(
+                self.get_queryset().filter(pigletsGroupCell__section=OuterRef('section'))\
+                    .aggregate(pigs_qty=Sum('piglets__quantity'))['pigs_qty'],
+                output_field=models.IntegerField()
+                )
+            )
+
+        # return locs_sections.annotate(
+        #         pigs_count=models.Sum(
+        #             Subquery(piglets_cells)
+        #             )
+        #     )
+
+        # return self.get_queryset().filter(section__isnull=False) \
+        #     .annotate(
+        #         piglets_in_section=Subquery(
+        #             self.get_queryset()
+        #             .filter(section=OuterRef('section')
+        #             .aggregate(Sum('piglets__quantity')),
+        #             output_field=models.IntegerField()
+        #             )
+        #         )
+        #     )
+            # .annotate(
+            #     piglets_qnty = Location.objects.count_piglets_in_section(
+            #         section=each item in get_queryset
+            #         )
+                # Subquery(self.get_queryset().filter(section=OuterRef('section')))
+                # )
+
 
 class Location(CoreModel):
     workshop = models.OneToOneField(WorkShop, null=True, on_delete=models.SET_NULL,
@@ -256,6 +326,5 @@ class Location(CoreModel):
 
     @property
     def count_piglets(self):
-        return self.piglets.all().aggregate(piglets_in_section=Sum('quantity'))
-
-
+        return Location.objects.filter(pigletsGroupCell__section=self.section) \
+            .aggregate(Sum('piglets__quantity'))['piglets__quantity__sum']

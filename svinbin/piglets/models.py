@@ -45,7 +45,7 @@ class PigletsManager(CoreModelManager):
     def get_all(self):
         return PigletsQuerySet(self.model, using=self._db)
 
-    # for init only
+    # for init and test only
     def init_piglets_with_metatour(self, tour, location, quantity, gilts_quantity=0, created_at=None):
     	piglets = self.create(location=location,
                 start_quantity=quantity,

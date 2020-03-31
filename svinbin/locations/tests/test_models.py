@@ -13,13 +13,14 @@ from locations.models import (
     SowGroupCell, SowAndPigletsCell
     )
 from sows_events.models import SowFarrow
+from piglets.models import Piglets
 
 from locations.serializers import (
-    LocationSerializer, LocationCellSerializer, LocationSectionSerializer
+    LocationSerializer, LocationCellSerializer, LocationSectionSerializer, SectionSerializer
     )
 
 
-class LocationModelManagerQuerysetTest(TransactionTestCase):
+class LocationsTest(TransactionTestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
@@ -49,6 +50,15 @@ class LocationModelManagerQuerysetTest(TransactionTestCase):
         SowFarrow.objects.create_sow_farrow(sow=sow6, alive_quantity=10)
         SowFarrow.objects.create_sow_farrow(sow=sow7, alive_quantity=10)
 
+        location8 = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        Piglets.objects.init_piglets_by_farrow_date('2020-01-01', location8, 20)
+
+        location9 = Location.objects.filter(pigletsGroupCell__isnull=False)[1]
+        Piglets.objects.init_piglets_by_farrow_date('2020-01-02', location9, 21)
+
+        location10 = Location.objects.filter(pigletsGroupCell__section__number=2).first()
+        Piglets.objects.init_piglets_by_farrow_date('2020-01-02', location10, 53)
+
     # def test_queryset_with_all_related(self):
     #     with self.assertNumQueries(3):
     #         data = Location.objects.all()\
@@ -75,7 +85,7 @@ class LocationModelManagerQuerysetTest(TransactionTestCase):
                     'sow_set__status',
                     'piglets__metatour__records__tour__sowfarrow_set',)
             serializer = LocationCellSerializer(data, many=True)
-            print(serializer.data)
+            serializer.data
 
     def test_location_section_serializer_queries(self):
         with self.assertNumQueries(1):
@@ -84,7 +94,42 @@ class LocationModelManagerQuerysetTest(TransactionTestCase):
                     'section__workshop',
                     ) 
             serializer = LocationSectionSerializer(data, many=True)
-            print(serializer.data)
+            serializer.data
+
+    def test_count_piglets(self):
+        section_ws4 = Location.objects.filter(section__number=1, section__workshop__number=4).first()
+        self.assertEqual(section_ws4.count_piglets, 41)
+
+    def test_section_serializer_queries(self):
+        with self.assertNumQueries(1):
+            data = Section.objects.all() \
+                .select_related(
+                    'location',
+                    ) 
+            serializer = SectionSerializer(data, many=True)
+            serializer.data
+
+    def test_location_section_serializer_queries_with_count_piglets(self):
+        loc_section_ws4 = Location.objects.filter(section__number=1, section__workshop__number=4).first()
+
+        data = Location.objects.count_piglets_in_section(loc_section_ws4.section) 
+        print(data)
+
+        data2 = Location.objects.get_with_count_piglets_in_section() 
+        print(data2)
+        # print(data2.count())
+        print(data2[0].section)
+        print(data2[0].pigletsGroupCell)
+        print(data2[0].pigs_count)
+        print(data2[1].pigs_count)
+
+        # with self.assertNumQueries(1):
+        #     data = Location.objects.get_with_count_piglets(section_ws4) \
+        #         .select_related(
+        #             'section__workshop',
+        #             ) 
+        #     serializer = LocationSectionSerializer(data, many=True)
+        #     serializer.data
 
 
 # class WorkshopModelTest(TestCase):
