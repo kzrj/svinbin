@@ -173,7 +173,7 @@ class LocationManager(CoreModelManager):
         #             )
         #     )
 
-        piglets = 
+        # piglets = 
 
         piglets_cells = self.get_queryset().filter(pigletsGroupCell__section=OuterRef('section')).values('piglets__quantity')[:1]
         return locs_sections.annotate(
