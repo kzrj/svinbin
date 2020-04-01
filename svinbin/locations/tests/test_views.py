@@ -44,6 +44,15 @@ class LocationsViewSetTest(APITestCase):
         SowFarrow.objects.create_sow_farrow(sow=sow2, alive_quantity=10)
         SowFarrow.objects.create_sow_farrow(sow=sow3, alive_quantity=10)
 
+        location8 = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        Piglets.objects.init_piglets_by_farrow_date('2020-01-01', location8, 20)
+
+        location9 = Location.objects.filter(pigletsGroupCell__isnull=False)[1]
+        Piglets.objects.init_piglets_by_farrow_date('2020-01-02', location9, 21)
+
+        location10 = Location.objects.filter(pigletsGroupCell__section__number=2).first()
+        Piglets.objects.init_piglets_by_farrow_date('2020-01-02', location10, 53)
+
     def test_common_list_locations(self):
         response = self.client.get('/api/locations/')
         location = response.data['results'][0]
@@ -55,7 +64,9 @@ class LocationsViewSetTest(APITestCase):
         self.assertEqual(len(response.data['results']) > 0, True)
 
     def test_sections_list_locations(self):
-        workshop = Location.objects.filter(workshop__number=3).first()
+        workshop = Location.objects.filter(workshop__number=4).first()
         response = self.client.get(f'/api/locations/?sections_by_workshop_number={workshop.workshop.number}&sections=true')
-        location = response.data['results'][0]
         self.assertEqual(len(response.data['results']) > 0, True)
+
+        section = response.data['results'][0]
+        self.assertEqual(section['pigs_count'], 41)

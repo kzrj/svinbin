@@ -96,10 +96,6 @@ class LocationsTest(TransactionTestCase):
             serializer = LocationSectionSerializer(data, many=True)
             serializer.data
 
-    def test_count_piglets(self):
-        section_ws4 = Location.objects.filter(section__number=1, section__workshop__number=4).first()
-        self.assertEqual(section_ws4.count_piglets, 41)
-
     def test_section_serializer_queries(self):
         with self.assertNumQueries(1):
             data = Section.objects.all() \
@@ -110,35 +106,12 @@ class LocationsTest(TransactionTestCase):
             serializer.data
 
     def test_location_section_serializer_queries_with_count_piglets(self):
-        loc_section_ws4 = Location.objects.filter(section__number=1, section__workshop__number=4).first()
+        data = Location.objects.filter(section__workshop__number=4, section__isnull=False).get_with_count_piglets_in_section() 
+        self.assertEqual(data[0].pigs_count, 41)
+        self.assertEqual(data[1].pigs_count, 53)
 
-        data = Location.objects.count_piglets_in_section(loc_section_ws4.section) 
-        print(data)
-
-        data2 = Location.objects.filter(section__workshop__number=4, section__isnull=False).get_with_count_piglets_in_section() 
-        # data2 = Location.objects.get_with_count_piglets_in_section() 
-        print(data2)
-        # print(data2.count())
-        print(data2[0])
-        print(data2[0].pigs_all)
-        print(data2[1])
-        print(data2[1].pigs_all)
-        # print(data2[0].section)
-        # print(data2[0].pigletsGroupCell)
-        # print(data2[0].pigs_count)
-        # print(data2[1].pigs_count)
-
-        # with self.assertNumQueries(1):
-        #     data = Location.objects.get_with_count_piglets(section_ws4) \
-        #         .select_related(
-        #             'section__workshop',
-        #             ) 
-        #     serializer = LocationSectionSerializer(data, many=True)
-        #     serializer.data
-
-
-# class WorkshopModelTest(TestCase):
-#     def setUp(self):
-#         locations_testing.create_workshops_sections_and_cells()
-#         sows_testing.create_statuses()
-#         piglets_testing.create_piglets_statuses()
+        with self.assertNumQueries(1):
+            data = Location.objects.filter(section__workshop__number=4, section__isnull=False) \
+                .select_related('section').get_with_count_piglets_in_section() 
+            serializer = LocationSectionSerializer(data, many=True)
+            serializer.data

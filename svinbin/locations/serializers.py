@@ -75,8 +75,10 @@ class LocationCellSerializer(serializers.ModelSerializer):
 class LocationSectionSerializer(serializers.ModelSerializer):
     section_number = serializers.ReadOnlyField(source='section.number')
     section_id = serializers.ReadOnlyField(source='section.id')
-    # count_piglets = serializers.ReadOnlyField()
+
+    # created via aggregation in queryset method - get_with_count_piglets_in_section 
+    pigs_count = serializers.ReadOnlyField() 
 
     class Meta:
         model = Location
-        fields = ['id', 'section_number', 'section_id']
+        fields = ['id', 'section_number', 'section_id', 'pigs_count']

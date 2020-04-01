@@ -59,7 +59,7 @@ class LocationViewSet(viewsets.ModelViewSet):
             serializer = serializers.LocationSectionSerializer
             queryset = self.filter_queryset(
                 self.get_queryset()\
-                    .select_related('section__workshop')
+                    .select_related('section__workshop').get_with_count_piglets_in_section()
             )
 
         page = self.paginate_queryset(queryset)
