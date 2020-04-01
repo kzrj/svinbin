@@ -259,6 +259,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 transactions_models.PigletsTransaction.objects.create_transaction(
                     serializer.validated_data['location'], piglets,
                     request.user, serializer.validated_data.get('transaction_date', None))
+                piglets.change_status_to_without_save('Готовы ко взвешиванию')
 
             return Response(
                 {
