@@ -4,7 +4,8 @@ from django.db import models, connection
 from django.db.models import Sum, OuterRef, Subquery
 
 from core.models import CoreModel, CoreModelManager
-
+# from locations.managers import LocationManager
+# from piglets.models import Piglets
 
 class WorkShop(CoreModel):
     number = models.IntegerField()
@@ -12,34 +13,6 @@ class WorkShop(CoreModel):
 
     def __str__(self):
         return self.title
-
-    # def get_info_data_ws3(self):
-    #     data = dict()
-    #     data['workshop'] = dict()
-    #     for section in Section.objects.filter(workshop=self):
-    #         data[str(section.number)] = Location.objects \
-    #             .get_sowandpiglets_cells_by_section(section) \
-    #             .get_cells_data()
-    #         data[str(section.number)]['sow_count'] = 0
-            # data[str(section.number)]['sow_count'] = Sow.objects.filter( \
-            #     location__sowAndPigletsCell__section=section).count()
-            # locations = Location.objects.filter(sowAndPigletsCell__section=section) \
-            #     .prefetch_related('sow_set', 'newbornpigletsgroup_set')
-            # print(locations.sow_set.count())
-            # print(locations.annotate(num_sows=models.Count('sow'))[0].num_sows)
-            # for loc_cell in Location.objects.filter(sowAndPigletsCell__section=section) \
-            #     .prefetch_related('sow_set', 'newbornpigletsgroup_set'):
-            #     data[str(section.number)]['sow_count'] = data[str(section.number)]['sow_count'] + 
-
-
-            # data[str(section.number)]['piglets_count'] = NewBornPigletsGroup.objects.filter( \
-            #     location__sowAndPigletsCell__section=section).count()
-
-            # for key in data[str(section.number)].keys():
-            #     if data['workshop'].get(key):
-            #         data['workshop'][key] = data['workshop'][key] + data[str(section.number)][key]
-            #     else:
-            #         data['workshop'][key] = data[str(section.number)][key]
 
 
 class Section(CoreModel):
@@ -85,22 +58,6 @@ class SowGroupCell(Cell):
 class PigletsGroupCell(Cell):
     def __str__(self):
         return 'Групповая клетка № {}, {}'.format(self.number, str(self.section))
-
-    def get_locations_with_residents(self):
-        return self.locations.get_with_active_nomad_group()
-
-    def get_list_of_residents(self):
-        residents = list()
-        for location in self.locations.get_with_active_nomad_group():
-            residents.append(location.nomadpigletsgroup)
-
-        return residents
-
-    @property
-    def is_empty(self):
-        if self.get_locations_with_residents().first() == None:
-            return True
-        return False
 
 
 class SowAndPigletsCell(Cell):
