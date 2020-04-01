@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Sum, Avg
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
@@ -36,6 +36,10 @@ class PigletsQuerySet(models.QuerySet):
         return self.prefetch_related('weighing_records') \
                     .filter(~Q(weighing_records__place=place)) \
                     .distinct()
+
+    def with_tour(self, week_number):
+        return self.filter(metatour__records__tour__week_number=week_number)
+        # return self.filter(metatour__records__tour__week_number=week_number, metatour__records__percentage=100)
 
 
 class PigletsManager(CoreModelManager):

@@ -2,6 +2,7 @@
 import datetime
 
 from django.db import models
+from django.db.models import Q, Sum, Avg, Value, F
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -228,6 +229,10 @@ class WeighingPigletsManager(CoreModelManager):
         piglets_group.change_status_to('Взвешены, готовы к заселению')
         return weighing_record
 
+    def get_weigths_by_piglets(self, piglets):
+        return self.get_queryset().filter(piglets_group__in=piglets).aggregate(total_weight=Sum('total_weight'),
+            average_weight=Avg('average_weight'))
+
 
 class WeighingPiglets(PigletsEvent):
     WEIGHING_PLACES = [('3/4', '3/4'), ('4/8', '4/8'), ('8/5', '8/5'), ('8/6', '8/6'),
@@ -266,7 +271,15 @@ class CullingPigletsManager(CoreModelManager):
         piglets_group.remove_gilts(quantity)
         return self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
             date=date, initiator=initiator, is_it_gilt=True, quantity=quantity,
-            total_weight=total_weight)      
+            total_weight=total_weight)
+
+    def get_culling_by_piglets(self, culling_type, piglets):
+        return self.get_queryset().filter(piglets_group__in=piglets, culling_type=culling_type) \
+                    .aggregate(
+                        total_quantity=Sum('quantity'),
+                        total_weight=Sum('total_weight'),
+                        avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())
+                    )
 
 
 class CullingPiglets(PigletsEvent):

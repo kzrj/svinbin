@@ -101,7 +101,6 @@ class PigletsQueryTest(TransactionTestCase):
         sows_events_testings.create_types()
         piglets_testing.create_piglets_statuses()
 
-    def test_queryset_serializer(self):
         location_cell1 = Location.objects.filter(sowAndPigletsCell__section__number=1)[0]
         piglets1 = piglets_testing.create_from_sow_farrow_by_week(location=location_cell1,
             week=1)
@@ -114,8 +113,13 @@ class PigletsQueryTest(TransactionTestCase):
         piglets1 = piglets_testing.create_from_sow_farrow_by_week(location=location_cell3,
             week=2)
 
-        with self.assertNumQueries(3):
+    def test_queryset_serializer(self):
+        with self.assertNumQueries(4):
             data = Piglets.objects.all() \
-                .prefetch_related('metatour__records__tour') 
+                .prefetch_related('metatour__records__tour__sowfarrow_set') 
             serializer = PigletsSerializer(data, many=True)
-            print(serializer.data)
+            serializer.data
+
+    def test_with_tour(self):
+        
+        self.assertEqual(Piglets.objects.all().with_tour(tour_week=1).count())

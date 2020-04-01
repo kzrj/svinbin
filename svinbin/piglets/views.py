@@ -23,7 +23,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.filter_queryset(
             self.get_queryset() \
-                .prefetch_related('metatour__records__tour')
+                .prefetch_related('metatour__records__tour__sowfarrow_set')
         )
 
         page = self.paginate_queryset(queryset)

@@ -444,6 +444,7 @@ class WeighingPigletsTest(TestCase):
         piglets_testing.create_piglets_statuses()
         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
         self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
 
     def test_create_weighing(self):
         piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -458,6 +459,31 @@ class WeighingPigletsTest(TestCase):
         self.assertEqual(weighing_record.piglets_quantity, piglets.quantity)
         self.assertEqual(weighing_record.place, '3/4')
 
+    def test_manager_get_weigths_by_piglets(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 101)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 99)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 105)
+
+        # print(Piglets.objects.all().with_tour(week_number=1))
+
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=piglets1, total_weight=670, place='3/4'
+            )
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=piglets2, total_weight=670, place='3/4'
+            )
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=piglets3, total_weight=670, place='3/4'
+            )
+        piglets = Piglets.objects.all().with_tour(week_number=1)
+
+        weights = WeighingPiglets.objects.get_weigths_by_piglets(piglets=piglets)
+        self.assertEqual(weights['total_weight'], 2010)
+        self.assertEqual(round(weights['average_weight'], 2), 6.59)
+
 
 class CullingPigletsTest(TestCase):
     def setUp(self):
@@ -466,6 +492,8 @@ class CullingPigletsTest(TestCase):
 
         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
         self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+
         self.piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3, 101)
 
@@ -482,6 +510,51 @@ class CullingPigletsTest(TestCase):
         self.assertEqual(culling.reason, 'xz')
         self.assertEqual(culling.total_weight, 100)
         self.assertEqual(culling.date.day, 9)
+
+    def test_manager_get_culling_total_data_by_piglets(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 101)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 99)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 105)
+
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=piglets1, culling_type='padej', reason='xz', quantity=10, 
+            total_weight=100, date='2020-03-09'
+            )
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=piglets1, culling_type='padej', reason='xz', quantity=1, 
+            total_weight=9.5, date='2020-03-09'
+            )
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=piglets2, culling_type='padej', reason='xz', quantity=2, 
+            total_weight=18, date='2020-03-09'
+            )
+
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=piglets3, culling_type='spec', reason='xz', quantity=2, 
+            total_weight=18, date='2020-03-09'
+            )
+
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=piglets2, culling_type='spec', reason='xz', quantity=5, 
+            total_weight=53, date='2020-03-09'
+            )
+
+        piglets = Piglets.objects.all().with_tour(week_number=1)
+
+        culling_total_data1 = CullingPiglets.objects.get_culling_by_piglets(culling_type='spec',
+            piglets=piglets)
+        self.assertEqual(culling_total_data1['total_quantity'], 7)
+        self.assertEqual(culling_total_data1['total_weight'], 71)
+        self.assertEqual(culling_total_data1['avg_weight'], 9.8)
+
+        culling_total_data2 = CullingPiglets.objects.get_culling_by_piglets(culling_type='padej',
+            piglets=piglets)
+        self.assertEqual(culling_total_data2['total_quantity'], 13)
+        self.assertEqual(culling_total_data2['total_weight'], 127.5)
+        self.assertEqual(culling_total_data2['avg_weight'], 9.5)
         
         
 class RestPigletsTest(TestCase):
