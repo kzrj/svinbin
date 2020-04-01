@@ -82,4 +82,4 @@ class LocationSectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ['id', 'section_number', 'section_id', 'pigs_count']
+        fields = ['id', 'section_number', 'section_id', 'pigs_count', 'section_name']
