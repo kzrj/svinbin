@@ -115,13 +115,18 @@ class LocationsTest(TransactionTestCase):
         data = Location.objects.count_piglets_in_section(loc_section_ws4.section) 
         print(data)
 
-        data2 = Location.objects.get_with_count_piglets_in_section() 
+        data2 = Location.objects.filter(section__workshop__number=4, section__isnull=False).get_with_count_piglets_in_section() 
+        # data2 = Location.objects.get_with_count_piglets_in_section() 
         print(data2)
         # print(data2.count())
-        print(data2[0].section)
-        print(data2[0].pigletsGroupCell)
-        print(data2[0].pigs_count)
-        print(data2[1].pigs_count)
+        print(data2[0])
+        print(data2[0].pigs_all)
+        print(data2[1])
+        print(data2[1].pigs_all)
+        # print(data2[0].section)
+        # print(data2[0].pigletsGroupCell)
+        # print(data2[0].pigs_count)
+        # print(data2[1].pigs_count)
 
         # with self.assertNumQueries(1):
         #     data = Location.objects.get_with_count_piglets(section_ws4) \
