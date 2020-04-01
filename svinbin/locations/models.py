@@ -111,7 +111,7 @@ class SowAndPigletsCell(Cell):
 class LocationQuerySet(models.QuerySet):
     def get_with_count_piglets_in_section(self):
         ''' 
-            aggregate in field count_piglets sum of all piglets in section
+            aggregate in field count_piglets sum of all piglets in piglets section(exclude ws3 sections)
 
             thanks to 
             https://stackoverflow.com/questions/55925437/django-subquery-with-aggregate
