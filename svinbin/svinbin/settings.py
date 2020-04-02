@@ -54,6 +54,7 @@ OWN_APPS = [
     'workshoponetwo.apps.WorkshoponetwoConfig',
     'workshopthree.apps.WorkshopthreeConfig',
     # 'workshopfour.apps.WorkshopfourConfig',
+    'reports.apps.ReportsConfig',
 ]
 
 

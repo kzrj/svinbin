@@ -142,7 +142,7 @@ class MetaTourRecordManager(CoreModelManager):
         note = None
         # validate
         if percentage > 100:
-            # percentage = 100
+            percentage = 100
             note = f'Неверно подсчитались проценты {percentage}, \
                  у группы с количеством {metatour.piglets.quantity}, \
                  Данные : тур={tour.week_number}, quantity={quantity}, total_quantity={total_quantity}, \
@@ -150,12 +150,12 @@ class MetaTourRecordManager(CoreModelManager):
                  ID piglets {metatour.piglets.pk}, piglets.quantty={metatour.piglets.quantity}, \
                  piglets.quantty={metatour.piglets.start_quantity},'
 
-            raise DjangoValidationError(message=f'Неверно подсчитались проценты {percentage}, \
-                 у группы с количеством {metatour.piglets.quantity}, \
-                 Данные : тур={tour.week_number}, quantity={quantity}, total_quantity={total_quantity}, \
-                 percentage={percentage}.  \
-                 ID piglets {metatour.piglets.pk}, piglets.quantty={metatour.piglets.quantity}, \
-                 piglets.quantty={metatour.piglets.start_quantity},')
+            # raise DjangoValidationError(message=f'Неверно подсчитались проценты {percentage}, \
+            #      у группы с количеством {metatour.piglets.quantity}, \
+            #      Данные : тур={tour.week_number}, quantity={quantity}, total_quantity={total_quantity}, \
+            #      percentage={percentage}.  \
+            #      ID piglets {metatour.piglets.pk}, piglets.quantty={metatour.piglets.quantity}, \
+            #      piglets.quantty={metatour.piglets.start_quantity},')
 
         return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage, note=note)
 
