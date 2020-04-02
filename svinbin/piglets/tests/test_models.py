@@ -3,6 +3,7 @@ from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
 from piglets.models import Piglets
+from piglets_events.models import PigletsMerger
 from tours.models import Tour
 from locations.models import Location
 
@@ -150,9 +151,17 @@ class PigletsQueryTest(TransactionTestCase):
         # piglets in ws
         piglets11 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws5, 100)
-        piglets11 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+        piglets12 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
             self.loc_ws5, 100)
 
+        piglets13 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        piglets14 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+
+        self.loc_cell_ws5_1 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[0]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets13, piglets14], new_location=self.loc_cell_ws5_1)
 
     def test_queryset_serializer(self):
         with self.assertNumQueries(4):
@@ -160,9 +169,6 @@ class PigletsQueryTest(TransactionTestCase):
                 .prefetch_related('metatour__records__tour__sowfarrow_set') 
             serializer = PigletsSerializer(data, many=True)
             serializer.data
-
-    def test_with_tour(self):
-        self.assertEqual(Piglets.objects.all().with_tour(week_number=1).count(), 4)
 
     def test_all_in_workshop(self):
         self.assertEqual(Piglets.objects.all().all_in_workshop(workshop_number=4).count(), 5)        
@@ -173,3 +179,12 @@ class PigletsQueryTest(TransactionTestCase):
             section=self.loc_section_ws4_1.section).count(), 3)        
         self.assertEqual(Piglets.objects.get_all().all_in_section(
             section=self.loc_section_ws4_1.section).count(), 5)
+
+    def test_with_tour(self):
+        self.assertEqual(Piglets.objects.all().with_tour(week_number=1).count(), 5)
+
+    def test_with_tour_mixed(self):
+        self.assertEqual(Piglets.objects.all().with_tour_mixed(week_number=1).count(), 1)
+
+    def with_tour_not_mixed(self):
+        self.assertEqual(Piglets.objects.all().with_tour_mixed(week_number=1).count(), 4)

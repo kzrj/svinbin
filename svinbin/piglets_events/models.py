@@ -2,7 +2,7 @@
 import datetime
 
 from django.db import models
-from django.db.models import Q, Sum, Avg, Value, F
+from django.db.models import Q, Sum, Avg, Value, F, OuterRef, Subquery, ExpressionWrapper
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -229,9 +229,23 @@ class WeighingPigletsManager(CoreModelManager):
         piglets_group.change_status_to('Взвешены, готовы к заселению')
         return weighing_record
 
-    def get_weigths_by_piglets(self, piglets):
+    def get_weights_piglets(self, piglets):
         return self.get_queryset().filter(piglets_group__in=piglets).aggregate(total_weight=Sum('total_weight'),
             average_weight=Avg('average_weight'))
+
+    def get_weights_mixed_piglets_by_tour(self, piglets, tour):
+        # get tour percentage in each piglets groups
+        subquery = MetaTourRecord.objects.filter(metatour__piglets=OuterRef('piglets_group'), tour=tour) \
+            .annotate(percentages=Sum('percentage')) \
+            .values('percentages')
+
+        # annotate weight by tour to each piglets group, than aggerate that weights
+        return self.get_queryset().filter(piglets_group__in=piglets) \
+            .annotate(weight_by_tour=ExpressionWrapper(
+                    (F('total_weight')  * Subquery(subquery, output_field=models.IntegerField()) / 100),
+                    output_field=models.FloatField())
+                ).aggregate(total_weight_by_tour=Sum('weight_by_tour'),
+                     average_weight_by_tour=Avg('average_weight'))
 
 
 class WeighingPiglets(PigletsEvent):

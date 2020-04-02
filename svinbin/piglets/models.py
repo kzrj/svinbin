@@ -39,7 +39,12 @@ class PigletsQuerySet(models.QuerySet):
 
     def with_tour(self, week_number):
         return self.filter(metatour__records__tour__week_number=week_number)
-        # return self.filter(metatour__records__tour__week_number=week_number, metatour__records__percentage=100)
+
+    def with_tour_not_mixed(self, week_number):
+        return self.filter(metatour__records__tour__week_number=week_number, metatour__records__percentage=100)
+
+    def with_tour_mixed(self, week_number):
+        return self.filter(metatour__records__tour__week_number=week_number, metatour__records__percentage__lt=100)
 
     def all_in_workshop(self, workshop_number):
         return self.filter(Q(

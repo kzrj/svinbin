@@ -442,9 +442,56 @@ class WeighingPigletsTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         piglets_testing.create_piglets_statuses()
-        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
         self.loc_ws3 = Location.objects.get(workshop__number=3)
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
         self.loc_ws4 = Location.objects.get(workshop__number=4)
+        # piglets in ws
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 100)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws4, 100)
+
+        #  piglets in pigletsCell in ws
+        self.loc_cell_ws4_1 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[0]
+        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_1, 100)
+        self.loc_cell_ws4_2 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[1]
+        piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_2, 100)
+
+        self.loc_cell_ws4_3 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[2]
+        piglets8 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_3, 100)
+        piglets8.deactivate()
+        self.loc_cell_ws4_4 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[3]
+        piglets9 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_4, 100)
+        piglets9.deactivate()
+
+        # piglets in section
+        self.loc_section_ws4_1 = Location.objects.filter(section__workshop__number=4)[0]
+        piglets10 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_section_ws4_1, 100)
+
+
+        self.loc_ws5 = Location.objects.get(workshop__number=5)
+        # piglets in ws
+        self.piglets11 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        self.piglets12 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 100)
+
+        piglets13 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        piglets14 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+
+        self.loc_cell_ws5_1 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[0]
+        self.merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets13, piglets14], new_location=self.loc_cell_ws5_1)
 
     def test_create_weighing(self):
         piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -459,7 +506,7 @@ class WeighingPigletsTest(TestCase):
         self.assertEqual(weighing_record.piglets_quantity, piglets.quantity)
         self.assertEqual(weighing_record.place, '3/4')
 
-    def test_manager_get_weigths_by_piglets(self):
+    def test_manager_get_get_weights_piglets(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws4, 101)
         piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -480,9 +527,40 @@ class WeighingPigletsTest(TestCase):
             )
         piglets = Piglets.objects.all().with_tour(week_number=1)
 
-        weights = WeighingPiglets.objects.get_weigths_by_piglets(piglets=piglets)
+        weights = WeighingPiglets.objects.get_weights_piglets(piglets=piglets)
         self.assertEqual(weights['total_weight'], 2010)
         self.assertEqual(round(weights['average_weight'], 2), 6.59)
+
+    def test_manager_get_get_weights_mixed_piglets_by_tour(self):
+        self.loc_ws5 = Location.objects.get(workshop__number=5)
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 60)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 40)
+
+        self.loc_cell_ws5_2 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[1]
+        merged_piglets = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets1, piglets2], new_location=self.loc_cell_ws5_2)
+
+        piglets = [merged_piglets, self.merged_piglets1]
+
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=merged_piglets, total_weight=1100, place='4/5'
+            )
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.merged_piglets1, total_weight=1200, place='4/5'
+            )
+
+        weights_by_tour1 = WeighingPiglets.objects.get_weights_mixed_piglets_by_tour(
+            piglets=piglets, tour=self.tour1)
+        self.assertEqual(weights_by_tour1['total_weight_by_tour'], 1460)
+        self.assertEqual(weights_by_tour1['average_weight_by_tour'], 9.5)
+
+        
+        weights_by_tour2 = WeighingPiglets.objects.get_weights_mixed_piglets_by_tour(
+            piglets=piglets, tour=self.tour2)
+        self.assertEqual(weights_by_tour2['total_weight_by_tour'], 840)
+        self.assertEqual(weights_by_tour2['average_weight_by_tour'], 9.5)
 
 
 class CullingPigletsTest(TestCase):
