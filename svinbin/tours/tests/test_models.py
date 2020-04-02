@@ -22,14 +22,27 @@ class TourModelManagerTest(TestCase):
         pigs_testings.create_statuses()
         sows_events_testing.create_types()
 
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.tour3 = Tour.objects.get_or_create_by_week_in_current_year(week_number=3)
+        self.tour4 = Tour.objects.get_or_create_by_week_in_current_year(week_number=4)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_cell_ws4_1 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[0]
+        self.loc_cell_ws4_2 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[1]
+        self.loc_cell_ws4_3 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[2]
+        self.loc_cell_ws4_4 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[3]
+        self.loc_section_ws4_1 = Location.objects.filter(section__workshop__number=4)[0]
+        self.loc_ws5 = Location.objects.get(workshop__number=5)
+
     def test_get_or_create_by_week_in_current_year(self):
         Tour.objects.get_or_create_by_week_in_current_year(1)
-        self.assertEqual(Tour.objects.all().count(), 1)
+        self.assertEqual(Tour.objects.all().count(), 4)
         self.assertEqual(Tour.objects.all().first().week_number, 1)
         self.assertEqual(Tour.objects.all().first().year, 2020)
 
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
-        self.assertEqual(Tour.objects.all().count(), 1)
+        self.assertEqual(Tour.objects.all().count(), 4)
         self.assertEqual(tour.week_number, 1)
 
     def test_get_tours_in_workshop_by_sows(self):
@@ -63,6 +76,50 @@ class TourModelManagerTest(TestCase):
         
         monday2 = Tour.objects.get_monday_date_by_week_number(week_number=2, year=2020)
         self.assertEqual(monday2.day, 13)
+
+    def test_get_tours_by_piglets(self):
+        # piglets in ws 4
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 100)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws4, 100)
+
+        #  piglets in pigletsCell in ws
+        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_1, 100)
+        piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_2, 100)
+
+        # inactive piglets
+        piglets8 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_3, 100)
+        piglets8.deactivate()
+        piglets9 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_4, 100)
+        piglets9.deactivate()
+
+        # piglets in section
+        piglets10 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_section_ws4_1, 100)
+
+        # piglets in ws5
+        piglets11 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        piglets12 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 100)
+        piglets13 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour3,
+            self.loc_ws5, 100)
+        piglets14 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour4,
+            self.loc_ws5, 100)
+
+        piglets_t1_t2 = Piglets.objects.filter(pk__in=[piglets4.pk, piglets5.pk])
+        t1_t_2 = Tour.objects.get_tours_by_piglets(piglets=piglets_t1_t2)
+        self.assertEqual(t1_t_2.count(), 2)
+        self.assertEqual(t1_t_2[0].week_number, 1)
+        self.assertEqual(t1_t_2[1].week_number, 2)
+
+        all_piglets_tours = Piglets.objects.all()
+        self.assertEqual(Tour.objects.get_tours_by_piglets(all_piglets_tours).count(), 4)
 
     
 class TourModelTest(TestCase):

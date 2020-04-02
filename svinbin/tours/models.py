@@ -54,6 +54,9 @@ class TourManager(CoreModelManager):
         week_number = int(semination_date.strftime("%V"))
         return self.get_or_create_by_week(week_number, semination_date.year, semination_date)
 
+    def get_tours_by_piglets(self, piglets):
+        return self.get_queryset().filter(metatourrecords__metatour__piglets__in=piglets)
+
 
 class Tour(CoreModel):
     start_date = models.DateTimeField()

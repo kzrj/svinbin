@@ -106,12 +106,53 @@ class PigletsQueryTest(TransactionTestCase):
             week=1)
 
         location_cell2 = Location.objects.filter(sowAndPigletsCell__section__number=1)[1]
-        piglets1 = piglets_testing.create_from_sow_farrow_by_week(location=location_cell2,
+        piglets2 = piglets_testing.create_from_sow_farrow_by_week(location=location_cell2,
             week=1)
 
         location_cell3 = Location.objects.filter(sowAndPigletsCell__section__number=1)[2]
-        piglets1 = piglets_testing.create_from_sow_farrow_by_week(location=location_cell3,
+        piglets3 = piglets_testing.create_from_sow_farrow_by_week(location=location_cell3,
             week=2)
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+        # piglets in ws
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 100)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws4, 100)
+
+        #  piglets in pigletsCell in ws
+        self.loc_cell_ws4_1 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[0]
+        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_1, 100)
+        self.loc_cell_ws4_2 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[1]
+        piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_2, 100)
+
+        self.loc_cell_ws4_3 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[2]
+        piglets8 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_3, 100)
+        piglets8.deactivate()
+        self.loc_cell_ws4_4 = Location.objects.filter(pigletsGroupCell__workshop__number=4)[3]
+        piglets9 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_4, 100)
+        piglets9.deactivate()
+
+        # piglets in section
+        self.loc_section_ws4_1 = Location.objects.filter(section__workshop__number=4)[0]
+        piglets10 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_section_ws4_1, 100)
+
+
+        self.loc_ws5 = Location.objects.get(workshop__number=5)
+        # piglets in ws
+        piglets11 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        piglets11 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 100)
+
 
     def test_queryset_serializer(self):
         with self.assertNumQueries(4):
@@ -121,5 +162,14 @@ class PigletsQueryTest(TransactionTestCase):
             serializer.data
 
     def test_with_tour(self):
-        
-        self.assertEqual(Piglets.objects.all().with_tour(tour_week=1).count())
+        self.assertEqual(Piglets.objects.all().with_tour(week_number=1).count(), 4)
+
+    def test_all_in_workshop(self):
+        self.assertEqual(Piglets.objects.all().all_in_workshop(workshop_number=4).count(), 5)        
+        self.assertEqual(Piglets.objects.get_all().all_in_workshop(workshop_number=4).count(), 7)
+
+    def test_all_in_section(self):
+        self.assertEqual(Piglets.objects.all().all_in_section(
+            section=self.loc_section_ws4_1.section).count(), 3)        
+        self.assertEqual(Piglets.objects.get_all().all_in_section(
+            section=self.loc_section_ws4_1.section).count(), 5)

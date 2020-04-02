@@ -41,6 +41,24 @@ class PigletsQuerySet(models.QuerySet):
         return self.filter(metatour__records__tour__week_number=week_number)
         # return self.filter(metatour__records__tour__week_number=week_number, metatour__records__percentage=100)
 
+    def all_in_workshop(self, workshop_number):
+        return self.filter(Q(
+            Q(location__workshop__number=workshop_number) |
+            Q(location__section__workshop__number=workshop_number) |
+            Q(location__pigletsGroupCell__workshop__number=workshop_number)
+            )
+        )
+
+    def all_in_section(self, section):
+        return self.filter(Q(
+            Q(location__section=section) |
+            Q(location__pigletsGroupCell__section=section)
+            )
+        )
+
+    # def get_tours(self):
+        # self.
+
 
 class PigletsManager(CoreModelManager):
     def get_queryset(self):
