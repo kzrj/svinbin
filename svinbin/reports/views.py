@@ -13,6 +13,6 @@ class ReportsViewSet(viewsets.ViewSet):
     	# Piglets.objects.with_tour()
 
     	# all tours in ws
-    	# tours.objects.filter(metarecords__metatour__piglets__in)
+    	# tours = tours.objects.filter(metarecords__metatour__piglets__in=piglets_in_ws).distinct()
 
     	return Response({'report': 'report'})

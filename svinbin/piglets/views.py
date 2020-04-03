@@ -201,7 +201,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
                     to_location=serializer.validated_data['to_location'],
                     new_amount=serializer.validated_data.get('new_amount', None),
                     gilts_contains=serializer.validated_data.get('gilts_contains', False),
-                    merge=serializer.validated_data['merge']
+                    merge=serializer.validated_data['merge'],
+                    initiator=request.user
                     )
 
             return Response(

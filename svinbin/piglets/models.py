@@ -61,9 +61,6 @@ class PigletsQuerySet(models.QuerySet):
             )
         )
 
-    # def get_tours(self):
-        # self.
-
 
 class PigletsManager(CoreModelManager):
     def get_queryset(self):

@@ -558,8 +558,6 @@ class PigletsTransactionManagerTest(TestCase):
         self.assertEqual(piglets3.quantity, 95)
         self.assertEqual(piglets3.metatour.records.all().count(), 1)
         self.assertEqual(piglets3.metatour.records.all().first().percentage, 100)
-
-
     
     def test_create_transaction_change_piglets_status(self):
         # if we transfer from workshop to cell we should change status to "Кормятся"
@@ -577,3 +575,44 @@ class PigletsTransactionManagerTest(TestCase):
 
         piglets1.refresh_from_db()
         self.assertEqual(piglets1.status.title, 'Кормятся')
+
+
+class PigletsTransactionToWs75Test(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+
+        self.loc_ws_5 = Location.objects.get(workshop__number=5)
+        # 22 gilts in ws5
+        self.piglets5_1 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-30',
+         location=self.loc_ws_5, quantity=93, gilts_quantity=10)
+        self.piglets5_2 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31',
+         location=self.loc_ws_5, quantity=94, gilts_quantity=12)
+        self.piglets5_3 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-25',
+         location=self.loc_ws_5, quantity=100, gilts_quantity=0)
+
+        self.loc_ws_6 = Location.objects.get(workshop__number=6)
+        # 35 gilts in ws6
+        self.piglets6_1 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-30',
+         location=self.loc_ws_6, quantity=100, gilts_quantity=15)
+        self.piglets6_2 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31',
+         location=self.loc_ws_6, quantity=100, gilts_quantity=20)
+
+    def test_dercrease_gilts_v1(self):
+        # gilts less than gilts in group
+        piglets = PigletsTransaction.objects.dercrease_gilts(piglets=self.piglets5_1,
+             gilts_amount=4)
+        self.assertEqual(piglets.gilts_quantity, 6)
+
+        gilts_in_ws = Piglets.objects.all().all_in_workshop(workshop_number=5).get_total_gilts_quantity()
+        self.assertEqual(gilts_in_ws, 18)
+
+    def test_decrease_gilts_v2(self):
+        # gilts more than gilts in group, less than gilts in ws
+        piglets = PigletsTransaction.objects.dercrease_gilts(piglets=self.piglets5_1,
+             gilts_amount=20)
+        self.assertEqual(piglets.gilts_quantity, 0)
+
+        gilts_in_ws = Piglets.objects.all().all_in_workshop(workshop_number=5).get_total_gilts_quantity()
+        self.assertEqual(gilts_in_ws, 2)
