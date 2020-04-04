@@ -31,7 +31,7 @@ services:
     # command: bash -c "cd svinbin &&
     #                   python manage.py migrate &&
     #                   python manage.py makemigrations --no-input &&
-    #                   python manage.py test transactions.tests.test_models.PigletsTransactionToWs75Test"
+    #                   python manage.py test piglets.tests.test_views"
                       # python manage.py test workshopfour.tests.test_views"
                       # python manage.py test transactions.tests.test_models"
                       # python manage.py test sows.tests.test_managers"

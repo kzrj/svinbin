@@ -52,6 +52,10 @@ class MovePigletsSerializer(serializers.Serializer):
     merge = serializers.BooleanField(default=False)
 
 
+class MoveGiltsToWs75Serializer(serializers.Serializer):
+    gilts_amount = serializers.IntegerField(required=False)
+
+
 class InitPigletsSerializer(serializers.Serializer):
     farrow_date = serializers.CharField()
     from_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all(),

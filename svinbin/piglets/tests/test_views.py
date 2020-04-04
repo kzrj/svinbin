@@ -42,6 +42,9 @@ class PigletsViewSetTest(APITestCase):
         self.loc_ws4_cell1 = Location.objects.filter(pigletsGroupCell__isnull=False)[0]
         self.loc_ws4_cell2 = Location.objects.filter(pigletsGroupCell__isnull=False)[1]
 
+        self.loc_ws_5 = Location.objects.get(workshop__number=5)
+        self.loc_ws_6 = Location.objects.get(workshop__number=6)
+
     def test_create_from_merging_list(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3_sec1, 10)
@@ -294,6 +297,21 @@ class PigletsViewSetTest(APITestCase):
         response = self.client.post('/api/piglets/%s/recount_piglets/' % piglets.pk, 
             {'new_quantity': 106,})
         self.assertEqual(response.data['message'], 'Пересчет прошел успешно.')
+
+    def test_move_gilts_to_ws75(self):
+        piglets5_1 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-30',
+         location=self.loc_ws_5, quantity=93, gilts_quantity=10)
+        piglets5_2 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31',
+         location=self.loc_ws_5, quantity=94, gilts_quantity=12)
+        piglets5_3 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-25',
+         location=self.loc_ws_5, quantity=100, gilts_quantity=0)
+
+        response = self.client.post('/api/piglets/%s/move_gilts_to_ws75/' % piglets5_1.pk, 
+            {'gilts_amount': 5})
+        self.assertEqual(response.data['message'], 'Перевод прошел успешно.')
+
+        response = self.client.post('/api/piglets/%s/move_gilts_to_ws75/' % piglets5_2.pk)
+        self.assertEqual(response.data['message'], 'Перевод прошел успешно.')
 
 
 class PigletsFilterTest(APITestCase):

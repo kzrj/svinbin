@@ -149,13 +149,14 @@ class PigletsTransactionManager(CoreModelManager):
 
     def transaction_gilts_to_7_5(self, piglets, gilts_amount=None, initiator=None):
         # split or not
-        if gilts_amount:
-            # split
+        if gilts_amount and gilts_amount < piglets.quantity:
+            # split check amount
             piglets = self.dercrease_gilts_from_ws(piglets=piglets, gilts_amount=gilts_amount)
 
             stayed_piglets, piglets_to_transfer = PigletsSplit.objects.split_return_groups( \
                 parent_piglets=piglets, new_amount=gilts_amount, gilts_to_new=None, initiator=initiator)
         else:
+            gilts_amount = piglets.quantity
             piglets_to_transfer = self.dercrease_gilts_from_ws(piglets=piglets, gilts_amount=piglets.quantity)
         
         piglets_to_transfer.gilts_quantity = gilts_amount

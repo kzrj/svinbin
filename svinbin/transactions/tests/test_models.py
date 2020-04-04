@@ -662,7 +662,9 @@ class PigletsTransactionToWs75Test(TestCase):
         gilts_in_another_ws = Piglets.objects.all().all_in_workshop(workshop_number=6).get_total_gilts_quantity()
         self.assertEqual(gilts_in_another_ws, 35)
 
-    def test_transaction_gilts_to_7_5(self):
+    def test_transaction_gilts_to_7_5_v1(self):
+        # transfer with split. gilts amount less than piglets quantity
+
         # 22 gilts in ws5
         piglets5_1 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-30',
          location=self.loc_ws_5, quantity=93, gilts_quantity=10)
@@ -680,3 +682,50 @@ class PigletsTransactionToWs75Test(TestCase):
         transaction = PigletsTransaction.objects.transaction_gilts_to_7_5(piglets=piglets5_1,
          gilts_amount=4)
         self.assertEqual(piglets5_1.gilts_quantity, 6)
+        self.assertEqual(transaction.piglets_group.quantity, 4)
+        self.assertEqual(transaction.piglets_group.gilts_quantity, 4)
+
+        gilts_in_ws = Piglets.objects.all().all_in_workshop(workshop_number=5).get_total_gilts_quantity()
+        self.assertEqual(gilts_in_ws, 18)
+        gilts_in_another_ws = Piglets.objects.all().all_in_workshop(workshop_number=6).get_total_gilts_quantity()
+        self.assertEqual(gilts_in_another_ws, 35)
+
+    def test_transaction_gilts_to_7_5_v2(self):
+        # transafer full group
+
+        # 22 gilts in ws5
+        piglets5_1 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-30',
+         location=self.loc_ws_5, quantity=93, gilts_quantity=10)
+        piglets5_2 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31',
+         location=self.loc_ws_5, quantity=94, gilts_quantity=12)
+        piglets5_3 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-25',
+         location=self.loc_ws_5, quantity=100, gilts_quantity=0)
+
+        transaction = PigletsTransaction.objects.transaction_gilts_to_7_5(piglets=piglets5_1)
+        piglets5_1.refresh_from_db()
+        self.assertEqual(transaction.piglets_group, piglets5_1)
+        self.assertEqual(transaction.piglets_group.gilts_quantity, piglets5_1.quantity)
+
+        gilts_in_ws = Piglets.objects.all().all_in_workshop(workshop_number=5).get_total_gilts_quantity()
+        self.assertEqual(gilts_in_ws, 0)
+
+    def test_transaction_gilts_to_7_5_v3(self):
+        # transafer gilts over piglets quantity
+
+        # 22 gilts in ws5
+        piglets5_1 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-30',
+         location=self.loc_ws_5, quantity=93, gilts_quantity=10)
+        piglets5_2 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31',
+         location=self.loc_ws_5, quantity=94, gilts_quantity=12)
+        piglets5_3 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-25',
+         location=self.loc_ws_5, quantity=100, gilts_quantity=0)
+
+        transaction = PigletsTransaction.objects.transaction_gilts_to_7_5(piglets=piglets5_1,
+            gilts_amount=100)
+        piglets5_1.refresh_from_db()
+        self.assertEqual(piglets5_1.quantity, 93)
+        self.assertEqual(transaction.piglets_group, piglets5_1)
+        self.assertEqual(transaction.piglets_group.gilts_quantity, piglets5_1.quantity)
+
+        gilts_in_ws = Piglets.objects.all().all_in_workshop(workshop_number=5).get_total_gilts_quantity()
+        self.assertEqual(gilts_in_ws, 0)
