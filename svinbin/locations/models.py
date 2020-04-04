@@ -4,8 +4,7 @@ from django.db import models, connection
 from django.db.models import Sum, OuterRef, Subquery
 
 from core.models import CoreModel, CoreModelManager
-# from locations.managers import LocationManager
-# from piglets.models import Piglets
+
 
 class WorkShop(CoreModel):
     number = models.IntegerField()

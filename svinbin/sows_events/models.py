@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from core.models import Event, CoreModel, CoreModelManager
 from piglets.models import Piglets, PigletsStatus
 from tours.models import Tour, MetaTour, MetaTourRecord
+from piglets_events.models import PigletsMerger
 
 
 class SowEvent(Event):
@@ -162,12 +163,8 @@ class SowFarrowManager(CoreModelManager):
         if not sow.location.sowAndPigletsCell:
             raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.')            
 
-        if not sow.location.is_piglets_empty:
-            raise DjangoValidationError(message='В клетке есть другие поросята.')
-
         if alive_quantity == 0 and dead_quantity == 0 and mummy_quantity == 0:
             raise DjangoValidationError(message='Не может быть 0 поросят.')
-
 
         # We assume that sow has one farrow per tour. Sow there are no piglets in cell
         piglets = Piglets.objects.create(
@@ -186,7 +183,12 @@ class SowFarrowManager(CoreModelManager):
                 )
 
         sow.change_status_to('Опоросилась')
-       
+        
+        if sow.location.piglets.all().count() > 1:
+            # merge piglets
+            PigletsMerger.objects.create_merger_return_group(parent_piglets=sow.location.piglets.all(),
+                new_location=sow.location, initiator=initiator)
+
         return farrow
 
 

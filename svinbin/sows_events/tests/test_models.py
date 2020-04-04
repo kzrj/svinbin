@@ -156,6 +156,9 @@ class SowFarrowModelManagerTest(TestCase):
         sows_events_testing.create_types()
         piglets_testing.create_piglets_statuses()
 
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
     def test_create_farrow(self):
         location = Location.objects.filter(sowAndPigletsCell__number=1).first()
         sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=1)
@@ -176,6 +179,24 @@ class SowFarrowModelManagerTest(TestCase):
         self.assertEqual(farrow.alive_quantity, 10)
         self.assertEqual(farrow.dead_quantity, 1)
 
+    def test_create_farrow_v2(self):
+        # there are another piglets in cell
+        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            location, 10)
+
+        sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=1)
+
+        farrow = SowFarrow.objects.create_sow_farrow(
+            sow=sow1,
+            alive_quantity=10,
+            dead_quantity=1
+            )
+
+        self.assertEqual(farrow.piglets_group.quantity, 10)
+        self.assertEqual(location.piglets.all().count(), 1)
+        new_piglets = location.piglets.all().first()
+        self.assertEqual(new_piglets.metatour.records.all().count(), 2)
 
     def test_create_farrow_validation_location(self):
         sow1 = sows_testing.create_sow_seminated_usouded_ws3_section(week=1, section_number=1)
