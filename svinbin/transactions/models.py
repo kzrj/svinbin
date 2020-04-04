@@ -122,24 +122,24 @@ class PigletsTransactionManager(CoreModelManager):
 
         return transaction, moved_piglets, stayed_piglets, split_event, merge_event
 
-    def dercrease_gilts(self, piglets, gilts_amount):
+    def dercrease_gilts_from_ws(self, piglets, gilts_amount):
         if piglets.gilts_quantity >= gilts_amount:
             piglets.gilts_quantity = piglets.gilts_quantity - gilts_amount
         else:
             gilts_to_decrease = gilts_amount - piglets.gilts_quantity
             piglets.gilts_quantity = 0
 
-            workshop = piglets.location.pigletsGroupCell.workshop
+            workshop = piglets.location.get_workshop
+            piglets_in_ws_with_gilts = Piglets.objects.all().all_in_workshop(workshop.number)\
+                    .filter(gilts_quantity__gt=0).exclude(pk=piglets.pk)
 
-            for piglets_with_gilts in Piglets.objects.all_in_workshop(workshop.number)\
-                    .filter(gilts_quantity__gt=0):
-
+            for piglets_with_gilts in piglets_in_ws_with_gilts:
                 if piglets_with_gilts.gilts_quantity >= gilts_to_decrease:
                     piglets_with_gilts.gilts_quantity = piglets_with_gilts.gilts_quantity - gilts_to_decrease
                     piglets_with_gilts.save()
                     break
                 else:
-                    gilts_to_decrease = gilts_amount - piglets_with_gilts.gilts_quantity
+                    gilts_to_decrease = gilts_to_decrease - piglets_with_gilts.gilts_quantity
                     piglets_with_gilts.gilts_quantity = 0
                     piglets_with_gilts.save()
 
@@ -151,12 +151,12 @@ class PigletsTransactionManager(CoreModelManager):
         # split or not
         if gilts_amount:
             # split
-            piglets = self.dercrease_gilts(piglets=piglets, gilts_amount=gilts_amount)
+            piglets = self.dercrease_gilts_from_ws(piglets=piglets, gilts_amount=gilts_amount)
 
             stayed_piglets, piglets_to_transfer = PigletsSplit.objects.split_return_groups( \
                 parent_piglets=piglets, new_amount=gilts_amount, gilts_to_new=None, initiator=initiator)
         else:
-            piglets_to_transfer = self.dercrease_gilts(piglets=piglets, gilts_amount=piglets.quantity)
+            piglets_to_transfer = self.dercrease_gilts_from_ws(piglets=piglets, gilts_amount=piglets.quantity)
         
         piglets_to_transfer.gilts_quantity = gilts_amount
         piglets_to_transfer.save()
