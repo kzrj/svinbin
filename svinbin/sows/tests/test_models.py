@@ -368,33 +368,27 @@ class SowQueryTest(TransactionTestCase):
                 )
             # print(data[0].semination_set.all())
             serializer = SowManySerializer(data, many=True)
-            print(serializer.data)
+            serializer.data
 
 
+class GiltModelManagerTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
 
-# class GiltModelManagerTest(TransactionTestCase):
-#     def setUp(self):
-#         locations_testing.create_workshops_sections_and_cells()
-#         sows_testings.create_statuses()
-#         sows_events_testings.create_types()
-#         piglets_testing.create_piglets_statuses()
-
-#     def test_create_gilt(self):
-#         # 1 cell 1 section
-#         location = Location.objects.filter(sowAndPigletsCell__number=1).first()
-#         sow = sows_testings.create_sow_with_semination_usound(location, 1)
-#         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+    def test_create_gilt(self):
+        # 1 cell 1 section
+        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        sow = sows_testings.create_sow_with_semination_usound(location, 1)
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+        piglets = farrow.piglets_group
         
-#         gilt = Gilt.objects.create_gilt(birth_id=1, mother_sow=sow)
+        gilt = Gilt.objects.create_gilt(birth_id='1a', mother_sow_farm_id=sow.farm_id,
+             piglets=piglets)
 
-#         self.assertEqual(gilt.mother_sow, sow)
-#         self.assertEqual(gilt.tour.week_number, 1)
-#         self.assertEqual(gilt.farrow, sow.get_last_farrow)
-        
-        # with self.assertRaises(ValidationError):
-        #     # not unique birthId
-        #     gilt2 = Gilt.objects.create_gilt(birth_id=1, mother_sow=sow)
-
-        # sow2 = sows_testings.create_sow_with_location(Location.objects.get(workshop__number=3))
-        # with self.assertRaises(ValidationError):
-        #     gilt3 = Gilt.objects.create_gilt(birth_id=12, mother_sow=sow2)
+        self.assertEqual(gilt.mother_sow, sow)
+        self.assertEqual(gilt.tour.week_number, 1)
+        self.assertEqual(gilt.farrow, sow.get_last_farrow)
+        self.assertEqual(piglets.gilts_quantity, 1)

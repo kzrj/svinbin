@@ -5,6 +5,7 @@ from rest_framework.decorators import action
 
 import piglets.serializers as piglets_serializers
 import piglets_events.serializers as piglets_events_serializers
+import sows.serializers as sows_serializers
 
 import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
@@ -304,6 +305,26 @@ class PigletsViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                  "message": 'Пересчет прошел успешно.',
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['post'], detail=True)
+    def create_gilt(self, request, pk=None):        
+        serializer = sows_serializers.GiltCreateSerializer(data=request.data)
+        if serializer.is_valid():
+
+            sows_models.Gilt.objects.create_gilt(
+              birth_id=serializer.validated_data['birth_id'],
+              mother_sow_farm_id=serializer.validated_data['mother_sow_farm_id'],
+              piglets=self.get_object()              
+              )
+
+            return Response(
+                {
+                 "message": 'Ремонтная свинка создана успешно.',
                  },
                 status=status.HTTP_200_OK)
         else:

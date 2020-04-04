@@ -127,3 +127,8 @@ class InitOnlyCreateFarrowSow(InitOnlyCreateSeminatedSow):
     mummy_quantity = serializers.IntegerField()
     section = serializers.IntegerField()
     cell = serializers.IntegerField()
+
+
+class GiltCreateSerializer(serializers.Serializer):
+    birth_id = serializers.CharField()
+    mother_sow_farm_id = serializers.IntegerField()

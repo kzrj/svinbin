@@ -277,13 +277,15 @@ class Sow(Pig):
 
 
 class GiltManager(CoreModelManager):
-    def create_gilt(self, birth_id, mother_sow):
+    def create_gilt(self, birth_id, mother_sow_farm_id, piglets):
+        mother_sow = Sow.objects.get(farm_id=mother_sow_farm_id)
+        
         if not mother_sow.tour:
             raise DjangoValidationError(message=f'У свиноматки {mother_sow.farm_id} не текущего тура.')
 
-        if mother_sow.get_last_farrow.piglets_group.active == False:
-            raise DjangoValidationError(message=f'Рожденная группа поросят {mother_sow.piglets_group.pk} \
-                неактивна')            
+        # if mother_sow.get_last_farrow.piglets_group.active == False:
+        #     raise DjangoValidationError(message=f'Рожденная группа поросят {mother_sow.piglets_group.pk} \
+        #         неактивна')            
 
         gilt = self.create(
             birth_id=birth_id,
@@ -292,7 +294,7 @@ class GiltManager(CoreModelManager):
             farrow=mother_sow.get_last_farrow
          )
 
-        mother_sow.get_last_farrow.piglets_group.add_gilts_without_increase_quantity(1)
+        piglets.add_gilts_without_increase_quantity(1)
 
         return gilt
 

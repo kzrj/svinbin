@@ -10,6 +10,7 @@ from rest_framework.test import APITestCase
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
+import sows_events.utils as sows_events_testings
 import piglets.testing_utils as piglets_testing
 import staff.testing_utils as staff_testing
 
@@ -18,6 +19,7 @@ from locations.models import Location
 from tours.models import Tour, MetaTour
 from piglets_events.models import WeighingPiglets
 from sows.models import Sow
+from sows_events.models import SowFarrow
 from transactions.models import PigletsTransaction, SowTransaction
 
 
@@ -27,6 +29,8 @@ class PigletsViewSetTest(APITestCase):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
+        sows_events_testings.create_types()
+
         self.user = staff_testing.create_employee()
         self.client.force_authenticate(user=self.user)
 
@@ -312,6 +316,16 @@ class PigletsViewSetTest(APITestCase):
 
         response = self.client.post('/api/piglets/%s/move_gilts_to_ws75/' % piglets5_2.pk)
         self.assertEqual(response.data['message'], 'Перевод прошел успешно.')
+
+    def test_create_gilt(self):
+        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        sow = sows_testing.create_sow_with_semination_usound(location, 1)
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+        piglets = farrow.piglets_group
+
+        response = self.client.post('/api/piglets/%s/create_gilt/' % piglets.pk,
+            {'mother_sow_farm_id': sow.farm_id, 'birth_id': '1s'})
+        self.assertEqual(response.data['message'], 'Ремонтная свинка создана успешно.')
 
 
 class PigletsFilterTest(APITestCase):
