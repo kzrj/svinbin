@@ -278,7 +278,10 @@ class Sow(Pig):
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow_farm_id, piglets):
-        mother_sow = Sow.objects.get(farm_id=mother_sow_farm_id)
+        mother_sow = Sow.objects.filter(farm_id=mother_sow_farm_id).first()
+
+        if not mother_sow:
+            raise DjangoValidationError(message=f'Нет свиноматки с {mother_sow_farm_id}.')
         
         if not mother_sow.tour:
             raise DjangoValidationError(message=f'У свиноматки {mother_sow.farm_id} не текущего тура.')
