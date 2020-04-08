@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
+import re
 from xlrd import open_workbook, xldate_as_tuple
 
 from django.test import TestCase
@@ -189,11 +190,11 @@ class FarmImportXlsTest(TestCase):
         seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
             import_farm.create_semination_lists(rows, shmigina)
 
-        print(Sow.objects.get_queryset_with_not_alive().filter(farm_id=2376))
+        self.assertEqual(Sow.objects.get_queryset_with_not_alive()
+            .filter(tour__week_number=51).count(), 75)
 
-        
 
-        
+       
 # class FarmImportJsonTest(TestCase):
 #     def setUp(self):
 #         locaions_testing.create_workshops_sections_and_cells()
