@@ -183,6 +183,9 @@ class SowFarrowManager(CoreModelManager):
                 )
 
         sow.change_status_to('Опоросилась')
+
+        if alive_quantity <= 0:
+            piglets.deactivate()
         
         if sow.location.piglets.all().count() > 1:
             # merge piglets

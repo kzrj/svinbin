@@ -70,10 +70,10 @@ class FarmImportXlsTest(TestCase):
 
         # sows in another tour still
         rows3 = [
-            [1, '1a', 1, '1925', timezone.now(), 1, 'ШМЫГИ', 2, 'ШМЫГИ'],
-            [2, '2a', 1, '1925', timezone.now(), 12, 'БОРИС', 23, 'БОРИС'],
-            [3, '3a', 1, '1925', timezone.now(), 13, 'СЕМЕН', 24, 'СЕМЕН'],
-            [4, '4a', 1, '1925', timezone.now(), 14, 'ШМЫГИ', 25, 'ШМЫГИ'],
+            [1, '1a', 1, '1923', timezone.now(), 1, 'ШМЫГИ', 2, 'ШМЫГИ'],
+            [2, '2a', 1, '1923', timezone.now(), 12, 'БОРИС', 23, 'БОРИС'],
+            [3, '3a', 1, '1923', timezone.now(), 13, 'СЕМЕН', 24, 'СЕМЕН'],
+            [4, '4a', 1, '1923', timezone.now(), 14, 'ШМЫГИ', 25, 'ШМЫГИ'],
         ]
 
         seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
@@ -88,7 +88,7 @@ class FarmImportXlsTest(TestCase):
             [1, '1a', 1, '1924', timezone.now(), 1, 'ШМЫГИ', 2, 'ШМЫГИ'],
             [2, '2a', 1, '1924', timezone.now(), 12, 'БОРИС', 23, 'БОРИС'],
             [3, '3a', 1, '1924', timezone.now(), 13, 'СЕМЕН', 24, 'СЕМЕН'],
-            [4, '4a', 1, '1925', timezone.now(), 14, 'ШМЫГИ', 25, 'ШМЫГИ'],
+            [4, '4a', 1, '1923', timezone.now(), 14, 'ШМЫГИ', 25, 'ШМЫГИ'],
             [5, '5a', 1, '1924', timezone.now(), 14, 'ШМЫГИ', 25, 'ШМЫГИ'],
         ]
 
@@ -179,6 +179,18 @@ class FarmImportXlsTest(TestCase):
 
         seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
             import_farm.create_semination_lists(rows, shmigina)
+
+    def test_missing_sow(self):
+        # грузили 51-52 туры, на завелась свиноматка 2376
+        wb = open_workbook('../data/51-52.xls')
+        rows = import_farm.get_semenation_rows(wb)
+        shmigina = staff_testings.create_employee('ШМЫГИ')
+
+        seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
+            import_farm.create_semination_lists(rows, shmigina)
+
+        print(Sow.objects.get_queryset_with_not_alive().filter(farm_id=2376))
+
         
 
         

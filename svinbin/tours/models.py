@@ -141,6 +141,10 @@ class MetaTourRecordManager(CoreModelManager):
 
     def create_record(self, metatour, tour, quantity, total_quantity):
         # total quantity is quantity by all metatour records
+        if quantity <= 0 or total_quantity <= 0:
+            quantity = 1
+            total_quantity = 1
+            
         percentage = (quantity * 100) / total_quantity
         note = None
         # validate

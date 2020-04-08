@@ -20,6 +20,8 @@ def init_wb(file_from_request): # to test
     return wb
 
 def normalize_row(row, workbook): # to test
+    # if '23' in row[0]:
+    #     print('Finded normalize', row[0])
     row[0] = int(row[0]) # farm_id to int
     row[4] = datetime.datetime(*xldate_as_tuple(row[4], workbook.datemode))
     if row[5] == '*' or row[5] == '**':
@@ -35,6 +37,24 @@ def normalize_row(row, workbook): # to test
     return row
 
 def define_match_row_and_convert_datetime(row_values): # to test
+    try:
+        if '2376' in row_values[0]:
+            print('Finded in define', row_values[0])
+            if len(row_values) > 3:
+                print('len(row_values) > 3')
+                if re.match(r'^[0-9]+$', str(row_values[0])):
+                    print("re.match(r'^[0-9]+$', str(row_values[0]))")
+                    print(row_values[0])
+                    print(row_values[1])
+                    if re.match(re.match(r'^[0-9A-Z]+$', str(row_values[1]))):
+                        print("re.match(r'^[0-9A-Z]+$', str(row_values[1]))")
+                        if re.match(re.match(r'^[0-9]{4}$', str(row_values[3]))):
+                            print("re.match(r'^[0-9]{4}$', str(row_values[3]))")
+                    else:
+                        print('row_values[1]', row_values[1])
+            print("___________________________________@@_____________________________________________")
+    except:
+        pass
     if len(row_values) > 3 and \
         re.match(r'^[0-9]+$', str(row_values[0])) and \
         re.match(r'^[0-9A-Z]+$', str(row_values[1])) and \
@@ -52,6 +72,7 @@ def get_semenation_rows(workbook): # to test
                 if len(str(s.cell(row,col).value).strip()) > 0:
                     row_values.append(s.cell(row, col).value)
             if define_match_row_and_convert_datetime(row_values):
+                # if ro
                 row_values = normalize_row(row_values, workbook)
                 rows.append(row_values)
     return rows
@@ -67,6 +88,9 @@ def create_semination_lists(rows, request_user):
     for row in rows:
         tour = Tour.objects.create_or_return_by_raw(row[3], row[4])
         sow, created = Sow.objects.create_or_return(row[0])
+
+        if row[0] == 2376:
+            print('Finded!')
 
         if sow.alive == False:
             continue
