@@ -3,12 +3,14 @@ import datetime
 
 from django.test import TestCase
 from django.utils import timezone
+from django.db import models
 
 from tours.models import Tour, MetaTour, MetaTourRecord
 from sows.models import Sow
 from sows_events.models import Semination, Ultrasound, SowFarrow
 from locations.models import Location
 from piglets.models import Piglets
+from piglets_events.models import PigletsMerger
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as pigs_testings
@@ -266,3 +268,112 @@ class TestMetaTourRecordModel(TestCase):
             isinstance(meta_tour.records_repr()[1]['days_left_from_farrow_approx'], str), True)
 
         self.assertEqual(isinstance(meta_tour.records_repr()[1]['days_left_from_farrow'], str), False)
+
+
+class TourQuerysetTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        pigs_testings.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        location1 = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        sow1 = pigs_testings.create_sow_with_semination_usound(location=location1, week=1)
+        farrow = SowFarrow.objects.create_sow_farrow(
+            sow=sow1,
+            alive_quantity=10,
+            dead_quantity=0,
+            mummy_quantity=0
+            )
+
+        location2 = Location.objects.filter(sowAndPigletsCell__isnull=False)[1]
+        sow2 = pigs_testings.create_sow_with_semination_usound(location=location2, week=1)
+        farrow = SowFarrow.objects.create_sow_farrow(
+            sow=sow2,
+            alive_quantity=12,
+            dead_quantity=5,
+            mummy_quantity=1
+            )
+
+        location3 = Location.objects.filter(sowAndPigletsCell__isnull=False)[2]
+        sow3 = pigs_testings.create_sow_with_semination_usound(location=location3, week=1)
+        farrow = SowFarrow.objects.create_sow_farrow(
+            sow=sow3,
+            alive_quantity=13,
+            dead_quantity=3,
+            mummy_quantity=2
+            )
+
+        location4 = Location.objects.filter(sowAndPigletsCell__isnull=False)[3]
+        sow4 = pigs_testings.create_sow_with_semination_usound(location=location4, week=2)
+        farrow = SowFarrow.objects.create_sow_farrow(
+            sow=sow4,
+            alive_quantity=19,
+            dead_quantity=3,
+            mummy_quantity=2
+            )
+
+        location5 = Location.objects.filter(sowAndPigletsCell__isnull=False)[4]
+        sow5 = pigs_testings.create_sow_with_semination_usound(location=location5, week=2)
+        farrow = SowFarrow.objects.create_sow_farrow(
+            sow=sow5,
+            alive_quantity=14,
+            dead_quantity=0,
+            mummy_quantity=0
+            )
+
+        # piglets without farrow
+        self.loc_ws5 = Location.objects.get(workshop__number=5)
+        piglets11 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        piglets12 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 100)
+
+         # merged piglets
+        piglets13 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        piglets14 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+
+        self.loc_cell_ws5_1 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[0]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets13, piglets14], new_location=self.loc_cell_ws5_1)
+
+        piglets15 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets16 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+
+        loc_cell_ws5_2 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[1]
+        merged_piglets2 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets15, piglets16], new_location=loc_cell_ws5_2)
+
+    def test_add_farrow_data(self):
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_farrow_data()
+            bool(tours)
+            self.assertEqual(tours[0].total_born_alive, 35)
+            self.assertEqual(tours[0].total_born_dead, 8)
+            self.assertEqual(tours[0].total_born_mummy, 3)
+
+            self.assertEqual(tours[1].total_born_alive, 33)
+            self.assertEqual(tours[1].total_born_dead, 3)
+            self.assertEqual(tours[1].total_born_mummy, 2)
+
+
+    def test_add_current_not_mixed_piglets_quantity(self):
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_current_not_mixed_piglets_quantity()
+            bool(tours)
+            self.assertEqual(tours[0].total_not_mixed_piglets, 135)
+            self.assertEqual(tours[1].total_not_mixed_piglets, 133)
+
+    def test_add_current_mixed_piglets_quantity(self):
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_current_mixed_piglets_quantity()
+            bool(tours)
+            self.assertEqual(tours[0].total_mixed_piglets, 130)
+            self.assertEqual(tours[1].total_mixed_piglets, 100)

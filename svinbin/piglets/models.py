@@ -46,6 +46,26 @@ class PigletsQuerySet(models.QuerySet):
     def with_tour_mixed(self, week_number):
         return self.filter(metatour__records__tour__week_number=week_number, metatour__records__percentage__lt=100)
 
+    def count_piglets_in_mixed_groups(self, week_number):
+        subquery = MetaTourRecord.objects.filter(metatour__piglets__pk=models.OuterRef('pk'), tour__week_number=week_number) \
+            .values('quantity')
+
+        return self.with_tour_mixed(week_number=week_number).annotate(
+            count_piglets=models.Subquery(subquery, output_field=models.IntegerField())
+            ).aggregate(models.Sum('count_piglets'))['count_piglets__sum']
+
+    def count_piglets_in_mixed_group_annotate(self, week_number):
+        subquery = MetaTourRecord.objects.filter(metatour__piglets__pk=models.OuterRef('pk'), 
+                                                    tour__week_number=week_number) \
+                                        .values('quantity')
+
+        return self.with_tour_mixed(week_number=week_number) \
+                    .annotate(
+                        count_piglets=models.Subquery(subquery, output_field=models.IntegerField())
+                    ) 
+                    # .annotate(cnt=models.Sum('count_piglets')).values('cnt')[:1]
+
+
     def all_in_workshop(self, workshop_number):
         return self.filter(Q(
             Q(location__workshop__number=workshop_number) |

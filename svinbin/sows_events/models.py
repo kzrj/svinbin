@@ -145,6 +145,33 @@ class SowFarrowQuerySet(models.QuerySet):
     def get_by_tour_and_sow_location(self, tour, sow_location):
         return self.filter(sow__location=sow_location, tour=tour)
 
+    def count_piglets(self):
+        return self.aggregate(total_alive=models.Sum('alive_quantity'), total_dead=models.Sum('dead_quantity'),
+            total_mummy=models.Sum('mummy_quantity'))
+
+    def count_piglets_by_tour_annotate(self):
+        subquery_alive = self.filter(tour=models.OuterRef('tour')) \
+                            .values('tour') \
+                            .annotate(
+                                total_alive=models.Sum('alive_quantity'))\
+                            .values('total_alive')
+
+        subquery_dead = self.filter(tour=models.OuterRef('tour')) \
+                            .values('tour') \
+                            .annotate(total_dead=models.Sum('dead_quantity'))\
+                            .values('total_dead')
+
+        subquery_mummy = self.filter(tour=models.OuterRef('tour')) \
+                            .values('tour') \
+                            .annotate(total_mummy=models.Sum('mummy_quantity'))\
+                            .values('total_mummy')
+
+        return self.annotate(
+            total_alive=models.Subquery(subquery_alive, output_field=models.IntegerField()),
+            total_dead=models.Subquery(subquery_dead, output_field=models.IntegerField()),
+            total_mummy=models.Subquery(subquery_mummy, output_field=models.IntegerField()),
+            )
+
 
 class SowFarrowManager(CoreModelManager):
     def get_queryset(self):

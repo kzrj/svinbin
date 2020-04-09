@@ -11,7 +11,51 @@ from piglets import models as piglets_models
 
 
 class TourQuerySet(models.QuerySet):
-    pass
+    def add_farrow_data(self):
+        subquery_alive = events_models.SowFarrow.objects.filter(tour__pk=models.OuterRef('pk')) \
+                            .values('tour') \
+                            .annotate(total_alive=models.Sum('alive_quantity')) \
+                            .values('total_alive')
+
+        subquery_dead = events_models.SowFarrow.objects.filter(tour__pk=models.OuterRef('pk')) \
+                            .values('tour') \
+                            .annotate(total_dead=models.Sum('dead_quantity')) \
+                            .values('total_dead')
+
+        subquery_mummy = events_models.SowFarrow.objects.filter(tour__pk=models.OuterRef('pk')) \
+                            .values('tour') \
+                            .annotate(total_mummy=models.Sum('mummy_quantity')) \
+                            .values('total_mummy')
+
+        return self.annotate(
+            total_born_alive=models.Subquery(subquery_alive, output_field=models.IntegerField()),
+            total_born_dead=models.Subquery(subquery_dead, output_field=models.IntegerField()),
+            total_born_mummy=models.Subquery(subquery_mummy, output_field=models.IntegerField()),
+            )
+
+    def add_current_not_mixed_piglets_quantity(self):
+        subquery_piglets = piglets_models.Piglets.objects.all() \
+            .with_tour_not_mixed(week_number=models.OuterRef('week_number')) \
+                            .values('metatour__records__tour') \
+                            .annotate(qnty=models.Sum('quantity')) \
+                            .values('qnty')
+
+        return self.annotate(
+            total_not_mixed_piglets=models.Subquery(subquery_piglets, output_field=models.IntegerField()),
+            )
+
+    def add_current_mixed_piglets_quantity(self):
+        subquery = MetaTourRecord.objects.filter(tour__pk=models.OuterRef('pk'),
+                                                 percentage__lt=100,
+                                                 metatour__piglets__active=True
+                                                 ) \
+                                        .values('tour') \
+                                        .annotate(qnty=models.Sum('quantity')) \
+                                        .values('qnty')
+
+        return self.annotate(
+            total_mixed_piglets=models.Subquery(subquery, output_field=models.IntegerField()),
+            ) 
 
 
 class TourManager(CoreModelManager):
@@ -55,7 +99,7 @@ class TourManager(CoreModelManager):
         return self.get_or_create_by_week(week_number, semination_date.year, semination_date)
 
     def get_tours_by_piglets(self, piglets):
-        return self.get_queryset().filter(metatourrecords__metatour__piglets__in=piglets)
+        return self.get_queryset().filter(metatourrecords__metatour__piglets__in=piglets).distinct()
 
 
 class Tour(CoreModel):
