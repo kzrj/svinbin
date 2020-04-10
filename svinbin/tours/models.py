@@ -1,5 +1,6 @@
 import datetime
 from django.db import models
+from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg
 from django.utils import timezone
 from django.apps import apps
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -8,54 +9,144 @@ from core.models import CoreModel, CoreModelManager
 from sows_events import models as events_models
 from sows import models as sows_models
 from piglets import models as piglets_models
+# from piglets_events import models as piglets_events_models
+import piglets_events
 
 
 class TourQuerySet(models.QuerySet):
     def add_farrow_data(self):
-        subquery_alive = events_models.SowFarrow.objects.filter(tour__pk=models.OuterRef('pk')) \
+        subquery_alive = events_models.SowFarrow.objects.filter(tour__pk=OuterRef('pk')) \
                             .values('tour') \
                             .annotate(total_alive=models.Sum('alive_quantity')) \
                             .values('total_alive')
 
-        subquery_dead = events_models.SowFarrow.objects.filter(tour__pk=models.OuterRef('pk')) \
+        subquery_dead = events_models.SowFarrow.objects.filter(tour__pk=OuterRef('pk')) \
                             .values('tour') \
                             .annotate(total_dead=models.Sum('dead_quantity')) \
                             .values('total_dead')
 
-        subquery_mummy = events_models.SowFarrow.objects.filter(tour__pk=models.OuterRef('pk')) \
+        subquery_mummy = events_models.SowFarrow.objects.filter(tour__pk=OuterRef('pk')) \
                             .values('tour') \
                             .annotate(total_mummy=models.Sum('mummy_quantity')) \
                             .values('total_mummy')
 
         return self.annotate(
-            total_born_alive=models.Subquery(subquery_alive, output_field=models.IntegerField()),
-            total_born_dead=models.Subquery(subquery_dead, output_field=models.IntegerField()),
-            total_born_mummy=models.Subquery(subquery_mummy, output_field=models.IntegerField()),
+            total_born_alive=Subquery(subquery_alive, output_field=models.IntegerField()),
+            total_born_dead=Subquery(subquery_dead, output_field=models.IntegerField()),
+            total_born_mummy=Subquery(subquery_mummy, output_field=models.IntegerField()),
             )
 
     def add_current_not_mixed_piglets_quantity(self):
         subquery_piglets = piglets_models.Piglets.objects.all() \
-            .with_tour_not_mixed(week_number=models.OuterRef('week_number')) \
+            .with_tour_not_mixed(week_number=OuterRef('week_number')) \
                             .values('metatour__records__tour') \
-                            .annotate(qnty=models.Sum('quantity')) \
+                            .annotate(qnty=Sum('quantity')) \
                             .values('qnty')
 
         return self.annotate(
-            total_not_mixed_piglets=models.Subquery(subquery_piglets, output_field=models.IntegerField()),
+            total_not_mixed_piglets=Subquery(subquery_piglets, output_field=models.FloatField()),
             )
 
     def add_current_mixed_piglets_quantity(self):
-        subquery = MetaTourRecord.objects.filter(tour__pk=models.OuterRef('pk'),
+        subquery = MetaTourRecord.objects.filter(tour__pk=OuterRef('pk'),
                                                  percentage__lt=100,
                                                  metatour__piglets__active=True
                                                  ) \
                                         .values('tour') \
-                                        .annotate(qnty=models.Sum('quantity')) \
+                                        .annotate(qnty=Sum('quantity')) \
                                         .values('qnty')
 
         return self.annotate(
-            total_mixed_piglets=models.Subquery(subquery, output_field=models.IntegerField()),
-            ) 
+            total_mixed_piglets=Subquery(subquery, output_field=models.FloatField()),
+            )
+
+    def gen_weight_subquery(self, piglets_subquery, place):
+        return piglets_events.models.WeighingPiglets.objects.filter(
+                                piglets_group__in=Subquery(piglets_subquery), place=place) \
+                            .values('piglets_group__metatour__records__tour') \
+                            .annotate(weight=Sum('total_weight')) \
+                            .values('weight')
+
+    def add_weight_data_not_mixed(self):
+        subquery_piglets = MetaTourRecord.objects \
+            .filter(tour__pk=OuterRef(OuterRef('pk')), percentage=100) \
+            .values('metatour__piglets')
+
+        subquery_3_4 = self.gen_weight_subquery(subquery_piglets, '3/4')
+        subquery_4_8 = self.gen_weight_subquery(subquery_piglets, '4/8')
+        subquery_8_5 = self.gen_weight_subquery(subquery_piglets, '8/5')
+        subquery_8_6 = self.gen_weight_subquery(subquery_piglets, '8/6')
+        subquery_8_7 = self.gen_weight_subquery(subquery_piglets, '8/7')
+        
+        return self.annotate(
+            total_weight_not_mixed_3_4=Subquery(subquery_3_4, output_field=models.FloatField()),
+            total_weight_not_mixed_4_8=Subquery(subquery_4_8, output_field=models.FloatField()),
+            total_weight_not_mixed_8_5=Subquery(subquery_8_5, output_field=models.FloatField()),
+            total_weight_not_mixed_8_6=Subquery(subquery_8_6, output_field=models.FloatField()),
+            total_weight_not_mixed_8_7=Subquery(subquery_8_7, output_field=models.FloatField()),
+            )
+
+    def gen_weight_mixed_subquery(self, subquery_mixed_piglets, subquery_percent, place):
+        return piglets_events.models.WeighingPiglets.objects.filter(
+                                piglets_group__in=Subquery(subquery_mixed_piglets), place=place) \
+                            .values('piglets_group__metatour__records__tour') \
+                            .annotate(weight=ExpressionWrapper(
+                                (F('total_weight')  * Subquery(subquery_percent,
+                                                                 output_field=models.FloatField()) / 100),
+                                output_field=models.FloatField())) \
+                            .values('piglets_group__metatour__records__tour') \
+                            .annotate(all_weight=Sum('weight')) \
+                            .values('all_weight')[:1]
+
+    def add_weight_data_mixed(self):
+        subquery_mixed_piglets = MetaTourRecord.objects \
+            .filter(tour__pk=OuterRef(OuterRef('pk')), percentage__lt=100) \
+            .values('metatour__piglets')
+
+        subquery_percent = MetaTourRecord.objects.filter(metatour__piglets=OuterRef('piglets_group'),
+                 tour=OuterRef(OuterRef('pk'))) \
+            .annotate(percentages=Sum('percentage')) \
+            .values('percentages')
+
+        subquery_3_4 = self.gen_weight_mixed_subquery(subquery_mixed_piglets, subquery_percent, '3/4')
+        subquery_4_8 = self.gen_weight_mixed_subquery(subquery_mixed_piglets, subquery_percent, '4/8')
+        subquery_8_5 = self.gen_weight_mixed_subquery(subquery_mixed_piglets, subquery_percent, '8/5')
+        subquery_8_6 = self.gen_weight_mixed_subquery(subquery_mixed_piglets, subquery_percent, '8/6')
+        subquery_8_7 = self.gen_weight_mixed_subquery(subquery_mixed_piglets, subquery_percent, '8/7')
+
+        return self.annotate(
+            total_weight_mixed_3_4=Subquery(subquery_3_4, output_field=models.FloatField()),
+            total_weight_mixed_4_8=Subquery(subquery_4_8, output_field=models.FloatField()),
+            total_weight_mixed_8_5=Subquery(subquery_8_5, output_field=models.FloatField()),
+            total_weight_mixed_8_6=Subquery(subquery_8_6, output_field=models.FloatField()),
+            total_weight_mixed_8_7=Subquery(subquery_8_7, output_field=models.FloatField()),
+            )
+
+    def gen_avg_weight_subquery(self, piglets_subquery, place):
+        return piglets_events.models.WeighingPiglets.objects.filter(
+                                piglets_group__in=Subquery(piglets_subquery), place=place) \
+                            .values('place') \
+                            .annotate(weight=Avg('average_weight')) \
+                            .values('weight')
+
+    def add_avg_weight_data(self):
+        subquery_piglets = MetaTourRecord.objects \
+            .filter(tour__pk=OuterRef(OuterRef('pk'))) \
+            .values('metatour__piglets')
+
+        subquery_3_4 = self.gen_avg_weight_subquery(subquery_piglets, '3/4')
+        subquery_4_8 = self.gen_avg_weight_subquery(subquery_piglets, '4/8')
+        subquery_8_5 = self.gen_avg_weight_subquery(subquery_piglets, '8/5')
+        subquery_8_6 = self.gen_avg_weight_subquery(subquery_piglets, '8/6')
+        subquery_8_7 = self.gen_avg_weight_subquery(subquery_piglets, '8/7')
+        
+        return self.annotate(
+            avg_weight_3_4=Subquery(subquery_3_4, output_field=models.FloatField()),
+            avg_weight_4_8=Subquery(subquery_4_8, output_field=models.FloatField()),
+            avg_weight_8_5=Subquery(subquery_8_5, output_field=models.FloatField()),
+            avg_weight_8_6=Subquery(subquery_8_6, output_field=models.FloatField()),
+            avg_weight_8_7=Subquery(subquery_8_7, output_field=models.FloatField()),
+            )
 
 
 class TourManager(CoreModelManager):

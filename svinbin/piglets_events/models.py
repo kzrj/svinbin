@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import Event, CoreModel, CoreModelManager
-from piglets.models import Piglets, PigletsStatus
+from piglets.models import Piglets
 from locations.models import Location
 from tours.models import MetaTour, MetaTourRecord, Tour
 

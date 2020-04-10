@@ -10,7 +10,7 @@ from sows.models import Sow
 from sows_events.models import Semination, Ultrasound, SowFarrow
 from locations.models import Location
 from piglets.models import Piglets
-from piglets_events.models import PigletsMerger
+from piglets_events.models import PigletsMerger, WeighingPiglets
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as pigs_testings
@@ -377,3 +377,108 @@ class TourQuerysetTest(TestCase):
             bool(tours)
             self.assertEqual(tours[0].total_mixed_piglets, 130)
             self.assertEqual(tours[1].total_mixed_piglets, 100)
+
+    def test_add_weight_data_not_mixed(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1100, place='3/4')
+
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=1300, place='3/4')
+
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+
+        loc_cell_ws5_2 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_2)
+        WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets1, total_weight=1200,
+         place='3/4')
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=2600, place='4/8')
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_weight_data_not_mixed()
+            bool(tours)
+            self.assertEqual(tours[0].total_weight_not_mixed_3_4, 2400)
+            self.assertEqual(tours[0].total_weight_not_mixed_4_8, 2600)
+
+    def test_add_weight_data_mixed(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1100, place='3/4')
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=2600, place='4/8')
+
+        # mixed tour piglets
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+        WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets1, total_weight=1000,
+         place='3/4')
+
+        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 20)
+        piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 80)
+        loc_cell_ws5_4 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[3]
+        merged_piglets2 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets6, piglets7], new_location=loc_cell_ws5_4)
+        WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets2, total_weight=1000,
+         place='3/4')
+
+        WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets2, total_weight=1000,
+         place='4/8')
+
+        WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets2, total_weight=2000,
+         place='8/5')
+
+        WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets1, total_weight=2000,
+         place='8/5')
+        merged_piglets1.deactivate()
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_weight_data_mixed()
+            bool(tours)            
+            self.assertEqual(tours[0].total_weight_mixed_3_4, 500)
+            self.assertEqual(tours[0].total_weight_mixed_4_8, 200)
+            self.assertEqual(tours[0].total_weight_mixed_8_5, 1000)
+
+    def test_add_avg_weight_data(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1100, place='3/4')
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=2600, place='4/8')
+
+        # mixed tour piglets
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+        WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets1, total_weight=1000,
+         place='3/4')
+
+        merged_piglets1.deactivate()
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_avg_weight_data()
+            bool(tours)            
+            self.assertEqual(tours[0].avg_weight_3_4, 10.5)
+            
