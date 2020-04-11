@@ -10,7 +10,7 @@ from sows.models import Sow
 from sows_events.models import Semination, Ultrasound, SowFarrow
 from locations.models import Location
 from piglets.models import Piglets
-from piglets_events.models import PigletsMerger, WeighingPiglets
+from piglets_events.models import PigletsMerger, WeighingPiglets, CullingPiglets
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as pigs_testings
@@ -482,3 +482,127 @@ class TourQuerysetTest(TestCase):
             bool(tours)            
             self.assertEqual(tours[0].avg_weight_3_4, 10.5)
             
+    def test_add_culling_weight_not_mixed_piglets(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 100)
+
+        # mixed tour piglets
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+
+        piglets1.deactivate()
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
+         quantity=1, total_weight=19)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
+         quantity=1, total_weight=11)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3, culling_type='padej',
+         quantity=1, total_weight=15)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3, culling_type='padej',
+         quantity=10, total_weight=175)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=merged_piglets1, culling_type='padej',
+         quantity=10, total_weight=210)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='spec',
+         quantity=50, total_weight=525)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='prirezka',
+         quantity=1, total_weight=None)
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_culling_weight_not_mixed_piglets()
+            bool(tours)
+            self.assertEqual(tours[0].padej_weight, 30)
+            self.assertEqual(tours[0].spec_weight, 525)
+            self.assertEqual(tours[0].prirezka_weight, None)
+            self.assertEqual(tours[1].padej_weight, 190)
+
+    def test_add_culling_qnty_not_mixed_piglets(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 100)
+
+        # mixed tour piglets
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+
+        piglets1.deactivate()
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
+         quantity=1, total_weight=19)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
+         quantity=1, total_weight=11)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3, culling_type='padej',
+         quantity=1, total_weight=15)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3, culling_type='padej',
+         quantity=10, total_weight=175)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=merged_piglets1, culling_type='padej',
+         quantity=10, total_weight=210)
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_culling_qnty_not_mixed_piglets()
+            bool(tours)
+            self.assertEqual(tours[0].padej_quantity, 2)
+            self.assertEqual(tours[1].padej_quantity, 11)
+
+    def test_add_culling_avg_weight_not_mixed_piglets(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 100)
+
+        # mixed tour piglets
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+
+        piglets1.deactivate()
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
+         quantity=1, total_weight=19)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
+         quantity=1, total_weight=11)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3, culling_type='padej',
+         quantity=1, total_weight=15)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3, culling_type='padej',
+         quantity=10, total_weight=175)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=merged_piglets1, culling_type='padej',
+         quantity=10, total_weight=210)
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_culling_avg_weight_not_mixed_piglets()
+            bool(tours)
+            self.assertEqual(tours[0].padej_avg_weight, 15)
+            self.assertEqual(tours[1].padej_avg_weight, 16.25)

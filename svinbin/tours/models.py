@@ -60,6 +60,16 @@ class TourQuerySet(models.QuerySet):
             total_mixed_piglets=Subquery(subquery, output_field=models.FloatField()),
             )
 
+    def gen_not_mixed_piglets_subquery(self):
+        return MetaTourRecord.objects \
+            .filter(tour__pk=OuterRef(OuterRef('pk')), percentage=100) \
+            .values('metatour__piglets')
+
+    def gen_mixed_piglets_subquery(self):
+        return MetaTourRecord.objects \
+            .filter(tour__pk=OuterRef(OuterRef('pk')), percentage__lt=100) \
+            .values('metatour__piglets')
+
     def gen_weight_subquery(self, piglets_subquery, place):
         return piglets_events.models.WeighingPiglets.objects.filter(
                                 piglets_group__in=Subquery(piglets_subquery), place=place) \
@@ -68,9 +78,7 @@ class TourQuerySet(models.QuerySet):
                             .values('weight')
 
     def add_weight_data_not_mixed(self):
-        subquery_piglets = MetaTourRecord.objects \
-            .filter(tour__pk=OuterRef(OuterRef('pk')), percentage=100) \
-            .values('metatour__piglets')
+        subquery_piglets = self.gen_not_mixed_piglets_subquery()
 
         subquery_3_4 = self.gen_weight_subquery(subquery_piglets, '3/4')
         subquery_4_8 = self.gen_weight_subquery(subquery_piglets, '4/8')
@@ -99,9 +107,7 @@ class TourQuerySet(models.QuerySet):
                             .values('all_weight')[:1]
 
     def add_weight_data_mixed(self):
-        subquery_mixed_piglets = MetaTourRecord.objects \
-            .filter(tour__pk=OuterRef(OuterRef('pk')), percentage__lt=100) \
-            .values('metatour__piglets')
+        subquery_mixed_piglets = self.gen_mixed_piglets_subquery()
 
         subquery_percent = MetaTourRecord.objects.filter(metatour__piglets=OuterRef('piglets_group'),
                  tour=OuterRef(OuterRef('pk'))) \
@@ -146,6 +152,73 @@ class TourQuerySet(models.QuerySet):
             avg_weight_8_5=Subquery(subquery_8_5, output_field=models.FloatField()),
             avg_weight_8_6=Subquery(subquery_8_6, output_field=models.FloatField()),
             avg_weight_8_7=Subquery(subquery_8_7, output_field=models.FloatField()),
+            )
+
+    def gen_culling_weight_subquery(self, subquery_piglets, culling_type):
+        return piglets_events.models.CullingPiglets.objects.filter(
+                                piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type) \
+                            .values('culling_type') \
+                            .annotate(all_weight=Sum('total_weight')) \
+                            .values('all_weight')
+
+    def add_culling_weight_not_mixed_piglets(self):
+        subquery_piglets = self.gen_not_mixed_piglets_subquery()
+
+        subquery_padej = self.gen_culling_weight_subquery(subquery_piglets, 'padej')
+        subquery_prirezka = self.gen_culling_weight_subquery(subquery_piglets, 'prirezka')
+        subquery_vinuzhd = self.gen_culling_weight_subquery(subquery_piglets, 'vinuzhd')
+        subquery_spec = self.gen_culling_weight_subquery(subquery_piglets, 'spec')
+
+        return self.annotate(
+            padej_weight=Subquery(subquery_padej, output_field=models.FloatField()),
+            prirezka_weight=Subquery(subquery_prirezka, output_field=models.FloatField()),
+            vinuzhd_weight=Subquery(subquery_vinuzhd, output_field=models.FloatField()),
+            spec_weight=Subquery(subquery_spec, output_field=models.FloatField()),
+            )
+
+    def gen_culling_qnty_subquery(self, subquery_piglets, culling_type):
+        return piglets_events.models.CullingPiglets.objects.filter(
+                                piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type) \
+                            .values('culling_type') \
+                            .annotate(all_qnty=Sum('quantity')) \
+                            .values('all_qnty')
+
+    def add_culling_qnty_not_mixed_piglets(self):
+        subquery_piglets = self.gen_not_mixed_piglets_subquery()
+
+        subquery_padej = self.gen_culling_qnty_subquery(subquery_piglets, 'padej')
+        subquery_prirezka = self.gen_culling_qnty_subquery(subquery_piglets, 'prirezka')
+        subquery_vinuzhd = self.gen_culling_qnty_subquery(subquery_piglets, 'vinuzhd')
+        subquery_spec = self.gen_culling_qnty_subquery(subquery_piglets, 'spec')
+
+        return self.annotate(
+            padej_quantity=Subquery(subquery_padej, output_field=models.IntegerField()),
+            prirezka_quantity=Subquery(subquery_prirezka, output_field=models.IntegerField()),
+            vinuzhd_quantity=Subquery(subquery_vinuzhd, output_field=models.IntegerField()),
+            spec_quantity=Subquery(subquery_spec, output_field=models.IntegerField()),
+            )
+
+    def gen_culling_avg_weight_subquery(self, subquery_piglets, culling_type):
+        return piglets_events.models.CullingPiglets.objects.filter(
+                                piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type) \
+                            .values('culling_type') \
+                            .annotate(padej_avg_weight=Avg(F('total_weight') / F('quantity'),
+                                                                output_field=models.FloatField())) \
+                            .values('padej_avg_weight')
+
+    def add_culling_avg_weight_not_mixed_piglets(self):
+        subquery_piglets = self.gen_not_mixed_piglets_subquery()
+
+        subquery_padej = self.gen_culling_avg_weight_subquery(subquery_piglets, 'padej')
+        subquery_prirezka = self.gen_culling_avg_weight_subquery(subquery_piglets, 'prirezka')
+        subquery_vinuzhd = self.gen_culling_avg_weight_subquery(subquery_piglets, 'vinuzhd')
+        subquery_spec = self.gen_culling_avg_weight_subquery(subquery_piglets, 'spec')
+
+        return self.annotate(
+            padej_avg_weight=Subquery(subquery_padej, output_field=models.FloatField()),
+            prirezka_avg_weight=Subquery(subquery_padej, output_field=models.FloatField()),
+            vinuzhd_avg_weight=Subquery(subquery_padej, output_field=models.FloatField()),
+            spec_avg_weight=Subquery(subquery_padej, output_field=models.FloatField()),
             )
 
 
