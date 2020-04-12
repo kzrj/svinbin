@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg
+from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg, Count
 from django.utils import timezone
 from django.apps import apps
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -14,6 +14,51 @@ import piglets_events
 
 
 class TourQuerySet(models.QuerySet):
+    def add_sow_data(self):
+        subquery_seminated = events_models.Semination.objects.filter(tour__pk=OuterRef('pk')) \
+                            .values('tour') \
+                            .annotate(cnt=Count('sow', distinct=True)) \
+                            .values('cnt')
+
+        subquery_usound28_suporos = events_models.Ultrasound.objects.filter(
+                                            tour__pk=OuterRef('pk'), u_type__days=30, result=True) \
+                            .values('tour') \
+                            .annotate(cnt=Count('sow', distinct=True)) \
+                            .values('cnt')
+
+        subquery_usound28_proholost = events_models.Ultrasound.objects.filter(
+                                            tour__pk=OuterRef('pk'), u_type__days=30, result=False) \
+                            .values('tour') \
+                            .annotate(cnt=Count('sow', distinct=True)) \
+                            .values('cnt')
+
+        subquery_usound35_suporos = events_models.Ultrasound.objects.filter(
+                                            tour__pk=OuterRef('pk'), u_type__days=60, result=True) \
+                            .values('tour') \
+                            .annotate(cnt=Count('sow', distinct=True)) \
+                            .values('cnt')
+
+        subquery_usound35_proholost = events_models.Ultrasound.objects.filter(
+                                            tour__pk=OuterRef('pk'), u_type__days=60, result=False) \
+                            .values('tour') \
+                            .annotate(cnt=Count('sow', distinct=True)) \
+                            .values('cnt')
+
+        subquery_abort = events_models.AbortionSow.objects.filter(tour__pk=OuterRef('pk')) \
+                            .values('tour') \
+                            .annotate(cnt=Count('sow', distinct=True)) \
+                            .values('cnt')
+
+        return self.annotate(
+            count_sow=Count('sows'),
+            count_seminated=Subquery(subquery_seminated),
+            count_usound28_suporos=Subquery(subquery_usound28_suporos),
+            count_usound28_proholost=Subquery(subquery_usound28_proholost),
+            count_usound35_suporos=Subquery(subquery_usound35_suporos),
+            count_usound35_proholost=Subquery(subquery_usound35_proholost),
+            count_abort=Subquery(subquery_abort),
+            )
+
     def add_farrow_data(self):
         subquery_alive = events_models.SowFarrow.objects.filter(tour__pk=OuterRef('pk')) \
                             .values('tour') \
@@ -208,18 +253,42 @@ class TourQuerySet(models.QuerySet):
 
     def add_culling_avg_weight_not_mixed_piglets(self):
         subquery_piglets = self.gen_not_mixed_piglets_subquery()
+        subquery_mixed_piglets = self.gen_mixed_piglets_subquery()
 
         subquery_padej = self.gen_culling_avg_weight_subquery(subquery_piglets, 'padej')
         subquery_prirezka = self.gen_culling_avg_weight_subquery(subquery_piglets, 'prirezka')
         subquery_vinuzhd = self.gen_culling_avg_weight_subquery(subquery_piglets, 'vinuzhd')
         subquery_spec = self.gen_culling_avg_weight_subquery(subquery_piglets, 'spec')
 
+        subquery_mixed_padej = self.gen_culling_avg_weight_subquery(subquery_mixed_piglets, 'padej')
+        subquery_mixed_prirezka = self.gen_culling_avg_weight_subquery(subquery_mixed_piglets, 'prirezka')
+        subquery_mixed_vinuzhd = self.gen_culling_avg_weight_subquery(subquery_mixed_piglets, 'vinuzhd')
+        subquery_mixed_spec = self.gen_culling_avg_weight_subquery(subquery_mixed_piglets, 'spec')
+
         return self.annotate(
             padej_avg_weight=Subquery(subquery_padej, output_field=models.FloatField()),
             prirezka_avg_weight=Subquery(subquery_padej, output_field=models.FloatField()),
             vinuzhd_avg_weight=Subquery(subquery_padej, output_field=models.FloatField()),
             spec_avg_weight=Subquery(subquery_padej, output_field=models.FloatField()),
+
+            padej_avg_weight_mixed=Subquery(subquery_mixed_padej, output_field=models.FloatField()),
+            prirezka_avg_weight_mixed=Subquery(subquery_mixed_prirezka, output_field=models.FloatField()),
+            vinuzhd_avg_weight_mixed=Subquery(subquery_mixed_vinuzhd, output_field=models.FloatField()),
+            spec_avg_weight_mixed=Subquery(subquery_mixed_spec, output_field=models.FloatField()),
             )
+
+    def add_culling_percentage_not_mixed_piglets(self):
+        # use only after add_farrow_data, add_culling_qnty_not_mixed_piglets
+        return self.annotate(
+            padej_percentage=ExpressionWrapper(F('padej_quantity') * 100.0 / F('total_born_alive'),
+                                                            output_field=models.FloatField()),
+            prirezka_percentage=ExpressionWrapper(F('prirezka_quantity') * 100.0 / F('total_born_alive'),
+                                                            output_field=models.FloatField()),
+            vinuzhd_percentage=ExpressionWrapper(F('vinuzhd_quantity') * 100.0 / F('total_born_alive'),
+                                                            output_field=models.FloatField()),
+            spec_percentage=ExpressionWrapper(F('spec_quantity') * 100.0 / F('total_born_alive'),
+                                                            output_field=models.FloatField())
+        )
 
 
 class TourManager(CoreModelManager):

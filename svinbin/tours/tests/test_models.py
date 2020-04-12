@@ -7,7 +7,7 @@ from django.db import models
 
 from tours.models import Tour, MetaTour, MetaTourRecord
 from sows.models import Sow
-from sows_events.models import Semination, Ultrasound, SowFarrow
+from sows_events.models import Semination, Ultrasound, SowFarrow, AbortionSow
 from locations.models import Location
 from piglets.models import Piglets
 from piglets_events.models import PigletsMerger, WeighingPiglets, CullingPiglets
@@ -270,7 +270,7 @@ class TestMetaTourRecordModel(TestCase):
         self.assertEqual(isinstance(meta_tour.records_repr()[1]['days_left_from_farrow'], str), False)
 
 
-class TourQuerysetTest(TestCase):
+class TourQuerysetAddPigletsDataTest(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         pigs_testings.create_statuses()
@@ -281,45 +281,45 @@ class TourQuerysetTest(TestCase):
         self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
 
         location1 = Location.objects.filter(sowAndPigletsCell__number=1).first()
-        sow1 = pigs_testings.create_sow_with_semination_usound(location=location1, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow1,
+        self.sow1 = pigs_testings.create_sow_with_semination_usound(location=location1, week=1)
+        self.farrow1 = SowFarrow.objects.create_sow_farrow(
+            sow=self.sow1,
             alive_quantity=10,
             dead_quantity=0,
             mummy_quantity=0
             )
 
         location2 = Location.objects.filter(sowAndPigletsCell__isnull=False)[1]
-        sow2 = pigs_testings.create_sow_with_semination_usound(location=location2, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow2,
+        self.sow2 = pigs_testings.create_sow_with_semination_usound(location=location2, week=1)
+        self.farrow2 = SowFarrow.objects.create_sow_farrow(
+            sow=self.sow2,
             alive_quantity=12,
             dead_quantity=5,
             mummy_quantity=1
             )
 
         location3 = Location.objects.filter(sowAndPigletsCell__isnull=False)[2]
-        sow3 = pigs_testings.create_sow_with_semination_usound(location=location3, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow3,
+        self.sow3 = pigs_testings.create_sow_with_semination_usound(location=location3, week=1)
+        self.farrow3 = SowFarrow.objects.create_sow_farrow(
+            sow=self.sow3,
             alive_quantity=13,
             dead_quantity=3,
             mummy_quantity=2
             )
 
         location4 = Location.objects.filter(sowAndPigletsCell__isnull=False)[3]
-        sow4 = pigs_testings.create_sow_with_semination_usound(location=location4, week=2)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow4,
+        self.sow4 = pigs_testings.create_sow_with_semination_usound(location=location4, week=2)
+        self.farrow4 = SowFarrow.objects.create_sow_farrow(
+            sow=self.sow4,
             alive_quantity=19,
             dead_quantity=3,
             mummy_quantity=2
             )
 
         location5 = Location.objects.filter(sowAndPigletsCell__isnull=False)[4]
-        sow5 = pigs_testings.create_sow_with_semination_usound(location=location5, week=2)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow5,
+        self.sow5 = pigs_testings.create_sow_with_semination_usound(location=location5, week=2)
+        self.farrow5 = SowFarrow.objects.create_sow_farrow(
+            sow=self.sow5,
             alive_quantity=14,
             dead_quantity=0,
             mummy_quantity=0
@@ -584,6 +584,14 @@ class TourQuerysetTest(TestCase):
         merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
             parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
 
+        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 20)
+        piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 80)
+        loc_cell_ws5_4 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[3]
+        merged_piglets2 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets6, piglets7], new_location=loc_cell_ws5_4)
+
         piglets1.deactivate()
 
         CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
@@ -601,8 +609,142 @@ class TourQuerysetTest(TestCase):
         CullingPiglets.objects.create_culling_piglets(piglets_group=merged_piglets1, culling_type='padej',
          quantity=10, total_weight=210)
 
+        CullingPiglets.objects.create_culling_piglets(piglets_group=merged_piglets2, culling_type='padej',
+         quantity=7, total_weight=140)
+
         with self.assertNumQueries(1):
             tours = Tour.objects.all().add_culling_avg_weight_not_mixed_piglets()
             bool(tours)
             self.assertEqual(tours[0].padej_avg_weight, 15)
             self.assertEqual(tours[1].padej_avg_weight, 16.25)
+
+            self.assertEqual(tours[0].padej_avg_weight_mixed, 20.5)
+
+
+    def test_add_culling_avg_weight_not_mixed_piglets(self):
+        piglets1 = self.farrow1.piglets_group
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
+         quantity=1, total_weight=19)
+
+        piglets2 = self.farrow2.piglets_group
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2, culling_type='prirezka',
+         quantity=4, total_weight=42)
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all() \
+                .add_farrow_data() \
+                .add_culling_qnty_not_mixed_piglets() \
+                .add_culling_percentage_not_mixed_piglets()
+            bool(tours)
+            self.assertEqual(round(tours[0].padej_percentage, 2), 2.86)
+            self.assertEqual(round(tours[0].prirezka_percentage, 2), 11.43)
+
+
+class TourQuerysetAddSowsDataTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        pigs_testings.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_add_sow_data_seminated(self):
+        loc_ws1 = Location.objects.get(workshop__number=1)
+
+        sow3 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow3, week=1)
+        Semination.objects.create_semination(sow=sow3, week=1)
+
+        sow4 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow4, week=1)
+        Semination.objects.create_semination(sow=sow4, week=1)
+
+        sow7 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow7, week=1)
+
+        sow8 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow8, week=2)
+        Semination.objects.create_semination(sow=sow8, week=2)
+
+        sow9 = pigs_testings.create_sow_with_location(loc_ws1)
+        
+        sows_seminated = Semination.objects.filter(tour__week_number=1).values_list('sow')
+        count_seminated = Sow.objects.filter(pk__in=sows_seminated).distinct().count()
+        bool(count_seminated)
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_sow_data()
+            bool(tours)
+            self.assertEqual(tours[0].count_seminated, count_seminated)
+            
+    def test_add_sow_data_usound_abort(self):
+        loc_ws1 = Location.objects.get(workshop__number=1)
+
+        sow3 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow3, week=1)
+        Semination.objects.create_semination(sow=sow3, week=1)
+
+        sow4 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow4, week=1)
+        Semination.objects.create_semination(sow=sow4, week=1)
+        Ultrasound.objects.create_ultrasound(sow=sow4, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow4, result=True, days=60)
+
+        sow5 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow5, week=1)
+        Semination.objects.create_semination(sow=sow5, week=1)
+        Ultrasound.objects.create_ultrasound(sow=sow5, result=False, days=30)
+
+        sow6 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow6, week=1)
+        Semination.objects.create_semination(sow=sow6, week=1)
+        Ultrasound.objects.create_ultrasound(sow=sow6, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow6, result=False, days=60)
+
+        sow12 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow12, week=1)
+        Semination.objects.create_semination(sow=sow12, week=1)
+        Ultrasound.objects.create_ultrasound(sow=sow12, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow12, result=True, days=60)
+
+        sow13 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow13, week=2)
+        Semination.objects.create_semination(sow=sow13, week=2)
+        Ultrasound.objects.create_ultrasound(sow=sow13, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow13, result=True, days=60)
+
+        AbortionSow.objects.create_abortion(sow=sow13)
+
+        sow7 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow7, week=1)
+
+        sow8 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow8, week=2)
+        Semination.objects.create_semination(sow=sow8, week=2)
+
+        sow9 = pigs_testings.create_sow_with_location(loc_ws1)
+
+        sow10 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow10, week=1)
+        Semination.objects.create_semination(sow=sow10, week=1)
+        Ultrasound.objects.create_ultrasound(sow=sow10, result=False, days=30)
+
+        sow11 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow11, week=2)
+        Semination.objects.create_semination(sow=sow11, week=2)
+        Ultrasound.objects.create_ultrasound(sow=sow11, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow11, result=False, days=60)
+
+        sow14 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow13, week=2)
+        Semination.objects.create_semination(sow=sow13, week=2)
+        Ultrasound.objects.create_ultrasound(sow=sow13, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow13, result=True, days=60)
+        
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_sow_data()
+            bool(tours)
+            self.assertEqual(tours[0].count_usound28_suporos, 3)
+            self.assertEqual(tours[0].count_usound28_proholost, 2)
+            self.assertEqual(tours[0].count_usound35_suporos, 2)
+            self.assertEqual(tours[0].count_usound35_proholost, 1)
+            self.assertEqual(tours[1].count_abort, 1)
