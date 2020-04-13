@@ -1,6 +1,6 @@
 import datetime
 from django.db import models
-from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg, Count
+from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg, Count, Value, Func
 from django.utils import timezone
 from django.apps import apps
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -9,7 +9,6 @@ from core.models import CoreModel, CoreModelManager
 from sows_events import models as events_models
 from sows import models as sows_models
 from piglets import models as piglets_models
-# from piglets_events import models as piglets_events_models
 import piglets_events
 
 
@@ -68,6 +67,12 @@ class TourQuerySet(models.QuerySet):
                             .annotate(total=models.Sum(f'{born_type}_quantity')) \
                             .values('total')
                 ,output_field=models.IntegerField())
+
+        data['gilt_count'] = Subquery(sows_models.Gilt.objects.filter(tour__pk=OuterRef('pk')) \
+                                .values('tour') \
+                                .annotate(cnt=Count('*')) \
+                                .values('cnt'),
+                output_field=models.IntegerField())
 
         return self.annotate(**data)
 
@@ -203,6 +208,34 @@ class TourQuerySet(models.QuerySet):
        
         return self.annotate(**data)
 
+    def add_weight_date(self):
+        subquery_piglets = self.gen_not_mixed_piglets_subquery()
+
+        data = dict()
+        for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
+            subquery = Subquery(
+                piglets_events.models.WeighingPiglets.objects.filter(
+                                    piglets_group__in=Subquery(subquery_piglets), place=place) \
+                                .values('date')[:1]
+
+                ,output_field=models.DateTimeField())
+            place = place.replace('/', '_')
+            data[f'weight_date_{place}'] = subquery
+
+        return self.annotate(**data)
+
+    def add_age_at_weight_date(self):
+        # use after add_weight_date
+        subquery_piglets = self.gen_not_mixed_piglets_subquery()
+
+        data = dict()
+        for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
+            subquery = self.gen_piglets_age_at_date_subquery(OuterRef('weight_date_3_4'))
+            place = place.replace('/', '_')
+            data[f'age_at_{place}'] = subquery
+
+        return self.annotate(**data)
+
     def gen_culling_weight_subquery(self, subquery_piglets, culling_type):
         return piglets_events.models.CullingPiglets.objects.filter(
                                 piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type) \
@@ -265,16 +298,27 @@ class TourQuerySet(models.QuerySet):
 
     def add_culling_percentage_not_mixed_piglets(self):
         # use only after add_farrow_data, add_culling_qnty_not_mixed_piglets
-        return self.annotate(
-            padej_percentage=ExpressionWrapper(F('padej_quantity') * 100.0 / F('total_born_alive'),
-                                                            output_field=models.FloatField()),
-            prirezka_percentage=ExpressionWrapper(F('prirezka_quantity') * 100.0 / F('total_born_alive'),
-                                                            output_field=models.FloatField()),
-            vinuzhd_percentage=ExpressionWrapper(F('vinuzhd_quantity') * 100.0 / F('total_born_alive'),
-                                                            output_field=models.FloatField()),
-            spec_percentage=ExpressionWrapper(F('spec_quantity') * 100.0 / F('total_born_alive'),
-                                                            output_field=models.FloatField())
-        )
+        data = dict()
+        for c_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
+            data[f'{c_type}_percentage'] = ExpressionWrapper(
+                    F(f'{c_type}_quantity') * 100.0 / F('total_born_alive'), \
+                    output_field=models.FloatField())
+
+        return self.annotate(**data)
+
+    def gen_piglets_age_at_date_subquery(self, date_at=timezone.now()): 
+        return events_models.SowFarrow.objects.filter(tour__pk=OuterRef('pk')) \
+                                    .values('tour') \
+                                    .annotate(age=Avg(Func(
+                                        date_at, F('date'), function='age')
+                                        )
+                                    ) \
+                                    .values('age')
+
+    def add_piglets_age_at_date(self, date_at=timezone.now()):
+        subquery = self.gen_piglets_age_at_date_subquery(date_at)
+
+        return self.annotate(piglets_age=Subquery(subquery, output_field=models.DateTimeField()))
 
 
 class TourManager(CoreModelManager):

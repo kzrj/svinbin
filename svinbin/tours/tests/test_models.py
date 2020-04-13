@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.db import models
 
 from tours.models import Tour, MetaTour, MetaTourRecord
-from sows.models import Sow
+from sows.models import Sow, Gilt
 from sows_events.models import Semination, Ultrasound, SowFarrow, AbortionSow
 from locations.models import Location
 from piglets.models import Piglets
@@ -288,6 +288,8 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             dead_quantity=0,
             mummy_quantity=0
             )
+        Gilt.objects.create_gilt('1a', self.sow1.farm_id, self.farrow1.piglets_group)
+        Gilt.objects.create_gilt('1b', self.sow1.farm_id, self.farrow1.piglets_group)
 
         location2 = Location.objects.filter(sowAndPigletsCell__isnull=False)[1]
         self.sow2 = pigs_testings.create_sow_with_semination_usound(location=location2, week=1)
@@ -351,13 +353,14 @@ class TourQuerysetAddPigletsDataTest(TestCase):
         merged_piglets2 = PigletsMerger.objects.create_merger_return_group(
             parent_piglets=[piglets15, piglets16], new_location=loc_cell_ws5_2)
 
-    def test_add_farrow_data(self):
+    def test_add_farrow_data(self):        
         with self.assertNumQueries(1):
             tours = Tour.objects.all().add_farrow_data()
             bool(tours)
             self.assertEqual(tours[0].total_born_alive, 35)
             self.assertEqual(tours[0].total_born_dead, 8)
             self.assertEqual(tours[0].total_born_mummy, 3)
+            self.assertEqual(tours[0].gilt_count, 2)
 
             self.assertEqual(tours[1].total_born_alive, 33)
             self.assertEqual(tours[1].total_born_dead, 3)
@@ -641,6 +644,53 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             bool(tours)
             self.assertEqual(round(tours[0].padej_percentage, 2), 2.86)
             self.assertEqual(round(tours[0].prirezka_percentage, 2), 11.43)
+
+    def test_piglets_age(self):
+        # Using current time 
+        ini_time_for_now = datetime.datetime.now() 
+
+        location6 = Location.objects.filter(sowAndPigletsCell__isnull=False)[5]
+        sow1 = pigs_testings.create_sow_with_semination_usound(location=location6, week=50)
+        farrow1 = SowFarrow.objects.create_sow_farrow(
+            sow=sow1,
+            alive_quantity=14,
+            dead_quantity=0,
+            mummy_quantity=0,
+            date=ini_time_for_now - datetime.timedelta(days=100) 
+            )
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_piglets_age_at_date(timezone.now())
+            bool(tours)
+            self.assertEqual(tours[2].piglets_age.days, 99)
+
+    def test_add_weight_date_and age(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1100, place='3/4')
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=2600, place='4/8')
+
+        # mixed tour piglets
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+        WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets1, total_weight=1000,
+         place='3/4')
+
+        merged_piglets1.deactivate()
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_weight_date().add_age_at_weight_date()
+            bool(tours)
+            self.assertEqual(tours[0].weight_date_3_4.year, 2020)
+            self.assertEqual(tours[0].age_at_3_4.days, 0)
 
 
 class TourQuerysetAddSowsDataTest(TestCase):

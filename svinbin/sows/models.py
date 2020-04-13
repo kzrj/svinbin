@@ -307,6 +307,8 @@ class Gilt(Pig):
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
     farrow = models.ForeignKey('sows_events.SowFarrow', on_delete=models.SET_NULL, null=True)
 
+    active = models.BooleanField(default=True)
+
     objects = GiltManager()
 
     def __str__(self):
