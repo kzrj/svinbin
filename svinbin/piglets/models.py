@@ -70,14 +70,16 @@ class PigletsQuerySet(models.QuerySet):
         return self.filter(Q(
             Q(location__workshop__number=workshop_number) |
             Q(location__section__workshop__number=workshop_number) |
-            Q(location__pigletsGroupCell__workshop__number=workshop_number)
+            Q(location__pigletsGroupCell__workshop__number=workshop_number) |
+            Q(location__sowAndPigletsCell__workshop__number=workshop_number)
             )
         )
 
     def all_in_section(self, section):
         return self.filter(Q(
             Q(location__section=section) |
-            Q(location__pigletsGroupCell__section=section)
+            Q(location__pigletsGroupCell__section=section) |
+            Q(location__sowAndPigletsCell__section=section)
             )
         )
 

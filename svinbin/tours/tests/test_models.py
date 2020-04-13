@@ -363,12 +363,13 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             self.assertEqual(tours[1].total_born_dead, 3)
             self.assertEqual(tours[1].total_born_mummy, 2)
 
-
     def test_add_current_not_mixed_piglets_quantity(self):
         with self.assertNumQueries(1):
             tours = Tour.objects.all().add_current_not_mixed_piglets_quantity()
             bool(tours)
             self.assertEqual(tours[0].total_not_mixed_piglets, 135)
+            self.assertEqual(tours[0].ws3_qnty_not_mixed, 35)
+            self.assertEqual(tours[0].ws5_qnty_not_mixed, 100)
             self.assertEqual(tours[1].total_not_mixed_piglets, 133)
 
     def test_add_current_mixed_piglets_quantity(self):
@@ -376,6 +377,8 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             tours = Tour.objects.all().add_current_mixed_piglets_quantity()
             bool(tours)
             self.assertEqual(tours[0].total_mixed_piglets, 130)
+            self.assertEqual(tours[0].ws5_qnty_mixed, 130)
+            self.assertEqual(tours[0].ws4_qnty_mixed, None)
             self.assertEqual(tours[1].total_mixed_piglets, 100)
 
     def test_add_weight_data_not_mixed(self):
