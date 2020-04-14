@@ -57,7 +57,7 @@ class ReportTourSerializer(serializers.ModelSerializer):
     # farrow_data
     total_born_alive = serializers.ReadOnlyField()
     total_born_dead = serializers.ReadOnlyField()
-    total_born_alive = serializers.ReadOnlyField()
+    total_born_mummy = serializers.ReadOnlyField()
     gilt_count = serializers.ReadOnlyField()
 
     # current_not_mixed_piglets_quantity
