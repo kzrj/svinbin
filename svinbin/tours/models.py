@@ -315,7 +315,7 @@ class TourQuerySet(models.QuerySet):
                                     ) \
                                     .values('age')
 
-    def add_piglets_age_at_date(self, date_at=timezone.now()):
+    def add_current_piglets_age(self, date_at=timezone.now()):
         subquery = self.gen_piglets_age_at_date_subquery(date_at)
 
         return self.annotate(piglets_age=Subquery(subquery, output_field=models.DateTimeField()))

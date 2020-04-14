@@ -21,6 +21,7 @@ from staff import views as staff_views
 from piglets import views as piglets_views
 from workshoponetwo import views as workshoponetwo_views
 from workshopthree import views as workshopthree_views
+from reports import views as reports_views
 
 router = routers.DefaultRouter()
 
@@ -67,6 +68,9 @@ router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsView
  basename='workshopthree-sows')
 router.register(r'workshopthree/wsinfo', workshopthree_views.WorkshopInfo, \
  basename='workshopthree-info')
+
+# reports
+router.register(r'reports/tours', reports_views.TourReportViewSet, basename='report-tours')
 
 schema_view = get_swagger_view(title='API Docs')
 

@@ -664,7 +664,7 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             bool(tours)
             self.assertEqual(tours[2].piglets_age.days, 99)
 
-    def test_add_weight_date_and age(self):
+    def test_add_weight_date_and_age(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws5, 100)
         WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1100, place='3/4')
@@ -691,6 +691,27 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             bool(tours)
             self.assertEqual(tours[0].weight_date_3_4.year, 2020)
             self.assertEqual(tours[0].age_at_3_4.days, 0)
+
+    def test_add_all(self):
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all() \
+                .add_sow_data() \
+                .add_farrow_data() \
+                .add_current_not_mixed_piglets_quantity() \
+                .add_current_mixed_piglets_quantity() \
+                .add_weight_data_not_mixed() \
+                .add_weight_data_mixed() \
+                .add_avg_weight_data() \
+                .add_weight_date() \
+                .add_age_at_weight_date() \
+                .add_culling_weight_not_mixed_piglets() \
+                .add_culling_qnty_not_mixed_piglets() \
+                .add_culling_avg_weight_not_mixed_piglets() \
+                .add_culling_percentage_not_mixed_piglets() \
+                .add_piglets_age_at_date()
+            bool(tours)
+            print(tours)
+
 
 
 class TourQuerysetAddSowsDataTest(TestCase):
