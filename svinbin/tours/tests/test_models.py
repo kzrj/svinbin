@@ -660,9 +660,9 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             )
 
         with self.assertNumQueries(1):
-            tours = Tour.objects.all().add_piglets_age_at_date(timezone.now())
+            tours = Tour.objects.all().add_current_piglets_age()
             bool(tours)
-            self.assertEqual(tours[2].piglets_age.days, 99)
+            self.assertEqual(tours[2].piglets_age.days, 98)
 
     def test_add_weight_date_and_age(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -692,6 +692,32 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             self.assertEqual(tours[0].weight_date_3_4.year, 2020)
             self.assertEqual(tours[0].age_at_3_4.days, 0)
 
+    def test_add_culling_data_by_ws(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
+         quantity=1, total_weight=19)
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3, culling_type='padej',
+         quantity=5, total_weight=51)
+
+        loc2 = Location.objects.get(workshop__number=6)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            loc2, 100)
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2, culling_type='prirezka',
+         quantity=4, total_weight=42)
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_culling_data_by_ws()
+            bool(tours)
+            self.assertEqual(tours[0].ws5_padej_quantity, 6)
+            self.assertEqual(tours[0].ws5_padej_weight, 70)
+            self.assertEqual(tours[0].ws5_padej_avg_weight, 14.6)
+            self.assertEqual(tours[0].ws5_prirezka_quantity, None)
+            self.assertEqual(tours[0].ws6_prirezka_quantity, 4)
+
     def test_add_all(self):
         with self.assertNumQueries(1):
             tours = Tour.objects.all() \
@@ -702,17 +728,16 @@ class TourQuerysetAddPigletsDataTest(TestCase):
                 .add_weight_data_not_mixed() \
                 .add_weight_data_mixed() \
                 .add_avg_weight_data() \
-                .add_weight_date() \
-                .add_age_at_weight_date() \
                 .add_culling_weight_not_mixed_piglets() \
                 .add_culling_qnty_not_mixed_piglets() \
                 .add_culling_avg_weight_not_mixed_piglets() \
                 .add_culling_percentage_not_mixed_piglets() \
-                .add_piglets_age_at_date()
+                .add_current_piglets_age() \
+                .add_weight_date() \
+                .add_age_at_weight_date() \
+                .add_culling_data_by_ws()
+
             bool(tours)
-            print(tours)
-
-
 
 class TourQuerysetAddSowsDataTest(TestCase):
     def setUp(self):
@@ -822,3 +847,31 @@ class TourQuerysetAddSowsDataTest(TestCase):
             self.assertEqual(tours[0].count_usound35_suporos, 2)
             self.assertEqual(tours[0].count_usound35_proholost, 1)
             self.assertEqual(tours[1].count_abort, 1)
+
+    def test_count_tour_sow(self):
+        loc_ws1 = Location.objects.get(workshop__number=1)
+        loc_ws2 = Location.objects.get(workshop__number=2)
+        loc_ws3 = Location.objects.get(workshop__number=3)
+
+        sow1 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow1, week=1)
+
+        sow2 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow2, week=1)
+
+        sow3 = pigs_testings.create_sow_with_location(loc_ws2)
+        Semination.objects.create_semination(sow=sow3, week=1)
+
+        sow4 = pigs_testings.create_sow_with_location(loc_ws3)
+        Semination.objects.create_semination(sow=sow4, week=1)
+
+        sow5 = pigs_testings.create_sow_with_location(loc_ws3)
+        Semination.objects.create_semination(sow=sow5, week=2)
+        sow6 = pigs_testings.create_sow_with_location(loc_ws3)
+        Semination.objects.create_semination(sow=sow6, week=2)
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_count_tour_sow()
+            bool(tours)
+            self.assertEqual(tours[0].ws1_count_tour_sow,2)
+            self.assertEqual(tours[0].ws3_count_tour_sow,1)

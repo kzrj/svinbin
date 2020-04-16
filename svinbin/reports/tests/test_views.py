@@ -66,8 +66,8 @@ class TourReportsViewSetTest(APITestCase):
                 .add_current_mixed_piglets_quantity() \
                 .add_weight_data_not_mixed() \
                 .add_weight_data_mixed() \
-                .add_avg_weight_data() \
                 .add_weight_date() \
+                .add_avg_weight_data() \
                 .add_age_at_weight_date() \
                 .add_culling_weight_not_mixed_piglets() \
                 .add_culling_qnty_not_mixed_piglets() \
@@ -83,3 +83,5 @@ class TourReportsViewSetTest(APITestCase):
 
         response = self.client.get('/api/reports/tours/')
         print(response.data)
+        print(response.data['results'][0]['age_at_3_4'])
+        print(response.data['results'][0]['piglets_age'])

@@ -76,6 +76,23 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def add_count_tour_sow(self):
+        data = dict()
+        for ws_number in [1, 2, 3]:
+            data[f'ws{ws_number}_count_tour_sow'] = Subquery(
+                sows_models.Sow.objects.filter(tour__pk=OuterRef('pk')).filter(
+                         Q(
+                            Q(location__workshop__number=ws_number) |
+                            Q(location__section__workshop__number=ws_number) |
+                            Q(location__sowAndPigletsCell__workshop__number=ws_number)
+                        )) \
+                        .values('tour') \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt'),
+                 output_field=models.IntegerField())
+
+        return self.annotate(**data)        
+
     def add_current_not_mixed_piglets_quantity(self):
         data = dict()
         data['total_not_mixed_piglets'] = Subquery(
@@ -236,12 +253,23 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def gen_culling_weight_subquery(self, subquery_piglets, culling_type):
-        return piglets_events.models.CullingPiglets.objects.filter(
-                                piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type) \
-                            .values('culling_type') \
-                            .annotate(all_weight=Sum('total_weight')) \
-                            .values('all_weight')
+    def gen_culling_weight_subquery(self, subquery_piglets, culling_type, ws_number=None):
+        queryset =  piglets_events.models.CullingPiglets.objects.filter(
+            piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type)
+
+        if ws_number:
+            queryset = queryset.filter(
+                        Q(
+                            Q(location__workshop__number=ws_number) |
+                            Q(location__section__workshop__number=ws_number) |
+                            Q(location__pigletsGroupCell__workshop__number=ws_number) |
+                            Q(location__sowAndPigletsCell__workshop__number=ws_number)
+                        )
+                    )
+
+        return queryset.values('culling_type') \
+                        .annotate(all_weight=Sum('total_weight')) \
+                        .values('all_weight')
 
     def add_culling_weight_not_mixed_piglets(self):
         subquery_piglets = self.gen_not_mixed_piglets_subquery()
@@ -254,12 +282,23 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def gen_culling_qnty_subquery(self, subquery_piglets, culling_type):
-        return piglets_events.models.CullingPiglets.objects.filter(
-                                piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type) \
-                            .values('culling_type') \
-                            .annotate(all_qnty=Sum('quantity')) \
-                            .values('all_qnty')
+    def gen_culling_qnty_subquery(self, subquery_piglets, culling_type, ws_number=None):
+        queryset =  piglets_events.models.CullingPiglets.objects.filter(
+            piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type)
+
+        if ws_number:
+            queryset = queryset.filter(
+                        Q(
+                            Q(location__workshop__number=ws_number) |
+                            Q(location__section__workshop__number=ws_number) |
+                            Q(location__pigletsGroupCell__workshop__number=ws_number) |
+                            Q(location__sowAndPigletsCell__workshop__number=ws_number)
+                        )
+                    )
+
+        return queryset.values('culling_type') \
+                        .annotate(all_qnty=Sum('quantity')) \
+                        .values('all_qnty')
 
     def add_culling_qnty_not_mixed_piglets(self):
         subquery_piglets = self.gen_not_mixed_piglets_subquery()
@@ -272,13 +311,24 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def gen_culling_avg_weight_subquery(self, subquery_piglets, culling_type):
-        return piglets_events.models.CullingPiglets.objects.filter(
-                                piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type) \
-                            .values('culling_type') \
-                            .annotate(padej_avg_weight=Avg(F('total_weight') / F('quantity'),
-                                                                output_field=models.FloatField())) \
-                            .values('padej_avg_weight')
+    def gen_culling_avg_weight_subquery(self, subquery_piglets, culling_type, ws_number=None):
+        queryset =  piglets_events.models.CullingPiglets.objects.filter(
+            piglets_group__in=Subquery(subquery_piglets), culling_type=culling_type)
+
+        if ws_number:
+            queryset = queryset.filter(
+                        Q(
+                            Q(location__workshop__number=ws_number) |
+                            Q(location__section__workshop__number=ws_number) |
+                            Q(location__pigletsGroupCell__workshop__number=ws_number) |
+                            Q(location__sowAndPigletsCell__workshop__number=ws_number)
+                        )
+                    )
+
+        return queryset.values('culling_type') \
+                        .annotate(padej_avg_weight=Avg(F('total_weight') / F('quantity'),
+                                                            output_field=models.FloatField())) \
+                        .values('padej_avg_weight')
 
     def add_culling_avg_weight_not_mixed_piglets(self):
         subquery_piglets = self.gen_not_mixed_piglets_subquery()
@@ -320,47 +370,29 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(piglets_age=Subquery(subquery, output_field=models.DateTimeField()))
 
-    def gen_not_mixed_piglets_subquery_by_ws(self, workshop_number):
-        return self.gen_not_mixed_piglets_subquery()\
-            .filter(
-                 Q(
-                    Q(metatour__piglets__location__workshop__number=ws_number) |
-                    Q(metatour__piglets__location__section__workshop__number=ws_number) |
-                    Q(metatour__piglets__location__pigletsGroupCell__workshop__number=ws_number) |
-                    Q(metatour__piglets__location__sowAndPigletsCell__workshop__number=ws_number)
-                ))
-
-    def gen_mixed_piglets_subquery_by_ws(self, workshop_number):
-        return self.gen_mixed_piglets_subquery()\
-            .filter(
-                 Q(
-                    Q(metatour__piglets__location__workshop__number=ws_number) |
-                    Q(metatour__piglets__location__section__workshop__number=ws_number) |
-                    Q(metatour__piglets__location__pigletsGroupCell__workshop__number=ws_number) |
-                    Q(metatour__piglets__location__sowAndPigletsCell__workshop__number=ws_number)
-                ))
-
-    def add_culling_data_by_ws(self, ws_number):
-        subquery_piglets = self.gen_not_mixed_piglets_subquery_by_ws(ws_number)
-        subquery_mixed_piglets = self.gen_mixed_piglets_subquery_by_ws(ws_number)
+    def add_culling_data_by_ws(self):      
+        subquery_piglets = self.gen_not_mixed_piglets_subquery()
+        subquery_mixed_piglets = self.gen_mixed_piglets_subquery()
 
         data = dict()
-        for c_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
-            subquery_weight = Subquery(self.gen_culling_weight_subquery(subquery_piglets, c_type), \
-                output_field=models.FloatField())
-            data[f'{ws_number}_{c_type}_weight'] = subquery_weight
+        for ws_number in [3, 4, 5, 6, 7, 8]:
+            for c_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
+                subquery_weight = Subquery(self.gen_culling_weight_subquery(subquery_piglets, c_type, ws_number), \
+                    output_field=models.FloatField())
+                data[f'ws{ws_number}_{c_type}_weight'] = subquery_weight
 
-            subquery_qnty = Subquery(self.gen_culling_qnty_subquery(subquery_piglets, c_type), \
-                output_field=models.FloatField())
-            data[f'{ws_number}_{c_type}_quantity'] = subquery_qnty
+                subquery_qnty = Subquery(self.gen_culling_qnty_subquery(subquery_piglets, c_type, ws_number), \
+                    output_field=models.FloatField())
+                data[f'ws{ws_number}_{c_type}_quantity'] = subquery_qnty
 
-            subquery_avg = Subquery(self.gen_culling_avg_weight_subquery(subquery_piglets, c_type), \
-                output_field=models.FloatField())
-            data[f'{ws_number}_{c_type}_avg_weight'] = subquery_avg
+                subquery_avg = Subquery(self.gen_culling_avg_weight_subquery(subquery_piglets, c_type, ws_number), \
+                    output_field=models.FloatField())
+                data[f'ws{ws_number}_{c_type}_avg_weight'] = subquery_avg
 
-            subquery_mixed_avg = Subquery(self.gen_culling_avg_weight_subquery(subquery_mixed_piglets, c_type), \
-                output_field=models.FloatField())
-            data[f'{ws_number}_{c_type}_avg_weight_mixed'] = subquery_mixed_avg
+                subquery_mixed_avg = Subquery(self.gen_culling_avg_weight_subquery(subquery_mixed_piglets,
+                     c_type, ws_number), \
+                    output_field=models.FloatField())
+                data[f'ws{ws_number}_{c_type}_avg_weight_mixed'] = subquery_mixed_avg
 
         return self.annotate(**data)
 
