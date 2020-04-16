@@ -32,9 +32,6 @@ class ReportsViewSet(viewsets.ViewSet):
     	Piglets.objects.with_tour_not_mixed(tour)
     	Piglets.objects.with_tour_mixed(tour)
 
-
-
-
     	return Response({'report_tours': 'report'})
 
 

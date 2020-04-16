@@ -178,7 +178,7 @@ class TourQuerySet(models.QuerySet):
     def gen_weight_subquery(self, piglets_subquery, place):
         return piglets_events.models.WeighingPiglets.objects.filter(
                                 piglets_group__in=Subquery(piglets_subquery), place=place) \
-                            .values('piglets_group__metatour__records__tour') \
+                            .values('place') \
                             .annotate(weight=Sum('total_weight')) \
                             .values('weight')
 
