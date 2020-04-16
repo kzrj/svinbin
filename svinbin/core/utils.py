@@ -13,6 +13,8 @@ from django.core.mail import send_mail
 from django.db.utils import IntegrityError as DjangoIntegrityError
 
 from staff.serializers import WorkshopEmployeeSerializer
+from locations.models import Location
+
 
 class CustomValidation(exceptions.APIException):
     status_code = status.HTTP_400_BAD_REQUEST
@@ -108,7 +110,7 @@ def jwt_response_payload_handler(token, user=None, request=None):
 def set_piglets_culling_location(culling):
     if not culling.location:
         if culling.initiator:
-            culling.location = culling.initiator.employee.workshop
+            culling.location = Location.objects.get(workshop=culling.initiator.employee.workshop)
         else:
             culling.location = culling.piglets_group.location
 
