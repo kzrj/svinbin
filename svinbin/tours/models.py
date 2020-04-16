@@ -95,10 +95,10 @@ class TourQuerySet(models.QuerySet):
 
     def add_current_not_mixed_piglets_quantity(self):
         data = dict()
-        
+
         data['total_not_mixed_piglets'] = Subquery(
                     piglets_models.Piglets.objects.all() \
-                            .with_tour_not_mixed(week_number=OuterRef('week_number')) \
+                            .filter(metatour__records__tour__pk=OuterRef('pk'), metatour__records__percentage=100) \
                             .values('metatour__records__tour') \
                             .annotate(qnty=Sum('quantity')) \
                             .values('qnty'),\
@@ -107,7 +107,7 @@ class TourQuerySet(models.QuerySet):
         # for ws_number in [3, 4, 5, 6, 7, 8]:
         #     data[f'ws{ws_number}_qnty_not_mixed'] = Subquery(
         #             piglets_models.Piglets.objects.all() \
-        #                                 .with_tour_not_mixed(week_number=OuterRef('week_number')) \
+        #                                 .filter(metatour__records__tour__pk=OuterRef('pk'), metatour__records__percentage=100) \
         #                                 .all_in_workshop(workshop_number=ws_number) \
         #                                 .values('metatour__records__tour') \
         #                                 .annotate(qnty=Sum('quantity')) \
