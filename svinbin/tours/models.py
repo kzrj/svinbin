@@ -104,15 +104,15 @@ class TourQuerySet(models.QuerySet):
                             .values('qnty'),\
                     output_field=models.FloatField())
         
-        for ws_number in [3, 4, 5, 6, 7, 8]:
-            data[f'ws{ws_number}_qnty_not_mixed'] = Subquery(
-                    piglets_models.Piglets.objects.all() \
-                                        .with_tour_not_mixed(week_number=OuterRef('week_number')) \
-                                        .all_in_workshop(workshop_number=ws_number) \
-                                        .values('metatour__records__tour') \
-                                        .annotate(qnty=Sum('quantity')) \
-                                        .values('qnty'),
-                    output_field=models.FloatField())
+        # for ws_number in [3, 4, 5, 6, 7, 8]:
+        #     data[f'ws{ws_number}_qnty_not_mixed'] = Subquery(
+        #             piglets_models.Piglets.objects.all() \
+        #                                 .with_tour_not_mixed(week_number=OuterRef('week_number')) \
+        #                                 .all_in_workshop(workshop_number=ws_number) \
+        #                                 .values('metatour__records__tour') \
+        #                                 .annotate(qnty=Sum('quantity')) \
+        #                                 .values('qnty'),
+        #             output_field=models.FloatField())
 
         return self.annotate(**data)
 
