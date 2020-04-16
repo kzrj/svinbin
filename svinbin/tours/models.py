@@ -95,6 +95,7 @@ class TourQuerySet(models.QuerySet):
 
     def add_current_not_mixed_piglets_quantity(self):
         data = dict()
+        
         data['total_not_mixed_piglets'] = Subquery(
                     piglets_models.Piglets.objects.all() \
                             .with_tour_not_mixed(week_number=OuterRef('week_number')) \
@@ -147,15 +148,32 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def gen_not_mixed_piglets_subquery(self):
-        return MetaTourRecord.objects \
-            .filter(tour__pk=OuterRef(OuterRef('pk')), percentage=100) \
-            .values('metatour__piglets')
+    def gen_not_mixed_piglets_subquery(self, ws_number=None):
+        queryset = MetaTourRecord.objects.filter(tour__pk=OuterRef(OuterRef('pk')), percentage=100)
 
-    def gen_mixed_piglets_subquery(self):
-        return MetaTourRecord.objects \
-            .filter(tour__pk=OuterRef(OuterRef('pk')), percentage__lt=100) \
-            .values('metatour__piglets')
+        if ws_number:
+            queryset = queryset.filter(
+                Q(
+                    Q(metatour__piglets__location__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__section__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__pigletsGroupCell__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__sowAndPigletsCell__workshop__number=ws_number)
+                ))
+
+        return queryset.values('metatour__piglets')
+
+    def gen_mixed_piglets_subquery(self, ws_number=None):
+        queryset = MetaTourRecord.objects.filter(tour__pk=OuterRef(OuterRef('pk')), percentage__lt=100)
+        if ws_number:
+            queryset = queryset.filter(
+                Q(
+                    Q(metatour__piglets__location__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__section__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__pigletsGroupCell__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__sowAndPigletsCell__workshop__number=ws_number)
+                ))
+
+        return queryset.values('metatour__piglets')
 
     def gen_weight_subquery(self, piglets_subquery, place):
         return piglets_events.models.WeighingPiglets.objects.filter(
