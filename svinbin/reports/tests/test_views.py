@@ -59,21 +59,21 @@ class TourReportsViewSetTest(APITestCase):
         piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3_sec1, 10)
 
-        tours = Tour.objects.all() \
-                .add_sow_data() \
-                .add_farrow_data() \
-                .add_current_not_mixed_piglets_quantity() \
-                .add_current_mixed_piglets_quantity() \
-                .add_weight_data_not_mixed() \
-                .add_weight_data_mixed() \
-                .add_weight_date() \
-                .add_avg_weight_data() \
-                .add_age_at_weight_date() \
-                .add_culling_weight_not_mixed_piglets() \
-                .add_culling_qnty_not_mixed_piglets() \
-                .add_culling_avg_weight_not_mixed_piglets() \
-                .add_culling_percentage_not_mixed_piglets() \
-                .add_current_piglets_age()
+        # tours = Tour.objects.all() \
+        #         .add_sow_data() \
+        #         .add_farrow_data() \
+        #         .add_current_not_mixed_piglets_quantity() \
+        #         .add_current_mixed_piglets_quantity() \
+        #         .add_weight_data_not_mixed() \
+        #         .add_weight_data_mixed() \
+        #         .add_weight_date() \
+        #         .add_avg_weight_data() \
+        #         .add_age_at_weight_date() \
+        #         .add_culling_weight_not_mixed_piglets() \
+        #         .add_culling_qnty_not_mixed_piglets() \
+        #         .add_culling_avg_weight_not_mixed_piglets() \
+        #         .add_culling_percentage_not_mixed_piglets() \
+        #         .add_current_piglets_age()
 
         # serializer = ReportTourSerializer2(tours[0])
         # print(serializer.data)
