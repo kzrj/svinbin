@@ -49,8 +49,8 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_culling_avg_weight_not_mixed_piglets() \
                 .add_culling_percentage_not_mixed_piglets() \
                 .add_weight_date() \
-                # .add_count_tour_sow() \
-                # .add_culling_data_by_ws() \
+                .add_count_tour_sow() \
+                .add_culling_data_by_ws() \
                 # .add_current_piglets_age() \
                 # .add_age_at_weight_date() \
 
