@@ -5,3 +5,4 @@
 **/static
 !**/frontend/static
 **/seminations.xls
+**/postgres_data
