@@ -320,6 +320,50 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(piglets_age=Subquery(subquery, output_field=models.DateTimeField()))
 
+    def gen_not_mixed_piglets_subquery_by_ws(self, workshop_number):
+        return self.gen_not_mixed_piglets_subquery()\
+            .filter(
+                 Q(
+                    Q(metatour__piglets__location__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__section__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__pigletsGroupCell__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__sowAndPigletsCell__workshop__number=ws_number)
+                ))
+
+    def gen_mixed_piglets_subquery_by_ws(self, workshop_number):
+        return self.gen_mixed_piglets_subquery()\
+            .filter(
+                 Q(
+                    Q(metatour__piglets__location__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__section__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__pigletsGroupCell__workshop__number=ws_number) |
+                    Q(metatour__piglets__location__sowAndPigletsCell__workshop__number=ws_number)
+                ))
+
+    def add_culling_data_by_ws(self, ws_number):
+        subquery_piglets = self.gen_not_mixed_piglets_subquery_by_ws(ws_number)
+        subquery_mixed_piglets = self.gen_mixed_piglets_subquery_by_ws(ws_number)
+
+        data = dict()
+        for c_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
+            subquery_weight = Subquery(self.gen_culling_weight_subquery(subquery_piglets, c_type), \
+                output_field=models.FloatField())
+            data[f'{ws_number}_{c_type}_weight'] = subquery_weight
+
+            subquery_qnty = Subquery(self.gen_culling_qnty_subquery(subquery_piglets, c_type), \
+                output_field=models.FloatField())
+            data[f'{ws_number}_{c_type}_quantity'] = subquery_qnty
+
+            subquery_avg = Subquery(self.gen_culling_avg_weight_subquery(subquery_piglets, c_type), \
+                output_field=models.FloatField())
+            data[f'{ws_number}_{c_type}_avg_weight'] = subquery_avg
+
+            subquery_mixed_avg = Subquery(self.gen_culling_avg_weight_subquery(subquery_mixed_piglets, c_type), \
+                output_field=models.FloatField())
+            data[f'{ws_number}_{c_type}_avg_weight_mixed'] = subquery_mixed_avg
+
+        return self.annotate(**data)
+
 
 class TourManager(CoreModelManager):
     def get_queryset(self):

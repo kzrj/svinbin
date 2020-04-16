@@ -576,20 +576,31 @@ class CullingPigletsTest(TestCase):
             self.loc_ws3, 101)
 
     def test_create_culling_piglets(self):
+        piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 101)
+
         culling = CullingPiglets.objects.create_culling_piglets(
-            piglets_group=self.piglets, culling_type='padej', reason='xz', quantity=10, 
+            piglets_group=piglets, culling_type='padej', reason='xz', quantity=10, 
             total_weight=100, date='2020-03-09'
             )
 
         self.piglets.refresh_from_db()
-        self.assertEqual(self.piglets.quantity, 91)
-        self.assertEqual(culling.piglets_group, self.piglets)
+        self.assertEqual(piglets.quantity, 91)
+        self.assertEqual(culling.piglets_group, piglets)
         self.assertEqual(culling.culling_type, 'padej')
         self.assertEqual(culling.reason, 'xz')
         self.assertEqual(culling.total_weight, 100)
         self.assertEqual(culling.date.day, 9)
+        self.assertEqual(culling.location, self.loc_ws3)
 
-    def test_manager_get_culling_total_data_by_piglets(self):
+        piglets.location = self.loc_ws4
+        piglets.save()
+
+        culling.refresh_from_db()
+        self.assertEqual(culling.location, self.loc_ws3)
+
+
+    def test_manager_get_culling_data_by_piglets(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws4, 101)
         piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
