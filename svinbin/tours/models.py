@@ -196,12 +196,12 @@ class TourQuerySet(models.QuerySet):
     def gen_weight_mixed_subquery(self, subquery_mixed_piglets, subquery_percent, place):
         return piglets_events.models.WeighingPiglets.objects.filter(
                                 piglets_group__in=Subquery(subquery_mixed_piglets), place=place) \
-                            .values('piglets_group__metatour__records__tour') \
+                            .values('place') \
                             .annotate(weight=ExpressionWrapper(
                                 (F('total_weight')  * Subquery(subquery_percent,
                                                                  output_field=models.FloatField()) / 100),
                                 output_field=models.FloatField())) \
-                            .values('piglets_group__metatour__records__tour') \
+                            .values('place') \
                             .annotate(all_weight=Sum('weight')) \
                             .values('all_weight')[:1]
 
