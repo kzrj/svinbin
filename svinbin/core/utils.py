@@ -107,8 +107,8 @@ def jwt_response_payload_handler(token, user=None, request=None):
 
 def set_piglets_culling_location(culling):
     if not culling.location:
-        if initiator:
-            culling.location = initiator.employee.workshop
+        if culling.initiator:
+            culling.location = culling.initiator.employee.workshop
         else:
             culling.location = culling.piglets_group.location
 
