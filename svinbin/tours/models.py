@@ -193,6 +193,24 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def gen_weight_qnty_subquery(self, piglets_subquery, place):
+        return piglets_events.models.WeighingPiglets.objects.filter(
+                                piglets_group__in=Subquery(piglets_subquery), place=place) \
+                            .values('place') \
+                            .annotate(qnty=Sum('piglets_quantity')) \
+                            .values('qnty')
+
+    def add_weight_qnty_not_mixed(self):
+        subquery_piglets = self.gen_not_mixed_piglets_subquery()
+
+        data = dict()
+        for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
+            subquery = Subquery(self.gen_weight_qnty_subquery(subquery_piglets, place), output_field=models.FloatField())
+            place = place.replace('/', '_')
+            data[f'total_weight_qnty_not_mixed_{place}'] = subquery
+
+        return self.annotate(**data)
+
     def gen_weight_mixed_subquery(self, subquery_mixed_piglets, subquery_percent, place):
         return piglets_events.models.WeighingPiglets.objects.filter(
                                 piglets_group__in=Subquery(subquery_mixed_piglets), place=place) \

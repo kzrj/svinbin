@@ -44,6 +44,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_weight_data_not_mixed() \
                 .add_weight_data_mixed() \
                 .add_avg_weight_data() \
+                .add_weight_qnty_not_mixed() \
                 .add_culling_weight_not_mixed_piglets() \
                 .add_culling_qnty_not_mixed_piglets() \
                 .add_culling_avg_weight_not_mixed_piglets() \
