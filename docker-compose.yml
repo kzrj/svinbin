@@ -22,8 +22,9 @@ services:
     ports: 
       - "5432:5432"
     volumes:
-      - ./postgres_data:/var/lib/postgresql
+      # - ./postgres_data:/var/lib/postgresql
       - ./postgres_data2/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
+      - postgres:/var/lib/postgresql/data:z
 
   backend:
     build: .
