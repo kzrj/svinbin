@@ -39,6 +39,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
     queryset = Tour.objects.all() \
                 .add_sow_data() \
                 .add_farrow_data() \
+                .add_count_tour_sow() \
                 .add_current_not_mixed_piglets_quantity() \
                 .add_current_mixed_piglets_quantity() \
                 .add_weight_data_not_mixed() \
