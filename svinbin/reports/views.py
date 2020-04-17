@@ -51,7 +51,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_weight_date() \
                 .add_count_tour_sow() \
                 .add_culling_data_by_ws() \
-                # .add_current_piglets_age() \
+                .add_current_piglets_age() \
                 # .add_age_at_weight_date() \
 
     serializer_class = ReportTourSerializer
