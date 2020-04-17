@@ -394,7 +394,7 @@ class TourQuerySet(models.QuerySet):
 
         data = dict()
         # for ws_number in [3, 4, 5, 6, 7, 8]:
-        for ws_number in [3, 4, 5, 6]:
+        for ws_number in [3, 4, 5, 6, 7]:
             for c_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
                 subquery_weight = Subquery(self.gen_culling_weight_subquery(subquery_piglets, c_type, ws_number), \
                     output_field=models.FloatField())
