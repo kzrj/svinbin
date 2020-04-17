@@ -146,6 +146,12 @@ class ReportTourSerializer(serializers.ModelSerializer):
     vinuzhd_percentage = serializers.ReadOnlyField()
     spec_percentage = serializers.ReadOnlyField()
 
+    # culling ws3
+    ws3_padej_quantity = serializers.ReadOnlyField()
+    ws3_prirezka_quantity = serializers.ReadOnlyField()
+    # vinuzhd_percentage = serializers.ReadOnlyField()
+    # spec_percentage = serializers.ReadOnlyField()
+
     class Meta:
         model = Tour
         fields = '__all__'

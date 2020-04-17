@@ -12,6 +12,8 @@ class TourFilter(filters.FilterSet):
     by_workshop_number = filters.NumberFilter(field_name='location',
      method='filter_by_workshop_number')
 
+    # seminated_exist = filters.BooleanFilter(field_name='', method='filter_seminated_exist')
+
     # active = filters.BooleanField(method='filter_active')
 
     # farm_id startswith
@@ -19,6 +21,8 @@ class TourFilter(filters.FilterSet):
 
     def filter_by_workshop_number(self, queryset, name, value):
         return queryset.filter(location__workshop__number=value)
+
+    # def 
 
     # def filter_active(self, queryset, value):
     # 	if value:
