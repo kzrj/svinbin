@@ -111,11 +111,11 @@ class ReportTourSerializer(serializers.ModelSerializer):
     weight_date_8_7 = serializers.ReadOnlyField()
 
     # weight qnty
-    total_weight_qnty_not_mixed_3_4 = ReadOnlyField()
-    total_weight_qnty_not_mixed_4_8 = ReadOnlyField()
-    total_weight_qnty_not_mixed_8_5 = ReadOnlyField()
-    total_weight_qnty_not_mixed_8_6 = ReadOnlyField()
-    total_weight_qnty_not_mixed_8_7 = ReadOnlyField()
+    total_weight_qnty_not_mixed_3_4 = serializers.ReadOnlyField()
+    total_weight_qnty_not_mixed_4_8 = serializers.ReadOnlyField()
+    total_weight_qnty_not_mixed_8_5 = serializers.ReadOnlyField()
+    total_weight_qnty_not_mixed_8_6 = serializers.ReadOnlyField()
+    total_weight_qnty_not_mixed_8_7 = serializers.ReadOnlyField()
 
     # age_at_weight_date
     age_at_3_4 = serializers.ReadOnlyField()
