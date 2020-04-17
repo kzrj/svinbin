@@ -59,6 +59,7 @@ class ReportTourSerializer(serializers.ModelSerializer):
     total_born_dead = serializers.ReadOnlyField()
     total_born_mummy = serializers.ReadOnlyField()
     gilt_count = serializers.ReadOnlyField()
+    gilt_count2 = serializers.ReadOnlyField()
 
     # current_not_mixed_piglets_quantity
     total_not_mixed_piglets = serializers.ReadOnlyField()
