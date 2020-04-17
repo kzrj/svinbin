@@ -23,6 +23,7 @@ services:
       - "5432:5432"
     volumes:
       - ./postgres_data:/var/lib/postgresql
+      - ./customPostgresql.conf:/etc/postgresql.conf
       # - ./custom_postgresql.conf:/var/lib/postgresql/data/postgresql.conf
 
   backend:
