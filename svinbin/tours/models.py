@@ -283,7 +283,7 @@ class TourQuerySet(models.QuerySet):
 
         data = dict()
         for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
-            subquery = self.gen_piglets_age_at_date_subquery(OuterRef('weight_date_3_4'))
+            subquery = self.gen_piglets_age_at_date_subquery(OuterRef(OuterRef('weight_date_3_4')))
             place = place.replace('/', '_')
             data[f'age_at_{place}'] = subquery
 

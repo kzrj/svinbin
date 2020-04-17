@@ -46,15 +46,15 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_weight_data_mixed() \
                 .add_avg_weight_data() \
                 .add_weight_qnty_not_mixed() \
-                .add_culling_weight_not_mixed_piglets() \
-                .add_culling_qnty_not_mixed_piglets() \
-                .add_culling_avg_weight_not_mixed_piglets() \
-                .add_culling_percentage_not_mixed_piglets() \
                 .add_weight_date() \
                 .add_count_tour_sow() \
                 .add_current_piglets_age() \
                 .add_age_at_weight_date() \
                 .add_culling_data_by_ws() \
+                # .add_culling_weight_not_mixed_piglets() \
+                # .add_culling_qnty_not_mixed_piglets() \
+                # .add_culling_avg_weight_not_mixed_piglets() \
+                # .add_culling_percentage_not_mixed_piglets() \
 
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
