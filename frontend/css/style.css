@@ -393,3 +393,19 @@ hr {
 .cell-piglets-metatour{
 	font-size: 0.8rem;
 }
+
+/* REPORTS */
+
+.report-tour-table tr {
+	border: 1px solid black;
+	height: 10px !important;
+}
+
+.report-tour-table td {
+	border: 1px solid black;
+}
+
+.report-tour-column{
+	float: left !important;
+}
+
