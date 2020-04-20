@@ -202,6 +202,7 @@ class SowFarrowManager(CoreModelManager):
             )
         metatour = MetaTour.objects.create(piglets=piglets)
         MetaTourRecord.objects.create_record(metatour, sow.tour, alive_quantity, alive_quantity)
+        metatour.set_week_tour()
 
         farrow = self.create(sow=sow, tour=sow.tour, initiator=initiator,
                 date=date, alive_quantity=alive_quantity,

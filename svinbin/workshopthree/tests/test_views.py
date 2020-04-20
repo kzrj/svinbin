@@ -50,12 +50,12 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         self.assertEqual(sow.status.title, 'Кормилица')
         self.assertEqual(response.data['message'], 'Свинья помечена как кормилица.')
 
-    def test_create_gilt(self):
-        sow = sows_testing.create_sow_seminated_usouded_ws3_section(section_number=1, week=7)
-        location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
-        sow.change_sow_current_location(location)
-        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+    # def test_create_gilt(self):
+    #     sow = sows_testing.create_sow_seminated_usouded_ws3_section(section_number=1, week=7)
+    #     location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
+    #     sow.change_sow_current_location(location)
+    #     SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
 
-        response = self.client.post('/api/workshopthree/sows/%s/create_gilt/' % sow.pk,
-            {'birth_id': 1})
-        self.assertEqual('Ремонтная свинка' in response.data['message'], True)
+    #     response = self.client.post('/api/workshopthree/sows/%s/create_gilt/' % sow.pk,
+    #         {'birth_id': 1})
+    #     self.assertEqual('Ремонтная свинка' in response.data['message'], True)

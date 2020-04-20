@@ -95,6 +95,9 @@ class PigletsSplitManager(CoreModelManager):
                 quantity=round(parent_record.percentage * new_amount / 100),
                 total_quantity=new_amount)
 
+        metatour1.set_week_tour()
+        metatour2.set_week_tour()
+
         parent_piglets.deactivate()
 
         return piglets1, piglets2_new_amount
@@ -138,6 +141,9 @@ class PigletsMergerManager(CoreModelManager):
             tour.metatourrecords.create_record(metatour=metatour, tour=tour,
              quantity=parent_records.sum_quantity_by_tour(tour),
              total_quantity=total_quantity)
+
+        # set week tour
+        metatour.set_week_tour()
 
         # create merger
         merger = self.create(created_piglets=piglets, initiator=initiator, date=timezone.now())
@@ -216,7 +222,7 @@ class PigletsMerger(PigletsEvent):
 
 
 class WeighingPigletsManager(CoreModelManager):
-    def create_weighing(self, piglets_group, total_weight, place, initiator=None):
+    def create_weighing(self, piglets_group, total_weight, place, initiator=None, date=timezone.now()):
         weighing_record = self.create(
             piglets_group=piglets_group,
             total_weight=total_weight,
@@ -224,7 +230,7 @@ class WeighingPigletsManager(CoreModelManager):
             place=place,
             piglets_quantity=piglets_group.quantity,
             initiator=initiator,
-            date=timezone.now())
+            date=date)
 
         piglets_group.change_status_to('Взвешены, готовы к заселению')
         return weighing_record

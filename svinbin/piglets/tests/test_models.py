@@ -201,9 +201,9 @@ class PigletsQueryTest(TransactionTestCase):
     def test_with_count_piglets_in_mixed_groups(self):
         self.assertEqual(Piglets.objects.all().count_piglets_in_mixed_groups(week_number=1), 130)
 
-    def test_with_count_piglets_in_mixed_group_annotate(self):
-        self.assertEqual(Piglets.objects.all() \
-            .count_piglets_in_mixed_group_annotate(week_number=1), 130)
+    # def test_with_count_piglets_in_mixed_group_annotate(self):
+    #     self.assertEqual(Piglets.objects.all() \
+    #         .count_piglets_in_mixed_group_annotate(week_number=1).first().count_piglets, 130)
 
     # def test_queryset_s(self):
     #     with self.assertNumQueries(1):

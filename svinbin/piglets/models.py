@@ -54,15 +54,15 @@ class PigletsQuerySet(models.QuerySet):
             count_piglets=models.Subquery(subquery, output_field=models.IntegerField())
             ).aggregate(models.Sum('count_piglets'))['count_piglets__sum']
 
-    def count_piglets_in_mixed_group_annotate(self, week_number):
-        subquery = MetaTourRecord.objects.filter(metatour__piglets__pk=models.OuterRef('pk'), 
-                                                    tour__week_number=week_number) \
-                                        .values('quantity')
+    # def count_piglets_in_mixed_group_annotate(self, week_number):
+    #     subquery = MetaTourRecord.objects.filter(metatour__piglets__pk=models.OuterRef('pk'), 
+    #                                                 tour__week_number=week_number) \
+    #                                     .values('quantity')
 
-        return self.with_tour_mixed(week_number=week_number) \
-                    .annotate(
-                        count_piglets=models.Subquery(subquery, output_field=models.IntegerField())
-                    ) 
+    #     return self.with_tour_mixed(week_number=week_number) \
+    #                 .annotate(
+    #                     count_piglets=models.Subquery(subquery, output_field=models.IntegerField())
+    #                 ) 
                     # .annotate(cnt=models.Sum('count_piglets')).values('cnt')[:1]
 
 
@@ -93,24 +93,25 @@ class PigletsManager(CoreModelManager):
 
     # for init and test only
     def init_piglets_with_metatour(self, tour, location, quantity, gilts_quantity=0, created_at=None):
-    	piglets = self.create(location=location,
+        piglets = self.create(location=location,
                 start_quantity=quantity,
                 quantity=quantity,
                 gilts_quantity=gilts_quantity)
-    	metatour = MetaTour.objects.create(piglets=piglets)
-    	MetaTourRecord.objects.create_record(metatour, tour, quantity, quantity)
-    	return piglets
+        metatour = MetaTour.objects.create(piglets=piglets)
+        MetaTourRecord.objects.create_record(metatour, tour, quantity, quantity)
+        metatour.set_week_tour()
+        return piglets
 
     # test use kwargs
     def init_piglets_by_week(self, *args, **kwargs):
-    	tour = Tour.objects.get_or_create_by_week_in_current_year(kwargs['week'])
-    	kwargs.pop('week')
-    	kwargs['tour'] = tour
-    	return self.init_piglets_with_metatour(**kwargs)
+        tour = Tour.objects.get_or_create_by_week_in_current_year(kwargs['week'])
+        kwargs.pop('week')
+        kwargs['tour'] = tour
+        return self.init_piglets_with_metatour(**kwargs)
 
     def init_piglets_by_farrow_date(self, farrow_date, location, quantity, gilts_quantity=0):
-    	tour = Tour.objects.create_tour_from_farrow_date_string(farrow_date)
-    	return self.init_piglets_with_metatour(tour, location, quantity, gilts_quantity)
+        tour = Tour.objects.create_tour_from_farrow_date_string(farrow_date)
+        return self.init_piglets_with_metatour(tour, location, quantity, gilts_quantity)
 
 
 class Piglets(CoreModel):

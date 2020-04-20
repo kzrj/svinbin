@@ -445,6 +445,42 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def add_week_weight(self):
+        # tour.weight_date_3_4
+        # piglets with tour al
+        data = dict()
+        piglets_subquery = MetaTourRecord.objects.filter(tour__pk=OuterRef(OuterRef('pk'))).values('metatour__piglets')
+
+        for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
+            place_formatted = place.replace('/', '_')
+            weights_subquery = piglets_events.models.WeighingPiglets.objects.filter(
+                                    piglets_group__in=Subquery(piglets_subquery),
+                                    place=place,
+                                    date__lt=(OuterRef(f'weight_date_{place_formatted}') + datetime.timedelta(days=1))) \
+                                .values('place') 
+
+            # total weights
+            weights_subquery_total_weight = weights_subquery.annotate(weight=Sum('total_weight')) \
+                .values('weight')
+            data[f'week_weight_{place_formatted}'] = Subquery(weights_subquery_total_weight,
+                 output_field=models.FloatField())
+
+            # avg weights
+            weights_subquery_total_weight = weights_subquery.annotate(avg_weight=Avg('average_weight')) \
+                .values('avg_weight')
+            data[f'week_weight_avg_{place_formatted}'] = Subquery(weights_subquery_total_weight,
+                 output_field=models.FloatField())
+
+            # qnty weights
+            weights_subquery_total_weight = weights_subquery.annotate(qnty_weight=Sum('piglets_quantity')) \
+                .values('qnty_weight')
+            data[f'week_weight_qnty_{place_formatted}'] = Subquery(weights_subquery_total_weight,
+                 output_field=models.FloatField())
+
+        return self.annotate(**data)
+
+
+
 
 class TourManager(CoreModelManager):
     def get_queryset(self):
@@ -541,6 +577,7 @@ class MetaTourManager(CoreModelManager):
 
 class MetaTour(CoreModel):
     piglets = models.OneToOneField('piglets.Piglets', on_delete=models.CASCADE)
+    week_tour = models.ForeignKey(Tour, on_delete=models.SET_NULL, null=True)
 
     objects = MetaTourManager()
 
@@ -558,6 +595,12 @@ class MetaTour(CoreModel):
                 } 
             for record in self.records.all()]
 
+    def set_week_tour(self):
+        record = self.records.all().order_by('-percentage', 'tour__year', 'tour__week_number').first()
+        if record:
+            self.week_tour = record.tour
+            self.save()
+
 
 class MetaTourRecordQuerySet(models.QuerySet):
     def sum_quantity_by_tour(self, tour):
@@ -573,8 +616,8 @@ class MetaTourRecordManager(CoreModelManager):
 
     def create_record(self, metatour, tour, quantity, total_quantity):
         # total quantity is quantity by all metatour records
-        if quantity <= 0 or total_quantity <= 0:
-            quantity = 1
+        if total_quantity <= 0:
+            # quantity = 1
             total_quantity = 1
             
         percentage = (quantity * 100) / total_quantity
@@ -615,7 +658,7 @@ class MetaTourRecord(CoreModel):
         ordering = ['tour', ]
 
     def __str__(self):
-        return 'MetaTourRecord {}'.format(self.pk)
+        return 'MetaTourRecord {}  {}'.format(self.pk, self.tour)
 
     def increase_quantity(self, amount):
         self.quantity += amount

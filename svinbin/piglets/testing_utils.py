@@ -22,6 +22,7 @@ def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_q
 
     meta_tour = MetaTour.objects.create(piglets=piglets)
     meta_tour.records.create_record(meta_tour, tour, piglets.quantity, piglets.quantity)
+    meta_tour.set_week_tour()
 
     return piglets
 

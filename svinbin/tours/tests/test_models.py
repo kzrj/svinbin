@@ -690,7 +690,48 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             tours = Tour.objects.all().add_weight_date().add_age_at_weight_date()
             bool(tours)
             self.assertEqual(tours[0].weight_date_3_4.year, 2020)
-            self.assertEqual(tours[0].age_at_3_4.days, 0)
+            # self.assertEqual(tours[0].age_at_3_4.days, 0)
+
+    def test_add_week_weight(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1100, place='3/4')
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=2600, place='4/8')
+
+        # mixed tour piglets
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+        WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets1, total_weight=1000,
+         place='3/4')
+
+
+        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 50)
+        piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+        loc_cell_ws5_4 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[3]
+        merged_piglets2 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets6, piglets7], new_location=loc_cell_ws5_4)
+        w2 = WeighingPiglets.objects.create_weighing(piglets_group=merged_piglets2, total_weight=1000,
+         place='3/4', date=datetime.datetime.now() + datetime.timedelta(days=21))
+
+        merged_piglets1.deactivate()
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_weight_date().add_week_weight()
+            bool(tours)
+            self.assertEqual(tours[0].week_weight_3_4, 2100)
+            self.assertEqual(tours[0].week_weight_avg_3_4, 10.5)
+            self.assertEqual(tours[0].week_weight_qnty_3_4, 200)
+            
 
     def test_add_culling_data_by_ws(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -738,6 +779,60 @@ class TourQuerysetAddPigletsDataTest(TestCase):
                 .add_culling_data_by_ws()
 
             bool(tours)
+
+class TourQuerysetAddPigletsData2Test(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        pigs_testings.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.loc_ws5 = Location.objects.get(workshop__number=5)
+
+    def test_week_culling(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 100)
+
+        # less tour1 30/70
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+
+        # 50/50
+        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 50)
+        piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+        loc_cell_ws5_4 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[3]
+        merged_piglets2 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets6, piglets7], new_location=loc_cell_ws5_4)
+
+        # more tour 1 80/20
+        piglets8 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 80)
+        piglets9 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 20)
+        loc_cell_ws5_5 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[4]
+        merged_piglets3 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets8, piglets9], new_location=loc_cell_ws5_5)
+
+        piglets = Piglets.objects.filter(metatour__records__tour=self.tour1,
+             metatour__records__percentage__lt=100)
+        print(piglets)
+
+        print(piglets.values('metatour__records'))
+        print(piglets.values('metatour__records').values('metatour__records__tour'))
+
 
 class TourQuerysetAddSowsDataTest(TestCase):
     def setUp(self):
@@ -875,3 +970,127 @@ class TourQuerysetAddSowsDataTest(TestCase):
             bool(tours)
             self.assertEqual(tours[0].ws1_count_tour_sow,2)
             self.assertEqual(tours[0].ws3_count_tour_sow,1)
+
+
+class MetaTourTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        pigs_testings.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.tour3 = Tour.objects.get_or_create_by_week_in_current_year(week_number=3)
+        self.tour4 = Tour.objects.get_or_create_by_week_in_current_year(week_number=4)
+        self.tour52 = Tour.objects.get_or_create_by_week(week_number=52, year=2019)
+        self.tour51 = Tour.objects.get_or_create_by_week(week_number=51, year=2019)
+        self.loc_ws5 = Location.objects.get(workshop__number=5)
+
+    def test_set_week_tour1(self):
+        # one metarecord
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+
+        piglets1.metatour.set_week_tour()
+        self.assertEqual(piglets1.metatour.week_tour, self.tour1)
+
+    def test_set_week_tour2(self):
+        # two metarecord
+        # less tour1 30/70
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+
+        merged_piglets1.metatour.set_week_tour()
+        self.assertEqual(merged_piglets1.metatour.week_tour, self.tour2)
+
+    def test_set_week_tour3(self):
+        # two metarecord
+        # equal 50/50
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 50)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+
+        merged_piglets1.metatour.set_week_tour()
+        self.assertEqual(merged_piglets1.metatour.week_tour, self.tour1)
+
+    def test_set_week_tour4(self):
+        # four metarecord
+        # equal, same year 
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 50)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour3,
+            self.loc_ws5, 50)
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour4,
+            self.loc_ws5, 50)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets1, piglets2, piglets3, piglets4], new_location=loc_cell_ws5_3)
+
+        merged_piglets1.metatour.set_week_tour()
+        self.assertEqual(merged_piglets1.metatour.week_tour, self.tour1)
+
+    def test_set_week_tour5(self):
+        # four metarecord
+        # one less, same year 
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 45)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour3,
+            self.loc_ws5, 50)
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour4,
+            self.loc_ws5, 50)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets1, piglets2, piglets3, piglets4], new_location=loc_cell_ws5_3)
+
+        merged_piglets1.metatour.set_week_tour()
+        self.assertEqual(merged_piglets1.metatour.week_tour, self.tour2)
+
+    def test_set_week_tour6(self):
+        # four metarecord
+        # equal, not same year 
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 50)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour3,
+            self.loc_ws5, 50)
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour52,
+            self.loc_ws5, 50)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets1, piglets2, piglets3, piglets4], new_location=loc_cell_ws5_3)
+
+        merged_piglets1.metatour.set_week_tour()
+        self.assertEqual(merged_piglets1.metatour.week_tour, self.tour52)
+
+    def test_set_week_tour7(self):
+        # four metarecord
+        # equal, not same year 
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 50)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 50)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour51,
+            self.loc_ws5, 50)
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour52,
+            self.loc_ws5, 50)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets1, piglets2, piglets3, piglets4], new_location=loc_cell_ws5_3)
+
+        merged_piglets1.metatour.set_week_tour()
+        self.assertEqual(merged_piglets1.metatour.week_tour, self.tour51)

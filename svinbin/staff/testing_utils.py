@@ -42,6 +42,8 @@ def create_svinbin_users():
     create_workshop_user('test_admin2', 'svinbin123', 1, 'АДМ', True, True)
     create_workshop_user('test_officer', 'svinbin123', 1, 'ОФИЦЕР', True, True)
 
+    create_workshop_user('mitkinov', 'qwerty', 1, 'ОФИЦЕР', True, True)
+
     create_workshop_user('shmigina', '123', 1, 'ШМЫГИ', True)
     create_workshop_user('borisov', '123', 1, 'БОРИС', True)
     create_workshop_user('semenova', '123', 1, 'СЕМЕН', True)
