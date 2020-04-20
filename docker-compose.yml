@@ -21,8 +21,8 @@ services:
     image: postgres:10.1-alpine
     ports: 
       - "5432:5432"
-    # volumes:
-    #   - ./postgres_data:/var/lib/postgresql/data
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data
       # - ./custom_postgresql/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
 
   backend:
@@ -37,11 +37,10 @@ services:
 
     restart: unless-stopped
     command: bash -c "cd svinbin &&
-                      gunicorn svinbin.wsgi -b 0.0.0.0:8000"  
-                      # python manage.py makemigrations --no-input &&
-                      # python manage.py migrate &&
-                      # python manage.py collectstatic --no-input &&
-                      # gunicorn svinbin.wsgi -b 0.0.0.0:8000"        
+                      python manage.py makemigrations --no-input &&
+                      python manage.py migrate &&
+                      python manage.py collectstatic --no-input &&
+                      gunicorn svinbin.wsgi -b 0.0.0.0:8000"        
    
     volumes:
       - .:/code
