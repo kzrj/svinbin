@@ -54,6 +54,7 @@ class ReportTourSerializer(serializers.ModelSerializer):
     count_usound35_proholost = serializers.ReadOnlyField()
     count_abort = serializers.ReadOnlyField()
 
+    # add_count_tour_sow
     ws1_count_tour_sow = serializers.ReadOnlyField()
     ws2_count_tour_sow = serializers.ReadOnlyField()
     ws3_count_tour_sow = serializers.ReadOnlyField()
@@ -64,100 +65,55 @@ class ReportTourSerializer(serializers.ModelSerializer):
     total_born_mummy = serializers.ReadOnlyField()
     gilt_count = serializers.ReadOnlyField()
 
-    # current_not_mixed_piglets_quantity
-    total_not_mixed_piglets = serializers.ReadOnlyField()
-    ws3_qnty_not_mixed = serializers.ReadOnlyField()
-    ws4_qnty_not_mixed = serializers.ReadOnlyField()
-    ws8_qnty_not_mixed = serializers.ReadOnlyField()
-    ws5_qnty_not_mixed = serializers.ReadOnlyField()
-    ws6_qnty_not_mixed = serializers.ReadOnlyField()
-    ws7_qnty_not_mixed = serializers.ReadOnlyField()
-
-    # current_mixed_piglets_quantity
-    total_mixed_piglets = serializers.ReadOnlyField()
-    ws3_qnty_mixed = serializers.ReadOnlyField()
-    ws4_qnty_mixed = serializers.ReadOnlyField()
-    ws8_qnty_mixed = serializers.ReadOnlyField()
-    ws5_qnty_mixed = serializers.ReadOnlyField()
-    ws6_qnty_mixed = serializers.ReadOnlyField()
-    ws7_qnty_mixed = serializers.ReadOnlyField()
-
-    # weight_data_not_mixed
-    total_weight_not_mixed_3_4 = serializers.ReadOnlyField()
-    total_weight_not_mixed_4_8 = serializers.ReadOnlyField()
-    total_weight_not_mixed_8_5 = serializers.ReadOnlyField()
-    total_weight_not_mixed_8_6 = serializers.ReadOnlyField()
-    total_weight_not_mixed_8_7 = serializers.ReadOnlyField()
-
-    # weight_data_mixed
-    total_weight_mixed_3_4 = serializers.ReadOnlyField()
-    total_weight_mixed_4_8 = serializers.ReadOnlyField()
-    total_weight_mixed_8_5 = serializers.ReadOnlyField()
-    total_weight_mixed_8_6 = serializers.ReadOnlyField()
-    total_weight_mixed_8_7 = serializers.ReadOnlyField()
-
-    # avg_weight_data (?mixed)
-    avg_weight_3_4 = serializers.ReadOnlyField()
-    avg_weight_4_8 = serializers.ReadOnlyField()
-    avg_weight_8_5 = serializers.ReadOnlyField()
-    avg_weight_8_6 = serializers.ReadOnlyField()
-    avg_weight_8_7 = serializers.ReadOnlyField()
-
-    # weight_date
+    # add_weight_date
     weight_date_3_4 = serializers.ReadOnlyField()
     weight_date_4_8 = serializers.ReadOnlyField()
     weight_date_8_5 = serializers.ReadOnlyField()
     weight_date_8_6 = serializers.ReadOnlyField()
     weight_date_8_7 = serializers.ReadOnlyField()
 
-    # weight qnty
-    total_weight_qnty_not_mixed_3_4 = serializers.ReadOnlyField()
-    total_weight_qnty_not_mixed_4_8 = serializers.ReadOnlyField()
-    total_weight_qnty_not_mixed_8_5 = serializers.ReadOnlyField()
-    total_weight_qnty_not_mixed_8_6 = serializers.ReadOnlyField()
-    total_weight_qnty_not_mixed_8_7 = serializers.ReadOnlyField()
+    # add_week_weight
+    week_weight_avg_3_4 = serializers.ReadOnlyField()
+    week_weight_avg_4_8 = serializers.ReadOnlyField()
+    week_weight_avg_8_5 = serializers.ReadOnlyField()
+    week_weight_avg_8_6 = serializers.ReadOnlyField()
+    week_weight_avg_8_7 = serializers.ReadOnlyField()
 
-    # age_at_weight_date
-    age_at_3_4 = serializers.ReadOnlyField()
-    age_at_4_8 = serializers.ReadOnlyField()
-    age_at_8_5 = serializers.ReadOnlyField()
-    age_at_8_6 = serializers.ReadOnlyField()
-    age_at_8_7 = serializers.ReadOnlyField()
+    week_weight_qnty_3_4 = serializers.ReadOnlyField()
+    week_weight_qnty_4_8 = serializers.ReadOnlyField()
+    week_weight_qnty_8_5 = serializers.ReadOnlyField()
+    week_weight_qnty_8_6 = serializers.ReadOnlyField()
+    week_weight_qnty_8_7 = serializers.ReadOnlyField()
 
-    # culling_weight_not_mixed_piglets
-    padej_weight = serializers.ReadOnlyField()
-    prirezka_weight = serializers.ReadOnlyField()
-    vinuzhd_weight = serializers.ReadOnlyField()
-    spec_weight = serializers.ReadOnlyField()
-
-    # culling_qnty_not_mixed_piglets
-    padej_quantity = serializers.ReadOnlyField()
-    prirezka_quantity = serializers.ReadOnlyField()
-    vinuzhd_quantity = serializers.ReadOnlyField()
-    spec_quantity = serializers.ReadOnlyField()
-
-    # culling_avg_weight_not_mixed_piglets
-    padej_avg_weight = serializers.ReadOnlyField()
-    prirezka_avg_weight = serializers.ReadOnlyField()
-    vinuzhd_avg_weight = serializers.ReadOnlyField()
-    spec_avg_weight = serializers.ReadOnlyField()
-
-    padej_avg_weight_mixed = serializers.ReadOnlyField()
-    prirezka_avg_weight_mixed = serializers.ReadOnlyField()
-    vinuzhd_avg_weight_mixed = serializers.ReadOnlyField()
-    spec_avg_weight_mixed = serializers.ReadOnlyField()
-
-    # culling_percentage_not_mixed_piglets
-    padej_percentage = serializers.ReadOnlyField()
-    prirezka_percentage = serializers.ReadOnlyField()
-    vinuzhd_percentage = serializers.ReadOnlyField()
-    spec_percentage = serializers.ReadOnlyField()
-
-    # culling ws3
+    # add_culling_data_by_week_tour
     ws3_padej_quantity = serializers.ReadOnlyField()
+    ws4_padej_quantity = serializers.ReadOnlyField()
+    ws8_padej_quantity = serializers.ReadOnlyField()
+    ws5_padej_quantity = serializers.ReadOnlyField()
+    ws6_padej_quantity = serializers.ReadOnlyField()
+    ws7_padej_quantity = serializers.ReadOnlyField()
+
     ws3_prirezka_quantity = serializers.ReadOnlyField()
-    # vinuzhd_percentage = serializers.ReadOnlyField()
-    # spec_percentage = serializers.ReadOnlyField()
+    ws4_prirezka_quantity = serializers.ReadOnlyField()
+    ws8_prirezka_quantity = serializers.ReadOnlyField()
+    ws5_prirezka_quantity = serializers.ReadOnlyField()
+    ws6_prirezka_quantity = serializers.ReadOnlyField()
+    ws7_prirezka_quantity = serializers.ReadOnlyField()
+
+    ws3_vinuzhd_quantity = serializers.ReadOnlyField()
+    ws4_vinuzhd_quantity = serializers.ReadOnlyField()
+    ws8_vinuzhd_quantity = serializers.ReadOnlyField()
+    ws5_vinuzhd_quantity = serializers.ReadOnlyField()
+    ws6_vinuzhd_quantity = serializers.ReadOnlyField()
+    ws7_vinuzhd_quantity = serializers.ReadOnlyField()
+
+    ws5_spec_quantity = serializers.ReadOnlyField()
+    ws6_spec_quantity = serializers.ReadOnlyField()
+    ws7_spec_quantity = serializers.ReadOnlyField()
+
+    ws5_spec_avg_weight = serializers.ReadOnlyField()
+    ws6_spec_avg_weight = serializers.ReadOnlyField()
+    ws7_spec_avg_weight = serializers.ReadOnlyField()
 
     class Meta:
         model = Tour

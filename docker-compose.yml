@@ -21,8 +21,8 @@ services:
     image: postgres:10.1-alpine
     ports: 
       - "5432:5432"
-    volumes:
-      - ./postgres_data:/var/lib/postgresql/data
+    # volumes:
+    #   - ./postgres_data:/var/lib/postgresql/data
       # - ./custom_postgresql/postgresql.conf:/var/lib/postgresql/data/postgresql.conf
 
   backend:
@@ -32,7 +32,7 @@ services:
     # command: bash -c "cd svinbin &&
     #                   python manage.py migrate &&
     #                   python manage.py makemigrations --no-input &&
-    #                   python manage.py test"
+    #                   python manage.py test tours.tests.test_models.TourQuerysetAddPigletsDataTest"
                       # python manage.py test piglets.tests.test_models.PigletsQueryTest"
 
     restart: unless-stopped

@@ -479,7 +479,44 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def add_culling_data_by_week_tour(self):
+        data = dict()
 
+        for ws_number in [3, 4, 5, 6, 7, 8]:
+            for c_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
+                piglets_subquery = MetaTour.objects.filter(
+                    week_tour__pk=OuterRef(OuterRef('pk'))) \
+                    .filter(
+                    Q(
+                        Q(piglets__location__workshop__number=ws_number) |
+                        Q(piglets__location__section__workshop__number=ws_number) |
+                        Q(piglets__location__pigletsGroupCell__workshop__number=ws_number) |
+                        Q(piglets__location__sowAndPigletsCell__workshop__number=ws_number)
+                    )).values('piglets')
+
+                culling_subquery = piglets_events.models.CullingPiglets.objects.filter(
+                    piglets_group__in=Subquery(piglets_subquery),
+                    culling_type=c_type
+                    ) \
+                    .values('culling_type') \
+                    .annotate(qnty=Sum('quantity')) \
+                    .values('qnty')
+
+                data[f'ws{ws_number}_{c_type}_quantity'] = Subquery(culling_subquery, output_field=models.IntegerField())
+
+                if c_type == 'spec' and ws_number in [5, 6, 7]:
+                    culling_subquery_avg_weight = piglets_events.models.CullingPiglets.objects.filter(
+                        piglets_group__in=Subquery(piglets_subquery),
+                        culling_type=c_type
+                        ) \
+                        .values('culling_type') \
+                        .annotate(avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())) \
+                        .values('avg_weight')
+
+                    data[f'ws{ws_number}_{c_type}_avg_weight'] = Subquery(culling_subquery_avg_weight,
+                     output_field=models.FloatField())
+
+        return self.annotate(**data)
 
 
 class TourManager(CoreModelManager):

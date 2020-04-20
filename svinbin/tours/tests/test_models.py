@@ -759,6 +759,54 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             self.assertEqual(tours[0].ws5_prirezka_quantity, None)
             self.assertEqual(tours[0].ws6_prirezka_quantity, 4)
 
+    def test_add_culling_data_by_ws_week_tour(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1, culling_type='padej',
+         quantity=1, total_weight=19)
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3, culling_type='padej',
+         quantity=5, total_weight=51)
+
+        loc2 = Location.objects.get(workshop__number=6)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            loc2, 100)
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2, culling_type='prirezka',
+         quantity=4, total_weight=42)
+
+         # less tour1 30/70
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 30)
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 70)
+        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+        CullingPiglets.objects.create_culling_piglets(piglets_group=merged_piglets1,
+         culling_type='spec', quantity=10, total_weight=190)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=merged_piglets1,
+         culling_type='spec', quantity=5, total_weight=50)
+
+        # more tour 1 80/20
+        piglets8 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 80)
+        piglets9 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 20)
+        loc_cell_ws5_5 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[4]
+        merged_piglets3 = PigletsMerger.objects.create_merger_return_group(
+            parent_piglets=[piglets8, piglets9], new_location=loc_cell_ws5_5)
+        CullingPiglets.objects.create_culling_piglets(piglets_group=merged_piglets3,
+         culling_type='padej', quantity=20, total_weight=400)
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_culling_data_by_week_tour()
+            bool(tours)
+            self.assertEqual(tours[0].ws5_padej_quantity, 26)
+            self.assertEqual(tours[1].ws5_spec_avg_weight, 14.5)
+
     def test_add_all(self):
         with self.assertNumQueries(1):
             tours = Tour.objects.all() \
