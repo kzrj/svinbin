@@ -47,7 +47,7 @@ OWN_APPS = [
     'piglets.apps.PigletsConfig',
     'sows_events.apps.SowsEventsConfig',
     'piglets_events.apps.PigletsEventsConfig',
-    'gilts_events.apps.GiltsEventsConfig',
+    # 'gilts_events.apps.GiltsEventsConfig',
     'transactions.apps.TransactionsConfig',
     'tours.apps.ToursConfig',
     'staff.apps.StaffConfig',
