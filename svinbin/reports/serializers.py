@@ -85,6 +85,10 @@ class ReportTourSerializer(serializers.ModelSerializer):
     week_weight_qnty_8_6 = serializers.ReadOnlyField()
     week_weight_qnty_8_7 = serializers.ReadOnlyField()
 
+    # add_week_weight_ws8_v2
+    week_weight_qnty_ws8 = serializers.ReadOnlyField()
+    week_weight_avg_ws8 = serializers.ReadOnlyField()
+
     # add_culling_data_by_week_tour
     ws3_padej_quantity = serializers.ReadOnlyField()
     ws4_padej_quantity = serializers.ReadOnlyField()
@@ -96,11 +100,7 @@ class ReportTourSerializer(serializers.ModelSerializer):
     ws3_prirezka_quantity = serializers.ReadOnlyField()
     ws4_prirezka_quantity = serializers.ReadOnlyField()
     ws8_prirezka_quantity = serializers.ReadOnlyField()
-    ws5_prirezka_quantity = serializers.ReadOnlyField()
-    ws6_prirezka_quantity = serializers.ReadOnlyField()
-    ws7_prirezka_quantity = serializers.ReadOnlyField()
 
-    ws3_vinuzhd_quantity = serializers.ReadOnlyField()
     ws4_vinuzhd_quantity = serializers.ReadOnlyField()
     ws8_vinuzhd_quantity = serializers.ReadOnlyField()
     ws5_vinuzhd_quantity = serializers.ReadOnlyField()
