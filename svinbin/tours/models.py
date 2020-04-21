@@ -479,6 +479,17 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def add_week_weight_ws8(self):
+        return self.annotate(
+            week_weight_qnty_ws8=Sum(F('week_weight_qnty_8_5') + F('week_weight_qnty_8_6') + \
+                F('week_weight_qnty_8_7')),
+            week_weight_avg_ws8=ExpressionWrapper(
+                (F('week_weight_qnty_8_5') + F('week_weight_qnty_8_6') + F('week_weight_qnty_8_7')) / 3,
+                    output_field=models.FloatField()
+                ),
+            )
+
+
     def add_culling_data_by_week_tour(self):
         data = dict()
 
@@ -504,17 +515,21 @@ class TourQuerySet(models.QuerySet):
 
                 data[f'ws{ws_number}_{c_type}_quantity'] = Subquery(culling_subquery, output_field=models.IntegerField())
 
-                if c_type == 'spec' and ws_number in [5, 6, 7]:
-                    culling_subquery_avg_weight = piglets_events.models.CullingPiglets.objects.filter(
-                        piglets_group__in=Subquery(piglets_subquery),
-                        culling_type=c_type
-                        ) \
-                        .values('culling_type') \
-                        .annotate(avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())) \
-                        .values('avg_weight')
+                if ws_number in [5, 6, 7]:
+                    if c_type == 'prirezka':
+                        continue
 
-                    data[f'ws{ws_number}_{c_type}_avg_weight'] = Subquery(culling_subquery_avg_weight,
-                     output_field=models.FloatField())
+                    if c_type == 'spec':
+                        culling_subquery_avg_weight = piglets_events.models.CullingPiglets.objects.filter(
+                            piglets_group__in=Subquery(piglets_subquery),
+                            culling_type=c_type
+                            ) \
+                            .values('culling_type') \
+                            .annotate(avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())) \
+                            .values('avg_weight')
+
+                        data[f'ws{ws_number}_{c_type}_avg_weight'] = Subquery(culling_subquery_avg_weight,
+                         output_field=models.FloatField())
 
         return self.annotate(**data)
 
