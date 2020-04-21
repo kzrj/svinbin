@@ -1,6 +1,7 @@
 import datetime
 from django.db import models
 from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg, Count, Value, Func
+from django.db.models.functions import Coalesce, Greatest
 from django.utils import timezone
 from django.apps import apps
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -449,46 +450,64 @@ class TourQuerySet(models.QuerySet):
         # tour.weight_date_3_4
         # piglets with tour al
         data = dict()
-        piglets_subquery = MetaTourRecord.objects.filter(tour__pk=OuterRef(OuterRef('pk'))).values('metatour__piglets')
+        piglets_subquery = MetaTour.objects.filter(week_tour__pk=OuterRef(OuterRef('pk'))).values('piglets')
+        # piglets_subquery = MetaTourRecord.objects.filter(tour__pk=OuterRef(OuterRef('pk'))).values('metatour__piglets')
 
         for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
             place_formatted = place.replace('/', '_')
             weights_subquery = piglets_events.models.WeighingPiglets.objects.filter(
                                     piglets_group__in=Subquery(piglets_subquery),
-                                    place=place,
-                                    date__lt=(OuterRef(f'weight_date_{place_formatted}') + datetime.timedelta(days=1))) \
+                                    place=place,) \
                                 .values('place') 
+
+            # weights_subquery = piglets_events.models.WeighingPiglets.objects.filter(
+            #                         piglets_group__in=Subquery(piglets_subquery),
+            #                         place=place,
+            #                         date__lt=(OuterRef(f'weight_date_{place_formatted}') + datetime.timedelta(days=1))) \
+            #                     .values('place') 
 
             # total weights
             weights_subquery_total_weight = weights_subquery.annotate(weight=Sum('total_weight')) \
                 .values('weight')
-            data[f'week_weight_{place_formatted}'] = Subquery(weights_subquery_total_weight,
-                 output_field=models.FloatField())
+            data[f'week_weight_{place_formatted}'] = Coalesce(Subquery(weights_subquery_total_weight,
+                 output_field=models.FloatField()), 0)
 
             # avg weights
-            weights_subquery_total_weight = weights_subquery.annotate(avg_weight=Avg('average_weight')) \
+            weights_subquery_avg_weight = weights_subquery.annotate(avg_weight=Avg('average_weight')) \
                 .values('avg_weight')
-            data[f'week_weight_avg_{place_formatted}'] = Subquery(weights_subquery_total_weight,
-                 output_field=models.FloatField())
+            data[f'week_weight_avg_{place_formatted}'] = Coalesce(Subquery(weights_subquery_avg_weight,
+                 output_field=models.FloatField()), 0)
 
             # qnty weights
-            weights_subquery_total_weight = weights_subquery.annotate(qnty_weight=Sum('piglets_quantity')) \
+            weights_subquery_qnty_weight = weights_subquery.annotate(qnty_weight=Sum('piglets_quantity')) \
                 .values('qnty_weight')
-            data[f'week_weight_qnty_{place_formatted}'] = Subquery(weights_subquery_total_weight,
-                 output_field=models.FloatField())
+            data[f'week_weight_qnty_{place_formatted}'] = Coalesce(Subquery(weights_subquery_qnty_weight,
+                 output_field=models.FloatField()), 0)
 
         return self.annotate(**data)
 
-    def add_week_weight_ws8(self):
+    def add_greatest_weight_date_otkorm(self):
         return self.annotate(
-            week_weight_qnty_ws8=Sum(F('week_weight_qnty_8_5') + F('week_weight_qnty_8_6') + \
-                F('week_weight_qnty_8_7')),
-            week_weight_avg_ws8=ExpressionWrapper(
-                (F('week_weight_qnty_8_5') + F('week_weight_qnty_8_6') + F('week_weight_qnty_8_7')) / 3,
-                    output_field=models.FloatField()
-                ),
+            weight_date_last_ws8=Greatest(F('weight_date_8_5'), F('weight_date_8_6'), F('weight_date_8_7'))
             )
 
+    def add_week_weight_ws8_v2(self):
+        # avg by week_tour
+        piglets_subquery = MetaTour.objects.filter(week_tour__pk=OuterRef(OuterRef('pk'))).values('piglets')
+        weights_subquery = piglets_events.models.WeighingPiglets.objects.filter(
+                                    piglets_group__in=Subquery(piglets_subquery),
+                                    place__in=['8/5', '8/6', '8/7']) \
+                                .values('piglets_group__metatour__week_tour')
+
+        weights_subquery_avg_weight = weights_subquery.annotate(avg_weight=Avg('average_weight')) \
+                .values('avg_weight')
+
+        return self.annotate(
+            week_weight_qnty_ws8=F('week_weight_qnty_8_5') + F('week_weight_qnty_8_6') + \
+                F('week_weight_qnty_8_7'),
+            week_weight_avg_ws8=Coalesce(Subquery(weights_subquery_avg_weight,
+                 output_field=models.FloatField()), 0)
+            )
 
     def add_culling_data_by_week_tour(self):
         data = dict()
