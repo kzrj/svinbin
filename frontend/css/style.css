@@ -395,21 +395,52 @@ hr {
 }
 
 /* REPORTS */
-
-.report-tour-table tr {
-	border: 1px solid black;
-	height: 10px !important;
+.report-block table, th, td{
+	border: 1px solid #c9c5de !important;
 }
 
-.report-tour-table td {
-	border: 1px solid black;
+.report-table table{
+	/* table-layout:fixed; */
+	/* border: 1px solid blue ! important; */
 }
 
-.report-tour-column{
-	float: left !important;
+/* .report-cell-td{ */
+	/* text-align: center; */
+	/* vertical-align: middle; */
+/* } */
+.report-cell-title {
+	display: table-cell;
+	font-size: 0.9rem;
+	font-weight: 500 !important;
+	text-align: center !important;
+	/* min-height: 40px !important; */
+	width: 80px !important;
+	vertical-align: middle !important;
+	color: #4b3867 ;
+	background-color: #f5e9ff;
 }
 
-.report-cell-value{
-	
+.report-cell-value {
+	display: table-cell;
+	font-size: 1.1rem;
+	text-align: center !important;
+	/* height: 50px !important; */
+	width: 100px !important;
+	vertical-align: middle !important;
+	color: #5d506f;
+}
+
+.report-cell-sup{
+	color: #138a27;
+}
+
+.report-cell-proh{
+	color: #e43e3e;
+}
+
+.report-cell-value-border{
+	text-align: center !important;
+	background-color: #f5e9ff !important;
+	vertical-align: middle !important;
 }
 
