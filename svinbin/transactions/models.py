@@ -73,7 +73,8 @@ class PigletsTransactionManager(CoreModelManager):
                 initiator=initiator,
                 from_location=piglets_group.location,
                 to_location=to_location,
-                piglets_group=piglets_group
+                piglets_group=piglets_group,
+                quantity=piglets_group.quantity
                 )
 
         # we should remove status "взвешены"
@@ -173,5 +174,7 @@ class PigletsTransaction(Transaction):
      related_name="piglets_transaction_to")
     piglets_group = models.ForeignKey('piglets.Piglets', on_delete=models.CASCADE,
      related_name="transactions")
+
+    quantity = models.IntegerField(null=True)
 
     objects = PigletsTransactionManager()

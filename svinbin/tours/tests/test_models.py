@@ -4,6 +4,7 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 from django.db import models
+from django.db.models import Q
 
 from tours.models import Tour, MetaTour, MetaTourRecord
 from sows.models import Sow, Gilt
@@ -11,6 +12,7 @@ from sows_events.models import Semination, Ultrasound, SowFarrow, AbortionSow
 from locations.models import Location
 from piglets.models import Piglets
 from piglets_events.models import PigletsMerger, WeighingPiglets, CullingPiglets
+from transactions.models import PigletsTransaction
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as pigs_testings
@@ -969,6 +971,42 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             tours = Tour.objects.all().add_gilts_count_by_ws_week_tour()
             bool(tours)
             self.assertEqual(tours[0].ws5_gilts_qnty_now, 12)
+
+    def test_add_count_transfer_to_7_5(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        PigletsTransaction.objects.transaction_gilts_to_7_5(piglets1)
+
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5, 100)
+        PigletsTransaction.objects.transaction_gilts_to_7_5(piglets2)
+        piglets2.deactivate()
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws5, 100)
+        PigletsTransaction.objects.transaction_gilts_to_7_5(piglets3)
+        
+
+        week_piglets = Piglets.objects.get_all().filter(metatour__week_tour=self.tour1)
+
+        trs = PigletsTransaction.objects.filter(piglets_group__in=week_piglets) \
+            .filter(to_location__workshop__number=11) \
+            .filter(Q(
+                    Q(from_location__workshop__number=5) |
+                    Q(from_location__section__workshop__number=5) |
+                    Q(from_location__pigletsGroupCell__workshop__number=5) |
+                    Q(from_location__sowAndPigletsCell__workshop__number=5)
+                )) \
+            .values('piglets_group__metatour__week_tour') \
+            .aggregate(qnty=models.Sum('piglets_group__quantity'))
+
+        print(trs)
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_count_transfer_to_7_5()
+            bool(tours)
+            self.assertEqual(tours[0].ws5_qnty_to_7_5, 200)
+
 
     def test_add_all(self):
         with self.assertNumQueries(1):
