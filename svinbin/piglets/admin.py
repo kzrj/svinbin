@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.db.models import Q
 
 from piglets.models import Piglets, PigletsStatus
 
@@ -10,8 +11,8 @@ class PigletsAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(PigletsAdmin, self).get_queryset(request)
         if request.user.is_superuser:
-            return qs.get_all()
-        return qs.get_all()
+            return qs.filter(Q(Q(active=True) | Q(active=False)))
+        return qs.filter(Q(Q(active=True) | Q(active=False)))
 
 
 @admin.register(PigletsStatus)
