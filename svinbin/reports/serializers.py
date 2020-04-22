@@ -128,7 +128,11 @@ class ReportTourSerializer(serializers.ModelSerializer):
     ws7_gilts_qnty_now = serializers.ReadOnlyField()
     ws8_gilts_qnty_now = serializers.ReadOnlyField()
 
+    # add_count_transfer_to_7_5
+    ws5_qnty_to_7_5 = serializers.ReadOnlyField()
+    ws6_qnty_to_7_5 = serializers.ReadOnlyField()
+    ws7_qnty_to_7_5 = serializers.ReadOnlyField()
+
     class Meta:
         model = Tour
         fields = '__all__'
-
