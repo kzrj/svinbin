@@ -9,7 +9,7 @@ class PigletsAdmin(admin.ModelAdmin):
     list_display = [f.name for f in Piglets._meta.fields]
 
     def get_queryset(self, request):
-        qs = super(PigletsAdmin, self).get_all(request)
+        qs = super(PigletsAdmin, self).get_queryset(request)
         return qs.filter(Q(Q(active=True) | Q(active=False)))
 
 
