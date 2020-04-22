@@ -115,6 +115,19 @@ class ReportTourSerializer(serializers.ModelSerializer):
     ws6_spec_avg_weight = serializers.ReadOnlyField()
     ws7_spec_avg_weight = serializers.ReadOnlyField()
 
+    # add_piglets_count_by_ws_week_tour
+    ws5_piglets_qnty_now = serializers.ReadOnlyField()
+    ws6_piglets_qnty_now = serializers.ReadOnlyField()
+    ws7_piglets_qnty_now = serializers.ReadOnlyField()
+
+    # add_piglets_count_by_ws_week_tour
+    ws3_gilts_qnty_now = serializers.ReadOnlyField()
+    ws4_gilts_qnty_now = serializers.ReadOnlyField()
+    ws5_gilts_qnty_now = serializers.ReadOnlyField()
+    ws6_gilts_qnty_now = serializers.ReadOnlyField()
+    ws7_gilts_qnty_now = serializers.ReadOnlyField()
+    ws8_gilts_qnty_now = serializers.ReadOnlyField()
+
     class Meta:
         model = Tour
         fields = '__all__'

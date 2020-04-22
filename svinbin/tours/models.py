@@ -552,6 +552,44 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def add_piglets_count_by_ws_week_tour(self):
+        data = dict()
+        for ws_number in [5, 6, 7]:
+            count_subquery = piglets_models.Piglets.objects.filter(metatour__week_tour__pk=OuterRef('pk')) \
+                .filter(Q(
+                        Q(location__workshop__number=ws_number) |
+                        Q(location__section__workshop__number=ws_number) |
+                        Q(location__pigletsGroupCell__workshop__number=ws_number) |
+                        Q(location__sowAndPigletsCell__workshop__number=ws_number)
+                        )
+                )\
+                .values('metatour__week_tour') \
+                .annotate(total_qnty=Sum('quantity')) \
+                .values('total_qnty')
+
+            data[f'ws{ws_number}_piglets_qnty_now'] = Subquery(count_subquery, output_field=models.IntegerField())
+
+        return self.annotate(**data)
+
+    def add_gilts_count_by_ws_week_tour(self):
+        data = dict()
+        for ws_number in [3, 4, 5, 6, 7, 8]:
+            count_subquery = piglets_models.Piglets.objects.filter(metatour__week_tour__pk=OuterRef('pk')) \
+                .filter(Q(
+                        Q(location__workshop__number=ws_number) |
+                        Q(location__section__workshop__number=ws_number) |
+                        Q(location__pigletsGroupCell__workshop__number=ws_number) |
+                        Q(location__sowAndPigletsCell__workshop__number=ws_number)
+                        )
+                )\
+                .values('metatour__week_tour') \
+                .annotate(total_gilts_qnty=Sum('gilts_quantity')) \
+                .values('total_gilts_qnty')
+
+            data[f'ws{ws_number}_gilts_qnty_now'] = Subquery(count_subquery, output_field=models.IntegerField())
+
+        return self.annotate(**data)
+
 
 class TourManager(CoreModelManager):
     def get_queryset(self):

@@ -43,7 +43,9 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_weight_date() \
                 .add_week_weight() \
                 .add_week_weight_ws8_v2() \
-                .add_culling_data_by_week_tour()
+                .add_culling_data_by_week_tour() \
+                .add_piglets_count_by_ws_week_tour() \
+                .add_gilts_count_by_ws_week_tour()
 
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
