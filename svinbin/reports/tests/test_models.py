@@ -79,7 +79,7 @@ class ReportDateQsTest(TransactionTestCase):
         
         with self.assertNumQueries(1):
             rds = ReportDate.objects.all().add_today_sows_qnty()
-            self.assertEqual(rds[0].today_sows_qnty, 17)
+            self.assertEqual(rds[0].today_start_sows_qnty, 17)
 
     def test_add_sows_quantity_at_date(self):
         # init 10 sows
@@ -96,7 +96,7 @@ class ReportDateQsTest(TransactionTestCase):
             sow = Sow.objects.all()[i]
             CullingSow.objects.create_culling(sow=sow, culling_type='padej', date=past_date)
 
-        start_date = date(2020, 4, 15)
+        start_date = date(2020, 4, 20)
         end_date = timezone.now().date()
 
         culls = CullingSow.objects.filter(date__date__range=(start_date, end_date),
@@ -105,52 +105,81 @@ class ReportDateQsTest(TransactionTestCase):
             .annotate(cnt=models.Count('pk')) \
             .values('cnt')[:1]
 
-        print(culls.first(), 5)
-        print(culls.first()['cnt'], 5)
-        print(culls, 5)
-        # self.assertEqual(culls.first()['cnt'], 5)
-
+        self.assertEqual(culls[0]['cnt'], 5)
+        
         start_date = date(2020, 1, 1)
         end_date = date(2020, 1, 2)
-        end_date = timezone.now().date()
-
         culls = CullingSow.objects.filter(date__date__range=(start_date, end_date),
          culling_type='padej') \
             .values('culling_type') \
             .annotate(cnt=models.Count('pk')) \
             .values('cnt')
-        # self.assertEqual(culls[:1]['cnt'], 0)
+
+        self.assertEqual(culls.count(), 0)
+
+        start_date = date(2020, 1, 1)
+        end_date = timezone.now().date()
+        culls = CullingSow.objects.filter(date__date__range=(start_date, end_date),
+         culling_type='padej') \
+            .values('culling_type') \
+            .annotate(cnt=models.Count('pk')) \
+            .values('cnt')
+            
+        self.assertEqual(culls[0]['cnt'], 8)
         
+        with self.assertNumQueries(4):
+            rds = ReportDate.objects.all() \
+                    .add_today_sows_qnty() \
+                    .add_sows_quantity_at_date_start() \
+                    .add_sows_quantity_at_date_end()
+            bool(rds)
+            self.assertEqual(rds[0].today_start_sows_qnty, 17)
+            self.assertEqual(rds[0].today_padej_subquery, 5)
+            self.assertEqual(rds[0].today_vinuzhd_subquery, 0)
+            self.assertEqual(rds[0].sow_qnty_at_date_start, 20)
+            self.assertEqual(rds[0].cnt_padej_subquery_from_date, 3)
+            self.assertEqual(rds[0].cnt_vinuzhd_subquery_from_date, 0)
+            self.assertEqual(rds[0].cnt_padej_subquery_at_end_date, 0)
+            self.assertEqual(rds[0].cnt_vinuzhd_subquery_at_end_date, 0)
+            self.assertEqual(rds[0].sows_quantity_at_date_end, 20)
+
+            # print('RD')
+            # rd = rds.order_by('-date').first()
+            # print(rd)
+            # print('today_start_sows_qnty', rd.today_start_sows_qnty, 17)
+            # print('today_padej_subquery', rd.today_padej_subquery, 5)
+            # print('today_vinuzhd_subquery', rd.today_vinuzhd_subquery, 0)
+            # print('sow_qnty_at_date_start', rd.sow_qnty_at_date_start, 17)
+            # print('cnt_padej_subquery_from_date', rd.cnt_padej_subquery_from_date, 3)
+            # print('cnt_vinuzhd_subquery_from_date', rd.cnt_vinuzhd_subquery_from_date, 0)
+            # print('cnt_padej_subquery_at_end_date', rd.cnt_padej_subquery_at_end_date, 5)
+            # print('cnt_vinuzhd_subquery_at_end_date', rd.cnt_vinuzhd_subquery_at_end_date, 0)
+            # print('sows_quantity_at_date_end', rd.sows_quantity_at_date_end, 12)
+            # print('__________________________')
+
+            rd_yesterday = rds.order_by('-date')[1]
+            self.assertEqual(rd_yesterday.today_start_sows_qnty, 17)
+            self.assertEqual(rd_yesterday.today_padej_subquery, 5)
+            self.assertEqual(rd_yesterday.today_vinuzhd_subquery, 0)
+
+            self.assertEqual(rd_yesterday.sow_qnty_at_date_start, 17)
+            self.assertEqual(rd_yesterday.cnt_padej_subquery_from_date, 0)
+            self.assertEqual(rd_yesterday.cnt_vinuzhd_subquery_from_date, 0)
+            self.assertEqual(rd_yesterday.cnt_padej_subquery_at_end_date, 0)
+            self.assertEqual(rd_yesterday.cnt_vinuzhd_subquery_at_end_date, 0)
+            self.assertEqual(rd_yesterday.sows_quantity_at_date_end, 17)
+           
+            past_culling_date = timezone.now().date() - timedelta(10)
+            rd_past_culling_date = rds.filter(date=past_culling_date).first()
+            self.assertEqual(rd_past_culling_date.today_start_sows_qnty, 17)
+            self.assertEqual(rd_past_culling_date.today_padej_subquery, 5)
+            self.assertEqual(rd_past_culling_date.today_vinuzhd_subquery, 0)
+
+            self.assertEqual(rd_past_culling_date.sow_qnty_at_date_start, 20)
+            self.assertEqual(rd_past_culling_date.cnt_padej_subquery_from_date, 3)
+            self.assertEqual(rd_past_culling_date.cnt_vinuzhd_subquery_from_date, 0)
+            self.assertEqual(rd_past_culling_date.cnt_padej_subquery_at_end_date, 3)
+            self.assertEqual(rd_past_culling_date.cnt_vinuzhd_subquery_at_end_date, 0)
+            self.assertEqual(rd_past_culling_date.sows_quantity_at_date_end, 17)
 
 
-        # with self.assertNumQueries(3):
-        #     rds = ReportDate.objects.all() \
-        #             .add_today_sows_qnty() \
-        #             .add_sows_quantity_at_date_start() \
-        #             .add_sows_quantity_at_date_end()
-        #     bool(rds)
-        #     print(rds[0])
-        #     print(rds.order_by('-date')[0])
-        #     print(timezone.now().date())
-        #     rd = rds.filter(date=timezone.now().date() - timedelta(5)).first()
-        #     print('RD')
-        #     print(rd)
-        #     print(rd.sow_qnty_at_date_start, 20)
-        #     print(rd.sows_quantity_at_date_end, 17)
-        #     print(rd.cnt_padej_subquery_from_date, 17)
-        #     print(rd.cnt_vinuzhd_subquery_from_date, 17)
-        #     print(rd.cnt_padej_subquery_at_end_date, 17)
-        #     print(rd.cnt_vinuzhd_subquery_at_end_date, 17)
-        #     print('__________________________')
-
-        #     print('rds[0]')
-        #     print(rds[0].sow_qnty_at_date_start, 20)
-        #     print(rds[0].sows_quantity_at_date_end, 17)
-        #     print(rds[0].cnt_padej_subquery_from_date, 17)
-        #     print(rds[0].cnt_vinuzhd_subquery_from_date, 17)
-        #     print(rds[0].cnt_padej_subquery_at_end_date, 17)
-        #     print(rds[0].cnt_vinuzhd_subquery_at_end_date, 17)
-
-            # self.assertEqual(rds[0].sow_qnty_at_date_start, 20)
-            # self.assertEqual(rds[0].sows_quantity_at_date_end, 17)
-    # 

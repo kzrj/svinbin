@@ -8,7 +8,9 @@ from django.utils import timezone
 
 from core.models import CoreModel, CoreModelManager
 from sows.models import Sow
-from sows_events.models import CullingSow
+from sows_events.models import CullingSow, SowFarrow
+from piglets.models import Piglets
+from piglets_events.models import CullingPiglets
 
 
 # https://stackoverflow.com/questions/1060279/iterating-through-a-range-of-dates-in-python
@@ -18,12 +20,34 @@ def daterange(start_date, end_date):
 
 
 class ReportDateQuerySet(models.QuerySet):
-    def gen_sow_culling_cnt_by_daterange_subquery(self, culling_type, start_date, end_date):
+    def gen_sow_culling_cnt_by_daterange_subquery(self, culling_type, start_date, end_date, *args, **kwargs):
         return Coalesce(
                     Subquery(
                         CullingSow.objects.filter(
-                            # date__date__gte=start_date, date__date__lt=end_date, culling_type=culling_type) \
-                            date__date__range=(start_date, end_date), culling_type=culling_type) \
+                            date__date__gte=start_date, date__date__lt=end_date, culling_type=culling_type) \
+                            # date__date__range=(start_date, end_date), culling_type=culling_type) \
+                                    .values('culling_type') \
+                                    .annotate(cnt=Count('pk')) \
+                                    .values('cnt')
+                        ), 0
+        )
+
+    def gen_sow_culling_cnt_by_date_subquery(self, culling_type, target_date):
+        return Coalesce(
+                    Subquery(
+                        CullingSow.objects.filter(
+                            date__date=target_date, culling_type=culling_type) \
+                                    .values('culling_type') \
+                                    .annotate(cnt=Count('pk')) \
+                                    .values('cnt')
+                        ), 0
+        )
+
+    def gen_piglets_culling_cnt_by_date_subquery(self, culling_type, target_date):
+        return Coalesce(
+                    Subquery(
+                        CullingPiglets.objects.filter(
+                            date__date=target_date, culling_type=culling_type) \
                                     .values('culling_type') \
                                     .annotate(cnt=Count('pk')) \
                                     .values('cnt')
@@ -32,8 +56,8 @@ class ReportDateQuerySet(models.QuerySet):
 
     def add_today_sows_qnty(self):
         today = timezone.now().date()
-        today_padej_subquery = self.gen_sow_culling_cnt_by_daterange_subquery('padej', today, today)
-        today_vinuzhd_subquery = self.gen_sow_culling_cnt_by_daterange_subquery('vinuzhd', today, today)
+        today_padej_subquery = self.gen_sow_culling_cnt_by_date_subquery('padej', today)
+        today_vinuzhd_subquery = self.gen_sow_culling_cnt_by_date_subquery('vinuzhd', today)
 
         sows_subquery = Sow.objects.all() \
                         .values('alive') \
@@ -46,10 +70,12 @@ class ReportDateQuerySet(models.QuerySet):
         today_sows_qnty = Coalesce(Subquery(sows_subquery, output_field=models.IntegerField()), 0) + \
                          today_padej_subquery + today_vinuzhd_subquery - gitls_to_sows_subquery
 
-        return self.annotate(today_sows_qnty=today_sows_qnty)
+        return self.annotate(today_start_sows_qnty=today_sows_qnty, today_padej_subquery=today_padej_subquery,
+         today_vinuzhd_subquery=today_vinuzhd_subquery)
 
 
     def add_sows_quantity_at_date_start(self):
+        yesterday = timezone.now().date() - timedelta(1)
         today = timezone.now().date()
 
         cnt_padej_subquery = self.gen_sow_culling_cnt_by_daterange_subquery('padej', OuterRef('date'), today)
@@ -61,19 +87,18 @@ class ReportDateQuerySet(models.QuerySet):
                 cnt_padej_subquery_from_date=cnt_padej_subquery,
                 cnt_vinuzhd_subquery_from_date=cnt_vinuzhd_subquery,
                 sow_qnty_at_date_start=ExpressionWrapper(
-                    F('today_sows_qnty') + cnt_padej_subquery + cnt_vinuzhd_subquery - cnt_gilts_to_sows,
+                    F('today_start_sows_qnty') + cnt_padej_subquery + cnt_vinuzhd_subquery - cnt_gilts_to_sows,
                     output_field=models.IntegerField()
                     )
                 )
 
     def add_sows_quantity_at_date_end(self):
         today = timezone.now().date()
+        end_date = date(2020, 1, 2)
 
-        cnt_padej_subquery = self.gen_sow_culling_cnt_by_daterange_subquery('padej', OuterRef('date'),
-             OuterRef('date') + timedelta(1))
+        cnt_padej_subquery = self.gen_sow_culling_cnt_by_date_subquery('padej', OuterRef('date'))
 
-        cnt_vinuzhd_subquery = self.gen_sow_culling_cnt_by_daterange_subquery('vinuzhd', OuterRef('date'),
-             OuterRef('date') + timedelta(1))
+        cnt_vinuzhd_subquery = self.gen_sow_culling_cnt_by_date_subquery('vinuzhd', OuterRef('date'))
 
         cnt_gilts_to_sows = 0
 
@@ -85,6 +110,23 @@ class ReportDateQuerySet(models.QuerySet):
                     output_field=models.IntegerField()
                     )
                 )
+
+    def add_piglets_today_quantity(self):
+        count_piglets = Piglets.objects.all().count()
+
+        today = timezone.now().date()
+        # today cullings
+        piglets_today_padej_subquery = self.gen_piglets_culling_cnt_by_date_subquery('padej', today)
+        piglets_today_prirezka_subquery = self.gen_piglets_culling_cnt_by_date_subquery('prirezka', today)
+        piglets_today_vinuzhd_subquery = self.gen_piglets_culling_cnt_by_date_subquery('vinuzhd', today)
+        piglets_today_spec_subquery = self.gen_piglets_culling_cnt_by_date_subquery('spec', today)
+
+        # today born alive
+        SowFarrow.objects.filter()
+
+
+        # + cull qnty today - born today
+        return self.annotate(piglets_today_qnty=count_piglets)
 
 
 class ReportDateManager(CoreModelManager):
