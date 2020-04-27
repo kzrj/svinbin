@@ -37,7 +37,7 @@ class ReportsViewSet(viewsets.ViewSet):
 
 class TourReportViewSet(viewsets.ModelViewSet):
     queryset = Tour.objects.all() \
-                .order_by('-year','-week_number', ) \
+                .order_by('-year','week_number', ) \
                 .add_sow_data() \
                 .add_farrow_data() \
                 .add_count_tour_sow() \

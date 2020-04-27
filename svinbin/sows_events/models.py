@@ -237,9 +237,9 @@ class SowFarrow(SowEvent):
 
 
 class CullingSowManager(CoreModelManager):
-    def create_culling(self, sow, culling_type, reason, initiator=None):
+    def create_culling(self, sow, culling_type, reason=None, initiator=None, date=timezone.now()):
         culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason,
-         date=timezone.now(), culling_type=culling_type)
+         date=date, culling_type=culling_type)
         sow.change_status_to(status_title='Брак', alive=False)
         return culling
 
