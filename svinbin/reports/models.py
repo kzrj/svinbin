@@ -11,6 +11,7 @@ from sows.models import Sow
 from sows_events.models import CullingSow, SowFarrow
 from piglets.models import Piglets
 from piglets_events.models import CullingPiglets
+from transactions.models import PigletsTransaction
 
 
 # https://stackoverflow.com/questions/1060279/iterating-through-a-range-of-dates-in-python
@@ -20,12 +21,11 @@ def daterange(start_date, end_date):
 
 
 class ReportDateQuerySet(models.QuerySet):
-    def gen_sow_culling_cnt_by_daterange_subquery(self, culling_type, start_date, end_date, *args, **kwargs):
+    def gen_sow_culling_cnt_by_daterange_subquery(self, culling_type, start_date, end_date):
         return Coalesce(
                     Subquery(
                         CullingSow.objects.filter(
                             date__date__gte=start_date, date__date__lt=end_date, culling_type=culling_type) \
-                            # date__date__range=(start_date, end_date), culling_type=culling_type) \
                                     .values('culling_type') \
                                     .annotate(cnt=Count('pk')) \
                                     .values('cnt')
@@ -43,16 +43,44 @@ class ReportDateQuerySet(models.QuerySet):
                         ), 0
         )
 
+
+    def gen_piglets_culling_cnt_by_daterange_subquery(self, culling_type, start_date, end_date):
+        return Coalesce(
+                    Subquery(
+                        CullingPiglets.objects.filter(
+                            date__date__gte=start_date, date__date__lt=end_date, culling_type=culling_type) \
+                                    .values('culling_type') \
+                                    .annotate(qnty=Sum('quantity')) \
+                                    .values('qnty')
+                        ), 0
+        )
+
     def gen_piglets_culling_cnt_by_date_subquery(self, culling_type, target_date):
         return Coalesce(
                     Subquery(
                         CullingPiglets.objects.filter(
                             date__date=target_date, culling_type=culling_type) \
                                     .values('culling_type') \
-                                    .annotate(cnt=Count('pk')) \
-                                    .values('cnt')
+                                    .annotate(qnty=Sum('quantity')) \
+                                    .values('qnty')
                         ), 0
         )
+
+    def gen_sowfarrow_alive_piglets_qnty_at_date(self, target_date):
+        return Coalesce(
+                        Subquery(SowFarrow.objects.filter(date__date=target_date) \
+                                .values('date__date') \
+                                .annotate(today_born_alive=Sum('alive_quantity')) \
+                                .values('today_born_alive'), output_field=models.IntegerField()),
+                        0 )
+
+    def gen_sowfarrow_alive_piglets_qnty_at_daterange(self, start_date, end_date):
+        return Coalesce(
+                        Subquery(SowFarrow.objects.filter(date__date__gte=start_date, date__date__lt=end_date) \
+                                .values('date__date') \
+                                .annotate(today_born_alive=Sum('alive_quantity')) \
+                                .values('today_born_alive'), output_field=models.IntegerField()),
+                        0 )
 
     def add_today_sows_qnty(self):
         today = timezone.now().date()
@@ -84,8 +112,6 @@ class ReportDateQuerySet(models.QuerySet):
         cnt_gilts_to_sows = 0
 
         return self.annotate(
-                cnt_padej_subquery_from_date=cnt_padej_subquery,
-                cnt_vinuzhd_subquery_from_date=cnt_vinuzhd_subquery,
                 sow_qnty_at_date_start=ExpressionWrapper(
                     F('today_start_sows_qnty') + cnt_padej_subquery + cnt_vinuzhd_subquery - cnt_gilts_to_sows,
                     output_field=models.IntegerField()
@@ -93,26 +119,24 @@ class ReportDateQuerySet(models.QuerySet):
                 )
 
     def add_sows_quantity_at_date_end(self):
-        today = timezone.now().date()
-        end_date = date(2020, 1, 2)
-
-        cnt_padej_subquery = self.gen_sow_culling_cnt_by_date_subquery('padej', OuterRef('date'))
-
-        cnt_vinuzhd_subquery = self.gen_sow_culling_cnt_by_date_subquery('vinuzhd', OuterRef('date'))
-
         cnt_gilts_to_sows = 0
 
         return self.annotate(
-                cnt_padej_subquery_at_end_date=cnt_padej_subquery,
-                cnt_vinuzhd_subquery_at_end_date=cnt_vinuzhd_subquery,
                 sows_quantity_at_date_end=ExpressionWrapper(
-                    F('sow_qnty_at_date_start') - cnt_padej_subquery - cnt_vinuzhd_subquery + cnt_gilts_to_sows,
+                    F('sow_qnty_at_date_start') - F('sow_padej_qnty') - F('sow_vinuzhd_qnty') + cnt_gilts_to_sows,
                     output_field=models.IntegerField()
                     )
                 )
 
+    def add_sow_padej_qnty(self):
+        return self.annotate(sow_padej_qnty=self.gen_sow_culling_cnt_by_date_subquery('padej',  OuterRef('date')))
+
+    def add_sow_vinuzhd_qnty(self):
+        return self.annotate(sow_vinuzhd_qnty=self.gen_sow_culling_cnt_by_date_subquery('vinuzhd',  OuterRef('date')))
+        
     def add_piglets_today_quantity(self):
-        count_piglets = Piglets.objects.all().count()
+        count_piglets = Piglets.objects.all() \
+                    .values('active').annotate(sum_piglets=Sum('quantity')).values('sum_piglets')
 
         today = timezone.now().date()
         # today cullings
@@ -122,11 +146,92 @@ class ReportDateQuerySet(models.QuerySet):
         piglets_today_spec_subquery = self.gen_piglets_culling_cnt_by_date_subquery('spec', today)
 
         # today born alive
-        SowFarrow.objects.filter()
+        today_born_alive_subquery = Coalesce(
+                                        Subquery(SowFarrow.objects.filter(date__date=today) \
+                                                .values('date__date') \
+                                                .annotate(today_born_alive=Sum('alive_quantity')) \
+                                                .values('today_born_alive'), output_field=models.IntegerField()),
+                                        0 )
 
+        today_count_piglets = count_piglets + piglets_today_padej_subquery + piglets_today_prirezka_subquery + \
+                piglets_today_vinuzhd_subquery + piglets_today_spec_subquery - today_born_alive_subquery
 
         # + cull qnty today - born today
-        return self.annotate(piglets_today_qnty=count_piglets)
+        return self.annotate(piglets_today_qnty=today_count_piglets)
+
+    def add_piglets_quantity_at_date_start(self):
+        today = timezone.now().date()
+
+        piglets_padej_subquery = self.gen_piglets_culling_cnt_by_daterange_subquery('padej', OuterRef('date'),
+             today)
+        piglets_prirezka_subquery = self.gen_piglets_culling_cnt_by_daterange_subquery('prirezka', OuterRef('date'),
+             today)
+        piglets_vinuzhd_subquery = self.gen_piglets_culling_cnt_by_daterange_subquery('vinuzhd', OuterRef('date'), 
+             today)
+        piglets_spec_subquery = self.gen_piglets_culling_cnt_by_daterange_subquery('spec', OuterRef('date'),
+             today)
+
+        born_alive = self.gen_sowfarrow_alive_piglets_qnty_at_daterange(OuterRef('date'), today)
+
+        return self.annotate(piglets_qnty_start_date=ExpressionWrapper(
+                        F('piglets_today_qnty') + piglets_padej_subquery + piglets_prirezka_subquery + \
+                        piglets_vinuzhd_subquery + piglets_spec_subquery - born_alive,
+                        output_field=models.IntegerField()
+                    ))
+
+    def add_piglets_quantity_at_date_end(self):
+        return self.annotate(piglets_qnty_start_end=ExpressionWrapper(
+                        F('piglets_qnty_start_date') - F('piglets_padej_qnty') - F('piglets_prirezka_qnty') - \
+                        F('piglets_vinuzhd_qnty') - F('piglets_spec_qnty') + F('born_alive'),
+                        output_field=models.IntegerField()
+                    ))
+
+    def add_born_alive(self):
+        return self.annotate(born_alive=self.gen_sowfarrow_alive_piglets_qnty_at_date(OuterRef('date')))
+
+    def add_piglets_padej_qnty(self):
+        return self.annotate(
+            piglets_padej_qnty=self.gen_piglets_culling_cnt_by_date_subquery('padej', OuterRef('date')))
+
+    def add_piglets_prirezka_qnty(self):
+        return self.annotate(
+            piglets_prirezka_qnty=self.gen_piglets_culling_cnt_by_date_subquery('prirezka', OuterRef('date')))
+
+    def add_piglets_vinuzhd_qnty(self):
+        return self.annotate(
+            piglets_vinuzhd_qnty=self.gen_piglets_culling_cnt_by_date_subquery('vinuzhd', OuterRef('date')))
+
+    def add_piglets_spec_qnty(self):
+        return self.annotate(
+            piglets_spec_qnty=self.gen_piglets_culling_cnt_by_date_subquery('spec', OuterRef('date')))
+
+    def add_piglets_spec_total_weight(self):
+        total_weight = Coalesce(
+                        Subquery(CullingPiglets.objects.filter(
+                            date__date=OuterRef('date'), culling_type='spec') \
+                                    .values('culling_type') \
+                                    .annotate(all_total_weight=Sum('total_weight')) \
+                                    .values('all_total_weight'), output_field=models.FloatField()),
+                        0 )
+        return self.annotate(piglets_spec_total_weight=total_weight)
+
+    def add_priplod_by_sow(self):
+        farrow_cnt = Coalesce(Subquery(SowFarrow.objects.filter(date__date=OuterRef('date')) \
+            .values('date__date') \
+            .annotate(cnt=Count('*')) \
+            .values('cnt'), output_field=models.IntegerField()), 1)
+
+        return self.annotate(priplod_by_sow=ExpressionWrapper(F('born_alive') / farrow_cnt,
+         output_field=models.FloatField()))
+
+    def add_piglets_qnty_in_transactions(self):
+        total_qnty = Coalesce(
+            Subquery(PigletsTransaction.objects.filter(date__date=OuterRef('date'))\
+            .values('date__date') \
+            .annotate(total_qnty=Sum('quantity')) \
+            .values('total_qnty')), 0)
+
+        return self.annotate(piglets_transfered=total_qnty)
 
 
 class ReportDateManager(CoreModelManager):
