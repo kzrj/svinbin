@@ -4,6 +4,7 @@ import datetime
 from rest_framework import serializers
 
 from tours.models import Tour
+from reports.models import ReportDate
 
 
 class AnnotateFieldsModelSerializer(serializers.ModelSerializer):
@@ -15,24 +16,19 @@ class AnnotateFieldsModelSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         # Instantiate the superclass normally
         super(AnnotateFieldsModelSerializer, self).__init__(*args, **kwargs)
-        # print(self.fields)
-        # print(type(self.fields))
-        # print(kwargs)
-        # print(args)
-        # # print(args[0].piglets_age)
-        # print(args[0])
-        # print(type(args[0]))
-        # print(args[0].__dict__.keys())
 
-        # TODO: args[0] - object or queryset
-
-        fields = args[0].__dict__.keys()
-        fields = args[0].__dict__.keys()
-        if fields:
-            for field_name in fields:
+        if len(args) > 0 and len(args[0]) > 0:
+            for field_name in args[0][0].__dict__.keys():
                 if field_name[0] == '_' or field_name in self.fields.keys():
                     continue
                 self.fields[field_name] = serializers.ReadOnlyField()
+
+
+class ReportDateSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
+    class Meta:
+        model = ReportDate
+        fields = '__all__'
+    
 
 
 class ReportTourSerializer2(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
