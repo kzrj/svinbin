@@ -51,7 +51,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                 .add_piglets_vinuzhd_qnty() \
                 .add_piglets_spec_qnty() \
                 .add_piglets_quantity_at_date_end() \
-                .add_piglets_qnty_in_transactions() \
+                # .add_piglets_qnty_in_transactions() \
                 # .add_piglets_spec_total_weight() \
                 # .add_priplod_by_sow()
 

@@ -339,7 +339,7 @@ class ReportDatePigletsQsTest(TransactionTestCase):
             self.assertEqual(rds[0].born_alive,  60)
             self.assertEqual(rds[0].priplod_by_sow,  12)
 
-    def test_add_priplod_by_sow(self):
+    def test_add_piglets_qnty_in_transactions(self):
         for i in range(0, 20):
             piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1, self.loc_ws1,
              10)
