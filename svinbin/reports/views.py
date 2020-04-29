@@ -15,27 +15,7 @@ from sows_events.models	import SowFarrow
 from reports.models import ReportDate
 
 from reports.serializers import ReportTourSerializer, AnnotateFieldsModelSerializer, ReportDateSerializer
-
-
-class ReportsViewSet(viewsets.ViewSet):
-    @action(detail=False)
-    def report_workshop(self, request):
-    	# Piglets.objects.with_tour()
-
-    	# all tours in ws
-    	# tours = tours.objects.filter(metarecords__metatour__piglets__in=piglets_in_ws).distinct()
-
-    	return Response({'report': 'report'})
-
-    @action(detail=False)
-    def report_tours(self, request):
-    	# born
-    	SowFarrow.objects.filter(tour).count_piglets()
-
-    	Piglets.objects.with_tour_not_mixed(tour)
-    	Piglets.objects.with_tour_mixed(tour)
-
-    	return Response({'report_tours': 'report'})
+from reports.filters import ReportDateFilter
 
 
 class TourReportViewSet(viewsets.ModelViewSet):
@@ -54,6 +34,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
 
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
+
 
 class ReportDateViewSet(viewsets.ModelViewSet):
     queryset = ReportDate.objects.all() \
@@ -76,4 +57,4 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                 .add_priplod_by_sow()
 
     serializer_class = ReportDateSerializer
-    # filter_class = TourFilter
+    filter_class = ReportDateFilter

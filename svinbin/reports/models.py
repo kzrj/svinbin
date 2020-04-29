@@ -236,6 +236,10 @@ class ReportDateQuerySet(models.QuerySet):
 
 class ReportDateManager(CoreModelManager):
     def get_queryset(self):
+        # start_date = date(2020, 1, 1)
+        # end_date = timezone.now().date() + timedelta(1)
+        # ReportDate.objects.create_bulk_if_none_from_range(start_date, end_date)
+        
         return ReportDateQuerySet(self.model, using=self._db)
 
     def get_exist_from_range(self, start_date, end_date):
