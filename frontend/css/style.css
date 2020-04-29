@@ -444,3 +444,17 @@ hr {
 	vertical-align: middle !important;
 }
 
+.report-dir-th{
+	/* writing-mode: vertical !important; */
+	/* text-orientation: sideways !important; */
+	text-align: center !important;
+	vertical-align: middle !important;
+	font-size: 0.9rem;
+	word-wrap: break-word;
+}
+
+.report-dir-date{
+	width: 120%;
+	/* font-size:0.9rem; */
+	white-space: nowrap;
+}
