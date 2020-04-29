@@ -77,7 +77,7 @@ class ReportDateQuerySet(models.QuerySet):
     def gen_sowfarrow_alive_piglets_qnty_at_daterange(self, start_date, end_date):
         return Coalesce(
                         Subquery(SowFarrow.objects.filter(date__date__gte=start_date, date__date__lt=end_date) \
-                                .annotate(flag_group=0) \
+                                .annotate(flag_group=Value(0)) \
                                 .values('flag_group') \
                                 .annotate(today_born_alive=Sum('alive_quantity')) \
                                 .values('today_born_alive'), output_field=models.IntegerField()),
