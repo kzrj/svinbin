@@ -45,7 +45,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                 .add_sows_quantity_at_date_end() \
                 .add_piglets_today_quantity() \
                 .add_piglets_quantity_at_date_start() \
-                # .add_born_alive() \
+                .add_born_alive() \
                 # .add_piglets_padej_qnty() \
                 # .add_piglets_prirezka_qnty() \
                 # .add_piglets_vinuzhd_qnty() \
