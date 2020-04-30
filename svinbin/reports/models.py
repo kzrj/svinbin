@@ -234,6 +234,43 @@ class ReportDateQuerySet(models.QuerySet):
 
         return self.annotate(piglets_transfered=total_qnty)
 
+    def add_today_rep_sows_count(self):
+        data = dict()
+        for ws_number in [1, 2, 3]:
+            data[f'ws{ws_number}_count_sow'] = Subquery(
+                Sow.objects.filter(
+                         Q(
+                            Q(location__workshop__number=ws_number) |
+                            Q(location__section__workshop__number=ws_number) |
+                            Q(location__sowAndPigletsCell__workshop__number=ws_number)
+                        )) \
+                        .annotate(flag=Value(0))
+                        .values('flag') \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt'),
+                 output_field=models.IntegerField())
+
+        return self.annotate(**data)
+
+    def add_today_rep_piglets_count(self):
+        data = dict()
+        for ws_number in [3, 4, 8, 5, 6, 7]:
+            data[f'ws{ws_number}_count_piglets'] = Subquery(
+                Piglets.objects.filter(
+                         Q(
+                            Q(location__workshop__number=ws_number) |
+                            Q(location__section__workshop__number=ws_number) |
+                            Q(location__sowAndPigletsCell__workshop__number=ws_number)
+                        )) \
+                        .annotate(flag=Value(0))
+                        .values('flag') \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt'),
+                 output_field=models.IntegerField())
+
+        return self.annotate(**data)
+
+
 
 class ReportDateManager(CoreModelManager):
     def get_queryset(self):

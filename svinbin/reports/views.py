@@ -37,6 +37,18 @@ class TourReportViewSet(viewsets.ModelViewSet):
     filter_class = TourFilter
 
 
+class CustomPagination(pagination.PageNumberPagination):
+    def get_paginated_response(self, data):
+        return Response({
+            'links': {
+                'next': self.get_next_link(),
+                'previous': self.get_previous_link()
+            },
+            'count': self.page.paginator.count,
+            'results': data
+        })
+
+
 class ReportDateViewSet(viewsets.ModelViewSet):
     queryset = ReportDate.objects.all() \
                 .add_today_sows_qnty() \
@@ -58,3 +70,9 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
     serializer_class = ReportDateSerializer
     filter_class = ReportDateFilter
+    pagination_class = CustomPagination
+
+    # def list(self, request):
+
+    #     super(ReportDateViewSet).list(self, request)
+    #     
