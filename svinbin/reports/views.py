@@ -38,16 +38,15 @@ class TourReportViewSet(viewsets.ModelViewSet):
 
 
 class CustomPagination(pagination.PageNumberPagination):
-    def get_paginated_response(self, data, total_info='Tvar'):
+    def get_paginated_response(self, data):
         return Response({
             'links': {
                 'next': self.get_next_link(),
                 'previous': self.get_previous_link()
             },
             'count': self.page.paginator.count,
-            'total_info2': 'HUs',
-            'total_info': total_info,
-            'results': data,
+            'total_info': data.total_info,
+            'results': data.results,
         })
 
 
@@ -79,8 +78,8 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
         if page is not None:
             serializer = ReportDateSerializer(page, many=True)
-            total_info = 'Hello'
-            return self.pagination_class.get_paginated_response(serializer.data, total_info)
+            data = {'results': serializer.data, 'total_info': 'Ebanavrot'}
+            return self.get_paginated_response(data)
 
         serializer = ReportDateSerializer(self.queryset, many=True)
         return Response(serializer.data)
