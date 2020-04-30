@@ -79,9 +79,8 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
         if page is not None:
             serializer = ReportDateSerializer(page, many=True)
-            print(page)
-            print(type(page))
-            data = {'results': serializer.data, 'total_info': 'Ebanavrot'}
+            total_data = queryset.dir_rep_aggregate_total_data()
+            data = {'results': serializer.data, 'total_info': total_data}
             return self.get_paginated_response(data)
 
         # serializer = ReportDateSerializer(self.filter_queryset(self.queryset), many=True)

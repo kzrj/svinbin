@@ -270,6 +270,18 @@ class ReportDateQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def dir_rep_aggregate_total_data(self):
+        return self.aggregate(
+                total_priplod=Sum('born_alive'),
+                total_sows_padej=Sum('piglets_padej_qnty'),
+                total_piglets_padej=Sum('sow_padej_qnty'),
+                total_sows_vinuzhd=Sum('sow_vinuzhd_qnty') ,
+                total_piglets_vinuzhd=Sum('piglets_vinuzhd_qnty'),
+                total_spec=Sum('piglets_spec_qnty'),
+                total_prirezka=Sum('piglets_prirezka_qnty'),
+                total_spec_weight=Sum('piglets_spec_total_weight'),
+                )
+
 
 
 class ReportDateManager(CoreModelManager):
