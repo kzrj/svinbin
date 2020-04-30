@@ -285,6 +285,7 @@ class ReportDateQuerySet(models.QuerySet):
                 total_spec=Sum('piglets_spec_qnty'),
                 total_prirezka=Sum('piglets_prirezka_qnty'),
                 total_spec_weight=Sum('piglets_spec_total_weight'),
+                avg_priplod=Avg('priplod_by_sow'),
                 # total_pigs=(pigs_count + F('pk') - F('pk'))
                 )
 
