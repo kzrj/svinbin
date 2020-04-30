@@ -46,6 +46,7 @@ class CustomPagination(pagination.PageNumberPagination):
             },
             'count': self.page.paginator.count,
             'total_info': data['total_info'],
+            'pigs_count': data['pigs_count'],
             'results': data['results'],
         })
 
@@ -80,7 +81,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         if page is not None:
             serializer = ReportDateSerializer(page, many=True)
             total_data = queryset.dir_rep_aggregate_total_data()
-            last_date = self.order_by('-date').first()
+            last_date = queryset.order_by('-date').first()
             pigs_count = 0
             if last_date:
                 pigs_count = last_date.sows_quantity_at_date_end + last_date.piglets_qnty_start_end
