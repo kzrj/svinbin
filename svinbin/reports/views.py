@@ -1,7 +1,8 @@
-   
+# -*- coding: utf-8 -*-
+from datetime import timedelta, date
 
-     # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 from rest_framework import status, viewsets
 from rest_framework.response import Response
@@ -37,6 +38,9 @@ class TourReportViewSet(viewsets.ModelViewSet):
 
 
 class ReportDateViewSet(viewsets.ModelViewSet):
+    yesterday = timezone.now().date() - timedelta(1)
+    month_ago = timezone.now().date() - timedelta(30)
+
     queryset = ReportDate.objects.all() \
                 .add_today_sows_qnty() \
                 .add_sows_quantity_at_date_start() \
@@ -53,7 +57,8 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                 .add_piglets_quantity_at_date_end() \
                 .add_piglets_qnty_in_transactions() \
                 .add_piglets_spec_total_weight() \
-                .add_priplod_by_sow()
+                .add_priplod_by_sow() \
+                .filter(date__lte=yesterday, date_gte=month_ago)
 
     serializer_class = ReportDateSerializer
     filter_class = ReportDateFilter
