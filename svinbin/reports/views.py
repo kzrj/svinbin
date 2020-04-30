@@ -74,12 +74,13 @@ class ReportDateViewSet(viewsets.ModelViewSet):
     pagination_class = CustomPagination
 
     def list(self, request):
-        page = self.paginate_queryset(self.filter_queryset(self.queryset))
+        queryset = self.filter_queryset(self.queryset)
+        page = self.paginate_queryset(queryset)
 
         if page is not None:
             serializer = ReportDateSerializer(page, many=True)
             data = {'results': serializer.data, 'total_info': 'Ebanavrot'}
             return self.get_paginated_response(data)
 
-        serializer = ReportDateSerializer(self.filter_queryset(self.queryset), many=True)
-        return Response(serializer.data)
+        # serializer = ReportDateSerializer(self.filter_queryset(self.queryset), many=True)
+        # return Response(serializer.data)
