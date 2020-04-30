@@ -270,7 +270,12 @@ class ReportDateQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def dir_rep_aggregate_total_data(self):
+    def dir_rep_aggregate_total_data(self):        
+        last_date = self.order_by('-date').first()
+        pigs_count = 0
+        if last_date:
+            pigs_count = last_date.sows_quantity_at_date_end + last_date.piglets_qnty_start_end
+
         return self.aggregate(
                 total_priplod=Sum('born_alive'),
                 total_sows_padej=Sum('piglets_padej_qnty'),
@@ -280,6 +285,7 @@ class ReportDateQuerySet(models.QuerySet):
                 total_spec=Sum('piglets_spec_qnty'),
                 total_prirezka=Sum('piglets_prirezka_qnty'),
                 total_spec_weight=Sum('piglets_spec_total_weight'),
+                pigs_count=Value(pigs_count)
                 )
 
 
