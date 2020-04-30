@@ -462,8 +462,8 @@ class TourQuerySet(models.QuerySet):
                     output_field=models.FloatField())
                 data[f'ws{ws_number}_{c_type}_weight'] = subquery_weight
 
-                subquery_qnty = Subquery(self.gen_culling_qnty_subquery(subquery_piglets, c_type, ws_number), \
-                    output_field=models.FloatField())
+                subquery_qnty = Coalesce(Subquery(self.gen_culling_qnty_subquery(subquery_piglets, c_type, ws_number), \
+                    output_field=models.FloatField()), 0)
                 data[f'ws{ws_number}_{c_type}_quantity'] = subquery_qnty
 
                 subquery_avg = Subquery(self.gen_culling_avg_weight_subquery(subquery_piglets, c_type, ws_number), \
@@ -628,6 +628,29 @@ class TourQuerySet(models.QuerySet):
             data[f'ws{ws_number}_qnty_to_7_5'] = Subquery(trs_subquery, output_field=models.IntegerField())
 
         return self.annotate(**data)
+
+    def add_culling_percentage(self):
+        return self.annotate(
+            ws3_padej_percentage=F('ws3_padej_quantity') * 100 / F('total_born_alive'),
+            ws3_prirezka_percentage=F('ws3_prirezka_quantity') * 100 / F('total_born_alive'),
+
+            ws4_padej_percentage=F('ws4_padej_quantity') * 100 / F('week_weight_qnty_3_4'),
+            ws4_prirezka_percentage=F('ws4_prirezka_quantity') * 100 / F('week_weight_qnty_3_4'),
+            ws4_vinuzhd_percentage=F('ws4_vinuzhd_quantity') * 100 / F('week_weight_qnty_3_4'),
+
+            ws8_padej_percentage=F('ws8_padej_quantity') * 100 / F('week_weight_qnty_4_8'),
+            ws8_vinuzhd_percentage=F('ws8_vinuzhd_quantity') * 100 / F('week_weight_qnty_4_8'),
+
+            ws5_padej_percentage=F('ws5_padej_quantity') * 100 / F('week_weight_qnty_8_5'),
+            ws5_vinuzhd_percentage=F('ws5_vinuzhd_quantity') * 100 / F('week_weight_qnty_8_5'),
+
+            ws6_padej_percentage=F('ws6_padej_quantity') * 100 / F('week_weight_qnty_8_6'),
+            ws6_vinuzhd_percentage=F('ws6_vinuzhd_quantity') * 100 / F('week_weight_qnty_8_6'),   
+
+            ws7_padej_percentage=F('ws7_padej_quantity') * 100 / F('week_weight_qnty_8_7'),
+            ws7_vinuzhd_percentage=F('ws7_vinuzhd_quantity') * 100 / F('week_weight_qnty_8_7'),            
+            )
+
 
 
 class TourManager(CoreModelManager):

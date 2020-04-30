@@ -31,7 +31,8 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_culling_data_by_week_tour() \
                 .add_piglets_count_by_ws_week_tour() \
                 .add_gilts_count_by_ws_week_tour() \
-                .add_count_transfer_to_7_5()
+                .add_count_transfer_to_7_5() \
+                .add_culling_percentage()
 
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
@@ -85,7 +86,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         pigs_count = 0
         if last_date:
             pigs_count = last_date.sows_quantity_at_date_end + last_date.piglets_qnty_start_end
-            
+
         data = {'results': serializer.data, 'total_info': total_data, 'pigs_count': pigs_count}
 
         return Response({
