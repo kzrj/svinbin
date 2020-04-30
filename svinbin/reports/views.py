@@ -38,16 +38,16 @@ class TourReportViewSet(viewsets.ModelViewSet):
 
 
 class CustomPagination(pagination.PageNumberPagination):
-    def get_paginated_response(self, data):
+    def get_paginated_response(self, data, total_info='Tvar'):
         return Response({
             'links': {
                 'next': self.get_next_link(),
                 'previous': self.get_previous_link()
             },
             'count': self.page.paginator.count,
+            'total_info2': 'HUs',
+            'total_info': total_info,
             'results': data,
-            'total_info': 'asdasdHUi'
-            # 'total_info': total_info
         })
 
 
