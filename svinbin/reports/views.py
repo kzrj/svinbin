@@ -58,7 +58,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                 .add_piglets_qnty_in_transactions() \
                 .add_piglets_spec_total_weight() \
                 .add_priplod_by_sow() \
-                .filter(date__lte=yesterday, date_gte=month_ago)
+                .filter(date__lte=yesterday, date__gte=month_ago)
 
     serializer_class = ReportDateSerializer
     filter_class = ReportDateFilter
