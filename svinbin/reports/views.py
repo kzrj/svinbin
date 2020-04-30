@@ -37,18 +37,18 @@ class TourReportViewSet(viewsets.ModelViewSet):
     filter_class = TourFilter
 
 
-class CustomPagination(pagination.PageNumberPagination):
-    def get_paginated_response(self, data):
-        return Response({
-            'links': {
-                'next': self.get_next_link(),
-                'previous': self.get_previous_link()
-            },
-            'count': self.page.paginator.count,
-            'total_info': data['total_info'],
-            'pigs_count': data['pigs_count'],
-            'results': data['results'],
-        })
+# class CustomPagination(pagination.PageNumberPagination):
+#     def get_paginated_response(self, data):
+#         return Response({
+#             'links': {
+#                 'next': self.get_next_link(),
+#                 'previous': self.get_previous_link()
+#             },
+#             'count': self.page.paginator.count,
+#             'total_info': data['total_info'],
+#             'pigs_count': data['pigs_count'],
+#             'results': data['results'],
+#         })
 
 
 class ReportDateViewSet(viewsets.ModelViewSet):
@@ -72,21 +72,24 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
     serializer_class = ReportDateSerializer
     filter_class = ReportDateFilter
-    pagination_class = CustomPagination
+    # pagination_class = CustomPagination
 
     def list(self, request):
         queryset = self.filter_queryset(self.queryset)
-        page = self.paginate_queryset(queryset)
 
-        if page is not None:
-            serializer = ReportDateSerializer(page, many=True)
-            total_data = queryset.dir_rep_aggregate_total_data()
-            last_date = queryset.order_by('-date').first()
-            pigs_count = 0
-            if last_date:
-                pigs_count = last_date.sows_quantity_at_date_end + last_date.piglets_qnty_start_end
-            data = {'results': serializer.data, 'total_info': total_data, 'pigs_count': pigs_count}
-            return self.get_paginated_response(data)
+        serializer = ReportDateSerializer(page, many=True)
 
-        # serializer = ReportDateSerializer(self.filter_queryset(self.queryset), many=True)
-        # return Response(serializer.data)
+        total_data = queryset.dir_rep_aggregate_total_data()
+
+        last_date = queryset.order_by('-date').first()
+        pigs_count = 0
+        if last_date:
+            pigs_count = last_date.sows_quantity_at_date_end + last_date.piglets_qnty_start_end
+            
+        data = {'results': serializer.data, 'total_info': total_data, 'pigs_count': pigs_count}
+
+        return Response({
+            'total_info': data['total_info'],
+            'pigs_count': data['pigs_count'],
+            'results': data['results'],
+        })
