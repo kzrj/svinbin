@@ -285,7 +285,8 @@ class ReportDateQuerySet(models.QuerySet):
                 total_spec=Sum('piglets_spec_qnty'),
                 total_prirezka=Sum('piglets_prirezka_qnty'),
                 total_spec_weight=Sum('piglets_spec_total_weight'),
-                total_pigs=Value(pigs_count, output_field=models.IntegerField())
+                total_pigs=Value(0)
+                # total_pigs=Value(pigs_count, output_field=models.IntegerField())
                 )
 
 
