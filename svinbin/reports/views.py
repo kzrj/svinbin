@@ -15,7 +15,7 @@ from piglets.models import Piglets
 from sows_events.models	import SowFarrow
 from reports.models import ReportDate
 
-from reports.serializers import ReportTourSerializer, AnnotateFieldsModelSerializer, ReportDateSerializer2
+from reports.serializers import ReportTourSerializer, AnnotateFieldsModelSerializer, ReportTourSerializer2
 from reports.filters import ReportDateFilter
 
 
