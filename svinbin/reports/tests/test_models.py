@@ -377,4 +377,4 @@ class ReportCurrentDataTest(TransactionTestCase):
 
     def test_add_today_rep_sows_count(self):
         # not cullings and farrows today
-        
+        pass
