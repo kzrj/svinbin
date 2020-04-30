@@ -15,7 +15,7 @@ from piglets.models import Piglets
 from sows_events.models	import SowFarrow
 from reports.models import ReportDate
 
-from reports.serializers import ReportTourSerializer, AnnotateFieldsModelSerializer, ReportDateSerializer
+from reports.serializers import ReportTourSerializer, AnnotateFieldsModelSerializer, ReportDateSerializer2
 from reports.filters import ReportDateFilter
 
 
@@ -34,7 +34,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_count_transfer_to_7_5() \
                 .add_culling_percentage()
 
-    serializer_class = ReportTourSerializer
+    serializer_class = ReportTourSerializer2
     filter_class = TourFilter
 
 
