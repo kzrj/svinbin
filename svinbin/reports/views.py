@@ -77,7 +77,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.filter_queryset(self.queryset)
 
-        serializer = ReportDateSerializer(page, many=True)
+        serializer = ReportDateSerializer(queryset, many=True)
 
         total_data = queryset.dir_rep_aggregate_total_data()
 
