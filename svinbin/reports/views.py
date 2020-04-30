@@ -80,7 +80,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         if page is not None:
             serializer = ReportDateSerializer(page, many=True)
             total_info = 'Hello'
-            return self.get_paginated_response(serializer.data, total_info)
+            return self.pagination_class.get_paginated_response(serializer.data, total_info)
 
         serializer = ReportDateSerializer(self.queryset, many=True)
         return Response(serializer.data)
