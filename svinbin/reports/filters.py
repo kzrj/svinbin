@@ -5,7 +5,7 @@ from reports.models import ReportDate
 
 
 class ReportDateFilter(filters.FilterSet):
-    date = filters.DateRangeFilter()
+    date = filters.DateFromToRangeFilter()
 
     class Meta:
         model = ReportDate
