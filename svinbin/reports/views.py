@@ -80,8 +80,11 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         if page is not None:
             serializer = ReportDateSerializer(page, many=True)
             total_data = queryset.dir_rep_aggregate_total_data()
-            # pigs_count = queryset[-1].sows_quantity_at_date_end + queryset[-1].piglets_qnty_start_end
-            data = {'results': serializer.data, 'total_info': total_data}
+            last_date = self.order_by('-date').first()
+            pigs_count = 0
+            if last_date:
+                pigs_count = last_date.sows_quantity_at_date_end + last_date.piglets_qnty_start_end
+            data = {'results': serializer.data, 'total_info': total_data, 'pigs_count': pigs_count}
             return self.get_paginated_response(data)
 
         # serializer = ReportDateSerializer(self.filter_queryset(self.queryset), many=True)
