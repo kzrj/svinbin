@@ -31,14 +31,14 @@ class ReportDateSerializer(AnnotateFieldsModelSerializer, serializers.ModelSeria
     
 
 
-class ReportTourSerializer2(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
+class ReportTourSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
     class Meta:
         model = Tour
         fields = '__all__'
 
 
 
-class ReportTourSerializer(serializers.ModelSerializer):
+class ReportTourSerializer2(serializers.ModelSerializer):
     piglets_age = serializers.ReadOnlyField()
 
     # sow data
