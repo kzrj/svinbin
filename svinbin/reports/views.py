@@ -14,6 +14,7 @@ from tours.models import Tour
 from piglets.models import Piglets
 from sows_events.models	import SowFarrow
 from reports.models import ReportDate
+from locations.models import Location
 
 from reports.serializers import ReportDateSerializer, ReportTourSerializer
 from reports.filters import ReportDateFilter
