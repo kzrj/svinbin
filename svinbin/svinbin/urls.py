@@ -72,7 +72,6 @@ router.register(r'workshopthree/wsinfo', workshopthree_views.WorkshopInfo, \
 # reports
 router.register(r'reports/tours', reports_views.TourReportViewSet, basename='report-tours')
 router.register(r'reports/director', reports_views.ReportDateViewSet, basename='report-director')
-router.register(r'reports/pigs_count', reports_views.ReportCountPigsView, basename='report-pigs-count')
 
 schema_view = get_swagger_view(title='API Docs')
 
@@ -83,5 +82,10 @@ urlpatterns = [
     url(r'^api/jwt/api-token-refresh/', refresh_jwt_token),
     url(r'^api/jwt/api-token-verify/', verify_jwt_token),
     url(r'^api/init_data/', locations_views.CreateWorkshopsView.as_view()),
-    url(r'^api/docs/$', schema_view) 
+    url(r'^api/docs/$', schema_view) ,
+
+    url(r'^api/reports/pigs_count/', reports_views.ReportCountPigsView.as_view()),
+
+
+
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
