@@ -4,7 +4,7 @@ from datetime import timedelta, date
 from django.contrib.auth.models import User
 from django.utils import timezone
 
-from rest_framework import status, viewsets, pagination
+from rest_framework import status, viewsets, pagination, views
 from rest_framework.response import Response
 from rest_framework.decorators import action
 
@@ -94,3 +94,12 @@ class ReportDateViewSet(viewsets.ModelViewSet):
             'pigs_count': data['pigs_count'],
             'results': data['results'],
         })
+
+
+class ReportCountPigsView(views.APIView):
+    # authentication_classes = [authentication.TokenAuthentication]
+    # permission_classes = [permissions.IsAdminUser]
+
+    def get(self, request, format=None):
+        data = Location.objects.gen_sections_pigs_count_dict()
+        return Response(data)

@@ -72,6 +72,7 @@ router.register(r'workshopthree/wsinfo', workshopthree_views.WorkshopInfo, \
 # reports
 router.register(r'reports/tours', reports_views.TourReportViewSet, basename='report-tours')
 router.register(r'reports/director', reports_views.ReportDateViewSet, basename='report-director')
+router.register(r'reports/pigs_count', reports_views.ReportCountPigsView, basename='report-pigs-count')
 
 schema_view = get_swagger_view(title='API Docs')
 

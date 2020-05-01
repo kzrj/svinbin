@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.contrib.auth.models import User
 from django.db import models, connection
-from django.db.models import Sum, OuterRef, Subquery
+from django.db.models import Sum, OuterRef, Subquery, Q, Count, Value
 
 from core.models import CoreModel, CoreModelManager
 
@@ -65,6 +65,16 @@ class SowAndPigletsCell(Cell):
     
 
 class LocationQuerySet(models.QuerySet):
+    def get_workshop_location(self, workshop):
+        return Location.objects.all().filter(
+            Q(
+                Q(workshop=workshop) |
+                Q(pigletsGroupCell__workshop=workshop) | 
+                Q(section__workshop=workshop) |
+                Q(sowAndPigletsCell__workshop=workshop)
+                )
+            )
+
     def get_with_count_piglets_in_section(self):
         ''' 
             aggregate in field count_piglets sum of all piglets in piglets section(exclude ws3 sections)
@@ -80,8 +90,79 @@ class LocationQuerySet(models.QuerySet):
                             .values('all')
 
         return self.annotate(pigs_count=models.Subquery(subquery, output_field=models.IntegerField()))
-    
-        
+
+    def add_pigs_count_by_sections(self):        
+        subquery = Location.objects.all().filter(
+            Q(Q(pigletsGroupCell__section=OuterRef('section')) | 
+              Q(section=OuterRef('section')) |
+              Q(sowAndPigletsCell__section=OuterRef('section')))) \
+                        .values('workshop') \
+                        .annotate(all=Sum('piglets__quantity'))\
+                        .values('all')
+
+        return self.annotate(pigs_count=models.Subquery(subquery, output_field=models.IntegerField()))
+
+    def add_sows_count_by_sections(self):        
+        subquery = Location.objects.all().filter(
+            Q(Q(section=OuterRef('section')) |
+              Q(sowAndPigletsCell__section=OuterRef('section')))) \
+                        .values('workshop') \
+                        .annotate(all=Count('sow'))\
+                        .values('all')
+
+        return self.annotate(sows_count=models.Subquery(subquery, output_field=models.IntegerField()))
+
+    def add_pigs_count_by_workshop(self):        
+        subquery = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=Sum('piglets__quantity'))\
+                        .values('all')
+
+        return self.annotate(pigs_count=models.Subquery(subquery, output_field=models.IntegerField()))
+
+    def add_sows_count_by_workshop(self):        
+        subquery = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=Count('sow'))\
+                        .values('all')
+
+        return self.annotate(sows_count=models.Subquery(subquery, output_field=models.IntegerField()))
+
+    def gen_sections_pigs_count_dict(self):
+        secs = Location.objects.all().filter(section__isnull=False) \
+            .select_related('section__workshop') \
+            .add_pigs_count_by_sections() \
+            .add_sows_count_by_sections()
+        data = {'sections': {}, 'workshops': {}}
+
+        for sec_number in [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]:
+            data['sections'][f'sec_{sec_number}'] = {}
+            for ws_number in [1, 2, 3, 4, 5, 6, 7, 8, 11]:
+                data['sections'][f'sec_{sec_number}'][f'ws{ws_number}_pigs_count'] = None
+                data['sections'][f'sec_{sec_number}'][f'ws{ws_number}_sows_count'] = None
+
+        for sec in secs:
+            if hasattr(sec, 'pigs_count'):
+                data['sections'][f'sec_{sec.section.number}'][f'ws{sec.section.workshop.number}_pigs_count'] = sec.pigs_count
+
+            if hasattr(sec, 'sows_count'):
+                data['sections'][f'sec_{sec.section.number}'][f'ws{sec.section.workshop.number}_sows_count'] = sec.sows_count
+
+        workshops = Location.objects.all().filter(workshop__isnull=False) \
+            .select_related('workshop') \
+            .add_pigs_count_by_workshop() \
+            .add_sows_count_by_workshop()
+
+        for ws in workshops:
+            data['workshops'][f'ws{ws.workshop.number}'] = {}
+            data['workshops'][f'ws{ws.workshop.number}']['pigs_count'] = ws.pigs_count
+            data['workshops'][f'ws{ws.workshop.number}']['sows_count'] = ws.sows_count              
+
+        return data
+
+
 class LocationManager(CoreModelManager):
     def get_queryset(self):
         return LocationQuerySet(self.model, using=self._db)
