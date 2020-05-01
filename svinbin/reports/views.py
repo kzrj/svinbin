@@ -102,5 +102,5 @@ class ReportCountPigsView(views.APIView):
     # permission_classes = [permissions.IsAdminUser]
 
     def get(self, request, format=None):
-        data = Location.objects.gen_sections_pigs_count_dict()
+        data = Location.objects.all().gen_sections_pigs_count_dict()
         return Response(data)
