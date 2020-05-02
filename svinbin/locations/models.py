@@ -4,6 +4,7 @@ from django.db import models, connection
 from django.db.models import Sum, OuterRef, Subquery, Q, Count, Value
 
 from core.models import CoreModel, CoreModelManager
+import piglets
 
 
 class WorkShop(CoreModel):

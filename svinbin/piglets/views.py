@@ -65,10 +65,10 @@ class PigletsViewSet(viewsets.ModelViewSet):
             merged_piglets = piglets_events_models.PigletsMerger.objects.create_from_merging_list(
                 merging_list=serializer.validated_data['records'], new_location=new_location,
                 initiator=request.user)
+            merged_piglets.change_status_to('Готовы ко взвешиванию')
 
             if serializer.validated_data.get('transfer_part_number', None):
                 merged_piglets.assign_transfer_part_number(serializer.validated_data['transfer_part_number'])
-                merged_piglets.change_status_to('Готовы ко взвешиванию')
 
             to_location = locations_models.Location.objects.get(workshop__number=4)
             transaction = transactions_models.PigletsTransaction.objects.create_transaction(
