@@ -49,6 +49,9 @@ class LocationsTest(TransactionTestCase):
         SowFarrow.objects.create_sow_farrow(sow=sow5, alive_quantity=10)
         SowFarrow.objects.create_sow_farrow(sow=sow6, alive_quantity=10)
         SowFarrow.objects.create_sow_farrow(sow=sow7, alive_quantity=10)
+ 
+        piglets3_7= location7.piglets.all().first()
+        piglets3_7.deactivate()
 
         location8 = Location.objects.filter(pigletsGroupCell__isnull=False).first()
         Piglets.objects.init_piglets_by_farrow_date('2020-01-01', location8, 20)
@@ -126,13 +129,14 @@ class LocationsTest(TransactionTestCase):
             self.assertEqual(locs[0].sows_count, 7)
 
     def test_add_pigs_count_by_sections(self):
+
         with self.assertNumQueries(1):
             locs = Location.objects \
                 .filter(section__workshop__number=3, section__isnull=False) \
                 .add_pigs_count_by_sections() 
 
             bool(locs)
-            self.assertEqual(locs[0].pigs_count, 70)
+            self.assertEqual(locs[0].pigs_count, 60)
 
     def test_add_pigs_count_by_workshop(self):
         with self.assertNumQueries(1):
@@ -144,11 +148,11 @@ class LocationsTest(TransactionTestCase):
             bool(locs)
             self.assertEqual(locs[0].pigs_count, None)
             self.assertEqual(locs[0].sows_count, 0)
-            self.assertEqual(locs[2].pigs_count, 70)
+            self.assertEqual(locs[2].pigs_count, 60)
             self.assertEqual(locs[2].sows_count, 7)
 
     def test_gen_sections_pigs_count_dict(self):
-        # with self.assertNumQueries(2):
+        with self.assertNumQueries(2):
             data = Location.objects.all().gen_sections_pigs_count_dict()
             bool(data)
-            print(data)
+            # print(data)
