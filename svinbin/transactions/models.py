@@ -29,6 +29,8 @@ class SowTransactionManager(CoreModelManager):
                 sow=sow
                 )
 
+        print('To_location', to_location)
+
         if sow.status.title == 'Опоросилась' and to_location.workshop:
             if to_location.workshop.number == 1  and sow.location.sowAndPigletsCell:
                 sow.tour = None
