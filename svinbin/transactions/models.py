@@ -30,6 +30,7 @@ class SowTransactionManager(CoreModelManager):
                 )
 
         print('To_location', to_location)
+        print('To_location workshop', to_location.workshop)
 
         if sow.status.title == 'Опоросилась' and to_location.workshop:
             if to_location.workshop.number == 1  and sow.location.sowAndPigletsCell:
