@@ -172,7 +172,7 @@ class SowManager(CoreModelManager):
 class Sow(Pig):
     farm_id = models.IntegerField(null=True, unique=True)
     status = models.ForeignKey(SowStatus, on_delete=models.SET_NULL, null=True)
-    tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, 
+    tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='sows')
     alive = models.BooleanField(default=True)
 
