@@ -64,9 +64,6 @@ def create_semination_lists(rows, request_user):
         tour = Tour.objects.create_or_return_by_raw(row[3], row[4])
         sow, created = Sow.objects.create_or_return(row[0])
 
-        if row[0] == 2376:
-            print('Finded!')
-
         if sow.alive == False:
             continue
 
