@@ -18,7 +18,7 @@ class SowStatus(CoreModel):
 
 
 class Pig(CoreModel):
-    birth_id = models.CharField(max_length=10, unique=True, null=True)
+    birth_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
     location = models.ForeignKey("locations.Location", on_delete=models.SET_NULL, null=True)
 
     class Meta:
