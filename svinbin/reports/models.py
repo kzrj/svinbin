@@ -290,7 +290,6 @@ class ReportDateQuerySet(models.QuerySet):
                 )
 
 
-
 class ReportDateManager(CoreModelManager):
     def get_queryset(self):
         # start_date = date(2020, 1, 1)

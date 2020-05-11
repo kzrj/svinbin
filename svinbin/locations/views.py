@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import viewsets, status
+from rest_framework import viewsets
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -9,20 +9,16 @@ import sows_events.utils as sows_events_testing
 import piglets.testing_utils as piglets_testing
 import staff.testing_utils as staff_testing
 
-from locations.models import PigletsGroupCell, Location, Section
+from locations.models import Location, Section
 from locations import serializers
 from locations.filters import LocationFilter, SectionFilter
 
 
 class CreateWorkshopsView(APIView):
-    # authentication_classes = (authentication.TokenAuthentication,)
-    # permission_classes = (permissions.IsAdminUser,)
-
     def get(self, request, format=None):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
-        # staff_testing.create_test_users()
         staff_testing.create_svinbin_users()
         sows_testing.create_boars()
         sows_events_testing.create_types()
@@ -32,7 +28,7 @@ class CreateWorkshopsView(APIView):
 
 class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
-    serializer_class = serializers.LocationSerializer
+    serializer_class = serializers.LocationCellSerializer
     filter_class = LocationFilter
 
     def list(self, request):
@@ -59,7 +55,7 @@ class LocationViewSet(viewsets.ModelViewSet):
             serializer = serializers.LocationSectionSerializer
             queryset = self.filter_queryset(
                 self.get_queryset()\
-                    .select_related('section__workshop').get_with_count_piglets_in_section()
+                    .select_related('section__workshop').add_pigs_count_by_sections()
             )
 
         page = self.paginate_queryset(queryset)

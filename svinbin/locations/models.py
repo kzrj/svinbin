@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.contrib.auth.models import User
-from django.db import models, connection
+from django.db import models
 from django.db.models import Sum, OuterRef, Subquery, Q, Count, Value
 
 from core.models import CoreModel, CoreModelManager
@@ -22,19 +21,6 @@ class Section(CoreModel):
 
     def __str__(self):
         return 'Секция {} {}'.format(self.number, self.workshop)
-
-    def sows_count_by_tour(self):
-        # only work for ws3
-        if self.workshop.number != 3:
-            return None
-
-        return self.location.sows_count_by_tour
-
-    def count_piglets(self):
-        if self.workshop.number == 3:
-            return None
-
-        return self.location.count_piglets
 
 
 class Cell(CoreModel):
@@ -75,22 +61,6 @@ class LocationQuerySet(models.QuerySet):
                 Q(sowAndPigletsCell__workshop=workshop)
                 )
             )
-
-    def get_with_count_piglets_in_section(self):
-        ''' 
-            aggregate in field count_piglets sum of all piglets in piglets section(exclude ws3 sections)
-
-            thanks to 
-            https://stackoverflow.com/questions/55925437/django-subquery-with-aggregate
-            https://medium.com/@hansonkd/the-dramatic-benefits-of-django-subqueries-and-annotations-4195e0dafb16
-        '''
-        
-        subquery = Location.objects.all().filter(pigletsGroupCell__section=OuterRef('section')) \
-                            .values('section') \
-                            .annotate(all=Sum('piglets__quantity'))\
-                            .values('all')
-
-        return self.annotate(pigs_count=models.Subquery(subquery, output_field=models.IntegerField()))
 
     def add_pigs_count_by_sections(self):        
         locations_subquery = models.Subquery(Location.objects.all().filter(
@@ -181,27 +151,6 @@ class LocationManager(CoreModelManager):
     def get_queryset(self):
         return LocationQuerySet(self.model, using=self._db)
 
-    def create_location(self, pre_location):
-        if isinstance(pre_location, WorkShop):
-            location = self.create(workshop=pre_location)
-        elif isinstance(pre_location, Section):
-            location = self.create(section=pre_location)
-        elif isinstance(pre_location, SowSingleCell):
-            location = self.create(sowSingleCell=pre_location)
-        elif isinstance(pre_location, SowGroupCell):
-            location = self.create(sowGroupCell=pre_location)
-        elif isinstance(pre_location, PigletsGroupCell):
-            location = self.create(pigletsGroupCell=pre_location)
-        elif isinstance(pre_location, SowAndPigletsCell):
-            location = self.create(sowAndPigletsCell=pre_location)
-        return location
-
-    def get_sowandpiglets_cells_by_section(self, section):
-            return self.get_queryset().filter(sowAndPigletsCell__section=section)
-
-    def get_sowandpiglets_cells_by_workshop(self, workshop):
-            return self.get_queryset().filter(sowAndPigletsCell__workshop=workshop)
-
 
 class Location(CoreModel):
     workshop = models.OneToOneField(WorkShop, null=True, on_delete=models.SET_NULL,
@@ -219,6 +168,9 @@ class Location(CoreModel):
 
     objects = LocationManager()
 
+    def __str__(self):
+        return str(self.pk)
+
     @property
     def get_location(self):
         if self.workshop:
@@ -227,34 +179,11 @@ class Location(CoreModel):
         if self.section:
             return self.section
 
-        # if self.sowSingleCell:
-        #     return self.sowSingleCell
-
         if self.pigletsGroupCell:
             return self.pigletsGroupCell
 
         if self.sowAndPigletsCell:
             return self.sowAndPigletsCell
-
-        # if self.sowGroupCell:
-        #     return self.sowGroupCell
-
-    @property
-    def get_sow_location(self):
-        if self.workshop:
-            return self.workshop
-
-        if self.section:
-            return self.section
-
-        # if self.sowSingleCell:
-        #     return self.sowSingleCell
-
-        if self.sowAndPigletsCell:
-            return self.sowAndPigletsCell
-
-        # if self.sowGroupCell:
-        #     return self.sowGroupCell
 
     @property
     def get_workshop(self):
@@ -275,9 +204,6 @@ class Location(CoreModel):
 
         if self.sowGroupCell:
             return self.sowGroupCell.section.workshop
-
-    def __str__(self):
-        return str(self.pk)
 
     @property
     def is_empty(self):
@@ -314,7 +240,3 @@ class Location(CoreModel):
             return f'{self.sowGroupCell.section.number}/{self.sowGroupCell.number}'
 
         return None
-
-    @property
-    def sows_count_by_tour(self):
-        return self.sow_set.get_tours_with_count_sows_by_location(self)

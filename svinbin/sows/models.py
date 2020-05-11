@@ -273,7 +273,7 @@ class Sow(Pig):
 
     @property
     def get_location(self):
-        return str(self.location.get_sow_location)
+        return str(self.location.get_location)
 
 
 class GiltManager(CoreModelManager):

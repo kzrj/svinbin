@@ -175,15 +175,3 @@ class FarmImportXlsTest(TestCase):
 
         seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
             import_farm.create_semination_lists(rows, shmigina)
-
-    def test_missing_sow(self):
-        # грузили 51-52 туры, на завелась свиноматка 2376
-        wb = open_workbook('../data/51-52.xls')
-        rows = import_farm.get_semenation_rows(wb)
-        shmigina = staff_testings.create_employee('ШМЫГИ')
-
-        seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
-            import_farm.create_semination_lists(rows, shmigina)
-
-        self.assertEqual(Sow.objects.get_queryset_with_not_alive()
-            .filter(tour__week_number=51).count(), 75)
