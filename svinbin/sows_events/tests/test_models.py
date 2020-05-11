@@ -234,42 +234,6 @@ class SowFarrowModelManagerTest(TransactionTestCase):
                 dead_quantity=1
                 )
 
-    def test_queryset_count_piglets_by_tour_annotate(self):
-        location1 = Location.objects.filter(sowAndPigletsCell__number=1).first()
-        sow1 = sows_testing.create_sow_with_semination_usound(location=location1, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow1,
-            alive_quantity=10,
-            dead_quantity=0,
-            mummy_quantity=0
-            )
-
-        location2 = Location.objects.filter(sowAndPigletsCell__isnull=False)[1]
-        sow2 = sows_testing.create_sow_with_semination_usound(location=location2, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow2,
-            alive_quantity=12,
-            dead_quantity=5,
-            mummy_quantity=1
-            )
-
-        location3 = Location.objects.filter(sowAndPigletsCell__isnull=False)[2]
-        sow3 = sows_testing.create_sow_with_semination_usound(location=location3, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow3,
-            alive_quantity=13,
-            dead_quantity=3,
-            mummy_quantity=2
-            )
-
-        with self.assertNumQueries(1):
-            sows = SowFarrow.objects.filter(tour__week_number=1)
-            sows = sows.count_piglets_by_tour_annotate()
-            bool(sows)
-            self.assertEqual(sows[0].total_alive, 35)
-            self.assertEqual(sows[0].total_dead, 8)
-            self.assertEqual(sows[0].total_mummy, 3)
-
 
 class CullingSowManagerTest(TestCase):
     def setUp(self):

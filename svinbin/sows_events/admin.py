@@ -26,12 +26,3 @@ class CullingSowAdmin(admin.ModelAdmin):
     list_display = [f.name for f in models.CullingSow._meta.fields]
     search_fields = ['sow__farm_id']
 
-
-# @admin.register(models.WeaningSow)
-# class WeaningSowAdmin(admin.ModelAdmin):
-#     list_display = [f.name for f in models.WeaningSow._meta.fields]
-
-
-# @admin.register(models.AbortionSow)
-# class AbortionSowAdmin(admin.ModelAdmin):
-#     list_display = [f.name for f in models.AbortionSow._meta.fields]

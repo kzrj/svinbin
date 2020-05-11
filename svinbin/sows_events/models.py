@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import Event, CoreModel, CoreModelManager
@@ -142,35 +141,7 @@ class Ultrasound(SowEvent):
 
 
 class SowFarrowQuerySet(models.QuerySet):
-    def get_by_tour_and_sow_location(self, tour, sow_location):
-        return self.filter(sow__location=sow_location, tour=tour)
-
-    def count_piglets(self):
-        return self.aggregate(total_alive=models.Sum('alive_quantity'), total_dead=models.Sum('dead_quantity'),
-            total_mummy=models.Sum('mummy_quantity'))
-
-    def count_piglets_by_tour_annotate(self):
-        subquery_alive = self.filter(tour=models.OuterRef('tour')) \
-                            .values('tour') \
-                            .annotate(
-                                total_alive=models.Sum('alive_quantity'))\
-                            .values('total_alive')
-
-        subquery_dead = self.filter(tour=models.OuterRef('tour')) \
-                            .values('tour') \
-                            .annotate(total_dead=models.Sum('dead_quantity'))\
-                            .values('total_dead')
-
-        subquery_mummy = self.filter(tour=models.OuterRef('tour')) \
-                            .values('tour') \
-                            .annotate(total_mummy=models.Sum('mummy_quantity'))\
-                            .values('total_mummy')
-
-        return self.annotate(
-            total_alive=models.Subquery(subquery_alive, output_field=models.IntegerField()),
-            total_dead=models.Subquery(subquery_dead, output_field=models.IntegerField()),
-            total_mummy=models.Subquery(subquery_mummy, output_field=models.IntegerField()),
-            )
+    pass
 
 
 class SowFarrowManager(CoreModelManager):
@@ -193,7 +164,7 @@ class SowFarrowManager(CoreModelManager):
         if alive_quantity == 0 and dead_quantity == 0 and mummy_quantity == 0:
             raise DjangoValidationError(message='Не может быть 0 поросят.')
 
-        # We assume that sow has one farrow per tour. Sow there are no piglets in cell
+        # We assume that sow has one farrow per tour.
         piglets = Piglets.objects.create(
                 location=sow.location,
                 status=PigletsStatus.objects.get(title='Родились, кормятся'),
@@ -243,10 +214,6 @@ class CullingSowManager(CoreModelManager):
         sow.change_status_to(status_title='Брак', alive=False)
         return culling
 
-    def create_culling_from_farm_id(self, sow_farm_id, culling_type, reason, initiator=None):
-        sow = Sow.objects.get_by_farm_id(sow_farm_id)
-        return self.create_culling(sow, culling_type, reason, initiator)
-
 
 class CullingSow(SowEvent):
     CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka'),
@@ -259,16 +226,6 @@ class CullingSow(SowEvent):
 
 class WeaningSowManager(CoreModelManager):
     def create_weaning(self, sow, piglets, tour=None, initiator=None, date=timezone.now()):
-        # if not tour:
-        #     tour = sow.tour
-            
-        # # validate
-        # if not tour and not sow.tour:
-        #     raise DjangoValidationError(message='У свиньи нет тура.')
-
-        # if not sow.location.sowAndPigletsCell:
-        #     raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.') 
-            
         weaning = self.create(sow=sow, tour=tour, piglets=piglets, quantity=piglets.quantity,
          initiator=initiator, date=date)
 
