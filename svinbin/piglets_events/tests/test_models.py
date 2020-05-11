@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 from piglets.models import Piglets
 from piglets_events.models import (
     PigletsMerger, PigletsSplit, WeighingPiglets,
-    CullingPiglets, init_piglets_with_single_tour, Recount
+    CullingPiglets, Recount
 )
 from tours.models import Tour, MetaTour
 from locations.models import Location
@@ -645,22 +645,6 @@ class CullingPigletsTest(TestCase):
         self.assertEqual(culling_total_data2['total_weight'], 127.5)
         self.assertEqual(culling_total_data2['avg_weight'], 9.5)
         
-        
-class RestPigletsTest(TestCase):
-    def setUp(self):
-        locations_testing.create_workshops_sections_and_cells()
-        piglets_testing.create_piglets_statuses()
-
-        self.loc_ws3 = Location.objects.get(workshop__number=3)
-
-    def test_init_piglets_with_single_tour(self):
-        piglets = init_piglets_with_single_tour(9, 105)
-
-        self.assertEqual(piglets.quantity, 105)
-        self.assertEqual(piglets.location, self.loc_ws3)
-        self.assertEqual(piglets.metatour.records.all().count(), 1)
-        self.assertEqual(piglets.metatour.records.all().first().tour.week_number, 9)
-
 
 class RecountManagerTest(TestCase):
     def setUp(self):
