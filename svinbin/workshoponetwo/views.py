@@ -72,7 +72,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
     @action(methods=['post'], detail=True)
     def assing_farm_id(self, request, pk=None):
         sow = self.get_object()
-        serializer = serializers.FarmIdSerializer(data=request.data)
+        serializer = serializers.CreateFarmIdSerializer(data=request.data)
         # initiator = request.user.workshopemployee
         if serializer.is_valid():
             sow.assing_farm_id(serializer.validated_data['farm_id'])
