@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -83,7 +84,7 @@ class SeminationManager(CoreModelManager):
 
 
 class Semination(SowEvent):
-    semination_employee = models.ForeignKey(settings.AUTH_USER_MODEL,
+    semination_employee = models.ForeignKey(User,
      on_delete=models.SET_NULL, null=True, related_name="semination_employee")
     boar = models.ForeignKey('sows.Boar', on_delete=models.SET_NULL, null=True)
 

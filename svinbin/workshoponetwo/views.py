@@ -124,69 +124,6 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['get'], detail=False)
-    def sows_by_tours(self, request):
-        data = list()
-        workshop = locations_models.WorkShop.objects.get(number=1)
-        tours = tours_models.Tour.objects.get_tours_in_workshop_by_sows(workshop)
-        for tour in tours:
-            qs = tour.sows.get_suporos_in_workshop(workshop)
-            if qs.count() > 0:
-                data.append(
-                    {   
-                        'title': str(tour),
-                        'tour': tours_serializers.TourSerializer(tour).data,
-                        'sows': sows_serializers.SowSerializer(qs, many=True).data,
-                        'count': qs.count()
-                    }
-                )
-        qs = sows_models.Sow.objects.get_not_seminated_not_suporos_in_workshop(workshop)
-        if qs.count() > 0:
-            data.append({
-                    'title': 'Не супорос, не осеменена, есть Id',
-                    'tour': {'id': 'Не супорос, не осеменена, есть Id'},
-                    'sows': sows_serializers.SowSerializer(qs, many=True).data,
-                    'count': qs.count()
-                    })
-
-        qs = sows_models.Sow.objects.get_without_farm_id_in_workshop(workshop)
-        if qs.count() > 0:
-            data.append({
-                    'title': 'Ремонтные',
-                    'tour': {'id': 'Нет Id'},
-                    'sows': sows_serializers.SowSerializer(qs, many=True).data,
-                    'count': qs.count()
-                    })
-
-        return Response(data, status=status.HTTP_200_OK)
-
-    @action(methods=['get'], detail=False)
-    def sows_by_tours_ws2(self, request):
-        data = list()
-        workshop = locations_models.WorkShop.objects.get(number=2)
-        tours = tours_models.Tour.objects.get_tours_in_workshop_by_sows(workshop)
-        for tour in tours:
-            qs = tour.sows.get_suporos_in_workshop(workshop)
-            if qs.count() > 0:
-                data.append(
-                    {   
-                        'title': str(tour),
-                        'tour': tours_serializers.TourSerializer(tour).data,
-                        'sows': sows_serializers.SowSerializer(qs, many=True).data,
-                        'count': qs.count()
-                    }
-                )
-        qs = sows_models.Sow.objects.get_not_suporos_in_workshop(workshop)
-        if qs.count() > 0:
-            data.append({
-                    'title': 'Не супорос',
-                    'tour': {'id': 'Не супорос'},
-                    'sows': sows_serializers.SowSerializer(qs, many=True).data,
-                    'count': qs.count()
-                    })
-
-        return Response(data, status=status.HTTP_200_OK)
-
     @action(methods=['post'], detail=False)
     def mass_semination(self, request):
         serializer = sows_serializers.SowsMassSeminationSerializer(data=request.data)
@@ -223,59 +160,6 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             return Response(
                 {
                     "message": "Узи проведено."
-                },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['post'], detail=False)
-    def mass_init_and_transfer(self, request):
-        serializer = serializers.MassSowCreateSerializer(data=request.data)
-        if serializer.is_valid():
-            create_sows, existed_sows = sows_models.Sow.objects.create_bulk_at_ws(
-                farm_ids=serializer.validated_data['sows'],
-                location=locations_models.Location.objects.get(workshop__number=2)
-                )
-            sows_to_create = sows_models.Sow.objects.filter(farm_id__in=create_sows)
-
-            sows_events_models.Semination.objects.mass_semination(
-                sows_qs=sows_to_create,
-                week=serializer.validated_data['week'],
-                semination_employee=request.user,
-                initiator=request.user
-                )
-
-            sows_events_models.Semination.objects.mass_semination(
-                sows_qs=sows_to_create,
-                week=serializer.validated_data['week'],
-                semination_employee=request.user,
-                initiator=request.user
-                )
-
-            sows_events_models.Ultrasound.objects.mass_ultrasound(
-                sows_qs=sows_to_create,
-                days=30,
-                result=True,
-                initiator=request.user
-                )
-
-            sows_events_models.Ultrasound.objects.mass_ultrasound(
-                sows_qs=sows_to_create,
-                days=60,
-                result=True,
-                initiator=request.user
-                )
-            
-            to_location = locations_models.Location.objects.get(workshop__number=3)
-            transactions_models.SowTransaction.objects.create_many_transactions(
-                sows_to_create, to_location, request.user)
-
-            return Response(
-                {
-                    "created": create_sows,
-                    "not_created": existed_sows,
-                    "message": "Созданы и переведены {}, не созданы {}". \
-                        format(str(create_sows), str(existed_sows)), 
                 },
                 status=status.HTTP_200_OK)
         else:

@@ -66,8 +66,6 @@ router.register(r'workshoponetwo/sows', workshoponetwo_views.WorkShopOneTwoSowVi
 # workshop three
 router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsViewSet, \
  basename='workshopthree-sows')
-router.register(r'workshopthree/wsinfo', workshopthree_views.WorkshopInfo, \
- basename='workshopthree-info')
 
 # reports
 router.register(r'reports/tours', reports_views.TourReportViewSet, basename='report-tours')
@@ -85,7 +83,5 @@ urlpatterns = [
     url(r'^api/docs/$', schema_view) ,
 
     url(r'^api/reports/pigs_count/', reports_views.ReportCountPigsView.as_view()),
-
-
 
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -10,7 +10,6 @@ from rest_framework import status, exceptions
 
 from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow
 from sows_events import serializers
-from sows_events.filters import SowFarrowFilter
 
 
 class SeminationViewSet(viewsets.ModelViewSet):

@@ -84,34 +84,3 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
             status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class WorkshopInfo(viewsets.ViewSet):
-    # @action(methods=['get'], detail=False)
-    # def info(self, request, format=None):
-    #     # to move to models
-    #     data = dict()
-    #     data['Цех'] = dict()
-    #     for section in locations_models.Section.objects.filter(workshop__number=3):
-    #         data[str(section.number)] = locations_models.Location.objects \
-    #             .get_sowandpiglets_cells_by_section(section) \
-    #             .get_cells_data()
-    #         data[str(section.number)]['sow_count'] = Sow.objects.filter( \
-    #             location__sowAndPigletsCell__section=section).count()
-    #         piglets_count = NewBornPigletsGroup.objects.filter( \
-    #             location__sowAndPigletsCell__section=section).aggregate(Sum('quantity'))['quantity__sum']
-    #         data[str(section.number)]['piglets_count'] = piglets_count if piglets_count else 0
-
-    #         for key in data[str(section.number)].keys():
-    #             if data['Цех'].get(key):
-    #                 data['Цех'][key] = data['Цех'][key] + data[str(section.number)][key]
-    #             else:
-    #                 data['Цех'][key] = data[str(section.number)][key]
-
-        # return Response(data)
-
-    @action(methods=['get'], detail=False)
-    def balances_by_tours(self, request, format=None):
-        tours = Tour.objects.get_tours_in_workshop_by_sows_and_piglets( \
-            locations_models.WorkShop.objects.filter(number=3).first())
-        return Response(tours.get_recounts_balance_data())

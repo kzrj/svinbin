@@ -30,14 +30,6 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.boar = Boar.objects.all().first()
         self.user = staff_testings.create_employee() # is_seminator = True
 
-    def test_assing_farm_id(self):
-        sow_without_farm_id = sows_testing.create_sow_without_farm_id_with_birth_id(1)
-
-        response = self.client.post('/api/workshoponetwo/sows/%s/assing_farm_id/' %
-          sow_without_farm_id.pk, {'farm_id': 670 })
-        self.assertEqual(response.data['sow']['id'], sow_without_farm_id.pk)
-        self.assertEqual(response.data['sow']['farm_id'], 670)
-
     # def test_put_in_semination_row(self):
     #     self.client.force_authenticate(user=self.user)
     #     sow = sows_testing.create_sow_and_put_in_workshop_one()

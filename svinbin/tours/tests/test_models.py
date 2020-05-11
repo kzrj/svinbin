@@ -49,20 +49,6 @@ class TourModelManagerTest(TestCase):
         self.assertEqual(Tour.objects.all().count(), 4)
         self.assertEqual(tour.week_number, 1)
 
-    def test_get_tours_in_workshop_by_sows(self):
-        sow1 = pigs_testings.create_sow_and_put_in_workshop_one()
-        sow2 = pigs_testings.create_sow_and_put_in_workshop_one()
-        seminated_sow1 = pigs_testings.create_sow_with_semination(sow1.location)
-
-        location2 = Location.objects.get(workshop__number=2)
-        seminated_sow2 = pigs_testings.create_sow_with_semination(location2, 1)
-        seminated_sow3 = pigs_testings.create_sow_with_semination(location2, 2)
-        seminated_sow3 = pigs_testings.create_sow_with_semination(location2, 2)
-        sow3 = pigs_testings.create_sow_and_put_in_workshop_one()
-        sow3.location = location2
-        sow3.save()
-
-        self.assertEqual(Tour.objects.get_tours_in_workshop_by_sows(location2.workshop).count(), 2)
 
     def test_create_or_return_by_raw(self):
         tour = Tour.objects.create_or_return_by_raw('1940')
