@@ -13,7 +13,6 @@ class PigletsAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         qs = super(PigletsAdmin, self).get_queryset(request)
         return Piglets.objects.get_all()
-        # return qs.filter(Q(Q(active=True) | Q(active=False)))
 
 
 @admin.register(PigletsStatus)

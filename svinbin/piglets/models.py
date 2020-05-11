@@ -40,46 +40,12 @@ class PigletsQuerySet(models.QuerySet):
     def with_tour(self, week_number):
         return self.filter(metatour__records__tour__week_number=week_number)
 
-    def with_tour_not_mixed(self, week_number):
-        return self.filter(metatour__records__tour__week_number=week_number, metatour__records__percentage=100)
-
-    def with_tour_mixed(self, week_number):
-        return self.filter(metatour__records__tour__week_number=week_number, metatour__records__percentage__lt=100)
-
-    def count_piglets_in_mixed_groups(self, week_number):
-        subquery = MetaTourRecord.objects.filter(metatour__piglets__pk=models.OuterRef('pk'), tour__week_number=week_number) \
-            .values('quantity')
-
-        return self.with_tour_mixed(week_number=week_number).annotate(
-            count_piglets=models.Subquery(subquery, output_field=models.IntegerField())
-            ).aggregate(models.Sum('count_piglets'))['count_piglets__sum']
-
-    # def count_piglets_in_mixed_group_annotate(self, week_number):
-    #     subquery = MetaTourRecord.objects.filter(metatour__piglets__pk=models.OuterRef('pk'), 
-    #                                                 tour__week_number=week_number) \
-    #                                     .values('quantity')
-
-    #     return self.with_tour_mixed(week_number=week_number) \
-    #                 .annotate(
-    #                     count_piglets=models.Subquery(subquery, output_field=models.IntegerField())
-    #                 ) 
-                    # .annotate(cnt=models.Sum('count_piglets')).values('cnt')[:1]
-
-
     def all_in_workshop(self, workshop_number):
         return self.filter(Q(
             Q(location__workshop__number=workshop_number) |
             Q(location__section__workshop__number=workshop_number) |
             Q(location__pigletsGroupCell__workshop__number=workshop_number) |
             Q(location__sowAndPigletsCell__workshop__number=workshop_number)
-            )
-        )
-
-    def all_in_section(self, section):
-        return self.filter(Q(
-            Q(location__section=section) |
-            Q(location__pigletsGroupCell__section=section) |
-            Q(location__sowAndPigletsCell__section=section)
             )
         )
 
@@ -101,13 +67,6 @@ class PigletsManager(CoreModelManager):
         MetaTourRecord.objects.create_record(metatour, tour, quantity, quantity)
         metatour.set_week_tour()
         return piglets
-
-    # test use kwargs
-    def init_piglets_by_week(self, *args, **kwargs):
-        tour = Tour.objects.get_or_create_by_week_in_current_year(kwargs['week'])
-        kwargs.pop('week')
-        kwargs['tour'] = tour
-        return self.init_piglets_with_metatour(**kwargs)
 
     def init_piglets_by_farrow_date(self, farrow_date, location, quantity, gilts_quantity=0):
         tour = Tour.objects.create_tour_from_farrow_date_string(farrow_date)
@@ -179,10 +138,6 @@ class Piglets(CoreModel):
     @property
     def metatour_repr(self):
         return self.metatour.records_repr()
-
-    # @property
-    # def metatour_repr(self):
-    #     return self.metatour.records_repr()
 
     def change_location(self, location):
         self.location = location
