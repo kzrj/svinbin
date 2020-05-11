@@ -38,25 +38,6 @@ class SowTransactionManagerTest(TestCase):
          Location.objects.get(workshop__number=1))
         self.assertEqual(transaction.to_location, to_location)
 
-    # def test_create_transaction_to_not_empty_cell(self):
-    #     sow1 = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=1)
-    #     sow2 = sows_testing.create_sow_and_put_in_workshop_three(section_number=1, cell_number=2)
-    #     with self.assertRaises(ValidationError):
-    #         transaction = SowTransaction.objects.create_transaction(
-    #             to_location=sow2.location,
-    #             sow=sow1
-    #             )
-
-    def test_create_transaction_with_resetellment(self):
-        sow_in = sows_testing.create_sow_with_semination_usound(
-            Location.objects.get(workshop__number=3))
-
-        to_location = Location.objects.get(sowAndPigletsCell__number=1, sowAndPigletsCell__section__number=1)
-        sow_out = sows_testing.create_sow_with_semination_usound(to_location)
-
-        transaction = SowTransaction.objects.create_transaction_with_resetellment(sow_in, to_location)
-        # self.assertEqual()
-
     def test_create_many_transaction(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         sow2 = sows_testing.create_sow_and_put_in_workshop_one()
