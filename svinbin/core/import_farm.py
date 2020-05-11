@@ -2,14 +2,11 @@
 from xlrd import open_workbook, xldate_as_tuple
 import re
 import datetime
-import json
-from pytz import timezone
 
 from sows.models import Sow, Boar
 from tours.models import Tour
 from staff.models import WorkShopEmployee
 from sows_events.models import Semination, Ultrasound, AbortionSow
-from locations.models import Location
 
 
 def init_wb(file_from_request): # to test
@@ -116,122 +113,3 @@ def create_semination_lists(rows, request_user):
             already_seminated_in_tour.append(sow)
 
     return seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list
-
-# берем только более позднее
-# какие больше 35 с момента осеменения, делаем узи +35 дней осеменение
-# отфильтровать по тур.
-
-def import_from_json_to_ws3(initiator=None):
-    with open('../data/ceh03.json', 'r') as file:
-        data = json.load(file)
-
-    for key in data.keys():
-        sow, created = Sow.objects.create_or_return(data[key]['farm_id'])
-        
-        if not created:
-            continue
-
-        cycle = data[key]['Cicles'][0]
-        tour = Tour.objects.create_or_return_by_raw(cycle['week'])
-
-        boar1 = Boar.objects.get_or_create_boar(cycle['boar1'])
-        boar2 = Boar.objects.get_or_create_boar(cycle['boar2'])
-        semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(cycle['insr1'])
-        semination_employee2 = WorkShopEmployee.objects.get_seminator_by_farm_name(cycle['insr2'])
-        date = datetime.datetime.strptime(cycle['insemdate'], '%Y-%m-%d')
-
-        sow, seminated = Semination.objects.double_semination_or_not(
-            sow=sow, tour=tour, date=date, initiator=None,
-            boar1=boar1, semination_employee1=semination_employee1,
-            boar2=boar2, semination_employee2=semination_employee2,                    
-            )
-
-        # usound
-        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
-         days=30, date=date + datetime.timedelta(days=28))
-        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
-         days=60, date=date + datetime.timedelta(days=35))
-
-        sow.location = Location.objects.filter(workshop__number=3).first()
-        sow.save()
-
-
-def import_from_json_to_ws2(initiator=None):
-    with open('../data/ceh02.json', 'r') as file:
-        data = json.load(file)
-
-    for key in data.keys():
-        sow, created = Sow.objects.create_or_return(data[key]['farm_id'])
-
-        if not created:
-            continue
-
-        cycle = data[key]['Cicles'][0]
-        tour = Tour.objects.create_or_return_by_raw(cycle['week'])
-
-        boar1 = Boar.objects.get_or_create_boar(cycle['boar1'])
-        boar2 = Boar.objects.get_or_create_boar(cycle['boar2'])
-        semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(cycle['insr1'])
-        semination_employee2 = WorkShopEmployee.objects.get_seminator_by_farm_name(cycle['insr2'])
-        date = datetime.datetime.strptime(cycle['insemdate'], '%Y-%m-%d')
-
-        sow, seminated = Semination.objects.double_semination_or_not(
-            sow=sow, tour=tour, date=date, initiator=None,
-            boar1=boar1, semination_employee1=semination_employee1,
-            boar2=boar2, semination_employee2=semination_employee2,                    
-            )
-
-        # usound
-        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
-         days=30, date=date + datetime.timedelta(days=28))
-        Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
-         days=60, date=date + datetime.timedelta(days=35))
-
-        sow.location = Location.objects.filter(workshop__number=2).first()
-        sow.save()
-
-
-def init_sow_cycle(sow, cycle, ws_number, initiator=None):
-    tour = Tour.objects.create_or_return_by_raw(cycle['week'])
-
-    boar1 = Boar.objects.get_or_create_boar(cycle['boar1'])
-    boar2 = Boar.objects.get_or_create_boar(cycle['boar2'])
-    semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(cycle['insr1'])
-    semination_employee2 = WorkShopEmployee.objects.get_seminator_by_farm_name(cycle['insr2'])
-    date = datetime.datetime.strptime(cycle['insemdate'], '%Y-%m-%d')
-
-    sow, seminated = Semination.objects.double_semination_or_not(
-        sow=sow, tour=tour, date=date, initiator=None,
-        boar1=boar1, semination_employee1=semination_employee1,
-        boar2=boar2, semination_employee2=semination_employee2,                    
-        )
-
-    # usound
-    Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
-     days=30, date=date + datetime.timedelta(days=28))
-    Ultrasound.objects.create_ultrasound(sow=sow, initiator=None, result=True,
-     days=60, date=date + datetime.timedelta(days=35))
-
-    sow.location = Location.objects.filter(workshop__number=ws_number).first()
-    sow.save()
-
-    return sow
-    
-
-def import_from_json_to_ws2_3(file, ws_number, initiator=None):
-    data = json.load(file)
-    sows_created = list()
-    sows_passed = list()
-
-    for key in data.keys():
-        sow, created = Sow.objects.create_or_return(data[key]['farm_id'])
-
-        if not created:
-            sows_passed.append(sow)
-            continue
-
-        cycle = data[key]['Cicles'][0]
-        sow = init_sow_cycle(sow, cycle, ws_number, initiator)
-        sows_created.append(sow)
-
-    return sows_created, sows_passed

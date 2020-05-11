@@ -43,13 +43,8 @@ class FarmImportXlsTest(TestCase):
         seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
             import_farm.create_semination_lists(rows1, shmigina)
 
-        print(seminated_list[0].tour.start_date)
-        print(seminated_list[0].tour.week_number)
         monday_24_week = Tour.objects.get_monday_date_by_week_number(week_number=24, year=2019)
-        print(monday_24_week)
-        print(monday_24_week.strftime("%V"))
         self.assertEqual(seminated_list[0].tour.week_number, 24)
-
         self.assertEqual(len(seminated_list), 4)
         self.assertEqual(len(already_seminated_in_tour), 0)
         self.assertEqual(len(sows_in_another_tour), 0)
@@ -192,60 +187,3 @@ class FarmImportXlsTest(TestCase):
 
         self.assertEqual(Sow.objects.get_queryset_with_not_alive()
             .filter(tour__week_number=51).count(), 75)
-
-
-       
-# class FarmImportJsonTest(TestCase):
-#     def setUp(self):
-#         locaions_testing.create_workshops_sections_and_cells()
-#         sows_testings.create_statuses()
-#         sows_events_testings.create_types()
-#         staff_testings.create_svinbin_users()
-
-    # def test_init_ceh3(self):
-    #     import_farm.import_from_json_to_ws3()
-    #     self.assertNotEqual(Sow.objects.all().count(), 0)
-        
-    #     sow1 = Sow.objects.all().first()
-
-    #     self.assertEqual(sow1.location.workshop.number, 3)
-
-    #     semination = Semination.objects.filter(sow=sow1).first()
-    #     ultrasound = Ultrasound.objects.filter(sow=sow1).first()
-    #     self.assertNotEqual(semination, None)
-    #     self.assertNotEqual(semination.semination_employee, None)
-    #     self.assertNotEqual(semination.boar, None)
-    #     self.assertNotEqual(semination.tour, None)
-    #     self.assertNotEqual(ultrasound, None)
-    #     self.assertEqual(ultrasound.result, True)
-    #     self.assertEqual(ultrasound.date, semination.date + datetime.timedelta(days=28))
-
-    # def test_init_ceh2(self):
-    #     import_farm.import_from_json_to_ws2()
-    #     self.assertNotEqual(Sow.objects.all().count(), 0)
-        
-    #     sow1 = Sow.objects.all().first()
-
-    #     self.assertEqual(sow1.location.workshop.number, 2)
-
-    #     semination = Semination.objects.filter(sow=sow1).first()
-    #     ultrasound = Ultrasound.objects.filter(sow=sow1).first()
-    #     self.assertNotEqual(semination, None)
-    #     self.assertNotEqual(semination.semination_employee, None)
-    #     self.assertNotEqual(semination.boar, None)
-    #     self.assertNotEqual(semination.tour, None)
-    #     self.assertNotEqual(ultrasound, None)
-    #     self.assertEqual(ultrasound.result, True)
-    #     self.assertEqual(ultrasound.date, semination.date + datetime.timedelta(days=28))
-
-
-    # def test_import_from_json_to_ws2_3(self):
-    #     json_file = open('../data/ceh03.json', 'r')
-    #     sows_created1, sows_passed1 = import_farm.import_from_json_to_ws2_3(json_file, 3)
-    #     print(sows_created1)
-    #     # sows_created2, sows_passed2 = import_farm.import_from_json_to_ws2_3(json_file, 3)
-
-        # self.assertEqual(len(sows_created1), len(sows_passed2))
-
-    # def test
-        
