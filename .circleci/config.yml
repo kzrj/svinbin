@@ -26,9 +26,9 @@ jobs:
           command: |
             . venv/bin/activate
             cd svinbin
-            python manage.py migrate
-            python manage.py makemigrations --no-input
-            python manage.py test
+            python manage.py migrate --settings=svinbin.circleci_settings
+            python manage.py makemigrations --no-input --settings=svinbin.circleci_settings
+            python manage.py test --settings=svinbin.circleci_settings
       - store_artifacts:
           path: test-reports/
           destination: python_app
