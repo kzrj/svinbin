@@ -101,7 +101,8 @@ class ReportDateSowQsTest(TransactionTestCase):
             sow = Sow.objects.all()[i]
             CullingSow.objects.create_culling(sow=sow, culling_type='padej', date=past_date)
 
-        start_date = date(2020, 4, 20)
+        # start_date = date(2020, 4, 20)
+        start_date = past_date + timedelta(1)
         end_date = timezone.now().date()
 
         culls = CullingSow.objects.filter(date__date__range=(start_date, end_date),
@@ -374,7 +375,3 @@ class ReportCurrentDataTest(TransactionTestCase):
         self.loc_ws3 = Location.objects.get(workshop__number=3)
 
         self.loc_ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
-
-    def test_add_today_rep_sows_count(self):
-        # not cullings and farrows today
-        pass
