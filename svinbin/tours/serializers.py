@@ -8,9 +8,3 @@ class TourSerializer(serializers.ModelSerializer):
     class Meta:
     	model = Tour
     	fields = '__all__'
-
-
-class MetaTourSerializer(serializers.ModelSerializer):
-    class Meta:
-    	model = MetaTour
-    	fields = '__all__'
