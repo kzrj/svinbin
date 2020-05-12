@@ -28,12 +28,12 @@ class SowTransactionManager(CoreModelManager):
                 sow=sow
                 )
 
-        if sow.status.title == 'Опоросилась' and to_location.workshop:
+        if sow.status and sow.status.title == 'Опоросилась' and to_location.workshop:
             if to_location.workshop.number == 1  and sow.location.sowAndPigletsCell:
                 sow.tour = None
                 sow.change_status_to('Ожидает осеменения')
 
-        if sow.status.title != 'Супорос 35' and to_location.workshop: 
+        if sow.status and sow.status.title != 'Супорос 35' and to_location.workshop: 
             if to_location.workshop.number == 3 and sow.location.workshop and \
                 sow.location.workshop.number in [1, 2]:
                 raise DjangoValidationError(message=f'Свиноматка №{sow.farm_id} супорос' )
