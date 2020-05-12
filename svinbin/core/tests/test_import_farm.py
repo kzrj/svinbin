@@ -5,6 +5,7 @@ from xlrd import open_workbook, xldate_as_tuple
 
 from django.test import TestCase
 from django.utils import timezone
+from django.test import tag
 
 from core import import_farm
 
@@ -95,6 +96,7 @@ class FarmImportXlsTest(TestCase):
         self.assertEqual(len(already_seminated_in_tour), 3)
         self.assertEqual(len(sows_in_another_tour), 1)
 
+    @tag('with_file')
     def test_repeated_seminations(self):
         wb = open_workbook('../data/seminations2.xls')
         rows = import_farm.get_semenation_rows(wb)
@@ -105,6 +107,7 @@ class FarmImportXlsTest(TestCase):
 
         self.assertEqual(Sow.objects.filter(tour__week_number=6).count(), 75)
 
+    @tag('with_file')
     def test_repeated_seminations_v2(self):
         # файл с более поздними осеменениями
         wb = open_workbook('../data/seminations2_short.xls')
@@ -126,6 +129,7 @@ class FarmImportXlsTest(TestCase):
         self.assertEqual(Sow.objects.filter(tour__week_number=6).count(), 75)
         self.assertEqual(Sow.objects.filter(tour__week_number=7).count(), 75)
 
+    @tag('with_file')
     def test_repeated_seminations_v3(self):
         # файл с более поздними осеменениями. По факту узи есть в файле нет.
         wb = open_workbook('../data/seminations2.xls')
@@ -155,6 +159,7 @@ class FarmImportXlsTest(TestCase):
 
         self.assertEqual(Ultrasound.objects.filter(sow=sow).count(), 1)
 
+    @tag('with_file')
     def test_repeated_seminations_v4(self):
         # файл с более поздними осеменениями. По факту узи есть в файле нет.
         wb = open_workbook('../data/seminations2.xls')
