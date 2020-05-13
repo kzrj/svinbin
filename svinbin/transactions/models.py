@@ -20,7 +20,7 @@ class SowTransactionManager(CoreModelManager):
             raise DjangoValidationError(message='Клетка №{} не пустая'. \
                 format(to_location.sowAndPigletsCell.number))
 
-        transaction = SowTransaction.objects.create(
+        transaction = self.create(
                 date=timezone.now(),
                 initiator=initiator,
                 from_location=sow.location,

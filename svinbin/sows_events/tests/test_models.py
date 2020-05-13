@@ -5,8 +5,8 @@ from django.core.exceptions import ValidationError
 
 from sows_events.models import (
     Semination, Ultrasound, SowFarrow, CullingSow,
-    UltrasoundType, AbortionSow)
-from sows.models import Sow, Boar
+    UltrasoundType, AbortionSow, MarkAsNurse, MarkAsGilt)
+from sows.models import Sow, Boar, Gilt
 from piglets.models import Piglets
 from locations.models import Location
 from transactions.models import SowTransaction
@@ -299,3 +299,69 @@ class AbortionSowTest(TestCase):
         sow.refresh_from_db()
         self.assertEqual(sow.tour, None)
         self.assertEqual(sow.status.title, 'Аборт')
+
+
+class MarkAsNurseTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_create_nurse_event(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        sow.change_sow_current_location(location)
+
+        SowFarrow.objects.create_sow_farrow(
+            sow=sow,
+            alive_quantity=10,
+            dead_quantity=1
+            )
+
+        sow.markasnurse_set.create_nurse_event(sow)
+        sow.refresh_from_db()
+        self.assertEqual(sow.tour, None)
+        self.assertEqual(sow.status.title, 'Кормилица')
+
+    def test_create_nurse_event_error(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+
+        with self.assertRaises(ValidationError):
+            sow.markasnurse_set.create_nurse_event(sow)
+
+
+class MarkAsGiltTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_create_gilt(self):
+        # 1 cell 1 section
+        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        sow = sows_testing.create_sow_with_semination_usound(location, 1)
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+        piglets = farrow.piglets_group
+        
+        gilt = Gilt.objects.create_gilt(birth_id='1a', mother_sow_farm_id=sow.farm_id,
+             piglets=piglets)
+
+        MarkAsGilt.objects.create_init_gilt_event(gilt=gilt)
+
+        marks_as_gilt_event = MarkAsGilt.objects.all().first()
+
+        self.assertEqual(marks_as_gilt_event.gilt, gilt)
+        self.assertEqual(marks_as_gilt_event.sow, gilt.mother_sow)
+        self.assertEqual(marks_as_gilt_event.tour, gilt.tour)

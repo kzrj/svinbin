@@ -253,3 +253,33 @@ class AbortionSowManager(CoreModelManager):
 
 class AbortionSow(SowEvent):
     objects = AbortionSowManager()
+
+
+class MarkAsNurseManager(CoreModelManager):
+    def create_nurse_event(self, sow, initiator=None, date=timezone.now()):
+        if sow.status.title != 'Опоросилась':
+            raise DjangoValidationError(message='Кормилицей свинья может стать только после опороса.')
+
+        mark_as_nurse_event = self.create(sow=sow, tour=sow.tour, date=date, initiator=initiator)
+        sow.mark_as_nurse
+        return mark_as_nurse_event
+
+
+class MarkAsNurse(SowEvent):
+    objects = MarkAsNurseManager()
+
+    class Meta:
+        ordering = ['date']
+
+
+class MarkAsGiltManager(CoreModelManager):
+    def create_init_gilt_event(self, gilt, initiator=None, date=timezone.now()):
+        return self.create(gilt=gilt, sow=gilt.mother_sow, tour=gilt.tour, initiator=initiator, date=date)      
+
+
+class MarkAsGilt(SowEvent):
+    gilt = models.OneToOneField('sows.Gilt', on_delete=models.CASCADE, related_name='mark_as_gilt_event')
+    objects = MarkAsGiltManager()
+
+    class Meta:
+        ordering = ['date']

@@ -10,6 +10,7 @@ import sows.serializers as sows_serializers
 import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
 import sows.models as sows_models
+import sows_events.models as sows_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
 
@@ -294,11 +295,12 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = sows_serializers.GiltCreateSerializer(data=request.data)
         if serializer.is_valid():
 
-            sows_models.Gilt.objects.create_gilt(
+            gilt = sows_models.Gilt.objects.create_gilt(
               birth_id=serializer.validated_data['birth_id'],
               mother_sow_farm_id=serializer.validated_data['mother_sow_farm_id'],
               piglets=self.get_object()              
               )
+            sows_events_models.MarkAsGilt.objects.create_init_gilt_event(gilt=gilt, initiator=request.user)
 
             return Response(
                 {

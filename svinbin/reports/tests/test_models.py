@@ -357,7 +357,7 @@ class ReportDatePigletsQsTest(TransactionTestCase):
             self.assertEqual(rds[0].piglets_transfered,  100)
 
 
-class ReportCurrentDataTest(TransactionTestCase):
+class OperationDataTest(TransactionTestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         sows_testings.create_statuses()
@@ -375,3 +375,6 @@ class ReportCurrentDataTest(TransactionTestCase):
         self.loc_ws3 = Location.objects.get(workshop__number=3)
 
         self.loc_ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
+
+    # def test_concat_qs(self):
+        

@@ -82,3 +82,50 @@ class ReportCountPigsView(views.APIView):
     def get(self, request, format=None):
         data = Location.objects.all().gen_sections_pigs_count_dict()
         return Response(data)
+
+
+class OperationsDataView(views.APIView):
+    def post(self, request):
+        data = dict()
+
+        # by ws
+        ''' ws1
+            1. Semenation
+            2. Usound
+            3. Abortion
+            4. Culling
+            5. Transactions
+        '''
+
+        ''' ws2
+            1. Usound
+            2. Abortion
+            3. Culling
+            4. Transactions
+        '''
+
+        '''
+            ws3
+            sows
+            1. SowFarrow
+            2. Abortion
+            3. CullingSow
+            4. InnerTransaction Tour??!
+            5. OuterTransactions. Rassadka
+            6. OuterTransactions. Otiem
+            7. Nurse .
+
+            piglets
+            1. Culling Piglets. Padej
+            2. Culling Piglets. Prirezka
+            3. InnerTransactions
+            4. OuterTransactions. Peregon
+            5. Remontki. Net eventa!
+
+
+        '''
+
+
+
+
+        return Response(data)
