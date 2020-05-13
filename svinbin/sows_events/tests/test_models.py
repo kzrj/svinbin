@@ -117,6 +117,7 @@ class UltrasoundModelManagerTest(TestCase):
 
         self.assertEqual(Ultrasound.objects.all().count(), 1)
         self.assertEqual(ultrasound.tour.week_number, 1)
+        self.assertEqual(ultrasound.location, sow.location)
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Прохолост')
 
@@ -246,6 +247,7 @@ class CullingSowManagerTest(TestCase):
         sow.refresh_from_db()
         self.assertEqual(sow.alive, False)
         self.assertEqual(culling.sow, sow)
+        self.assertEqual(culling.location, sow.location)
         self.assertEqual(culling.culling_type, 'spec')
         self.assertEqual(culling.reason, 'prichina')
 
@@ -295,10 +297,11 @@ class AbortionSowTest(TestCase):
          semination_employee=None)
         Ultrasound.objects.create_ultrasound(sow, None, True)
 
-        AbortionSow.objects.create_abortion(sow, None)
+        abort = AbortionSow.objects.create_abortion(sow, None)
         sow.refresh_from_db()
         self.assertEqual(sow.tour, None)
         self.assertEqual(sow.status.title, 'Аборт')
+        self.assertEqual(abort.location, sow.location)
 
 
 class MarkAsNurseTest(TestCase):

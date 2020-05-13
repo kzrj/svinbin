@@ -7,6 +7,9 @@ from tours.filters import TourFilter
 from tours.models import Tour
 from reports.models import ReportDate
 from locations.models import Location
+from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt )
+from piglets_events.models import CullingPiglets, WeighingPiglets
+from transactions.models import SowTransaction, PigletsTransaction
 
 from reports.serializers import ReportDateSerializer, ReportTourSerializer
 from reports.filters import ReportDateFilter
@@ -96,6 +99,11 @@ class OperationsDataView(views.APIView):
             4. Culling
             5. Transactions
         '''
+        ws1_semination_qs = Semenation.objects.all()
+        ws1_usound_qs = Ultrasound.objects.filter(location__workshop__number=1)
+        ws1_abort_qs = AbortionSow.objects.filter(location__workshop__number=1)
+        ws1_culling_qs = CullingSow.objects.filter(location__workshop__number=1)
+        w1_from_transactions = SowTransaction.objects.filter(from_location__workshop__number=1)
 
         ''' ws2
             1. Usound
@@ -103,6 +111,10 @@ class OperationsDataView(views.APIView):
             3. Culling
             4. Transactions
         '''
+        ws1_usound_qs = Ultrasound.objects.filter(location__workshop__number=1)
+        ws1_abort_qs = AbortionSow.objects.filter(location__workshop__number=1)
+        ws1_culling_qs = CullingSow.objects.filter(location__workshop__number=1)
+        w2_from_transactions = SowTransaction.objects.filter(from_location__workshop__number=2)
 
         '''
             ws3
@@ -111,19 +123,78 @@ class OperationsDataView(views.APIView):
             2. Abortion
             3. CullingSow
             4. InnerTransaction Tour??!
-            5. OuterTransactions. Rassadka
+            5. InnerTransactions. Rassadka
             6. OuterTransactions. Otiem
             7. Nurse .
+            8. Remontki.
 
             piglets
             1. Culling Piglets. Padej
             2. Culling Piglets. Prirezka
             3. InnerTransactions
             4. OuterTransactions. Peregon
-            5. Remontki. Net eventa!
+        '''
 
 
         '''
+            ws4
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling Prirezka
+            7. Culling vinuzhd
+        '''
+
+        '''
+            ws8
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling Prirezka
+            7. Culling vinuzhd
+        '''
+
+        '''
+            ws5
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling vinuzhd
+            7. Culling spec
+            8. OuterTransactions. Peregon 7-5
+        '''
+
+        '''
+            ws6
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling vinuzhd
+            7. Culling spec
+            8. OuterTransactions. Peregon 7-5
+        '''
+
+        '''
+            ws7
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling vinuzhd
+            7. Culling spec
+            8. OuterTransactions. Peregon 7-5
+        '''
+
+
 
 
 

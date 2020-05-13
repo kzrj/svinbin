@@ -105,7 +105,7 @@ class UltrasoundManager(CoreModelManager):
         u_type = UltrasoundType.objects.get(days=days)
 
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
-         date=date, result=result, u_type=u_type)
+         date=date, result=result, u_type=u_type, location=sow.location)
         if result:
             if days == 30:
                 sow.change_status_to('Супорос 28')
@@ -121,7 +121,7 @@ class UltrasoundManager(CoreModelManager):
         ultrasounds = list()
         for sow in sows_qs:
             ultrasounds.append(Ultrasound(sow=sow, tour=sow.tour, initiator=initiator,
-             date=timezone.now(), result=result, u_type=u_type))
+             date=timezone.now(), result=result, u_type=u_type, location=sow.location))
         Ultrasound.objects.bulk_create(ultrasounds)
 
         if result:
@@ -137,6 +137,8 @@ class UltrasoundManager(CoreModelManager):
 class Ultrasound(SowEvent):
     result = models.BooleanField()
     u_type = models.ForeignKey(UltrasoundType, on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey('locations.Location', null=True, on_delete=models.SET_NULL,
+     related_name='usounds_here')
 
     objects = UltrasoundManager()
 
@@ -211,7 +213,7 @@ class SowFarrow(SowEvent):
 class CullingSowManager(CoreModelManager):
     def create_culling(self, sow, culling_type, reason=None, initiator=None, date=timezone.now()):
         culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason,
-         date=date, culling_type=culling_type)
+         date=date, culling_type=culling_type, location=sow.location)
         sow.change_status_to(status_title='Брак', alive=False)
         return culling
 
@@ -221,6 +223,8 @@ class CullingSow(SowEvent):
      ('vinuzhd', 'vinuzhdennii uboi')]
     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
     reason = models.CharField(max_length=300, null=True)
+    location = models.ForeignKey('locations.Location', null=True, on_delete=models.SET_NULL,
+     related_name='sow_cullings_here')
 
     objects = CullingSowManager()
 
@@ -245,13 +249,15 @@ class WeaningSow(SowEvent):
 
 class AbortionSowManager(CoreModelManager):
     def create_abortion(self, sow, initiator=None, date=timezone.now()):
-        abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date)
+        abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date, location=sow.location)
         sow.tour = None
         sow.change_status_to(status_title='Аборт')
         return abortion
 
 
 class AbortionSow(SowEvent):
+    location = models.ForeignKey('locations.Location', null=True, on_delete=models.SET_NULL,
+     related_name='abort_here')
     objects = AbortionSowManager()
 
 
