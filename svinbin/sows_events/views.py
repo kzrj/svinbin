@@ -10,7 +10,6 @@ from rest_framework import status, exceptions
 
 from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow
 from sows_events import serializers
-from sows_events.filters import SowFarrowFilter
 
 
 class SeminationViewSet(viewsets.ModelViewSet):
@@ -24,13 +23,12 @@ class SeminationViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         serializer = serializers.CreateSeminationSerializer(data=request.data)
-        # initiator = request.user.workshopemployee
         if serializer.is_valid():
             semination = Semination.objects.create_semination(
                 sow_farm_id=serializer.validated_data['farm_id'],
                 week=serializer.validated_data['week'],
-                # initiator=request.user.workshopemployee,
-                # semination_employee=request.user.workshopemployee,
+                initiator=request.user,
+                semination_employee=serializer.validated_data['semination_employee'],
                 )
             return Response(serializers.SeminationSerializer(semination).data, status=status.HTTP_200_OK)
         else:
@@ -48,13 +46,12 @@ class UltrasoundViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         serializer = serializers.CreateUltrasoundSerializer(data=request.data)
-        # initiator = request.user.workshopemployee
         if serializer.is_valid():
             ultrasound = Ultrasound.objects.create_ultrasound(
                 sow_farm_id=serializer.validated_data['farm_id'],
                 week=serializer.validated_data['week'],
                 result=serializer.validated_data['result'],
-                # initiator=request.user.workshopemployee,
+                initiator=request.user,
                 )
             return Response(serializers.UltrasoundSerializer(ultrasound).data, status=status.HTTP_200_OK)
         else:
@@ -72,12 +69,11 @@ class CullingSowViewSet(viewsets.ModelViewSet):
 
     def create(self, request):
         serializer = serializers.CreateCullingSowSerializer(data=request.data)
-        # initiator = request.user.workshopemployee
         if serializer.is_valid():
             culling = CullingSow.objects.create_culling(
                 sow_farm_id=serializer.validated_data['farm_id'],
                 culling_type=serializer.validated_data['culling_type'],
-                # initiator=request.user.workshopemployee,
+                initiator=request.user,
                 )
             return Response(serializers.CullingSowSerializer(culling).data, status=status.HTTP_200_OK)
         else:
@@ -87,4 +83,3 @@ class CullingSowViewSet(viewsets.ModelViewSet):
 class SowFarrowViewSet(viewsets.ModelViewSet):
     queryset = SowFarrow.objects.all()
     serializer_class = serializers.SowFarrowSerializer
-    filter_class = SowFarrowFilter

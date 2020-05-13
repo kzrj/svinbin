@@ -1,60 +1,21 @@
 # -*- coding: utf-8 -*-
-from rest_framework import serializers, status
+from rest_framework import serializers
 
-from core.utils import CustomValidation
-
-import transactions.serializers as transactions_serializers
 import sows.serializers as sows_serializers
 import piglets.serializers as piglets_serializers
-# import piglets_events.serializers as piglets_events_serializers
 
-from locations.models import PigletsGroupCell, SowAndPigletsCell, Location, WorkShop, Section
-
-
-class WokrshopSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = WorkShop
-        exclude = ['created_at', 'modified_at' ]
+from locations.models import Location, Section
 
 
 class SectionSerializer(serializers.ModelSerializer):
     location = serializers.PrimaryKeyRelatedField(read_only=True)
-    # sows_count_by_tour = serializers.ReadOnlyField()
-    # count_piglets = serializers.ReadOnlyField()
-
     class Meta:
         model = Section
-        exclude = ['created_at', 'modified_at' ]
-
-
-class SowAndPigletsCellSerializer(serializers.ModelSerializer):
-    workshop = serializers.StringRelatedField()
-    section = serializers.StringRelatedField()
-
-    class Meta:
-        model = SowAndPigletsCell
-        exclude = ['created_at', 'modified_at' ]
-
-
-class PigletsGroupCellSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PigletsGroupCell
-        fields = ['number', 'section' ]    
+        exclude = ['created_at', 'modified_at' ]  
 
 
 class LocationPKSerializer(serializers.Serializer):
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-
-
-class LocationsFromToSerializer(serializers.Serializer):
-    from_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-    to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
-
-
-class LocationSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Location
-        fields = '__all__'
 
 
 class LocationCellSerializer(serializers.ModelSerializer):
@@ -77,7 +38,7 @@ class LocationSectionSerializer(serializers.ModelSerializer):
     section_id = serializers.ReadOnlyField(source='section.id')
     section_name = serializers.ReadOnlyField(source='section.name')
 
-    # created via aggregation in queryset method - get_with_count_piglets_in_section 
+    # created via aggregation in queryset method 
     pigs_count = serializers.ReadOnlyField() 
 
     class Meta:

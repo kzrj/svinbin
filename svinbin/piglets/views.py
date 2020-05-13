@@ -10,6 +10,7 @@ import sows.serializers as sows_serializers
 import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
 import sows.models as sows_models
+import sows_events.models as sows_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
 
@@ -34,28 +35,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
 
         serializer = piglets_serializers.PigletsSimpleSerializer(queryset, many=True)
         return Response(serializer.data)
-
-    @action(methods=['post'], detail=False)
-    def merge_init_list_and_move_merged_to_ws4(self, request):
-        serializer = piglets_serializers.MergeFromInitListSerializer(data=request.data)
-        if serializer.is_valid():
-            merged_piglets = piglets_events_models.PigletsMerger.objects.merge_piglets_from_init_list(
-                init_list=serializer.validated_data['records'], initiator=request.user)
-
-            if serializer.validated_data.get('transfer_part_number', None):
-                merged_piglets.assign_transfer_part_number(serializer.validated_data['transfer_part_number'])
-
-            to_location = locations_models.Location.objects.get(workshop__number=4)
-            transaction = transactions_models.PigletsTransaction.objects.create_transaction(
-                to_location=to_location, piglets_group=merged_piglets, initiator=request.user)
-            return Response(
-                {
-                  "message": 'Партия создана и перемещена в Цех4.',
-                 },
-                 
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=False)
     def create_from_merging_list_and_move_to_ws4(self, request):
@@ -196,7 +175,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = piglets_serializers.MovePigletsSerializer(data=request.data)
         if serializer.is_valid():
             piglets = piglets_models.Piglets.objects.select_related('location', 'status').get(pk=pk)
-            # piglets = self.get_object()
             transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
                 transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
                     piglets= self.get_object(),
@@ -317,11 +295,12 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = sows_serializers.GiltCreateSerializer(data=request.data)
         if serializer.is_valid():
 
-            sows_models.Gilt.objects.create_gilt(
+            gilt = sows_models.Gilt.objects.create_gilt(
               birth_id=serializer.validated_data['birth_id'],
               mother_sow_farm_id=serializer.validated_data['mother_sow_farm_id'],
               piglets=self.get_object()              
               )
+            sows_events_models.MarkAsGilt.objects.create_init_gilt_event(gilt=gilt, initiator=request.user)
 
             return Response(
                 {

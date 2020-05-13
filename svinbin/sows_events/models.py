@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
-from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import Event, CoreModel, CoreModelManager
@@ -84,7 +84,7 @@ class SeminationManager(CoreModelManager):
 
 
 class Semination(SowEvent):
-    semination_employee = models.ForeignKey(settings.AUTH_USER_MODEL,
+    semination_employee = models.ForeignKey(User,
      on_delete=models.SET_NULL, null=True, related_name="semination_employee")
     boar = models.ForeignKey('sows.Boar', on_delete=models.SET_NULL, null=True)
 
@@ -105,7 +105,7 @@ class UltrasoundManager(CoreModelManager):
         u_type = UltrasoundType.objects.get(days=days)
 
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
-         date=date, result=result, u_type=u_type)
+         date=date, result=result, u_type=u_type, location=sow.location)
         if result:
             if days == 30:
                 sow.change_status_to('Супорос 28')
@@ -121,7 +121,7 @@ class UltrasoundManager(CoreModelManager):
         ultrasounds = list()
         for sow in sows_qs:
             ultrasounds.append(Ultrasound(sow=sow, tour=sow.tour, initiator=initiator,
-             date=timezone.now(), result=result, u_type=u_type))
+             date=timezone.now(), result=result, u_type=u_type, location=sow.location))
         Ultrasound.objects.bulk_create(ultrasounds)
 
         if result:
@@ -137,40 +137,14 @@ class UltrasoundManager(CoreModelManager):
 class Ultrasound(SowEvent):
     result = models.BooleanField()
     u_type = models.ForeignKey(UltrasoundType, on_delete=models.SET_NULL, null=True)
+    location = models.ForeignKey('locations.Location', null=True, on_delete=models.SET_NULL,
+     related_name='usounds_here')
 
     objects = UltrasoundManager()
 
 
 class SowFarrowQuerySet(models.QuerySet):
-    def get_by_tour_and_sow_location(self, tour, sow_location):
-        return self.filter(sow__location=sow_location, tour=tour)
-
-    def count_piglets(self):
-        return self.aggregate(total_alive=models.Sum('alive_quantity'), total_dead=models.Sum('dead_quantity'),
-            total_mummy=models.Sum('mummy_quantity'))
-
-    def count_piglets_by_tour_annotate(self):
-        subquery_alive = self.filter(tour=models.OuterRef('tour')) \
-                            .values('tour') \
-                            .annotate(
-                                total_alive=models.Sum('alive_quantity'))\
-                            .values('total_alive')
-
-        subquery_dead = self.filter(tour=models.OuterRef('tour')) \
-                            .values('tour') \
-                            .annotate(total_dead=models.Sum('dead_quantity'))\
-                            .values('total_dead')
-
-        subquery_mummy = self.filter(tour=models.OuterRef('tour')) \
-                            .values('tour') \
-                            .annotate(total_mummy=models.Sum('mummy_quantity'))\
-                            .values('total_mummy')
-
-        return self.annotate(
-            total_alive=models.Subquery(subquery_alive, output_field=models.IntegerField()),
-            total_dead=models.Subquery(subquery_dead, output_field=models.IntegerField()),
-            total_mummy=models.Subquery(subquery_mummy, output_field=models.IntegerField()),
-            )
+    pass
 
 
 class SowFarrowManager(CoreModelManager):
@@ -193,7 +167,7 @@ class SowFarrowManager(CoreModelManager):
         if alive_quantity == 0 and dead_quantity == 0 and mummy_quantity == 0:
             raise DjangoValidationError(message='Не может быть 0 поросят.')
 
-        # We assume that sow has one farrow per tour. Sow there are no piglets in cell
+        # We assume that sow has one farrow per tour.
         piglets = Piglets.objects.create(
                 location=sow.location,
                 status=PigletsStatus.objects.get(title='Родились, кормятся'),
@@ -239,13 +213,9 @@ class SowFarrow(SowEvent):
 class CullingSowManager(CoreModelManager):
     def create_culling(self, sow, culling_type, reason=None, initiator=None, date=timezone.now()):
         culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason,
-         date=date, culling_type=culling_type)
+         date=date, culling_type=culling_type, location=sow.location)
         sow.change_status_to(status_title='Брак', alive=False)
         return culling
-
-    def create_culling_from_farm_id(self, sow_farm_id, culling_type, reason, initiator=None):
-        sow = Sow.objects.get_by_farm_id(sow_farm_id)
-        return self.create_culling(sow, culling_type, reason, initiator)
 
 
 class CullingSow(SowEvent):
@@ -253,22 +223,14 @@ class CullingSow(SowEvent):
      ('vinuzhd', 'vinuzhdennii uboi')]
     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
     reason = models.CharField(max_length=300, null=True)
+    location = models.ForeignKey('locations.Location', null=True, on_delete=models.SET_NULL,
+     related_name='sow_cullings_here')
 
     objects = CullingSowManager()
 
 
 class WeaningSowManager(CoreModelManager):
     def create_weaning(self, sow, piglets, tour=None, initiator=None, date=timezone.now()):
-        # if not tour:
-        #     tour = sow.tour
-            
-        # # validate
-        # if not tour and not sow.tour:
-        #     raise DjangoValidationError(message='У свиньи нет тура.')
-
-        # if not sow.location.sowAndPigletsCell:
-        #     raise DjangoValidationError(message='Свинья не в клетке 3-го цеха.') 
-            
         weaning = self.create(sow=sow, tour=tour, piglets=piglets, quantity=piglets.quantity,
          initiator=initiator, date=date)
 
@@ -287,11 +249,43 @@ class WeaningSow(SowEvent):
 
 class AbortionSowManager(CoreModelManager):
     def create_abortion(self, sow, initiator=None, date=timezone.now()):
-        abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date)
+        abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date, location=sow.location)
         sow.tour = None
         sow.change_status_to(status_title='Аборт')
         return abortion
 
 
 class AbortionSow(SowEvent):
+    location = models.ForeignKey('locations.Location', null=True, on_delete=models.SET_NULL,
+     related_name='abort_here')
     objects = AbortionSowManager()
+
+
+class MarkAsNurseManager(CoreModelManager):
+    def create_nurse_event(self, sow, initiator=None, date=timezone.now()):
+        if sow.status.title != 'Опоросилась':
+            raise DjangoValidationError(message='Кормилицей свинья может стать только после опороса.')
+
+        mark_as_nurse_event = self.create(sow=sow, tour=sow.tour, date=date, initiator=initiator)
+        sow.mark_as_nurse
+        return mark_as_nurse_event
+
+
+class MarkAsNurse(SowEvent):
+    objects = MarkAsNurseManager()
+
+    class Meta:
+        ordering = ['date']
+
+
+class MarkAsGiltManager(CoreModelManager):
+    def create_init_gilt_event(self, gilt, initiator=None, date=timezone.now()):
+        return self.create(gilt=gilt, sow=gilt.mother_sow, tour=gilt.tour, initiator=initiator, date=date)      
+
+
+class MarkAsGilt(SowEvent):
+    gilt = models.OneToOneField('sows.Gilt', on_delete=models.CASCADE, related_name='mark_as_gilt_event')
+    objects = MarkAsGiltManager()
+
+    class Meta:
+        ordering = ['date']

@@ -1,14 +1,9 @@
 # -*- coding: utf-8 -*-
-from rest_framework import serializers, status
+from rest_framework import serializers
 
-from sows.models import Sow
 from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow
-# from piglets_events.models import NewBornPigletsGroupRecount, NewBornPigletsMerger
-from tours.models import Tour
 
 from sows.serializers import SowSerializer
-
-from core.utils import CustomValidation
 
 
 class SeminationSerializer(serializers.ModelSerializer):

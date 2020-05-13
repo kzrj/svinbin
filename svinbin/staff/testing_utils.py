@@ -12,15 +12,6 @@ def create_employee(farm_name=''):
     WorkShopEmployee.objects.create(user=user, is_seminator=True, farm_name=farm_name)
     return user
 
-
-def create_test_users():
-    try:
-        user = User.objects.create_user('test_seminator', 't@t.ru', 'svinbin123')
-        WorkShopEmployee.objects.create(user=user, is_seminator=True, is_officer=True)
-        return user
-    except:
-        pass
-
 def create_user(username, farm_name):
     user = User.objects.create_user(username, 't@t.ru', 'svinbin123')
     WorkShopEmployee.objects.create(user=user, is_seminator=True, is_officer=False, farm_name=farm_name)

@@ -2,7 +2,7 @@
 from datetime import timedelta, date
 
 from django.db import models
-from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg, Count, Value, Func
+from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg, Count, Value
 from django.db.models.functions import Coalesce, Greatest
 from django.utils import timezone
 
@@ -234,47 +234,15 @@ class ReportDateQuerySet(models.QuerySet):
 
         return self.annotate(piglets_transfered=total_qnty)
 
-    def add_today_rep_sows_count(self):
-        data = dict()
-        for ws_number in [1, 2, 3]:
-            data[f'ws{ws_number}_count_sow'] = Subquery(
-                Sow.objects.filter(
-                         Q(
-                            Q(location__workshop__number=ws_number) |
-                            Q(location__section__workshop__number=ws_number) |
-                            Q(location__sowAndPigletsCell__workshop__number=ws_number)
-                        )) \
-                        .annotate(flag=Value(0))
-                        .values('flag') \
-                        .annotate(cnt=Count('*')) \
-                        .values('cnt'),
-                 output_field=models.IntegerField())
-
-        return self.annotate(**data)
-
-    def add_today_rep_piglets_count(self):
-        data = dict()
-        for ws_number in [3, 4, 8, 5, 6, 7]:
-            data[f'ws{ws_number}_count_piglets'] = Subquery(
-                Piglets.objects.filter(
-                         Q(
-                            Q(location__workshop__number=ws_number) |
-                            Q(location__section__workshop__number=ws_number) |
-                            Q(location__sowAndPigletsCell__workshop__number=ws_number)
-                        )) \
-                        .annotate(flag=Value(0))
-                        .values('flag') \
-                        .annotate(cnt=Count('*')) \
-                        .values('cnt'),
-                 output_field=models.IntegerField())
-
-        return self.annotate(**data)
-
     def dir_rep_aggregate_total_data(self):        
         last_date = self.order_by('-date').first()
         pigs_count = 0
         if last_date:
-            pigs_count = last_date.sows_quantity_at_date_end + last_date.piglets_qnty_start_end
+            sows_quantity_at_date_end = last_date.sows_quantity_at_date_end \
+                if last_date.sows_quantity_at_date_end else 0
+            piglets_qnty_start_end = last_date.piglets_qnty_start_end \
+                if last_date.piglets_qnty_start_end else 0
+            pigs_count = sows_quantity_at_date_end + piglets_qnty_start_end
 
         return self.aggregate(
                 total_priplod=Sum('born_alive'),
@@ -286,9 +254,7 @@ class ReportDateQuerySet(models.QuerySet):
                 total_prirezka=Sum('piglets_prirezka_qnty'),
                 total_spec_weight=Sum('piglets_spec_total_weight'),
                 avg_priplod=Avg('priplod_by_sow'),
-                # total_pigs=(pigs_count + F('pk') - F('pk'))
                 )
-
 
 
 class ReportDateManager(CoreModelManager):

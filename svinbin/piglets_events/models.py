@@ -2,7 +2,7 @@
 import datetime
 
 from django.db import models
-from django.db.models import Q, Sum, Avg, Value, F, OuterRef, Subquery, ExpressionWrapper
+from django.db.models import Q, Sum, Avg, F, OuterRef, Subquery, ExpressionWrapper
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -270,9 +270,7 @@ class WeighingPiglets(PigletsEvent):
 class CullingPigletsManager(CoreModelManager):
     def create_culling_piglets(self, piglets_group, culling_type, is_it_gilt=False, reason=None,
          initiator=None, date=timezone.now(), quantity=1, total_weight=None):
-        if isinstance(date, str):
-        	# 2020-03-12
-            # date = datetime.datetime.strptime(date, '%d-%m-%Y')
+        if isinstance(date, str):       	
             date = datetime.datetime.strptime(date, '%Y-%m-%d')
 
         if is_it_gilt:

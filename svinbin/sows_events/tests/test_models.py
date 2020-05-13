@@ -5,8 +5,8 @@ from django.core.exceptions import ValidationError
 
 from sows_events.models import (
     Semination, Ultrasound, SowFarrow, CullingSow,
-    UltrasoundType, AbortionSow)
-from sows.models import Sow, Boar
+    UltrasoundType, AbortionSow, MarkAsNurse, MarkAsGilt)
+from sows.models import Sow, Boar, Gilt
 from piglets.models import Piglets
 from locations.models import Location
 from transactions.models import SowTransaction
@@ -117,6 +117,7 @@ class UltrasoundModelManagerTest(TestCase):
 
         self.assertEqual(Ultrasound.objects.all().count(), 1)
         self.assertEqual(ultrasound.tour.week_number, 1)
+        self.assertEqual(ultrasound.location, sow.location)
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Прохолост')
 
@@ -234,42 +235,6 @@ class SowFarrowModelManagerTest(TransactionTestCase):
                 dead_quantity=1
                 )
 
-    def test_queryset_count_piglets_by_tour_annotate(self):
-        location1 = Location.objects.filter(sowAndPigletsCell__number=1).first()
-        sow1 = sows_testing.create_sow_with_semination_usound(location=location1, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow1,
-            alive_quantity=10,
-            dead_quantity=0,
-            mummy_quantity=0
-            )
-
-        location2 = Location.objects.filter(sowAndPigletsCell__isnull=False)[1]
-        sow2 = sows_testing.create_sow_with_semination_usound(location=location2, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow2,
-            alive_quantity=12,
-            dead_quantity=5,
-            mummy_quantity=1
-            )
-
-        location3 = Location.objects.filter(sowAndPigletsCell__isnull=False)[2]
-        sow3 = sows_testing.create_sow_with_semination_usound(location=location3, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow3,
-            alive_quantity=13,
-            dead_quantity=3,
-            mummy_quantity=2
-            )
-
-        with self.assertNumQueries(1):
-            sows = SowFarrow.objects.filter(tour__week_number=1)
-            sows = sows.count_piglets_by_tour_annotate()
-            bool(sows)
-            self.assertEqual(sows[0].total_alive, 35)
-            self.assertEqual(sows[0].total_dead, 8)
-            self.assertEqual(sows[0].total_mummy, 3)
-
 
 class CullingSowManagerTest(TestCase):
     def setUp(self):
@@ -282,6 +247,7 @@ class CullingSowManagerTest(TestCase):
         sow.refresh_from_db()
         self.assertEqual(sow.alive, False)
         self.assertEqual(culling.sow, sow)
+        self.assertEqual(culling.location, sow.location)
         self.assertEqual(culling.culling_type, 'spec')
         self.assertEqual(culling.reason, 'prichina')
 
@@ -331,7 +297,74 @@ class AbortionSowTest(TestCase):
          semination_employee=None)
         Ultrasound.objects.create_ultrasound(sow, None, True)
 
-        AbortionSow.objects.create_abortion(sow, None)
+        abort = AbortionSow.objects.create_abortion(sow, None)
         sow.refresh_from_db()
         self.assertEqual(sow.tour, None)
         self.assertEqual(sow.status.title, 'Аборт')
+        self.assertEqual(abort.location, sow.location)
+
+
+class MarkAsNurseTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_create_nurse_event(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        sow.change_sow_current_location(location)
+
+        SowFarrow.objects.create_sow_farrow(
+            sow=sow,
+            alive_quantity=10,
+            dead_quantity=1
+            )
+
+        sow.markasnurse_set.create_nurse_event(sow)
+        sow.refresh_from_db()
+        self.assertEqual(sow.tour, None)
+        self.assertEqual(sow.status.title, 'Кормилица')
+
+    def test_create_nurse_event_error(self):
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow, None, True)
+
+        with self.assertRaises(ValidationError):
+            sow.markasnurse_set.create_nurse_event(sow)
+
+
+class MarkAsGiltTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_create_gilt(self):
+        # 1 cell 1 section
+        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        sow = sows_testing.create_sow_with_semination_usound(location, 1)
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+        piglets = farrow.piglets_group
+        
+        gilt = Gilt.objects.create_gilt(birth_id='1a', mother_sow_farm_id=sow.farm_id,
+             piglets=piglets)
+
+        MarkAsGilt.objects.create_init_gilt_event(gilt=gilt)
+
+        marks_as_gilt_event = MarkAsGilt.objects.all().first()
+
+        self.assertEqual(marks_as_gilt_event.gilt, gilt)
+        self.assertEqual(marks_as_gilt_event.sow, gilt.mother_sow)
+        self.assertEqual(marks_as_gilt_event.tour, gilt.tour)

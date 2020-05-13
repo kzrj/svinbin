@@ -2,7 +2,6 @@
 from __future__ import unicode_literals
 
 from django.db.models import Q
-from django.contrib.auth.models import User
 from django_filters import rest_framework as filters
 
 from locations.models import Location, Section

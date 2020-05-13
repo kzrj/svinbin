@@ -234,17 +234,6 @@ class PigletsViewSetTest(APITestCase):
         self.assertEqual(gilts_piglets2.active, False)
         self.assertEqual(Sow.objects.filter(farm_id__isnull=True).count(), 15)
 
-    def test_merge_init_list_and_move_merged_to_ws4(self):
-        response = self.client.post('/api/piglets/merge_init_list_and_move_merged_to_ws4/', \
-            {'records': [
-                {'week': 9, 'quantity': 60 },
-                {'week': 8, 'quantity': 40 },
-                ],
-             'transfer_part_number': 1
-            },
-            format='json')
-        self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
-
     def test_recount_and_weighing_piglets(self):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)

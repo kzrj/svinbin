@@ -7,10 +7,6 @@ from core.utils import CustomValidation
 from sows.models import Sow, Boar
 
 
-class FarmIdSerializer(serializers.Serializer):
-    farm_id = serializers.IntegerField()
-
-
 class CreateFarmIdSerializer(serializers.Serializer):
     farm_id = serializers.IntegerField()
 
@@ -19,15 +15,6 @@ class CreateFarmIdSerializer(serializers.Serializer):
             raise CustomValidation('Not unique farm_id', 
                 'farm_id', status_code=status.HTTP_400_BAD_REQUEST)
         return value
-
-
-class MassSowCreateSerializer(serializers.Serializer):
-    sows = serializers.ListField(
-       child=serializers.IntegerField()
-    )
-    week = serializers.IntegerField()
-    # boar = serializers.PrimaryKeyRelatedField(required=False, allow_null=True,
-    #   queryset=Boar.objects.all())
 
 
 class DoubleSeminationSerializer(serializers.Serializer):

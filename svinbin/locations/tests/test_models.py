@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.test import TestCase, TransactionTestCase
+from django.test import TransactionTestCase
 from django.db import models
 
 import locations.testing_utils as locations_testing
@@ -7,16 +7,12 @@ import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 import sows_events.utils as sows_events_testing
 
-from locations.models import (
-    Location, WorkShop, Section, 
-    SowSingleCell, PigletsGroupCell, 
-    SowGroupCell, SowAndPigletsCell
-    )
+from locations.models import  Location, Section
 from sows_events.models import SowFarrow
 from piglets.models import Piglets
 
 from locations.serializers import (
-    LocationSerializer, LocationCellSerializer, LocationSectionSerializer, SectionSerializer
+    LocationCellSerializer, LocationSectionSerializer, SectionSerializer
     )
 
 
@@ -62,18 +58,6 @@ class LocationsTest(TransactionTestCase):
         location10 = Location.objects.filter(pigletsGroupCell__section__number=2).first()
         Piglets.objects.init_piglets_by_farrow_date('2020-01-02', location10, 53)
 
-    # def test_queryset_with_all_related(self):
-    #     with self.assertNumQueries(3):
-    #         data = Location.objects.all()\
-    #             .select_related('section', 'workshop', 'pigletsGroupCell', 'sowAndPigletsCell' ) \
-    #             .prefetch_related('sow_set', 'piglets__metatour__records__tour',)
-    #         print(data)
-
-    #     with self.assertNumQueries(5):
-    #         for location in data:
-    #             for piglet in location.piglets.all():
-    #                 print(piglet.metatour_repr)
-
     def test_location_cell_serializer_queries(self):
         with self.assertNumQueries(8):
             data = Location.objects.all() \
@@ -108,16 +92,6 @@ class LocationsTest(TransactionTestCase):
             serializer = SectionSerializer(data, many=True)
             serializer.data
 
-    def test_location_section_serializer_queries_with_count_piglets(self):
-        data = Location.objects.filter(section__workshop__number=4, section__isnull=False).get_with_count_piglets_in_section() 
-        self.assertEqual(data[0].pigs_count, 41)
-        self.assertEqual(data[1].pigs_count, 53)
-
-        with self.assertNumQueries(1):
-            data = Location.objects.filter(section__workshop__number=4, section__isnull=False) \
-                .select_related('section').get_with_count_piglets_in_section() 
-            serializer = LocationSectionSerializer(data, many=True)
-            serializer.data
 
     def test_add_sows_count_by_sections(self):
         with self.assertNumQueries(1):
@@ -155,4 +129,3 @@ class LocationsTest(TransactionTestCase):
         with self.assertNumQueries(2):
             data = Location.objects.all().gen_sections_pigs_count_dict()
             bool(data)
-            # print(data)

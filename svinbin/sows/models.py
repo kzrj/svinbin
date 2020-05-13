@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.db.models import Q, Prefetch
-from django.core import exceptions
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
@@ -50,17 +49,6 @@ class SowsQuerySet(models.QuerySet):
 
         return self.filter(pk__in=once_seminated_sows), self.filter(pk__in=more_than_once_seminated_sows)
 
-    def get_all_sows_in_workshop(self, workshop):
-        return self.filter(
-            models.Q(
-                models.Q(location__workshop=workshop) |
-                models.Q(location__section__workshop=workshop) |
-                models.Q(location__sowGroupCell__workshop=workshop) |
-                models.Q(location__sowSingleCell__workshop=workshop) |
-                models.Q(location__sowAndPigletsCell__workshop=workshop)
-                )
-            )
-
 
 class SowManager(CoreModelManager):
     def get_queryset(self):
@@ -68,10 +56,6 @@ class SowManager(CoreModelManager):
 
     def get_queryset_with_not_alive(self):
         return SowsQuerySet(self.model, using=self._db)
-
-    def init_only_create_new(self, farm_id, location):
-        # for init only
-        return self.create(farm_id=farm_id, location=location)
 
     def create_new_from_noname(self, farm_id, workshop):
         noname_sow = self.get_without_farm_id_in_workshop(workshop).first()
@@ -99,36 +83,11 @@ class SowManager(CoreModelManager):
             return self.create_new_from_gilt_and_put_in_workshop_one(farm_id)
         return sow
 
-    def get_by_farm_id(self, farm_id):
-        sow = self.get_queryset().filter(farm_id=farm_id).first()
-        # if not sow:
-        #     raise error
-        return sow
-
-    def get_all_sows_in_workshop(self, workshop):
-        return self.get_queryset().get_all_sows_in_workshop(workshop)
-
     def get_without_farm_id_in_workshop(self, workshop):
         return self.get_queryset().filter(
             farm_id__isnull=True,            
             location=workshop.location
             )
-
-    # for init at ws2
-    def split_free_and_exist_farm_ids(self, farm_ids):
-        exist_farm_ids = list(
-            self.get_queryset().filter(farm_id__in=farm_ids).values_list('farm_id', flat=True)
-            )
-        free_farm_ids = list(set(farm_ids) - set(exist_farm_ids))
-        return free_farm_ids, exist_farm_ids
-
-    def create_bulk_at_ws(self, farm_ids, location):
-        free_farm_ids, exist_farm_ids = self.split_free_and_exist_farm_ids(farm_ids)
-
-        for farm_id in free_farm_ids:
-            self.bulk_create([Sow(farm_id=farm_id, location=location)])
-
-        return free_farm_ids, exist_farm_ids
 
     def create_or_return(self, farm_id):
         sow = self.get_queryset_with_not_alive().filter(farm_id=farm_id).first()
@@ -136,32 +95,6 @@ class SowManager(CoreModelManager):
             return self.create_new_and_put_in_workshop_one(farm_id), True
 
         return sow, False
-
-    # def create_or_return(self, farm_id):
-    #     return self.get_or_create(farm_id=farm_id, location=Location.objects.get(workshop__number=1))[0]
-
-    def get_tours_with_count_sows_by_location(self, location):
-        # https://medium.com/@hansonkd/the-dramatic-benefits-of-django-subqueries-and-annotations-4195e0dafb16
-        sows_query = self.get_queryset() \
-            .filter(
-                location=location,
-                tour=models.OuterRef('id')
-                ) \
-            .values('tour_id') \
-            .annotate(cnt=models.Count('*')) \
-            .values('cnt')[:1]
-
-        tours_ids = self.get_queryset().filter(location=location).values('tour')
-
-        tours = Tour.objects.filter(id__in=tours_ids) \
-            .annotate(
-                count_sows=models.Subquery(
-                   sows_query, 
-                   output_field=models.IntegerField()
-                )
-            ).values('week_number', 'count_sows')
-
-        return tours
 
     def create_from_gilts_group(self, piglets):
         # if gilt birth id = sow.farm_id
@@ -197,12 +130,6 @@ class Sow(Pig):
     def get_last_farrow(self):
         return self.sowfarrow_set.all().order_by('-created_at').first()
 
-    @property
-    def is_farrow_in_current_tour(self):
-        if self.sowfarrow_set.filter(tour=self.tour).first():
-            return True
-        return False
-
     def assing_farm_id(self, farm_id):
         self.farm_id = farm_id
         self.status = SowStatus.objects.get(title='Ожидает осеменения')
@@ -210,9 +137,6 @@ class Sow(Pig):
 
     def get_seminations_by_tour(self, tour):
         return self.semination_set.filter(tour=tour)      
-
-    def get_seminations_by_tour_values_list(self, tour):
-        return self.semination_set.filter(tour=tour).values_list('date', flat=True)
 
     @property
     def does_once_seminate_in_tour(self):
@@ -268,12 +192,8 @@ class Sow(Pig):
         self.change_status_to('Кормилица')
 
     @property
-    def repr_location(self):
-        return str(self.location.get_location)
-
-    @property
     def get_location(self):
-        return str(self.location.get_sow_location)
+        return str(self.location.get_location)
 
 
 class GiltManager(CoreModelManager):
@@ -285,10 +205,6 @@ class GiltManager(CoreModelManager):
         
         if not mother_sow.tour:
             raise DjangoValidationError(message=f'У свиноматки {mother_sow.farm_id} не текущего тура.')
-
-        # if mother_sow.get_last_farrow.piglets_group.active == False:
-        #     raise DjangoValidationError(message=f'Рожденная группа поросят {mother_sow.piglets_group.pk} \
-        #         неактивна')            
 
         gilt = self.create(
             birth_id=birth_id,

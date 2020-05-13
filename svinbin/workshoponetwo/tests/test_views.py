@@ -30,14 +30,6 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.boar = Boar.objects.all().first()
         self.user = staff_testings.create_employee() # is_seminator = True
 
-    def test_assing_farm_id(self):
-        sow_without_farm_id = sows_testing.create_sow_without_farm_id_with_birth_id(1)
-
-        response = self.client.post('/api/workshoponetwo/sows/%s/assing_farm_id/' %
-          sow_without_farm_id.pk, {'farm_id': 670 })
-        self.assertEqual(response.data['sow']['id'], sow_without_farm_id.pk)
-        self.assertEqual(response.data['sow']['farm_id'], 670)
-
     # def test_put_in_semination_row(self):
     #     self.client.force_authenticate(user=self.user)
     #     sow = sows_testing.create_sow_and_put_in_workshop_one()
@@ -91,18 +83,6 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         response = self.client.get('/api/workshoponetwo/sows/%s/' % sow.pk)
 
         self.assertEqual(response.data['sow']['id'], sow.pk)
-
-    def test_sows_move_many(self):
-        self.client.force_authenticate(user=self.user)
-        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
-        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
-        seminated_sow1 = sows_testing.create_sow_with_semination(sow1.location)
-        location2 = Location.objects.get(workshop__number=2)
-
-        response = self.client.post('/api/workshoponetwo/sows/move_many/', 
-            {'sows': [sow1.pk, sow2.pk, seminated_sow1.pk], 'to_location': location2.pk})
-        self.assertEqual(type(response.data['transaction_ids']), list)
-        self.assertEqual(len(response.data['transaction_ids']), 3)
 
     def test_create_new_without_farm_id(self):
         self.client.force_authenticate(user=self.user)
@@ -186,25 +166,6 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         response = self.client.post('/api/workshoponetwo/sows/%s/abortion/' % sow1.pk)
         self.assertEqual(response.data['sow']['status'], 'Аборт')
 
-    def test_mass_init_and_transfer(self):
-        self.client.force_authenticate(user=self.user)
-        response = self.client.post('/api/workshoponetwo/sows/mass_init_and_transfer/', 
-            {'sows': [1, 2, 3, 4], 'week': 55})
-
-        self.assertEqual(Semination.objects.filter(tour__week_number=55).count(), 8)
-        self.assertEqual(Ultrasound.objects.filter(tour__week_number=55, u_type__days=30).count(), 4)
-        self.assertEqual(Ultrasound.objects.filter(tour__week_number=55, u_type__days=60).count(), 4)
-        self.assertEqual(SowTransaction.objects.all().count(), 4)
-
-        response = self.client.post('/api/workshoponetwo/sows/mass_init_and_transfer/', 
-            {'sows': [1, 2, 3, 4, 5, 6, 7], 'week': 55})
-        self.assertEqual(response.data['created'], [5, 6, 7])
-        self.assertEqual(response.data['not_created'], [1, 2, 3, 4])
-        self.assertEqual(Semination.objects.filter(tour__week_number=55).count(), 14)
-        self.assertEqual(Ultrasound.objects.filter(tour__week_number=55, u_type__days=30).count(), 7)
-        self.assertEqual(Ultrasound.objects.filter(tour__week_number=55, u_type__days=60).count(), 7)
-        self.assertEqual(SowTransaction.objects.all().count(), 7)
-
     def test_double_semination(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         self.client.force_authenticate(user=self.user)
@@ -217,27 +178,3 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.assertEqual(response.data['semination2']['boar'], Boar.objects.all()[1].pk)
         self.assertEqual(response.data['semination1']['semination_employee'], self.user.pk)
         self.assertEqual(response.data['semination2']['semination_employee'], self.user.pk)
-
-    def test_import_seminations_from_farm(self):
-        self.client.force_authenticate(user=self.user)
-        shmigina = staff_testings.create_employee('ШМЫГИ')
-        ivanov = staff_testings.create_employee('ИВАНО')
-        semen = staff_testings.create_employee('СЕМЕН')
-        boris = staff_testings.create_employee('БОРИС')
-        gary = staff_testings.create_employee('ГАРИ')
-
-        file_path ='../data/1.xls'
-        with open(file_path, 'rb') as file:
-            response = self.client.post('/api/workshoponetwo/sows/import_seminations_from_farm/', 
-                {'file': file})
-            self.assertEqual(response.status_code, 200)
-            self.assertNotEqual(response.data.get('seminated_list_count'), None)
-            self.assertNotEqual(response.data.get('already_seminated_in_tour_count'), None)
-            self.assertNotEqual(response.data.get('sows_in_another_tour_count'), None)
-            self.assertEqual(response.data.get('message'), "Файл загружен и обработан.")
-
-        # # 19432 - last farm id from file
-        # sow = Sow.objects.filter(farm_id=19432).first()
-        # semination = Semination.objects.filter(sow=sow, tour=sow.tour).first()
-        # print(semination)
-        # print(semination.date)

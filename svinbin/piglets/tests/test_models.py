@@ -82,11 +82,6 @@ class PigletsModelmanagerTest(TestCase):
         self.assertEqual(piglets.metatour.records.all().count(), 1)
         self.assertEqual(piglets.metatour.records.all().first().tour, self.tour1)
 
-    def test_init_piglets_by_week(self):
-        piglets = Piglets.objects.init_piglets_by_week(week=5, location=self.loc_ws3,
-         quantity=100, gilts_quantity=10)
-        self.assertEqual(piglets.metatour.records.all().first().tour.week_number, 5)
-
     def test_init_piglets_by_farrow_date(self):
         piglets = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31', location=self.loc_ws3,
          quantity=100, gilts_quantity=10)
@@ -183,31 +178,5 @@ class PigletsQueryTest(TransactionTestCase):
         self.assertEqual(Piglets.objects.all().all_in_workshop(workshop_number=4).count(), 5)        
         self.assertEqual(Piglets.objects.get_all().all_in_workshop(workshop_number=4).count(), 7)
 
-    def test_all_in_section(self):
-        self.assertEqual(Piglets.objects.all().all_in_section(
-            section=self.loc_section_ws4_1.section).count(), 3)        
-        self.assertEqual(Piglets.objects.get_all().all_in_section(
-            section=self.loc_section_ws4_1.section).count(), 5)
-
     def test_with_tour(self):
         self.assertEqual(Piglets.objects.all().with_tour(week_number=1).count(), 6)
-
-    def test_with_tour_mixed(self):
-        self.assertEqual(Piglets.objects.all().with_tour_mixed(week_number=1).count(), 2)
-
-    def test_with_tour_not_mixed(self):
-        self.assertEqual(Piglets.objects.all().with_tour_not_mixed(week_number=1).count(), 4)
-
-    def test_with_count_piglets_in_mixed_groups(self):
-        self.assertEqual(Piglets.objects.all().count_piglets_in_mixed_groups(week_number=1), 130)
-
-    # def test_with_count_piglets_in_mixed_group_annotate(self):
-    #     self.assertEqual(Piglets.objects.all() \
-    #         .count_piglets_in_mixed_group_annotate(week_number=1).first().count_piglets, 130)
-
-    # def test_queryset_s(self):
-    #     with self.assertNumQueries(1):
-    #         piglets = Piglets.objects.all().with_tour(week_number=1)
-    #         bool(piglets)
-    #         print(piglets)
-    #         print(piglets.filter(metatour__records__percentage=100))

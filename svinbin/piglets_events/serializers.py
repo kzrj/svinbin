@@ -1,6 +1,5 @@
 # # -*- coding: utf-8 -*-
 from rest_framework import serializers
-from django.utils import timezone
 
 from piglets_events.models import CullingPiglets, WeighingPiglets, Recount
 from locations.models import Location

@@ -1,20 +1,15 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta, date
-
-from django.contrib.auth.models import User
-from django.utils import timezone
-
-from rest_framework import status, viewsets, pagination, views
+from rest_framework import viewsets, views
 from rest_framework.response import Response
-from rest_framework.decorators import action
 
 from tours.filters import TourFilter
 
 from tours.models import Tour
-from piglets.models import Piglets
-from sows_events.models	import SowFarrow
 from reports.models import ReportDate
 from locations.models import Location
+from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt )
+from piglets_events.models import CullingPiglets, WeighingPiglets
+from transactions.models import SowTransaction, PigletsTransaction
 
 from reports.serializers import ReportDateSerializer, ReportTourSerializer
 from reports.filters import ReportDateFilter
@@ -39,20 +34,6 @@ class TourReportViewSet(viewsets.ModelViewSet):
     filter_class = TourFilter
 
 
-# class CustomPagination(pagination.PageNumberPagination):
-#     def get_paginated_response(self, data):
-#         return Response({
-#             'links': {
-#                 'next': self.get_next_link(),
-#                 'previous': self.get_previous_link()
-#             },
-#             'count': self.page.paginator.count,
-#             'total_info': data['total_info'],
-#             'pigs_count': data['pigs_count'],
-#             'results': data['results'],
-#         })
-
-
 class ReportDateViewSet(viewsets.ModelViewSet):
     queryset = ReportDate.objects.all() \
                 .add_today_sows_qnty() \
@@ -74,7 +55,6 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
     serializer_class = ReportDateSerializer
     filter_class = ReportDateFilter
-    # pagination_class = CustomPagination
 
     def list(self, request):
         queryset = self.filter_queryset(self.queryset)
@@ -86,7 +66,11 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         last_date = queryset.order_by('-date').first()
         pigs_count = 0
         if last_date:
-            pigs_count = last_date.sows_quantity_at_date_end + last_date.piglets_qnty_start_end
+            sows_quantity_at_date_end = last_date.sows_quantity_at_date_end \
+                if last_date.sows_quantity_at_date_end else 0
+            piglets_qnty_start_end = last_date.piglets_qnty_start_end \
+                if last_date.piglets_qnty_start_end else 0
+            pigs_count = sows_quantity_at_date_end + piglets_qnty_start_end
 
         data = {'results': serializer.data, 'total_info': total_data, 'pigs_count': pigs_count}
 
@@ -98,9 +82,121 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
 
 class ReportCountPigsView(views.APIView):
-    # authentication_classes = [authentication.TokenAuthentication]
-    # permission_classes = [permissions.IsAdminUser]
-
     def get(self, request, format=None):
         data = Location.objects.all().gen_sections_pigs_count_dict()
+        return Response(data)
+
+
+class OperationsDataView(views.APIView):
+    def post(self, request):
+        data = dict()
+
+        # by ws
+        ''' ws1
+            1. Semenation
+            2. Usound
+            3. Abortion
+            4. Culling
+            5. Transactions
+        '''
+        ws1_semination_qs = Semenation.objects.all()
+        ws1_usound_qs = Ultrasound.objects.filter(location__workshop__number=1)
+        ws1_abort_qs = AbortionSow.objects.filter(location__workshop__number=1)
+        ws1_culling_qs = CullingSow.objects.filter(location__workshop__number=1)
+        w1_from_transactions = SowTransaction.objects.filter(from_location__workshop__number=1)
+
+        ''' ws2
+            1. Usound
+            2. Abortion
+            3. Culling
+            4. Transactions
+        '''
+        ws1_usound_qs = Ultrasound.objects.filter(location__workshop__number=1)
+        ws1_abort_qs = AbortionSow.objects.filter(location__workshop__number=1)
+        ws1_culling_qs = CullingSow.objects.filter(location__workshop__number=1)
+        w2_from_transactions = SowTransaction.objects.filter(from_location__workshop__number=2)
+
+        '''
+            ws3
+            sows
+            1. SowFarrow
+            2. Abortion
+            3. CullingSow
+            4. InnerTransaction Tour??!
+            5. InnerTransactions. Rassadka
+            6. OuterTransactions. Otiem
+            7. Nurse .
+            8. Remontki.
+
+            piglets
+            1. Culling Piglets. Padej
+            2. Culling Piglets. Prirezka
+            3. InnerTransactions
+            4. OuterTransactions. Peregon
+        '''
+
+
+        '''
+            ws4
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling Prirezka
+            7. Culling vinuzhd
+        '''
+
+        '''
+            ws8
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling Prirezka
+            7. Culling vinuzhd
+        '''
+
+        '''
+            ws5
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling vinuzhd
+            7. Culling spec
+            8. OuterTransactions. Peregon 7-5
+        '''
+
+        '''
+            ws6
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling vinuzhd
+            7. Culling spec
+            8. OuterTransactions. Peregon 7-5
+        '''
+
+        '''
+            ws7
+            1. Weights
+            2. InnerTransactions. Rassadka
+            3. InnerTransactions.
+            4. OuterTransactions. Peregon
+            5. Culling Padej
+            6. Culling vinuzhd
+            7. Culling spec
+            8. OuterTransactions. Peregon 7-5
+        '''
+
+
+
+
+
+
         return Response(data)
