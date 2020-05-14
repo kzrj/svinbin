@@ -11,6 +11,5 @@ class SowTransactionAdmin(admin.ModelAdmin):
 
 @admin.register(PigletsTransaction)
 class PigletsTransactionAdmin(admin.ModelAdmin):
-    list_display =  [f.name for f in PigletsTransaction._meta.fields]
+    list_display =  [f.name for f in PigletsTransaction._meta.fields] + ['from_location__get_full_loc']
     search_fields = ['date',]
-    fields = ['from_location__get_full_loc']
