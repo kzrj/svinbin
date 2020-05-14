@@ -181,7 +181,7 @@ class SowFarrowManager(CoreModelManager):
         farrow = self.create(sow=sow, tour=sow.tour, initiator=initiator,
                 date=date, alive_quantity=alive_quantity,
                 dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
-                piglets_group=piglets
+                piglets_group=piglets, location=sow.location
                 )
 
         sow.change_status_to('Опоросилась')
@@ -203,6 +203,9 @@ class SowFarrow(SowEvent):
     alive_quantity = models.IntegerField(default=0)
     dead_quantity = models.IntegerField(default=0)
     mummy_quantity = models.IntegerField(default=0)
+
+    location = models.ForeignKey('locations.Location', null=True, on_delete=models.SET_NULL,
+        related_name='farrows_here')
 
     objects = SowFarrowManager()
 

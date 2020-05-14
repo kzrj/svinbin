@@ -95,15 +95,14 @@ class OperationsDataView(views.APIView):
         
 
         # from POST
-        input_json_dict = {}
+        input_json_dict = {'key': 'True or False'}
 
         # if sow in input json => add filter(sow__farm_id=farm_id)
 
         for json_key in input_json_dict.keys():
             if input_json_dict[json_key]:
                 pass
-                # operations_dict[json_key] execute
-                # serialize qs
+                # serialize qs and execute operations_dict[json_key]
                 # append to mega_list(each in qs) 
 
 

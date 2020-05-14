@@ -16,7 +16,6 @@ from piglets_events.models import CullingPiglets, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
 
 
-
 # https://stackoverflow.com/questions/1060279/iterating-through-a-range-of-dates-in-python
 def daterange(start_date, end_date):
     for n in range(int ((end_date - start_date).days)):

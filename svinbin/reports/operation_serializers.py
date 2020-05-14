@@ -4,9 +4,7 @@ import datetime
 from rest_framework import serializers
 
 from tours.models import Tour
-from reports.models import ReportDate
 
-from core.models import CoreModel, CoreModelManager
 from sows.models import Sow
 from piglets.models import Piglets
 from locations.models import Location
@@ -34,14 +32,4 @@ class AnnotateFieldsModelSerializer(serializers.ModelSerializer):
 
 
 class ReportDateSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
-    class Meta:
-        model = ReportDate
-        fields = '__all__'
     
-
-
-class ReportTourSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
-    class Meta:
-        model = Tour
-        fields = '__all__'
-        
