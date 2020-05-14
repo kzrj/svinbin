@@ -3,11 +3,6 @@ import datetime
 
 from rest_framework import serializers
 
-from tours.models import Tour
-
-from sows.models import Sow
-from piglets.models import Piglets
-from locations.models import Location
 from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow,
  CullingSow, MarkAsNurse, MarkAsGilt )
 from piglets_events.models import CullingPiglets, WeighingPiglets

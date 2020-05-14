@@ -464,7 +464,7 @@ def gen_operations_dict():
 
     ws75_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=11)
     
-    for ws_number in [4, 8, 5, 6 , 7]:
+    for ws_number in [4, 8, 5, 6, 7]:
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
         not_ws_locs = Location.objects.all() \
             .get_locations_exclude_workshop_locations(workshop_number=ws_number)\
