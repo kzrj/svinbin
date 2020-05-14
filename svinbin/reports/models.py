@@ -476,11 +476,22 @@ def gen_operations_dict():
                 )
             )
 
-        place = '3/4' if ws_number == 4 
-        place = '4/8' if ws_number == 8
-        place = '8/5' if ws_number == 5
-        place = '8/6' if ws_number == 6
-        place = '8/7' if ws_number == 7
+        place = '4/8' 
+
+        if ws_number == 4:
+            place = '3/4'
+        
+        if ws_number == 8:
+            place = '4/8' 
+        
+        if ws_number == 5:
+            place = '8/5' 
+        
+        if ws_number == 6:
+            place = '8/6' 
+        
+        if ws_number == 7:
+            place = '8/7' 
 
         operations_data[f'ws{ws_number}_weighing'] = {'qs': WeighingPiglets.objects
                 .filter(place=place)\
