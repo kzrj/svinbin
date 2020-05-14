@@ -83,5 +83,6 @@ urlpatterns = [
     url(r'^api/docs/$', schema_view) ,
 
     url(r'^api/reports/pigs_count/', reports_views.ReportCountPigsView.as_view()),
+    url(r'^api/reports/operations/', reports_views.OperationsDataView.as_view()),
 
     ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

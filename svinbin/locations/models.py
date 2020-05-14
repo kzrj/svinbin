@@ -62,6 +62,26 @@ class LocationQuerySet(models.QuerySet):
                 )
             )
 
+    def get_workshop_location_by_number(self, workshop_number):
+        return self.filter(
+            Q(
+                Q(workshop__number=workshop_number) |
+                Q(pigletsGroupCell__workshop__number=workshop_number) | 
+                Q(section__workshop__number=workshop_number) |
+                Q(sowAndPigletsCell__workshop__number=workshop_number)
+                )
+            )
+
+    def get_locations_exclude_workshop_locations(self, workshop_number):
+        return self.exclude(
+            Q(
+                Q(workshop__number=workshop_number) |
+                Q(pigletsGroupCell__workshop__number=workshop_number) | 
+                Q(section__workshop__number=workshop_number) |
+                Q(sowAndPigletsCell__workshop__number=workshop_number)
+                )
+            )
+
     def add_pigs_count_by_sections(self):        
         locations_subquery = models.Subquery(Location.objects.all().filter(
                 Q(Q(pigletsGroupCell__section=OuterRef(OuterRef('section'))) | 

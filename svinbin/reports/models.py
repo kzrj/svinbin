@@ -8,10 +8,13 @@ from django.utils import timezone
 
 from core.models import CoreModel, CoreModelManager
 from sows.models import Sow
-from sows_events.models import CullingSow, SowFarrow
 from piglets.models import Piglets
-from piglets_events.models import CullingPiglets
-from transactions.models import PigletsTransaction
+from locations.models import Location
+from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse,
+ MarkAsGilt )
+from piglets_events.models import CullingPiglets, WeighingPiglets
+from transactions.models import SowTransaction, PigletsTransaction
+
 
 
 # https://stackoverflow.com/questions/1060279/iterating-through-a-range-of-dates-in-python
@@ -294,3 +297,164 @@ class ReportDate(CoreModel):
     def __str__(self):
         return f'{self.date}'
     
+
+# For operations view
+def gen_operations_dict():
+    operations_data = dict()
+
+    operations_data['ws1_semination'] = \
+        Semination.objects.all().annotate(oper_name=Value('ws1_semination', output_field=models.CharField()))
+
+    operations_data['ws1_usound'] = Ultrasound.objects.filter(location__workshop__number=1) \
+        .annotate(oper_name=Value('ws1_usound',  output_field=models.CharField()))
+
+    operations_data['ws1_abort'] = AbortionSow.objects.filter(location__workshop__number=1) \
+        .annotate(oper_name=Value('ws1_abort',  output_field=models.CharField()))
+
+    operations_data['ws1_culling'] = CullingSow.objects.filter(location__workshop__number=1) \
+        .annotate(oper_name=Value('ws1_culling',  output_field=models.CharField()))
+
+    operations_data['w1_peregon_sow'] = SowTransaction.objects.filter(from_location__workshop__number=1)\
+        .annotate(oper_name=Value('w1_peregon_sow',  output_field=models.CharField()))
+
+    operations_data['ws2_usound'] = Ultrasound.objects.filter(location__workshop__number=2) \
+        .annotate(oper_name=Value('ws2_usound',  output_field=models.CharField()))
+
+    operations_data['ws2_abort'] = AbortionSow.objects.filter(location__workshop__number=2) \
+        .annotate(oper_name=Value('ws2_abort',  output_field=models.CharField()))
+
+    operations_data['ws2_culling'] = CullingSow.objects.filter(location__workshop__number=2) \
+        .annotate(oper_name=Value('ws2_culling',  output_field=models.CharField()))
+
+    operations_data['w2_peregon_sow'] = SowTransaction.objects.filter(from_location__workshop__number=2)\
+        .annotate(oper_name=Value('w2_peregon_sow',  output_field=models.CharField()))
+
+    ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+    not_ws3_locs = Location.objects.all().get_locations_exclude_workshop_locations(workshop_number=3)
+
+    operations_data['ws3_farrow'] = SowFarrow.objects.all().annotate(
+        oper_name=Value('ws3_farrow',output_field=models.CharField()))
+
+    operations_data['ws3_abort'] = AbortionSow.objects.filter(location__workshop__number=3) \
+        .annotate(oper_name=Value('ws3_abort',  output_field=models.CharField()))
+
+    operations_data['ws3_sow_culling'] = CullingSow.objects.filter(location__workshop__number=3)\
+        .annotate(oper_name=Value('ws3_sow_culling',  output_field=models.CharField()))
+
+    operations_data['ws3_sow_rassadka'] = SowTransaction.objects.filter(
+        from_location__workshop__number=3, to_location__in=ws3_locs)\
+        .annotate(oper_name=Value('ws3_sow_rassadka',  output_field=models.CharField()))
+
+    operations_data['ws3_sow_otiem'] = SowTransaction.objects.filter(
+        from_location__in=ws3_locs, to_location__in=not_ws3_locs) \
+        .annotate(oper_name=Value('ws3_sow_otiem',  output_field=models.CharField()))
+
+    operations_data['ws3_sow_inner'] = SowTransaction.objects.filter(from_location__in=ws3_locs,
+        to_location__in=ws3_locs)\
+        .annotate(oper_name=Value('ws3_sow_inner',  output_field=models.CharField()))
+
+    operations_data['ws3_mark_as_nurse'] = MarkAsNurse.objects.all() \
+        .annotate(oper_name=Value('ws3_mark_as_nurse', output_field=models.CharField()))
+
+    operations_data['ws3_mark_as_gilt'] = MarkAsGilt.objects.all()\
+        .annotate(oper_name=Value('ws3_mark_as_gilt', output_field=models.CharField()))
+
+    operations_data['ws3_piglets_padej'] = CullingPiglets.objects.filter(
+        location__in=ws3_locs, culling_type='padej')\
+        .annotate(oper_name=Value('ws3_piglets_padej', output_field=models.CharField()))
+
+    operations_data['ws3_piglets_prirezka'] = CullingPiglets.objects.filter(location__in=ws3_locs,
+        culling_type='prirezka')\
+        .annotate(oper_name=Value('ws3_piglets_prirezka', output_field=models.CharField()))
+
+    operations_data['ws3_piglets_inner_trs'] = PigletsTransaction.objects.filter(from_location__in=ws3_locs, 
+        to_location__in=ws3_locs)\
+        .annotate(oper_name=Value('ws3_piglets_inner_trs', output_field=models.CharField()))
+
+    operations_data['ws3_piglets_outer_trs'] = PigletsTransaction.objects.filter(
+        from_location__in=ws3_locs, to_location__in=not_ws3_locs)\
+        .annotate(oper_name=Value('ws3_piglets_outer_trs', output_field=models.CharField()))
+
+    ws4_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=4)
+    not_ws4_locs = Location.objects.all().get_locations_exclude_workshop_locations(workshop_number=4)
+    
+    for ws_number in [4, 8]:
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
+        not_ws_locs = Location.objects.all().get_locations_exclude_workshop_locations(
+            workshop_number=ws_number)
+
+        place = '3/4' if ws_number == 4 else '4/8'
+        operations_data[f'ws{ws_number}_weighing'] = WeighingPiglets.objects.filter(place=place)\
+            .annotate(oper_name=Value(f'ws{ws_number}_weighing', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_padej'] = CullingPiglets.objects.filter(
+            location__in=ws_locs, culling_type='padej')\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_padej', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_prirezka'] = CullingPiglets.objects.filter(
+            location__in=ws_locs, culling_type='prirezka')\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_prirezka', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_rassadka'] = PigletsTransaction.objects.filter(
+            from_location__workshop__number=ws_number, to_location__in=ws_locs)\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_rassadka', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_inner_trs'] = PigletsTransaction.objects.filter(
+            from_location__in=ws_locs, to_location__in=ws_locs)\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_inner_trs', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_outer_trs'] = PigletsTransaction.objects.filter(
+            from_location__in=ws_locs, to_location__in=not_ws_locs)\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_outer_trs', output_field=models.CharField()))
+
+    ws75_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=11)
+
+    for ws_number in [5, 6, 7]:
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
+        not_ws_locs = Location.objects.all() \
+            .get_locations_exclude_workshop_locations(workshop_number=ws_number)\
+            .exclude(Q(
+                Q(workshop__number=11) |
+                Q(pigletsGroupCell__workshop__number=11) | 
+                Q(section__workshop__number=11) |
+                Q(sowAndPigletsCell__workshop__number=11)
+                )
+            )
+        place = f'8/{ws_number}'
+    
+        operations_data[f'ws{ws_number}_weighing'] = WeighingPiglets.objects.filter(place=place)\
+            .annotate(oper_name=Value(f'ws{ws_number}_weighing', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_padej'] = CullingPiglets.objects.filter(
+            location__in=ws_locs, culling_type='padej')\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_padej', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_prirezka'] = CullingPiglets.objects.filter(
+            location__in=ws_locs, culling_type='prirezka')\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_prirezka', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_vinuzhd'] = CullingPiglets.objects.filter(
+            location__in=ws_locs, culling_type='vinuzhd')\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_prirezka', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_spec'] = CullingPiglets.objects.filter(
+            location__in=ws_locs, culling_type='spec')\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_spec', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_rassadka'] = PigletsTransaction.objects.filter(
+            from_location__workshop__number=ws_number, to_location__in=ws_locs)\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_rassadka', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_inner_trs'] = PigletsTransaction.objects.filter(
+            from_location__in=ws_locs, to_location__in=ws_locs)\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_inner_trs', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_outer_trs'] = PigletsTransaction.objects.filter(
+            from_location__in=ws_locs, to_location__in=not_ws_locs)\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_outer_trs', output_field=models.CharField()))
+
+        operations_data[f'ws{ws_number}_piglets_to_75'] = PigletsTransaction.objects.filter(
+            from_location__in=ws_locs, to_location__in=ws75_locs)\
+            .annotate(oper_name=Value(f'ws{ws_number}_piglets_to_75', output_field=models.CharField()))
+
+    return operations_data
