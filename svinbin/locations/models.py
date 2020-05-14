@@ -260,3 +260,29 @@ class Location(CoreModel):
             return f'{self.sowGroupCell.section.number}/{self.sowGroupCell.number}'
 
         return None
+
+    @property
+    def get_full_loc(self):
+        if self.sowSingleCell:
+            return f'{self.sowSingleCell.workshop.number}/{self.sowSingleCell.section.number}/' \
+                + f'{self.sowSingleCell.number}'
+
+        if self.pigletsGroupCell:
+            return f'{self.pigletsGroupCell.workshop.number}/{self.pigletsGroupCell.section.number}'\
+                + f'/{self.pigletsGroupCell.number}'
+
+        if self.sowAndPigletsCell:
+            return f'{self.sowAndPigletsCell.workshop.number}/{self.sowAndPigletsCell.section.number}/'\
+                + f'{self.sowAndPigletsCell.number}'
+
+        if self.sowGroupCell:
+            return f'{self.sowGroupCell.workshop.number}/{self.sowGroupCell.section.number}/'\
+                + f'{self.sowGroupCell.number}'
+
+        if self.workshop:
+            return f'Цех {self.workshop.number}'
+
+        if self.section:
+            return f'Цех {self.section.workshop.number}/секция {self.section.number}'
+
+        return None

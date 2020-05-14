@@ -93,7 +93,6 @@ class OperationsDataView(views.APIView):
     def post(self, request):
         operations_data = gen_operations_dict()
         
-
         # from POST
         input_json_dict = {'key': 'True or False'}
 
@@ -102,8 +101,10 @@ class OperationsDataView(views.APIView):
         for json_key in input_json_dict.keys():
             if input_json_dict[json_key]:
                 pass
-                # serialize qs and execute operations_dict[json_key]
-                # append to mega_list(each in qs) 
+                # qs = operations_dict[json_key][qs]
+                # serializer = operations_dict[json_key][serializer]
+                # serializer(qs).data appent ot megalist
+                
 
 
         mega_list = list()

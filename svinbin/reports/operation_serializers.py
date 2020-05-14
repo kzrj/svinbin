@@ -8,28 +8,118 @@ from tours.models import Tour
 from sows.models import Sow
 from piglets.models import Piglets
 from locations.models import Location
-from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse,
- MarkAsGilt )
+from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow,
+ CullingSow, MarkAsNurse, MarkAsGilt )
 from piglets_events.models import CullingPiglets, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
 
 
-class AnnotateFieldsModelSerializer(serializers.ModelSerializer):
-    """
-    A ModelSerializer that takes an additional `fields` argument that
-    controls which fields should be displayed.
-    """
-
-    def __init__(self, *args, **kwargs):
-        # Instantiate the superclass normally
-        super(AnnotateFieldsModelSerializer, self).__init__(*args, **kwargs)
-
-        if len(args) > 0 and len(args[0]) > 0:
-            for field_name in args[0][0].__dict__.keys():
-                if field_name[0] == '_' or field_name in self.fields.keys():
-                    continue
-                self.fields[field_name] = serializers.ReadOnlyField()
+class OperationsSerializer(serializers.ModelSerializer):
+    oper_name = serializers.ReadOnlyField()
 
 
-class ReportDateSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
+class OpSowEventSerializer(OperationsSerializer):
+    sow = serializers.ReadOnlyField(source='sow.farm_id')
+    tour = serializers.StringRelatedField()
+    initiator = serializers.StringRelatedField()
+    location = serializers.ReadOnlyField(source='location.get_full_loc')
+
+
+class OpSeminationSerializer(OpSowEventSerializer):
+    semination_employee = serializers.StringRelatedField()
+    boar = serializers.ReadOnlyField(source='boar.birth_id')
+
+    class Meta:
+        model = Semination
+        fields = ['date', 'sow', 'tour', 'initiator', 'semination_employee', 'boar',
+        'oper_name']
+
+
+class OpUsoundSerializer(OpSowEventSerializer):
+    u_type = serializers.ReadOnlyField(source='u_type.days')
+
+    class Meta:
+        model = Ultrasound
+        fields = ['oper_name', 'date', 'sow', 'tour', 'initiator', 'u_type', 'result',
+            'location']
+
+
+class OpAbortSerializer(OpSowEventSerializer):
+    class Meta:
+        model = AbortionSow
+        fields = ['oper_name','date', 'sow', 'tour', 'initiator', 'location' ]
+
+
+class OpCullingSowSerializer(OpSowEventSerializer):
+    class Meta:
+        model = CullingSow
+        fields = ['oper_name','date', 'sow', 'tour', 'location', 'initiator',
+         'culling_type', 'reason', ]
+
+
+class OpSowFarrowSerializer(OpSowEventSerializer):
+    class Meta:
+        model = SowFarrow
+        fields = ['oper_name', 'date', 'location', 'sow', 'alive_quantity', 'dead_quantity',
+         'mummy_quantity', 'tour', 'initiator']
+
+
+class OpSowTransactionSerializer(OpSowEventSerializer):
+    from_location = serializers.ReadOnlyField(source='from_location.get_full_loc')
+    to_location = serializers.ReadOnlyField(source='to_location.get_full_loc')
+
+    class Meta:
+        model = SowTransaction
+        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'from_location', 
+            'location', 'to_location']
+
+
+class OpMarkAsNurseSerializer(OpSowEventSerializer):
+    class Meta:
+        model = MarkAsNurse
+        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour']
+
+
+class OpMarkAsGiltSerializer(OpSowEventSerializer):
+    gilt = serializers.ReadOnlyField(source='gilt.birth_id')
+
+    class Meta:
+        model = MarkAsGilt
+        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'gilt']
+
+
+class OperationsSerializer(serializers.ModelSerializer):
+    oper_name = serializers.ReadOnlyField()
+
+
+class OpPigletsEventSerializer(OperationsSerializer):
+    week_tour = serializers.StringRelatedField()
+    initiator = serializers.StringRelatedField()
+    location = serializers.ReadOnlyField(source='location.get_full_loc')
     
+    # Todo: 
+    age = serializers.ReadOnlyField(source=None)
+
+
+class OpPigletsCullingSerializer(OpPigletsEventSerializer):
+    class Meta:
+        model = CullingPiglets
+        fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
+         'culling_type', 'reason', 'quantity', 'total_weight', 'age' ]
+
+
+class OpPigletsTransactionSerializer(OpPigletsEventSerializer):
+    from_location = serializers.ReadOnlyField(source='from_location.get_full_loc')
+    to_location = serializers.ReadOnlyField(source='to_location.get_full_loc')
+
+    class Meta:
+        model = PigletsTransaction
+        fields = ['oper_name', 'date', 'initiator', 'week_tour', 'age', 'from_location',
+          'to_location', 'location']
+
+
+class OpPigletsWeighingSerializer(OpPigletsEventSerializer):
+    class Meta:
+        model = WeighingPiglets
+        fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
+         'place', 'average_weight', 'piglets_quantity', 'total_weight', 'age' ]

@@ -25,7 +25,8 @@ class SowTransactionManager(CoreModelManager):
                 initiator=initiator,
                 from_location=sow.location,
                 to_location=to_location,
-                sow=sow
+                sow=sow,
+                tour=sow.tour
                 )
 
         if sow.status and sow.status.title == 'Опоросилась' and to_location.workshop:
@@ -57,6 +58,9 @@ class SowTransaction(Transaction):
      related_name="sow_transactions_to")
     sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE, related_name='transactions')
 
+    tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True,
+        related_name='sow_transactions')
+
     objects = SowTransactionManager()
 
 
@@ -68,7 +72,8 @@ class PigletsTransactionManager(CoreModelManager):
                 from_location=piglets_group.location,
                 to_location=to_location,
                 piglets_group=piglets_group,
-                quantity=piglets_group.quantity
+                quantity=piglets_group.quantity,
+                week_tour=piglets_group.metatour.week_tour
                 )
 
         # we should remove status "взвешены"
@@ -170,6 +175,9 @@ class PigletsTransaction(Transaction):
      related_name="piglets_transaction_to")
     piglets_group = models.ForeignKey('piglets.Piglets', on_delete=models.CASCADE,
      related_name="transactions")
+
+    week_tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="piglets_transactions")
 
     quantity = models.IntegerField(null=True)
 
