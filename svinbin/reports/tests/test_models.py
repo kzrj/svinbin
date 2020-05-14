@@ -6,7 +6,7 @@ from django.db import models
 from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
-from reports.models import ReportDate
+from reports.models import ReportDate, gen_operations_dict
 from sows.models import Sow
 from sows_events.models import CullingSow, SowFarrow
 from piglets.models import Piglets
@@ -376,5 +376,10 @@ class OperationDataTest(TransactionTestCase):
 
         self.loc_ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
 
-    # def test_concat_qs(self):
+    def test_gen_operations_dict(self):
+        with self.assertNumQueries(0):
+            ops_dict = gen_operations_dict()
+            self.assertEqual('ws1_semination' in ops_dict.keys(), True)
+            self.assertEqual('ws7_piglets_to_75' in ops_dict.keys(), True)
+            self.assertEqual(type(ops_dict['ws1_semination']), models.query.QuerySet)
         

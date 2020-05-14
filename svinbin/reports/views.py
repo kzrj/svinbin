@@ -1,11 +1,13 @@
 # -*- coding: utf-8 -*-
+from django.db.models import CharField, Value
+
 from rest_framework import viewsets, views
 from rest_framework.response import Response
 
 from tours.filters import TourFilter
 
 from tours.models import Tour
-from reports.models import ReportDate
+from reports.models import ReportDate, gen_operations_dict
 from locations.models import Location
 from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt )
 from piglets_events.models import CullingPiglets, WeighingPiglets
@@ -89,114 +91,22 @@ class ReportCountPigsView(views.APIView):
 
 class OperationsDataView(views.APIView):
     def post(self, request):
-        data = dict()
+        operations_data = gen_operations_dict()
+        
 
-        # by ws
-        ''' ws1
-            1. Semenation
-            2. Usound
-            3. Abortion
-            4. Culling
-            5. Transactions
-        '''
-        ws1_semination_qs = Semenation.objects.all()
-        ws1_usound_qs = Ultrasound.objects.filter(location__workshop__number=1)
-        ws1_abort_qs = AbortionSow.objects.filter(location__workshop__number=1)
-        ws1_culling_qs = CullingSow.objects.filter(location__workshop__number=1)
-        w1_from_transactions = SowTransaction.objects.filter(from_location__workshop__number=1)
+        # from POST
+        input_json_dict = {}
 
-        ''' ws2
-            1. Usound
-            2. Abortion
-            3. Culling
-            4. Transactions
-        '''
-        ws1_usound_qs = Ultrasound.objects.filter(location__workshop__number=1)
-        ws1_abort_qs = AbortionSow.objects.filter(location__workshop__number=1)
-        ws1_culling_qs = CullingSow.objects.filter(location__workshop__number=1)
-        w2_from_transactions = SowTransaction.objects.filter(from_location__workshop__number=2)
+        # if sow in input json => add filter(sow__farm_id=farm_id)
 
-        '''
-            ws3
-            sows
-            1. SowFarrow
-            2. Abortion
-            3. CullingSow
-            4. InnerTransaction Tour??!
-            5. InnerTransactions. Rassadka
-            6. OuterTransactions. Otiem
-            7. Nurse .
-            8. Remontki.
-
-            piglets
-            1. Culling Piglets. Padej
-            2. Culling Piglets. Prirezka
-            3. InnerTransactions
-            4. OuterTransactions. Peregon
-        '''
+        for json_key in input_json_dict.keys():
+            if input_json_dict[json_key]:
+                pass
+                # operations_dict[json_key] execute
+                # serialize qs
+                # append to mega_list(each in qs) 
 
 
-        '''
-            ws4
-            1. Weights
-            2. InnerTransactions. Rassadka
-            3. InnerTransactions.
-            4. OuterTransactions. Peregon
-            5. Culling Padej
-            6. Culling Prirezka
-            7. Culling vinuzhd
-        '''
+        mega_list = list()
 
-        '''
-            ws8
-            1. Weights
-            2. InnerTransactions. Rassadka
-            3. InnerTransactions.
-            4. OuterTransactions. Peregon
-            5. Culling Padej
-            6. Culling Prirezka
-            7. Culling vinuzhd
-        '''
-
-        '''
-            ws5
-            1. Weights
-            2. InnerTransactions. Rassadka
-            3. InnerTransactions.
-            4. OuterTransactions. Peregon
-            5. Culling Padej
-            6. Culling vinuzhd
-            7. Culling spec
-            8. OuterTransactions. Peregon 7-5
-        '''
-
-        '''
-            ws6
-            1. Weights
-            2. InnerTransactions. Rassadka
-            3. InnerTransactions.
-            4. OuterTransactions. Peregon
-            5. Culling Padej
-            6. Culling vinuzhd
-            7. Culling spec
-            8. OuterTransactions. Peregon 7-5
-        '''
-
-        '''
-            ws7
-            1. Weights
-            2. InnerTransactions. Rassadka
-            3. InnerTransactions.
-            4. OuterTransactions. Peregon
-            5. Culling Padej
-            6. Culling vinuzhd
-            7. Culling spec
-            8. OuterTransactions. Peregon 7-5
-        '''
-
-
-
-
-
-
-        return Response(data)
+        return Response('Hoba!')
