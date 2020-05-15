@@ -100,7 +100,11 @@ def set_piglets_age_mixed():
             else:
                 pre_birthday_ts = datetime.timestamp(record.tour.start_date)
 
-            avg_ts += (pre_birthday_ts * record.quantity / piglets.quantity)
+            if piglets.quantity < 1:
+                avg_ts = datetime.timestamp(piglets.created_at)
+                break
+            else
+                avg_ts += (pre_birthday_ts * record.quantity / piglets.quantity)
         
         piglets.birthday = datetime.fromtimestamp(avg_ts)
         piglets.save()
