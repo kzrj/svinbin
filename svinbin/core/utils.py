@@ -103,7 +103,7 @@ def set_piglets_age_mixed():
             if piglets.quantity < 1:
                 avg_ts = datetime.timestamp(piglets.created_at)
                 break
-            else
+            else:
                 avg_ts += (pre_birthday_ts * record.quantity / piglets.quantity)
         
         piglets.birthday = datetime.fromtimestamp(avg_ts)
