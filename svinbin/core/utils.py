@@ -70,7 +70,7 @@ def set_piglets_culling_location(culling):
 
 def set_piglets_age_not_mixed():
     
-    piglets_qs = Piglets.objects.filter(metatour__records__percentage=100)
+    piglets_qs = Piglets.objects.get_all().filter(metatour__records__percentage=100)
     for piglets in piglets_qs:
         tour = piglets.metatour.week_tour
         first_farrow = tour.sowfarrow_set.all().first()
@@ -85,7 +85,7 @@ def set_piglets_age_not_mixed():
 
 def set_piglets_age_mixed():
     
-    piglets_qs = Piglets.objects.filter(metatour__records__percentage__lt=100)
+    piglets_qs = Piglets.objects.get_all().filter(metatour__records__percentage__lt=100)
 
     for piglets in piglets_qs:
         avg_ts = 0
