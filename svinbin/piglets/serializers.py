@@ -17,7 +17,7 @@ class PigletsSerializer(serializers.ModelSerializer):
 
 class PigletsSimpleSerializer(serializers.ModelSerializer):
     metatour_repr = serializers.ReadOnlyField()
-    week_tour = serializers.ReadOnlyField(source='metatour.week_tour')
+    week_tour = serializers.StringRelatedField(source='metatour.week_tour')
     age = serializers.ReadOnlyField()
 
     class Meta:
