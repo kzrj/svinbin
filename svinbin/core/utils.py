@@ -17,6 +17,7 @@ from staff.serializers import WorkshopEmployeeSerializer
 from locations.models import Location
 from tours.models import MetaTourRecord
 from piglets.models import Piglets
+from sows_events.models import SowFarrow
 
 
 class CustomValidation(exceptions.APIException):

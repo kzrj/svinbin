@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from django.db import models
+from django.utils import timezone
 from django.db.models import Q, Sum, Avg
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -172,4 +173,13 @@ class Piglets(CoreModel):
         if self.gilts_quantity > 0:
             return True
         return False
+
+    @property
+    def age(self):
+        if not self.birthday:
+            return None
+        
+        return (timezone.now() - self.birthday)
+
+
 
