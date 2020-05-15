@@ -90,7 +90,7 @@ def set_piglets_age_mixed():
     for piglets in piglets_qs:
         avg_ts = 0
 
-        for record in piglets.metatour.records:
+        for record in piglets.metatour.records.all():
 
             first_farrow = record.tour.sowfarrow_set.all().first()
             pre_birthday_ts = 0
