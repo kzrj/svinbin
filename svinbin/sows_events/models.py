@@ -173,6 +173,7 @@ class SowFarrowManager(CoreModelManager):
                 status=PigletsStatus.objects.get(title='Родились, кормятся'),
                 start_quantity=alive_quantity,
                 quantity=alive_quantity,
+                birthday=date
             )
         metatour = MetaTour.objects.create(piglets=piglets)
         MetaTourRecord.objects.create_record(metatour, sow.tour, alive_quantity, alive_quantity)

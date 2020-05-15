@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
+
 from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
@@ -180,3 +182,39 @@ class PigletsQueryTest(TransactionTestCase):
 
     def test_with_tour(self):
         self.assertEqual(Piglets.objects.all().with_tour(week_number=1).count(), 6)
+
+
+class PigletsAgeTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.loc_ws5 = Location.objects.get(workshop__number=5)
+
+    def test_gen_anf_birthday(self):
+        now = datetime.today()
+
+        piglets1_born_date = now - timedelta(10)
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour2, location=self.loc_ws5, quantity=15,
+            birthday=piglets1_born_date)
+
+        piglets2_born_date = now - timedelta(15)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=self.loc_ws5, quantity=4,
+            birthday=piglets2_born_date)
+
+        piglets3_born_date = now - timedelta(20)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=self.loc_ws5, quantity=8,
+            birthday=piglets3_born_date)
+
+        piglets_qs = Piglets.objects.filter(pk__in=[piglets1.pk, piglets2.pk, piglets3.pk,])
+
+        avg_birthday = piglets_qs.gen_avg_birthday()
+        self.assertEqual((now - avg_birthday).days, 13)

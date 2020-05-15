@@ -68,7 +68,9 @@ class PigletsSplitManager(CoreModelManager):
             quantity=(parent_piglets.quantity - new_amount),
             gilts_quantity=piglets1_group_gilts_quantity,
             split_as_child=split_record,
-            transfer_part_number=parent_piglets.transfer_part_number)
+            transfer_part_number=parent_piglets.transfer_part_number,
+            birthday=parent_piglets.birthday
+            )
         metatour1 = MetaTour.objects.create(piglets=piglets1)
 
         piglets2_new_amount = Piglets.objects.create(location=parent_piglets.location,
@@ -77,7 +79,9 @@ class PigletsSplitManager(CoreModelManager):
             quantity=new_amount,
             gilts_quantity=piglets2_new_group_gilts_quantity,
             split_as_child=split_record,
-            transfer_part_number=parent_piglets.transfer_part_number)
+            transfer_part_number=parent_piglets.transfer_part_number,
+            birthday=parent_piglets.birthday
+            )
         metatour2 = MetaTour.objects.create(piglets=piglets2_new_amount)
         
         # create metarecodrs
@@ -123,12 +127,12 @@ class PigletsMergerManager(CoreModelManager):
                 pks = [group.pk for group in parent_piglets]
                 parent_piglets = Piglets.objects.filter(pk__in=pks)
 
-        # create child piglets
         total_quantity = parent_piglets.get_total_quantity()
         gilts_quantity = parent_piglets.get_total_gilts_quantity()
+        avg_birthday = parent_piglets.gen_avg_birthday(total_quantity=total_quantity)
 
         piglets = Piglets.objects.create(location=new_location, status=None, start_quantity=total_quantity,
-            quantity=total_quantity, gilts_quantity=gilts_quantity)
+            quantity=total_quantity, gilts_quantity=gilts_quantity, birthday=avg_birthday)
 
         # create metatour
         metatour = MetaTour.objects.create(piglets=piglets)
