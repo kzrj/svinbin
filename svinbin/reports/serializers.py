@@ -6,6 +6,15 @@ from rest_framework import serializers
 from tours.models import Tour
 from reports.models import ReportDate
 
+from core.models import CoreModel, CoreModelManager
+from sows.models import Sow
+from piglets.models import Piglets
+from locations.models import Location
+from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse,
+ MarkAsGilt )
+from piglets_events.models import CullingPiglets, WeighingPiglets
+from transactions.models import SowTransaction, PigletsTransaction
+
 
 class AnnotateFieldsModelSerializer(serializers.ModelSerializer):
     """
@@ -35,100 +44,4 @@ class ReportTourSerializer(AnnotateFieldsModelSerializer, serializers.ModelSeria
     class Meta:
         model = Tour
         fields = '__all__'
-
-
-
-class ReportTourSerializer2(serializers.ModelSerializer):
-    piglets_age = serializers.ReadOnlyField()
-
-    # sow data
-    count_sow = serializers.ReadOnlyField()
-    count_seminated = serializers.ReadOnlyField()
-    count_usound28_suporos = serializers.ReadOnlyField()
-    count_usound28_proholost = serializers.ReadOnlyField()
-    count_usound35_suporos = serializers.ReadOnlyField()
-    count_usound35_proholost = serializers.ReadOnlyField()
-    count_abort = serializers.ReadOnlyField()
-
-    # add_count_tour_sow
-    ws1_count_tour_sow = serializers.ReadOnlyField()
-    ws2_count_tour_sow = serializers.ReadOnlyField()
-    ws3_count_tour_sow = serializers.ReadOnlyField()
-
-    # farrow_data
-    total_born_alive = serializers.ReadOnlyField()
-    total_born_dead = serializers.ReadOnlyField()
-    total_born_mummy = serializers.ReadOnlyField()
-    gilt_count = serializers.ReadOnlyField()
-
-    # add_weight_date
-    weight_date_3_4 = serializers.ReadOnlyField()
-    weight_date_4_8 = serializers.ReadOnlyField()
-    weight_date_8_5 = serializers.ReadOnlyField()
-    weight_date_8_6 = serializers.ReadOnlyField()
-    weight_date_8_7 = serializers.ReadOnlyField()
-
-    # add_week_weight
-    week_weight_avg_3_4 = serializers.ReadOnlyField()
-    week_weight_avg_4_8 = serializers.ReadOnlyField()
-    week_weight_avg_8_5 = serializers.ReadOnlyField()
-    week_weight_avg_8_6 = serializers.ReadOnlyField()
-    week_weight_avg_8_7 = serializers.ReadOnlyField()
-
-    week_weight_qnty_3_4 = serializers.ReadOnlyField()
-    week_weight_qnty_4_8 = serializers.ReadOnlyField()
-    week_weight_qnty_8_5 = serializers.ReadOnlyField()
-    week_weight_qnty_8_6 = serializers.ReadOnlyField()
-    week_weight_qnty_8_7 = serializers.ReadOnlyField()
-
-    # add_week_weight_ws8_v2
-    week_weight_qnty_ws8 = serializers.ReadOnlyField()
-    week_weight_avg_ws8 = serializers.ReadOnlyField()
-
-    # add_culling_data_by_week_tour
-    ws3_padej_quantity = serializers.ReadOnlyField()
-    ws4_padej_quantity = serializers.ReadOnlyField()
-    ws8_padej_quantity = serializers.ReadOnlyField()
-    ws5_padej_quantity = serializers.ReadOnlyField()
-    ws6_padej_quantity = serializers.ReadOnlyField()
-    ws7_padej_quantity = serializers.ReadOnlyField()
-
-    ws3_prirezka_quantity = serializers.ReadOnlyField()
-    ws4_prirezka_quantity = serializers.ReadOnlyField()
-    ws8_prirezka_quantity = serializers.ReadOnlyField()
-
-    ws4_vinuzhd_quantity = serializers.ReadOnlyField()
-    ws8_vinuzhd_quantity = serializers.ReadOnlyField()
-    ws5_vinuzhd_quantity = serializers.ReadOnlyField()
-    ws6_vinuzhd_quantity = serializers.ReadOnlyField()
-    ws7_vinuzhd_quantity = serializers.ReadOnlyField()
-
-    ws5_spec_quantity = serializers.ReadOnlyField()
-    ws6_spec_quantity = serializers.ReadOnlyField()
-    ws7_spec_quantity = serializers.ReadOnlyField()
-
-    ws5_spec_avg_weight = serializers.ReadOnlyField()
-    ws6_spec_avg_weight = serializers.ReadOnlyField()
-    ws7_spec_avg_weight = serializers.ReadOnlyField()
-
-    # add_piglets_count_by_ws_week_tour
-    ws5_piglets_qnty_now = serializers.ReadOnlyField()
-    ws6_piglets_qnty_now = serializers.ReadOnlyField()
-    ws7_piglets_qnty_now = serializers.ReadOnlyField()
-
-    # add_piglets_count_by_ws_week_tour
-    ws3_gilts_qnty_now = serializers.ReadOnlyField()
-    ws4_gilts_qnty_now = serializers.ReadOnlyField()
-    ws5_gilts_qnty_now = serializers.ReadOnlyField()
-    ws6_gilts_qnty_now = serializers.ReadOnlyField()
-    ws7_gilts_qnty_now = serializers.ReadOnlyField()
-    ws8_gilts_qnty_now = serializers.ReadOnlyField()
-
-    # add_count_transfer_to_7_5
-    ws5_qnty_to_7_5 = serializers.ReadOnlyField()
-    ws6_qnty_to_7_5 = serializers.ReadOnlyField()
-    ws7_qnty_to_7_5 = serializers.ReadOnlyField()
-
-    class Meta:
-        model = Tour
-        fields = '__all__'
+        

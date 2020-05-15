@@ -16,9 +16,10 @@ def create_piglets_statuses():
             ])
 
 
-def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_quantity=0, status=None):
-    piglets = Piglets.objects.create(location=location, quantity=quantity, start_quantity=quantity,
-        gilts_quantity=gilts_quantity, status=status)
+def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_quantity=0,
+     status=None, birthday=None):
+    piglets = Piglets.objects.create(location=location, quantity=quantity,
+     start_quantity=quantity, gilts_quantity=gilts_quantity, status=status, birthday=birthday)
 
     meta_tour = MetaTour.objects.create(piglets=piglets)
     meta_tour.records.create_record(meta_tour, tour, piglets.quantity, piglets.quantity)

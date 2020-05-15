@@ -9,6 +9,9 @@ from sows_events.models import Semination, SowFarrow, Ultrasound
 
 FARM_ID_COUNT = 100000
 
+def create_boar():
+    return Boar.objects.get_or_create_boar(birth_id=random.randint(1, FARM_ID_COUNT))
+
 def create_statuses():
     if SowStatus.objects.all().count() < 1:
         SowStatus.objects.bulk_create([
@@ -58,8 +61,9 @@ def create_sow_and_put_in_workshop_three_section(section_number=1, cell_number=1
 
 def create_sow_seminated_usouded_ws3_section(week=1, section_number=1):
     sow = create_sow_and_put_in_workshop_three_section(section_number)
+    boar = create_boar()
     Semination.objects.create_semination(sow=sow, week=week,
-     initiator=None, semination_employee=None)
+     initiator=None, semination_employee=None, boar=boar)
     Ultrasound.objects.create_ultrasound(sow=sow, days=30, result=True)
     Ultrasound.objects.create_ultrasound(sow=sow, days=60, result=True)
     return sow
@@ -73,12 +77,14 @@ def create_sow_with_location(location, farm_id=None):
 
 def create_sow_with_semination(location, week=1):
     sow = create_sow_with_location(location)
-    Semination.objects.create_semination(sow=sow, week=week)
+    boar = create_boar()
+    Semination.objects.create_semination(sow=sow, week=week, boar=boar)
     return sow
 
 def create_sow_with_semination_usound(location, week=1):
     sow = create_sow_with_location(location)
-    Semination.objects.create_semination(sow=sow, week=week)
+    boar = create_boar()
+    Semination.objects.create_semination(sow=sow, week=week, boar=boar)
     Ultrasound.objects.create_ultrasound(sow=sow, days=30, result=True)
     Ultrasound.objects.create_ultrasound(sow=sow, days=60, result=True)
     return sow

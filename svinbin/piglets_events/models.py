@@ -68,7 +68,9 @@ class PigletsSplitManager(CoreModelManager):
             quantity=(parent_piglets.quantity - new_amount),
             gilts_quantity=piglets1_group_gilts_quantity,
             split_as_child=split_record,
-            transfer_part_number=parent_piglets.transfer_part_number)
+            transfer_part_number=parent_piglets.transfer_part_number,
+            birthday=parent_piglets.birthday
+            )
         metatour1 = MetaTour.objects.create(piglets=piglets1)
 
         piglets2_new_amount = Piglets.objects.create(location=parent_piglets.location,
@@ -77,7 +79,9 @@ class PigletsSplitManager(CoreModelManager):
             quantity=new_amount,
             gilts_quantity=piglets2_new_group_gilts_quantity,
             split_as_child=split_record,
-            transfer_part_number=parent_piglets.transfer_part_number)
+            transfer_part_number=parent_piglets.transfer_part_number,
+            birthday=parent_piglets.birthday
+            )
         metatour2 = MetaTour.objects.create(piglets=piglets2_new_amount)
         
         # create metarecodrs
@@ -123,12 +127,12 @@ class PigletsMergerManager(CoreModelManager):
                 pks = [group.pk for group in parent_piglets]
                 parent_piglets = Piglets.objects.filter(pk__in=pks)
 
-        # create child piglets
         total_quantity = parent_piglets.get_total_quantity()
         gilts_quantity = parent_piglets.get_total_gilts_quantity()
+        avg_birthday = parent_piglets.gen_avg_birthday(total_quantity=total_quantity)
 
         piglets = Piglets.objects.create(location=new_location, status=None, start_quantity=total_quantity,
-            quantity=total_quantity, gilts_quantity=gilts_quantity)
+            quantity=total_quantity, gilts_quantity=gilts_quantity, birthday=avg_birthday)
 
         # create metatour
         metatour = MetaTour.objects.create(piglets=piglets)
@@ -230,7 +234,9 @@ class WeighingPigletsManager(CoreModelManager):
             place=place,
             piglets_quantity=piglets_group.quantity,
             initiator=initiator,
-            date=date)
+            date=date,
+            week_tour=piglets_group.metatour.week_tour
+            )
 
         piglets_group.change_status_to('Взвешены, готовы к заселению')
         return weighing_record
@@ -264,6 +270,9 @@ class WeighingPiglets(PigletsEvent):
     piglets_quantity = models.IntegerField()
     place = models.CharField(max_length=10, choices=WEIGHING_PLACES)
 
+    week_tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="piglets_weights")
+
     objects = WeighingPigletsManager()
 
 
@@ -280,7 +289,8 @@ class CullingPigletsManager(CoreModelManager):
             
         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
             date=date, initiator=initiator, is_it_gilt=is_it_gilt, quantity=quantity,
-            total_weight=total_weight, location=piglets_group.location)
+            total_weight=total_weight, location=piglets_group.location,
+            week_tour=piglets_group.metatour.week_tour)
 
         return culling
 
@@ -289,7 +299,7 @@ class CullingPigletsManager(CoreModelManager):
         piglets_group.remove_gilts(quantity)
         return self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
             date=date, initiator=initiator, is_it_gilt=True, quantity=quantity,
-            total_weight=total_weight)
+            total_weight=total_weight, week_tour=piglets_group.metatour.week_tour)
 
     def get_culling_by_piglets(self, culling_type, piglets):
         return self.get_queryset().filter(piglets_group__in=piglets, culling_type=culling_type) \
@@ -315,6 +325,9 @@ class CullingPiglets(PigletsEvent):
     total_weight = models.FloatField(null=True)
     location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL, null=True, blank=True, 
         related_name="cullings")
+
+    week_tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
+        related_name="piglets_culling")
 
     objects = CullingPigletsManager()
 

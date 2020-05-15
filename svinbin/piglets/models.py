@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
+
 from django.db import models
 from django.db.models import Q, Sum, Avg
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -49,6 +51,22 @@ class PigletsQuerySet(models.QuerySet):
             )
         )
 
+    def gen_avg_birthday(self, total_quantity=None):
+        if not total_quantity:
+            total_quantity = self.get_total_quantity()
+        avg_ts = 0
+
+        for piglets in self:
+
+            if not piglets.birthday:
+                return None
+
+            ts = datetime.timestamp(piglets.birthday)
+            avg_item = ts * piglets.quantity / total_quantity
+            avg_ts += avg_item
+
+        return datetime.fromtimestamp(avg_ts)
+
 
 class PigletsManager(CoreModelManager):
     def get_queryset(self):
@@ -90,7 +108,9 @@ class Piglets(CoreModel):
 
     transfer_part_number = models.IntegerField(null=True, blank=True)
 
-    active = models.BooleanField(default=True)  
+    active = models.BooleanField(default=True)
+
+    birthday = models.DateTimeField(null=True, blank=True)
 
     objects = PigletsManager()
 
