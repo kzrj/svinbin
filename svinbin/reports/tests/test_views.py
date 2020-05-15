@@ -20,7 +20,7 @@ from locations.models import Location
 from tours.models import Tour, MetaTour
 from reports.models import ReportDate
 
-from reports.serializers import ReportTourSerializer, ReportTourSerializer2
+from reports.serializers import ReportTourSerializer
 
 
 class ReportDateViewSetTest(APITestCase):
