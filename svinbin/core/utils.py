@@ -16,6 +16,7 @@ from django.db.utils import IntegrityError as DjangoIntegrityError
 from staff.serializers import WorkshopEmployeeSerializer
 from locations.models import Location
 from tours.models import MetaTourRecord
+from piglets.models import Piglets
 
 
 class CustomValidation(exceptions.APIException):
