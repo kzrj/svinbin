@@ -83,7 +83,8 @@ class PigletsManager(CoreModelManager):
                 quantity=quantity,
                 gilts_quantity=gilts_quantity)
         metatour = MetaTour.objects.create(piglets=piglets)
-        MetaTourRecord.objects.create_record(metatour, tour, quantity, quantity)
+        MetaTourRecord.objects.create_record(metatour=metatour, tour=tour, quantity=quantity,
+         total_quantity=quantity, percentage=100)
         metatour.set_week_tour()
         return piglets
 

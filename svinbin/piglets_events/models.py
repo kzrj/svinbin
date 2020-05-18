@@ -24,7 +24,8 @@ def init_piglets_with_single_tour(week, quantity):
                 quantity=quantity,
             )
     metatour = MetaTour.objects.create(piglets=piglets)
-    MetaTourRecord.objects.create_record(metatour, tour, quantity, quantity)
+    MetaTourRecord.objects.create_record(metatour=metatour, tour=tour, quantity=quantity,
+     total_quantity=quantity, percentage=100)
     return piglets
 
 
@@ -90,14 +91,18 @@ class PigletsSplitManager(CoreModelManager):
             MetaTourRecord.objects.create_record(
                 metatour=metatour1,
                 tour=parent_record.tour,
-                quantity=round(parent_record.percentage * (parent_piglets.quantity - new_amount) / 100),
-                total_quantity=(parent_piglets.quantity - new_amount))
+                quantity=parent_record.percentage * (parent_piglets.quantity - new_amount) / 100,
+                total_quantity=(parent_piglets.quantity - new_amount),
+                percentage=parent_record.percentage
+                )
 
             MetaTourRecord.objects.create_record(
                 metatour=metatour2,
                 tour=parent_record.tour,
-                quantity=round(parent_record.percentage * new_amount / 100),
-                total_quantity=new_amount)
+                quantity=parent_record.percentage * new_amount / 100,
+                total_quantity=new_amount,
+                percentage=parent_record.percentage
+                )
 
         metatour1.set_week_tour()
         metatour2.set_week_tour()
