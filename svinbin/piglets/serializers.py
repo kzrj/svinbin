@@ -23,7 +23,7 @@ class PigletsSimpleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Piglets
         fields = ['id', 'quantity', 'gilts_quantity', 'metatour_repr', 'transfer_part_number', 
-            'week_tour', 'birthday',]
+            'birthday',]
 
 
 class MergeFromListRecordSerializer(serializers.Serializer):
