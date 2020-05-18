@@ -18,12 +18,12 @@ class PigletsSerializer(serializers.ModelSerializer):
 class PigletsSimpleSerializer(serializers.ModelSerializer):
     metatour_repr = serializers.ReadOnlyField()
     week_tour = serializers.StringRelatedField(source='metatour.week_tour')
-    age = serializers.DurationField()
+    # age = serializers.DurationField()
 
     class Meta:
         model = Piglets
         fields = ['id', 'quantity', 'gilts_quantity', 'metatour_repr', 'transfer_part_number', 
-            'week_tour', 'birthday', 'age']
+            'week_tour', 'birthday',]
 
 
 class MergeFromListRecordSerializer(serializers.Serializer):
