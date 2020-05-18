@@ -142,17 +142,38 @@ class TestMetaTourRecordModel(TestCase):
         pigs_testings.create_statuses()
         piglets_testing.create_piglets_statuses()
 
-    def test_create_record(self):
+    def test_create_record_without_percentage(self):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         location = Location.objects.get(section__number=1, section__workshop__number=3)
         piglets = Piglets.objects.create(location=location, quantity=10, start_quantity=10,
         gilts_quantity=0, status=None)
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
-        record = meta_tour.records.create_record(meta_tour, tour, piglets.quantity, piglets.quantity)
+        record = meta_tour.records.create_record(metatour=meta_tour, tour=tour,
+         quantity=piglets.quantity, total_quantity=piglets.quantity)
         self.assertEqual(record.quantity, 10)
         self.assertEqual(record.tour, tour)
         self.assertEqual(record.percentage, 100.0)
+
+    def test_create_record_with_percentage(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(1)
+        tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
+        location = Location.objects.get(section__number=1, section__workshop__number=3)
+        piglets = Piglets.objects.create(location=location, quantity=10, start_quantity=10,
+        gilts_quantity=0, status=None)
+        meta_tour = MetaTour.objects.create(piglets=piglets)
+
+        record = meta_tour.records.create_record(metatour=meta_tour, tour=tour,
+         quantity=8, total_quantity=piglets.quantity, percentage=80)
+        self.assertEqual(record.quantity, 8)
+        self.assertEqual(record.tour, tour)
+        self.assertEqual(record.percentage, 80)
+
+        record2 = meta_tour.records.create_record(metatour=meta_tour, tour=tour2,
+         quantity=2, total_quantity=piglets.quantity, percentage=20)
+        self.assertEqual(record2.quantity, 2)
+        self.assertEqual(record2.tour, tour2)
+        self.assertEqual(record2.percentage, 20)
 
     def test_recount_records_by_total_quantity_v1(self):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
@@ -162,8 +183,10 @@ class TestMetaTourRecordModel(TestCase):
         gilts_quantity=0, status=None)
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
-        record1 = meta_tour.records.create_record(meta_tour, tour, 60, piglets.quantity)
-        record2 = meta_tour.records.create_record(meta_tour, tour2, 40, piglets.quantity)
+        record1 = meta_tour.records.create_record(metatour=meta_tour, tour=tour, 
+            quantity=60, total_quantity=piglets.quantity, percentage=60)
+        record2 = meta_tour.records.create_record(metatour=meta_tour,  tour=tour2,
+         quantity=40, total_quantity=piglets.quantity, percentage=40)
 
         self.assertEqual(record1.quantity, 60)
         self.assertEqual(record1.tour, tour)
@@ -196,8 +219,8 @@ class TestMetaTourRecordModel(TestCase):
         piglets.metatour.records.recount_records_by_total_quantity(101)
         record1.refresh_from_db()
         record2.refresh_from_db()
-        self.assertEqual(record1.quantity, 61)
-        self.assertEqual(record2.quantity, 40)
+        self.assertEqual(record1.quantity, 60.6)
+        self.assertEqual(record2.quantity, 40.4)
 
     def test_days_left(self):
         tour1 = Tour.objects.create_tour_from_farrow_date_string('2020-01-01')
@@ -615,10 +638,10 @@ class TourQuerysetAddPigletsData2Test(TestCase):
 
         piglets = Piglets.objects.filter(metatour__records__tour=self.tour1,
              metatour__records__percentage__lt=100)
-        print(piglets)
+        # print(piglets)
 
-        print(piglets.values('metatour__records'))
-        print(piglets.values('metatour__records').values('metatour__records__tour'))
+        # print(piglets.values('metatour__records'))
+        # print(piglets.values('metatour__records').values('metatour__records__tour'))
 
 
 class TourQuerysetAddSowsDataTest(TestCase):

@@ -419,6 +419,7 @@ class MetaTour(CoreModel):
         return [{
                     'tour': record.tour.week_number, 
                     'percentage': round(record.percentage, 2),
+                    'quantity': round(record.quantity, 2),
                     'days_left_from_farrow_approx': str((record.tour.days_left_from_farrow_approx).days),
                     'days_left_from_farrow': str((record.tour.days_left_from_farrow).days) 
                         if record.tour.days_left_from_farrow else None
@@ -444,24 +445,26 @@ class MetaTourRecordManager(CoreModelManager):
     def get_queryset(self):
         return MetaTourRecordQuerySet(self.model, using=self._db)
 
-    def create_record(self, metatour, tour, quantity, total_quantity):
+    def create_record(self, metatour, tour, quantity, total_quantity, percentage=None):
         # total quantity is quantity by all metatour records
-        if total_quantity <= 0:
-            total_quantity = 1
-            
-        percentage = (quantity * 100) / total_quantity
+        # if total_quantity <= 0:
+        #     total_quantity = 1
+        
+        if not percentage:
+            percentage = (quantity * 100) / total_quantity
+
         note = None
-        # validate
         if percentage > 100:
             percentage = 100
-            note = f'Неверно подсчитались проценты {percentage}, \
+            note = f'Новая версия. Неверно подсчитались проценты {percentage}, \
                  у группы с количеством {metatour.piglets.quantity}, \
                  Данные : тур={tour.week_number}, quantity={quantity}, total_quantity={total_quantity}, \
                  percentage={percentage}. Проценты изменены на 100. \
                  ID piglets {metatour.piglets.pk}, piglets.quantty={metatour.piglets.quantity}, \
                  piglets.quantty={metatour.piglets.start_quantity},'
 
-        return self.create(metatour=metatour, tour=tour, quantity=quantity, percentage=percentage, note=note)
+        return self.create(metatour=metatour, tour=tour, quantity=quantity,
+            percentage=percentage, note=note)
 
     def recount_records_by_total_quantity(self, new_total_quantity):
         self.get_queryset().update(quantity=(models.F('percentage') * new_total_quantity / 100))
@@ -470,7 +473,7 @@ class MetaTourRecordManager(CoreModelManager):
 class MetaTourRecord(CoreModel):
     metatour = models.ForeignKey(MetaTour, on_delete=models.CASCADE, related_name='records')
     tour = models.ForeignKey(Tour, on_delete=models.CASCADE, related_name='metatourrecords')
-    quantity = models.IntegerField()
+    quantity = models.FloatField()
     percentage = models.FloatField()
     note = models.TextField(null=True, blank=True)
 

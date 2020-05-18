@@ -2,6 +2,7 @@
 from datetime import datetime
 
 from django.db import models
+from django.utils import timezone
 from django.db.models import Q, Sum, Avg
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -82,7 +83,8 @@ class PigletsManager(CoreModelManager):
                 quantity=quantity,
                 gilts_quantity=gilts_quantity)
         metatour = MetaTour.objects.create(piglets=piglets)
-        MetaTourRecord.objects.create_record(metatour, tour, quantity, quantity)
+        MetaTourRecord.objects.create_record(metatour=metatour, tour=tour, quantity=quantity,
+         total_quantity=quantity, percentage=100)
         metatour.set_week_tour()
         return piglets
 
@@ -172,4 +174,13 @@ class Piglets(CoreModel):
         if self.gilts_quantity > 0:
             return True
         return False
+
+    @property
+    def age(self):
+        if not self.birthday:
+            return None
+        
+        return (timezone.now() - self.birthday)
+
+
 

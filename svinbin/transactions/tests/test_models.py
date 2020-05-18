@@ -435,11 +435,15 @@ class PigletsTransactionManagerTest(TestCase):
 
         self.assertEqual(final_in_cell_piglets2.location, self.loc_ws4_cell2)
         self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[0]['tour'], 1)
-        self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[0]['percentage'], 0.0)
+        self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[0]['percentage'], 22.22)
+        self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[0]['quantity'], 0.22)
         self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[1]['tour'], 2)
-        self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[1]['percentage'], 0.0)
+        self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[1]['percentage'], 33.33)
+        self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[1]['quantity'], 0.33)
+
         self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[2]['tour'], 3)
-        self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[2]['percentage'], 0.0)
+        self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[2]['percentage'], 44.44)
+        self.assertEqual(final_in_cell_piglets2.metatour.records_repr()[2]['quantity'], 0.44)
 
         self.assertEqual(split_event1.piglets_as_child.all().first(), stayed_piglets1)
 
@@ -448,6 +452,17 @@ class PigletsTransactionManagerTest(TestCase):
             piglets=stayed_piglets1, 
             to_location=self.loc_ws4_cell2, 
             new_amount=9, merge=True)
+
+        self.assertEqual(final_in_cell_piglets3.location, self.loc_ws4_cell2)
+        self.assertEqual(final_in_cell_piglets3.metatour.records_repr()[0]['tour'], 1)
+        self.assertEqual(final_in_cell_piglets3.metatour.records_repr()[0]['percentage'], 22.22)
+        self.assertEqual(final_in_cell_piglets3.metatour.records_repr()[0]['quantity'], 2.22)
+        self.assertEqual(final_in_cell_piglets3.metatour.records_repr()[1]['tour'], 2)
+        self.assertEqual(final_in_cell_piglets3.metatour.records_repr()[1]['percentage'], 33.33)
+        self.assertEqual(final_in_cell_piglets3.metatour.records_repr()[1]['quantity'], 3.33)
+        self.assertEqual(final_in_cell_piglets3.metatour.records_repr()[2]['tour'], 3)
+        self.assertEqual(final_in_cell_piglets3.metatour.records_repr()[2]['percentage'], 44.44)
+        self.assertEqual(final_in_cell_piglets3.metatour.records_repr()[2]['quantity'], 4.44)
 
        
     def test_transaction_with_split_and_merge_v8(self):
