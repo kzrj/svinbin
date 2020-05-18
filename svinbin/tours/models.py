@@ -419,6 +419,7 @@ class MetaTour(CoreModel):
         return [{
                     'tour': record.tour.week_number, 
                     'percentage': round(record.percentage, 2),
+                    'quantity': round(record.quantity, 2),
                     'days_left_from_farrow_approx': str((record.tour.days_left_from_farrow_approx).days),
                     'days_left_from_farrow': str((record.tour.days_left_from_farrow).days) 
                         if record.tour.days_left_from_farrow else None

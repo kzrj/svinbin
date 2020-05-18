@@ -219,8 +219,8 @@ class TestMetaTourRecordModel(TestCase):
         piglets.metatour.records.recount_records_by_total_quantity(101)
         record1.refresh_from_db()
         record2.refresh_from_db()
-        self.assertEqual(record1.quantity, 61)
-        self.assertEqual(record2.quantity, 40)
+        self.assertEqual(record1.quantity, 60.6)
+        self.assertEqual(record2.quantity, 40.4)
 
     def test_days_left(self):
         tour1 = Tour.objects.create_tour_from_farrow_date_string('2020-01-01')
