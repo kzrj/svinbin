@@ -72,15 +72,19 @@ def set_piglets_culling_location(culling):
 def set_piglets_age_not_mixed(piglets_qs=None):
     if not piglets_qs:
         piglets_qs = Piglets.objects.get_all().filter(metatour__records__percentage=100)
-        
+
     for piglets in piglets_qs:
         tour = piglets.metatour.week_tour
         first_farrow = tour.sowfarrow_set.all().first()
 
-        if first_farrow:
-            piglets.birthday = first_farrow.date
+        if hasattr(piglets, 'farrow'):
+            piglets.birthday = piglets.farrow.date
+            
         else:
-            piglets.birthday = tour.start_date - timedelta(135)
+            if first_farrow:
+                piglets.birthday = first_farrow.date
+            else:
+                piglets.birthday = tour.start_date - timedelta(135)
 
         piglets.save()
 
