@@ -130,7 +130,7 @@ def fix_minus_age():
 
         else:
             correct_birthday = Piglets.objects.get_all().filter(metatour__week_tour=tour,
-                birthday__lt=now).order_by('birthday').first().birthday
+                birthday__lt=now).order_by('-birthday').first().birthday
             piglets.birthday = correct_birthday
 
         piglets.save()
