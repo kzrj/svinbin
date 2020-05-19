@@ -79,12 +79,12 @@ def set_piglets_age_not_mixed(piglets_qs=None):
 
         if hasattr(piglets, 'farrow'):
             piglets.birthday = piglets.farrow.date
-            
+
         else:
             if first_farrow:
                 piglets.birthday = first_farrow.date
             else:
-                piglets.birthday = tour.start_date - timedelta(135)
+                piglets.birthday = tour.start_date + timedelta(135)
 
         piglets.save()
 
@@ -104,7 +104,7 @@ def set_piglets_age_mixed():
             if first_farrow:
                 pre_birthday_ts = datetime.timestamp(first_farrow.date)
             else:
-                pre_birthday_ts = datetime.timestamp(record.tour.start_date)
+                pre_birthday_ts = datetime.timestamp(record.tour.start_date + timedelta(135))
 
             if piglets.quantity < 1:
                 avg_ts = datetime.timestamp(piglets.created_at)
