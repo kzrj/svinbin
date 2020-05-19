@@ -10,6 +10,7 @@ from rest_framework import status, exceptions
 from rest_framework.views import exception_handler as drf_exception_handler
 
 from django.utils.encoding import force_text
+from django.utils import timezone
 from django.core.mail import send_mail
 from django.db.utils import IntegrityError as DjangoIntegrityError
 
@@ -113,4 +114,23 @@ def set_piglets_age_mixed():
                 avg_ts += (pre_birthday_ts * record.quantity / piglets.quantity)
         
         piglets.birthday = datetime.fromtimestamp(avg_ts)
+        piglets.save()
+
+
+def fix_minus_age():
+    now = timezone.now()
+    piglets_qs = Piglets.objects.get_all().filter(birthday__gt=now)
+
+    for piglets in piglets_qs:
+        tour = piglets.metatour.week_tour
+        first_farrow = tour.sowfarrow_set.all().first()
+
+        if hasattr(piglets, 'farrow'):
+            piglets.birthday = piglets.farrow.date
+
+        else:
+            correct_birthday = Piglets.objects.get_all().filter(metatour__week_tour=tour,
+                birthday__lt=now).order_by('birthday').first().birthday
+            piglets.birthday = correct_birthday
+
         piglets.save()
