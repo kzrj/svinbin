@@ -59,7 +59,7 @@ class LocationsTest(TransactionTestCase):
         Piglets.objects.init_piglets_by_farrow_date('2020-01-02', location10, 53)
 
     def test_location_cell_serializer_queries(self):
-        with self.assertNumQueries(8):
+        with self.assertNumQueries(9):
             data = Location.objects.all() \
                 .select_related(
                     'pigletsGroupCell__section',
@@ -70,7 +70,9 @@ class LocationsTest(TransactionTestCase):
                 .prefetch_related(
                     'sow_set__tour',
                     'sow_set__status',
-                    'piglets__metatour__records__tour__sowfarrow_set',)
+                    'piglets__metatour__records__tour__sowfarrow_set',
+                    'piglets__metatour__week_tour',
+                    )
             serializer = LocationCellSerializer(data, many=True)
             serializer.data
 
