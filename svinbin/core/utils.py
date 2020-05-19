@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
@@ -69,17 +69,22 @@ def set_piglets_culling_location(culling):
         culling.save()
 
 
-def set_piglets_age_not_mixed():
-    
-    piglets_qs = Piglets.objects.get_all().filter(metatour__records__percentage=100)
+def set_piglets_age_not_mixed(piglets_qs=None):
+    if not piglets_qs:
+        piglets_qs = Piglets.objects.get_all().filter(metatour__records__percentage=100)
+
     for piglets in piglets_qs:
         tour = piglets.metatour.week_tour
         first_farrow = tour.sowfarrow_set.all().first()
 
-        if first_farrow:
-            piglets.birthday = first_farrow.date
+        if hasattr(piglets, 'farrow'):
+            piglets.birthday = piglets.farrow.date
+
         else:
-            piglets.birthday = tour.start_date
+            if first_farrow:
+                piglets.birthday = first_farrow.date
+            else:
+                piglets.birthday = tour.start_date + timedelta(135)
 
         piglets.save()
 
@@ -99,10 +104,10 @@ def set_piglets_age_mixed():
             if first_farrow:
                 pre_birthday_ts = datetime.timestamp(first_farrow.date)
             else:
-                pre_birthday_ts = datetime.timestamp(record.tour.start_date)
+                pre_birthday_ts = datetime.timestamp(record.tour.start_date + timedelta(135))
 
             if piglets.quantity < 1:
-                avg_ts = datetime.timestamp(piglets.created_at)
+                avg_ts = datetime.timestamp(piglets.metatour.week_tour.start_date + timedelta(135))
                 break
             else:
                 avg_ts += (pre_birthday_ts * record.quantity / piglets.quantity)

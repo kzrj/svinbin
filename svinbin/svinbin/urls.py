@@ -68,8 +68,10 @@ router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsView
  basename='workshopthree-sows')
 
 # reports
-router.register(r'reports/tours', reports_views.TourReportViewSet, basename='report-tours')
-router.register(r'reports/director', reports_views.ReportDateViewSet, basename='report-director')
+router.register(r'reports/tours', reports_views.TourReportViewSet,
+ basename='report-tours')
+router.register(r'reports/director', reports_views.ReportDateViewSet,
+ basename='report-director')
 
 schema_view = get_swagger_view(title='API Docs')
 
