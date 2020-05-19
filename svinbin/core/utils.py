@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
@@ -69,9 +69,10 @@ def set_piglets_culling_location(culling):
         culling.save()
 
 
-def set_piglets_age_not_mixed():
-    
-    piglets_qs = Piglets.objects.get_all().filter(metatour__records__percentage=100)
+def set_piglets_age_not_mixed(piglets_qs=None):
+    if not piglets_qs:
+        piglets_qs = Piglets.objects.get_all().filter(metatour__records__percentage=100)
+        
     for piglets in piglets_qs:
         tour = piglets.metatour.week_tour
         first_farrow = tour.sowfarrow_set.all().first()
@@ -79,7 +80,7 @@ def set_piglets_age_not_mixed():
         if first_farrow:
             piglets.birthday = first_farrow.date
         else:
-            piglets.birthday = tour.start_date
+            piglets.birthday = tour.start_date - timedelta(135)
 
         piglets.save()
 
