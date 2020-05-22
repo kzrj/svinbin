@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from operator import itemgetter
 
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 
 from django.db import models
 from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg, Count, Value
@@ -642,6 +642,7 @@ def gen_megalist(request_json):
             for i in data:
                 megalist.append(i)
 
-    megalist = sorted(megalist, key=itemgetter('date'), reverse=True)
+    megalist = sorted(megalist, key=lambda x: datetime.strptime(x.date, '%d-%m-%Y'),
+     reverse=True)
     
     return megalist
