@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 from datetime import timedelta, date
-import random
+import copy
 
 from django.utils import timezone
-from django.contrib.auth.models import User
-from django.db import connection
 
-from rest_framework.test import APIClient
-from rest_framework.test import APITestCase
+from rest_framework.test import APITestCase, APIClient
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -18,7 +15,7 @@ import staff.testing_utils as staff_testing
 from piglets.models import Piglets
 from locations.models import Location
 from tours.models import Tour, MetaTour
-from reports.models import ReportDate
+from reports.models import ReportDate, gen_operations_dict
 
 from reports.serializers import ReportTourSerializer
 
@@ -39,10 +36,26 @@ class ReportDateViewSetTest(APITestCase):
         self.loc_ws3 = Location.objects.get(workshop__number=3)
         self.loc_ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
 
-        start_date = date(2020, 1, 1)
-        end_date = timezone.now().date() + timedelta(1)
-        ReportDate.objects.create_bulk_if_none_from_range(start_date, end_date)
+        self.ops_dict = gen_operations_dict()
+
+        operations = dict()
+        for op_key in self.ops_dict.keys():
+            operations[op_key] = False
+
+        self.request_json = {
+            'operations': operations,
+            'filters': {'start_date': None, 'end_date': None, 'farm_id': None},
+            'target': None
+        } 
 
     def test_report_date_view(self):
         response = self.client.get('/api/reports/director/')
         self.assertEqual(len(response.data['results']) > 0, True)
+
+    def test_report_date_view(self):
+        request_json = copy.deepcopy(self.request_json)
+        request_json['operations']['ws1_semination'] = True
+
+        response = self.client.post('/api/reports/operations/', request_json, format='json')
+        print(response.data)
+        # self.assertEqual(len(response.data['results']) > 0, True)

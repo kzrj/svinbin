@@ -462,3 +462,69 @@ hr {
 .report-dir-total-tr td{
 	font-weight: bold;
 }
+
+
+@supports (zoom:2) {
+	input[type="radio"],  input[type=checkbox]{
+	zoom: 2;
+	}
+}
+@supports not (zoom:2) {
+	input[type="radio"],  input[type=checkbox]{
+		transform: scale(2);
+		margin: 15px;
+	}
+}
+
+/* Report operations */
+.op-list-item td{
+	border: none !important;
+}
+
+.op-div-table{
+	border: none !important;
+}
+
+.op-label-td{
+	border: none !important;
+	border-left: 1px solid !important;
+	width: 120%;
+	text-align: center !important;
+}
+.op-div-table{
+	border: none !important;
+	padding-left: 5px !important;
+	padding-right: 5px !important;
+}
+
+.op-name{
+	width: 150px !important;
+}
+
+.op-date{
+	width: 100px !important;
+}
+
+.op-initiator{
+	width: 100px !important;
+}
+
+.op-tour{
+	width: 100px !important;
+}
+
+.op-sow-id{
+	width: 60px !important;
+}
+
+.op-sem-emp{
+	width: 100px !important;
+}
+
+.op-farrow-quantity{
+	width: 90px !important;
+}
+
+.op-uzi-result{
+	width: 75px !important;
+}

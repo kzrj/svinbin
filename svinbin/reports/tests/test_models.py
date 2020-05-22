@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-from datetime import timedelta, date
+import copy
+
+from datetime import timedelta, date, datetime
 
 from django.contrib.auth.models import User
 from django.utils import timezone
@@ -7,7 +9,7 @@ from django.db import models
 from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
-from reports.models import ReportDate, gen_operations_dict
+from reports.models import ReportDate, gen_operations_dict, gen_megalist
 from sows.models import Sow
 from sows_events.models import CullingSow, SowFarrow
 from piglets.models import Piglets
@@ -448,8 +450,10 @@ class OperationDataTest(TransactionTestCase):
         initiator = User.objects.get(username='brigadir3')
         location = Location.objects.filter(sowAndPigletsCell__number=1,
             sowAndPigletsCell__section__number=1).first()
+
+        date = timezone.now() - timedelta(10)
         piglets = piglets_testing.create_from_sow_farrow_by_week(location=location,
-            quantity=15, week=1)
+            quantity=15, week=1, date=date)
         CullingPiglets.objects.create_culling_piglets(piglets_group=piglets,
             culling_type='padej', reason='xz', initiator=initiator, quantity=2,
             total_weight=68.6)
@@ -459,6 +463,7 @@ class OperationDataTest(TransactionTestCase):
 
         with self.assertNumQueries(1):
             serializer = serializer(qs, many=True)
+            self.assertEqual(serializer.data[0]['age_at'].days, 9)
             self.assertEqual(serializer.data[0]['location'], '3/1/1')
             self.assertEqual(serializer.data[0]['week_tour'], 'Тур 1 2020г')
             self.assertEqual(serializer.data[0]['initiator'], initiator.username)
@@ -481,3 +486,158 @@ class OperationDataTest(TransactionTestCase):
             self.assertEqual(serializer.data[0]['to_location'], '3/1/3')
             self.assertEqual(serializer.data[0]['week_tour'], 'Тур 1 2020г')
             self.assertEqual(serializer.data[0]['initiator'], initiator.username)
+
+
+class OperationDataMegalistTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+        staff_testings.create_svinbin_users()
+
+        start_date = date(2020, 1, 1)
+        end_date = timezone.now().date() + timedelta(1)
+        ReportDate.objects.create_bulk_if_none_from_range(start_date, end_date)
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.loc_ws1 = Location.objects.get(workshop__number=1)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+
+        self.loc_ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
+
+        self.ops_dict = gen_operations_dict()
+
+        operations = dict()
+        for op_key in self.ops_dict.keys():
+            operations[op_key] = False
+
+        self.request_json = {
+            'operations': operations,
+            'filters': {'start_date': None, 'end_date': None, 'farm_id': None},
+            'target': None
+        } 
+
+    def test_gen_megalist_one_operation(self):
+        request_json = copy.deepcopy(self.request_json)
+        request_json['operations']['ws1_semination'] = True
+        
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22)
+
+        date_10d_ago = timezone.now() - timedelta(10)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+
+        megalist = gen_megalist(request_json)
+        self.assertEqual(len(megalist), 4)
+
+    def test_gen_megalist_one_operation_filter_start_date(self):
+        request_json = copy.deepcopy(self.request_json)
+        request_json['operations']['ws1_semination'] = True
+        request_json['filters']['start_date'] = timezone.now().date().strftime("%Y-%m-%d")
+        
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22)
+
+        date_10d_ago = timezone.now() - timedelta(10)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+
+        megalist = gen_megalist(request_json)
+        self.assertEqual(len(megalist), 2)
+
+    def test_gen_megalist_two_operations_filter_start_date(self):
+        request_json = copy.deepcopy(self.request_json)
+        request_json['operations']['ws1_semination'] = True
+        request_json['operations']['ws1_usound'] = True
+        request_json['filters']['start_date'] = timezone.now().date().strftime("%Y-%m-%d")
+        
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22)
+
+        date_10d_ago = timezone.now() - timedelta(10)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+
+        megalist = gen_megalist(request_json)
+        self.assertEqual(len(megalist), 6)
+
+    def test_gen_megalist_two_operations_filter_end_date(self):
+        request_json = copy.deepcopy(self.request_json)
+        request_json['operations']['ws1_semination'] = True
+        request_json['operations']['ws1_usound'] = True
+        request_json['filters']['end_date'] = (timezone.now() - timedelta(1)) \
+            .date().strftime("%Y-%m-%d")
+        
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22)
+
+        date_10d_ago = timezone.now() - timedelta(10)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+
+        megalist = gen_megalist(request_json)
+        self.assertEqual(len(megalist), 3)
+
+    def test_gen_megalist_two_operations_filter_sow(self):
+        request_json = copy.deepcopy(self.request_json)
+        request_json['operations']['ws1_semination'] = True
+        request_json['operations']['ws3_piglets_padej'] = True
+        
+        sow1 = sows_testings.create_sow_with_semination_usound(location=self.loc_ws1,
+            week=22)
+        sow2 = sows_testings.create_sow_with_semination_usound(location=self.loc_ws1,
+            week=22)
+
+        date_10d_ago = timezone.now() - timedelta(10)
+        sow3 = sows_testings.create_sow_with_semination_usound(location=self.loc_ws1,
+            week=22, date=date_10d_ago)
+        sow4 = sows_testings.create_sow_with_semination_usound(
+            location=self.loc_ws3_cells[0],
+            week=22, date=date_10d_ago)
+
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow4, alive_quantity=10,
+         date=date_10d_ago)
+        piglets = farrow.piglets_group
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets,
+         culling_type='padej', date=date_10d_ago)
+
+        request_json['filters']['farm_id'] = sow1.farm_id
+
+        megalist = gen_megalist(request_json)
+        self.assertEqual(len(megalist), 1)
+        self.assertEqual(megalist[0]['sow'], sow1.farm_id)
+
+    def test_gen_megalist_sort_by_date(self):
+        request_json = copy.deepcopy(self.request_json)
+        request_json['operations']['ws1_semination'] = True
+        request_json['operations']['ws1_usound'] = True
+        
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=21)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=21)
+
+        date_10d_ago = timezone.now() - timedelta(10)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+
+        date_15d_ago = timezone.now() - timedelta(15)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=23,
+            date=date_15d_ago)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=23,
+            date=date_15d_ago)
+
+        megalist = gen_megalist(request_json)
+        
+        self.assertEqual(megalist[0]['date'] > megalist[-1]['date'])
