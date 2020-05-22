@@ -7,6 +7,7 @@ from django_filters import rest_framework as filters
 
 from sows.models import Sow, SowStatus
 from sows_events.models import Semination
+from locations.models import Location
 
 
 class SowStatusChoiceNotInFilter(filters.ModelMultipleChoiceFilter):
@@ -24,6 +25,9 @@ class SowsToSeminateFilter(filters.ModelMultipleChoiceFilter):
 
 
 class SowFilter(filters.FilterSet):
+    all_in_workshop_number = filters.NumberFilter(field_name='location',
+        method='filter_all_in_workshop_number')
+
     by_workshop_number = filters.NumberFilter(field_name='location',
         method='filter_by_workshop_number')
 
@@ -67,6 +71,10 @@ class SowFilter(filters.FilterSet):
             queryset = queryset.filter(~Q(status__title__in=
                 ["Осеменена 1", "Осеменена 2", "Супорос 28", "Супорос 35"]))
         return queryset
+
+    def filter_all_in_workshop_number(self, queryset, name, value):
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=value)
+        return queryset.filter(location__in=value)
 
     class Meta:
         model = Sow
