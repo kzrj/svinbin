@@ -642,7 +642,7 @@ def gen_megalist(request_json):
             for i in data:
                 megalist.append(i)
 
-    megalist = sorted(megalist, key=lambda x: datetime.strptime(x['date'], '%d-%m-%Y'),
+    megalist = sorted(megalist, key=lambda x: datetime.strptime(x['date'], '%d-%m-%Y %M:%S'),
      reverse=True)
     
     return megalist
