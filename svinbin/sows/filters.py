@@ -74,7 +74,7 @@ class SowFilter(filters.FilterSet):
 
     def filter_all_in_workshop_number(self, queryset, name, value):
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=value)
-        return queryset.filter(location__in=value)
+        return queryset.filter(location__in=ws_locs)
 
     class Meta:
         model = Sow
