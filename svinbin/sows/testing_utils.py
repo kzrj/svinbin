@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import random
 
+from django.utils import timezone
+
 from locations.models import Location, SowSingleCell, SowGroupCell, Section, WorkShop, \
     SowAndPigletsCell, PigletsGroupCell
 from sows.models import Sow, SowStatus, Gilt, Boar
@@ -75,18 +77,18 @@ def create_sow_with_location(location, farm_id=None):
     sow = Sow.objects.create(farm_id=init_farm_id, location=location)
     return sow
 
-def create_sow_with_semination(location, week=1):
+def create_sow_with_semination(location, week=1, date=timezone.now()):
     sow = create_sow_with_location(location)
     boar = create_boar()
-    Semination.objects.create_semination(sow=sow, week=week, boar=boar)
+    Semination.objects.create_semination(sow=sow, week=week, boar=boar, date=date)
     return sow
 
-def create_sow_with_semination_usound(location, week=1):
+def create_sow_with_semination_usound(location, week=1, date=timezone.now()):
     sow = create_sow_with_location(location)
     boar = create_boar()
-    Semination.objects.create_semination(sow=sow, week=week, boar=boar)
-    Ultrasound.objects.create_ultrasound(sow=sow, days=30, result=True)
-    Ultrasound.objects.create_ultrasound(sow=sow, days=60, result=True)
+    Semination.objects.create_semination(sow=sow, week=week, boar=boar, date=date)
+    Ultrasound.objects.create_ultrasound(sow=sow, days=30, result=True, date=date)
+    Ultrasound.objects.create_ultrasound(sow=sow, days=60, result=True, date=date)
     return sow
 
 def create_gilt(birth_id):

@@ -27,7 +27,7 @@ services:
     # command: bash -c "cd svinbin &&
     #                   python manage.py migrate &&
     #                   python manage.py makemigrations --no-input &&
-    #                   python manage.py test locations.tests.test_models"
+    #                   python manage.py test reports.tests.test_views"
                       # python manage.py test piglets.tests.test_models.PigletsQueryTest"
 
     restart: unless-stopped

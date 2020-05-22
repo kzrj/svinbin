@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from django.utils import timezone
+
 from piglets.models import PigletsStatus, Piglets
 from tours.models import Tour, MetaTour, MetaTourRecord
 from sows_events.models import SowFarrow
@@ -29,7 +31,7 @@ def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_q
     return piglets
 
 
-def create_from_sow_farrow(tour, location, quantity=0, gilts_quantity=0, status=None):
+def create_from_sow_farrow(tour, location, quantity=0, gilts_quantity=0, status=None, date=timezone.now()):
     sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=tour.week_number)
     alive_quantity = 10
 
@@ -39,7 +41,8 @@ def create_from_sow_farrow(tour, location, quantity=0, gilts_quantity=0, status=
     farrow = SowFarrow.objects.create_sow_farrow(
         sow=sow1,
         alive_quantity=alive_quantity,
-        dead_quantity=1
+        dead_quantity=1,
+        date=date
         )
 
     return farrow.piglets_group

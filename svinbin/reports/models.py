@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from operator import itemgetter
+
 from datetime import timedelta, date
 
 from django.db import models
@@ -304,20 +306,23 @@ def gen_operations_dict():
             .select_related('sow', 'tour', 'initiator', 'semination_employee', 'boar') \
             .annotate(
                 oper_name=Value('ws1_semination', output_field=models.CharField())),
-         'serializer': operation_serializers.OpSeminationSerializer
+         'serializer': operation_serializers.OpSeminationSerializer,
+         'target': 'sow'
         }
 
     operations_data['ws1_usound'] = { 
         'qs': Ultrasound.objects.filter(location__workshop__number=1) \
             .select_related('sow', 'tour', 'initiator', 'u_type', 'location__workshop') \
             .annotate(oper_name=Value('ws1_usound',  output_field=models.CharField())), 
-        'serializer': operation_serializers.OpUsoundSerializer 
+        'serializer': operation_serializers.OpUsoundSerializer,
+        'target': 'sow'
         }
 
     operations_data['ws1_abort'] = {'qs':  AbortionSow.objects.filter(location__workshop__number=1) \
             .select_related('sow', 'tour', 'initiator', 'location__workshop') \
             .annotate(oper_name=Value('ws1_abort',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpAbortSerializer  } 
+        'serializer': operation_serializers.OpAbortSerializer,
+        'target': 'sow'  } 
 
     operations_data['ws1_culling'] = {'qs':  CullingSow.objects.filter(location__workshop__number=1) \
             .select_related('sow', 'tour', 'initiator', 
@@ -325,7 +330,8 @@ def gen_operations_dict():
                 'location__sowAndPigletsCell__section', 
                 'location__sowAndPigletsCell__workshop') \
             .annotate(oper_name=Value('ws1_culling',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpCullingSowSerializer }
+        'serializer': operation_serializers.OpCullingSowSerializer,
+        'target': 'sow' }
 
     operations_data['w1_peregon_sow'] = {'qs':  SowTransaction.objects \
             .filter(from_location__workshop__number=1)\
@@ -333,17 +339,20 @@ def gen_operations_dict():
                 'from_location__workshop', 
                 'to_location__workshop') \
             .annotate(oper_name=Value('w1_peregon_sow',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpSowTransactionSerializer }
+        'serializer': operation_serializers.OpSowTransactionSerializer,
+        'target': 'sow' }
 
     operations_data['ws2_usound'] = {'qs':  Ultrasound.objects.filter(location__workshop__number=2) \
             .select_related('sow', 'tour', 'initiator', 'u_type', 'location__workshop') \
             .annotate(oper_name=Value('ws2_usound',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpUsoundSerializer  }
+        'serializer': operation_serializers.OpUsoundSerializer,
+        'target': 'sow'  }
 
     operations_data['ws2_abort'] = {'qs':  AbortionSow.objects.filter(location__workshop__number=2) \
             .select_related('sow', 'tour', 'initiator', 'location__workshop') \
             .annotate(oper_name=Value('ws2_abort',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpAbortSerializer }
+        'serializer': operation_serializers.OpAbortSerializer,
+        'target': 'sow' }
 
     operations_data['ws2_culling'] = {'qs':  CullingSow.objects.filter(location__workshop__number=2) \
             .select_related('sow', 'tour', 'initiator', 
@@ -351,14 +360,16 @@ def gen_operations_dict():
                 'location__sowAndPigletsCell__section', 
                 'location__sowAndPigletsCell__workshop') \
             .annotate(oper_name=Value('ws2_culling',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpCullingSowSerializer }
+        'serializer': operation_serializers.OpCullingSowSerializer,
+        'target': 'sow' }
 
     operations_data['w2_peregon_sow'] = {'qs':  SowTransaction.objects \
             .filter(from_location__workshop__number=2)\
             .select_related('sow', 'tour', 'initiator', 
                 'from_location__workshop', 'to_location__workshop') \
             .annotate(oper_name=Value('w2_peregon_sow',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpSowTransactionSerializer }
+        'serializer': operation_serializers.OpSowTransactionSerializer,
+        'target': 'sow' }
 
     ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
     not_ws3_locs = Location.objects.all().get_locations_exclude_workshop_locations(workshop_number=3)
@@ -368,13 +379,15 @@ def gen_operations_dict():
              'location__sowAndPigletsCell__workshop') \
             .annotate(
                 oper_name=Value('ws3_farrow',output_field=models.CharField())),
-        'serializer': operation_serializers.OpSowFarrowSerializer }
+        'serializer': operation_serializers.OpSowFarrowSerializer,
+        'target': 'sow' }
 
     operations_data['ws3_abort'] = {'qs':  AbortionSow.objects.filter(location__workshop__number=3) \
             .select_related('sow', 'tour', 'initiator', 'location__workshop', 
                 'location__sowAndPigletsCell__section', 'location__sowAndPigletsCell__workshop') \
             .annotate(oper_name=Value('ws3_abort',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpAbortSerializer }
+        'serializer': operation_serializers.OpAbortSerializer,
+        'target': 'sow' }
 
     operations_data['ws3_sow_culling'] = {'qs':  CullingSow.objects.filter(location__workshop__number=3)\
             .select_related('sow', 'tour', 'initiator', 
@@ -382,7 +395,8 @@ def gen_operations_dict():
                 'location__sowAndPigletsCell__section',
                 'location__sowAndPigletsCell__workshop') 
             .annotate(oper_name=Value('ws3_sow_culling',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpCullingSowSerializer }
+        'serializer': operation_serializers.OpCullingSowSerializer,
+        'target': 'sow' }
 
     operations_data['ws3_sow_rassadka'] = {'qs':  SowTransaction.objects \
             .filter(from_location__workshop__number=3, to_location__in=ws3_locs)\
@@ -391,7 +405,8 @@ def gen_operations_dict():
                 'to_location__sowAndPigletsCell__section',
                 'to_location__sowAndPigletsCell__workshop') \
             .annotate(oper_name=Value('ws3_sow_rassadka',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpSowTransactionSerializer }
+        'serializer': operation_serializers.OpSowTransactionSerializer,
+        'target': 'sow' }
 
     operations_data['ws3_sow_otiem'] = {'qs':  SowTransaction.objects \
             .filter(from_location__in=ws3_locs, to_location__in=not_ws3_locs) \
@@ -400,7 +415,8 @@ def gen_operations_dict():
                 'from_location__sowAndPigletsCell__section', 
                 'from_location__sowAndPigletsCell__workshop') \
             .annotate(oper_name=Value('ws3_sow_otiem',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpSowTransactionSerializer }
+        'serializer': operation_serializers.OpSowTransactionSerializer,
+        'target': 'sow' }
 
     operations_data['ws3_sow_inner'] = {'qs':  SowTransaction.objects
             .filter(from_location__in=ws3_locs, to_location__in=ws3_locs)\
@@ -412,33 +428,38 @@ def gen_operations_dict():
                 'to_location__sowAndPigletsCell__section',
                 'to_location__sowAndPigletsCell__workshop') \
             .annotate(oper_name=Value('ws3_sow_inner',  output_field=models.CharField())),
-        'serializer': operation_serializers.OpSowTransactionSerializer }
+        'serializer': operation_serializers.OpSowTransactionSerializer,
+        'target': 'sow' }
 
     operations_data['ws3_mark_as_nurse'] = {'qs':  MarkAsNurse.objects.all() \
             .select_related('sow', 'tour', 'initiator') \
             .annotate(oper_name=Value('ws3_mark_as_nurse', output_field=models.CharField())),
-        'serializer': operation_serializers.OpMarkAsNurseSerializer }
+        'serializer': operation_serializers.OpMarkAsNurseSerializer,
+        'target': 'sow' }
 
     operations_data['ws3_mark_as_gilt'] = {'qs': MarkAsGilt.objects.all()\
             .select_related('sow', 'tour', 'initiator', 'gilt') \
             .annotate(oper_name=Value('ws3_mark_as_gilt', output_field=models.CharField())),
-        'serializer': operation_serializers.OpMarkAsGiltSerializer }
+        'serializer': operation_serializers.OpMarkAsGiltSerializer,
+        'target': 'piglets' }
 
     operations_data['ws3_piglets_padej'] = {'qs': CullingPiglets.objects \
             .filter(location__in=ws3_locs, culling_type='padej')\
             .select_related('initiator', 'week_tour',
                 'location__sowAndPigletsCell__workshop',
-                'location__sowAndPigletsCell__section',) \
+                'location__sowAndPigletsCell__section','piglets_group') \
             .annotate(oper_name=Value('ws3_piglets_padej', output_field=models.CharField())),
-        'serializer': operation_serializers.OpPigletsCullingSerializer }
+        'serializer': operation_serializers.OpPigletsCullingSerializer,
+        'target': 'piglets' }
 
     operations_data['ws3_piglets_prirezka'] = {'qs': CullingPiglets.objects
             .filter(location__in=ws3_locs, culling_type='prirezka')\
             .select_related('initiator',  'week_tour',
                 'location__sowAndPigletsCell__workshop',
-                'location__sowAndPigletsCell__section', ) \
+                'location__sowAndPigletsCell__section','piglets_group') \
             .annotate(oper_name=Value('ws3_piglets_prirezka', output_field=models.CharField())),
-        'serializer': operation_serializers.OpPigletsCullingSerializer }
+        'serializer': operation_serializers.OpPigletsCullingSerializer,
+        'target': 'piglets' }
 
     operations_data['ws3_piglets_inner_trs'] = {'qs': PigletsTransaction.objects
             .filter(from_location__in=ws3_locs, to_location__in=ws3_locs)\
@@ -447,9 +468,10 @@ def gen_operations_dict():
                 'from_location__sowAndPigletsCell__workshop',
                 'from_location__sowAndPigletsCell__section', 
                 'to_location__sowAndPigletsCell__workshop',
-                'to_location__sowAndPigletsCell__section', ) \
+                'to_location__sowAndPigletsCell__section', 'piglets_group') \
             .annotate(oper_name=Value('ws3_piglets_inner_trs', output_field=models.CharField())),
-        'serializer': operation_serializers.OpPigletsTransactionSerializer }
+        'serializer': operation_serializers.OpPigletsTransactionSerializer,
+        'target': 'piglets' }
 
     operations_data['ws3_piglets_outer_trs'] = {'qs': PigletsTransaction.objects \
             .filter(from_location__in=ws3_locs, to_location__in=not_ws3_locs)\
@@ -458,9 +480,11 @@ def gen_operations_dict():
                 'from_location__sowAndPigletsCell__workshop',
                 'from_location__sowAndPigletsCell__section',
                 'to_location__workshop',
+                'piglets_group'
                 ) \
             .annotate(oper_name=Value('ws3_piglets_outer_trs', output_field=models.CharField())),
-        'serializer': operation_serializers.OpPigletsTransactionSerializer }
+        'serializer': operation_serializers.OpPigletsTransactionSerializer,
+        'target': 'piglets' }
 
     ws75_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=11)
     
@@ -497,33 +521,37 @@ def gen_operations_dict():
                 .filter(place=place)\
                 .select_related('initiator', 'week_tour') \
                 .annotate(oper_name=Value(f'ws{ws_number}_weighing', output_field=models.CharField())),
-            'serializer': operation_serializers.OpPigletsWeighingSerializer }
+            'serializer': operation_serializers.OpPigletsWeighingSerializer,
+            'target': 'piglets' }
 
         operations_data[f'ws{ws_number}_piglets_padej'] = {'qs': CullingPiglets.objects
                 .filter(location__in=ws_locs, culling_type='padej')\
                 .select_related('initiator',  'week_tour',
                     'location__pigletsGroupCell__workshop',
-                    'location__pigletsGroupCell__section', ) \
+                    'location__pigletsGroupCell__section', 'piglets_group') \
                 .annotate(oper_name=Value(f'ws{ws_number}_piglets_padej', output_field=models.CharField())),
-            'serializer': operation_serializers.OpPigletsCullingSerializer }
+            'serializer': operation_serializers.OpPigletsCullingSerializer,
+            'target': 'piglets' }
 
         if ws_number == 4:
             operations_data[f'ws{ws_number}_piglets_prirezka'] = {'qs': CullingPiglets.objects
                     .filter(location__in=ws_locs, culling_type='prirezka')\
                     .select_related('initiator',  'week_tour',
                         'location__pigletsGroupCell__workshop',
-                        'location__pigletsGroupCell__section', ) \
+                        'location__pigletsGroupCell__section', 'piglets_group') \
                     .annotate(oper_name=Value(f'ws{ws_number}_piglets_prirezka', output_field=models.CharField())),
-                'serializer': operation_serializers.OpPigletsCullingSerializer }
+                'serializer': operation_serializers.OpPigletsCullingSerializer,
+                'target': 'piglets' }
 
         else:
             operations_data[f'ws{ws_number}_piglets_vinuzhd'] = {'qs': CullingPiglets.objects
                     .filter(location__in=ws_locs, culling_type='vinuzhd')\
                     .select_related('initiator',  'week_tour',
                         'location__pigletsGroupCell__workshop',
-                        'location__pigletsGroupCell__section', ) \
+                        'location__pigletsGroupCell__section', 'piglets_group') \
                     .annotate(oper_name=Value(f'ws{ws_number}_piglets_vinuzhd', output_field=models.CharField())),
-                'serializer': operation_serializers.OpPigletsCullingSerializer }
+                'serializer': operation_serializers.OpPigletsCullingSerializer,
+                'target': 'piglets' }
 
         operations_data[f'ws{ws_number}_piglets_rassadka'] = {'qs': PigletsTransaction.objects
                 .filter(from_location__workshop__number=ws_number, to_location__in=ws_locs)\
@@ -531,9 +559,11 @@ def gen_operations_dict():
                     'from_location__workshop',
                     'to_location__pigletsGroupCell__workshop',
                     'to_location__pigletsGroupCell__section',
+                    'piglets_group'
                 ) \
                 .annotate(oper_name=Value(f'ws{ws_number}_piglets_rassadka', output_field=models.CharField())),
-            'serializer': operation_serializers.OpPigletsTransactionSerializer }
+            'serializer': operation_serializers.OpPigletsTransactionSerializer,
+            'target': 'piglets' }
 
         operations_data[f'ws{ws_number}_piglets_inner_trs'] = {'qs': PigletsTransaction.objects
                 .filter(from_location__in=ws_locs, to_location__in=ws_locs)\
@@ -542,9 +572,11 @@ def gen_operations_dict():
                     'from_location__pigletsGroupCell__section',
                     'to_location__pigletsGroupCell__workshop',
                     'to_location__pigletsGroupCell__section',
+                    'piglets_group'
                 ) \
                 .annotate(oper_name=Value(f'ws{ws_number}_piglets_inner_trs', output_field=models.CharField())),
-            'serializer': operation_serializers.OpPigletsTransactionSerializer }
+            'serializer': operation_serializers.OpPigletsTransactionSerializer,
+            'target': 'piglets' }
 
         operations_data[f'ws{ws_number}_piglets_outer_trs'] = {'qs': PigletsTransaction.objects
                 .filter(from_location__in=ws_locs, to_location__in=not_ws_locs)\
@@ -552,18 +584,23 @@ def gen_operations_dict():
                     'from_location__pigletsGroupCell__workshop',
                     'from_location__pigletsGroupCell__section',
                     'to_location__workshop',
+                    'piglets_group'
                 ) \
                 .annotate(oper_name=Value(f'ws{ws_number}_piglets_outer_trs', output_field=models.CharField())),
-            'serializer': operation_serializers.OpPigletsTransactionSerializer }
+            'serializer': operation_serializers.OpPigletsTransactionSerializer,
+            'target': 'piglets' }
 
         if ws_number in [5, 6, 7]:
             operations_data[f'ws{ws_number}_piglets_spec'] = {'qs': CullingPiglets.objects
                         .filter(location__in=ws_locs, culling_type='spec')\
                         .select_related('initiator',  'week_tour',
                             'location__pigletsGroupCell__workshop',
-                            'location__pigletsGroupCell__section', ) \
+                            'location__pigletsGroupCell__section',
+                            'piglets_group'
+                             ) \
                         .annotate(oper_name=Value(f'ws{ws_number}_piglets_spec', output_field=models.CharField())),
-                    'serializer': operation_serializers.OpPigletsCullingSerializer }
+                    'serializer': operation_serializers.OpPigletsCullingSerializer,
+                    'target': 'piglets' }
 
             operations_data[f'ws{ws_number}_piglets_to_75'] = {'qs': PigletsTransaction.objects
                 .filter(from_location__in=ws_locs, to_location__in=not_ws_locs)\
@@ -571,8 +608,40 @@ def gen_operations_dict():
                     'from_location__pigletsGroupCell__workshop',
                     'from_location__pigletsGroupCell__section',
                     'to_location__workshop',
+                    'piglets_group'
                 ) \
                 .annotate(oper_name=Value(f'ws{ws_number}_piglets_to_75', output_field=models.CharField())),
-            'serializer': operation_serializers.OpPigletsTransactionSerializer }
+            'serializer': operation_serializers.OpPigletsTransactionSerializer,
+            'target': 'piglets' }
 
     return operations_data
+
+
+def gen_megalist(request_json):
+    megalist = list()
+    operations_data = gen_operations_dict()
+
+    for operation_key in request_json['operations'].keys():
+        if request_json['operations'][operation_key]:
+            qs = operations_data[operation_key]['qs']
+            
+            if request_json['filters']['farm_id']:
+                if operations_data[operation_key]['target'] != 'sow':
+                    continue
+                else:
+                    qs = qs.filter(sow__farm_id=request_json['filters']['farm_id'])
+
+            if request_json['filters']['start_date']:
+                qs = qs.filter(date__date__gte=request_json['filters']['start_date'])
+            if request_json['filters']['end_date']:
+                qs = qs.filter(date__date__lte=request_json['filters']['end_date'])
+
+            serializer = operations_data[operation_key]['serializer']
+            data = serializer(qs, many=True).data
+            
+            for i in data:
+                megalist.append(i)
+
+    megalist = sorted(megalist, key=itemgetter('date'), reverse=True)
+    
+    return megalist

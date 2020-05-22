@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 from django.db.models import CharField, Value
+from django.utils import timezone
 
 from rest_framework import viewsets, views
 from rest_framework.response import Response
+from rest_framework.pagination import LimitOffsetPagination
 
 from tours.filters import TourFilter
 
 from tours.models import Tour
-from reports.models import ReportDate, gen_operations_dict
+from reports.models import ReportDate, gen_operations_dict, gen_megalist
 from locations.models import Location
 from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt )
 from piglets_events.models import CullingPiglets, WeighingPiglets
@@ -90,23 +92,10 @@ class ReportCountPigsView(views.APIView):
 
 
 class OperationsDataView(views.APIView):
+    pagination = LimitOffsetPagination()
+
     def post(self, request):
         operations_data = gen_operations_dict()
-        
-        # from POST
-        input_json_dict = {'key': 'True or False'}
-
-        # if sow in input json => add filter(sow__farm_id=farm_id)
-
-        for json_key in input_json_dict.keys():
-            if input_json_dict[json_key]:
-                pass
-                # qs = operations_dict[json_key][qs]
-                # serializer = operations_dict[json_key][serializer]
-                # serializer(qs).data appent ot megalist
-                
-
-
-        mega_list = list()
-
-        return Response('Hoba!')
+        megalist = gen_megalist(request.data)
+        return Response(megalist)
+        # return Response(self.pagination.get_paginated_response(data=megalist))

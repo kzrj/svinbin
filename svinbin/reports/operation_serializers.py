@@ -92,15 +92,17 @@ class OpPigletsEventSerializer(OperationsSerializer):
     initiator = serializers.StringRelatedField()
     location = serializers.ReadOnlyField(source='location.get_full_loc')
     
-    # Todo: 
-    age = serializers.ReadOnlyField(source=None)
+    age_at = serializers.SerializerMethodField()
+
+    def get_age_at(self, obj):
+        return obj.piglets_group.age_at_date(obj.date)
 
 
 class OpPigletsCullingSerializer(OpPigletsEventSerializer):
     class Meta:
         model = CullingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
-         'culling_type', 'reason', 'quantity', 'total_weight', 'age' ]
+         'culling_type', 'reason', 'quantity', 'total_weight', 'age_at' ]
 
 
 class OpPigletsTransactionSerializer(OpPigletsEventSerializer):
@@ -109,7 +111,7 @@ class OpPigletsTransactionSerializer(OpPigletsEventSerializer):
 
     class Meta:
         model = PigletsTransaction
-        fields = ['oper_name', 'date', 'initiator', 'week_tour', 'age', 'from_location',
+        fields = ['oper_name', 'date', 'initiator', 'week_tour', 'age_at', 'from_location',
           'to_location', 'location']
 
 
@@ -117,4 +119,4 @@ class OpPigletsWeighingSerializer(OpPigletsEventSerializer):
     class Meta:
         model = WeighingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
-         'place', 'average_weight', 'piglets_quantity', 'total_weight', 'age' ]
+         'place', 'average_weight', 'piglets_quantity', 'total_weight', 'age_at' ]

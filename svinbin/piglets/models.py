@@ -182,5 +182,10 @@ class Piglets(CoreModel):
         
         return (timezone.now() - self.birthday)
 
+    def age_at_date(self, date):
+        if not self.birthday:
+            return None
+
+        return (date - self.birthday)
 
 

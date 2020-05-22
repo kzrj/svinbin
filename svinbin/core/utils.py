@@ -148,11 +148,6 @@ def fix_plus_age():
             piglets.birthday = piglets.farrow.date
 
         else:
-            # if first_farrow:
-            #     pre_birthday_ts = datetime.timestamp(first_farrow.date)
-            # else:
-            #     pre_birthday_ts = datetime.timestamp(record.tour.start_date + timedelta(135))
-
             correct_birthday = Piglets.objects.get_all().filter(metatour__week_tour=tour,
                 birthday__lt=now).order_by('birthday').first().birthday
             piglets.birthday = correct_birthday
