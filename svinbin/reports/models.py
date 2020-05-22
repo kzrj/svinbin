@@ -382,7 +382,8 @@ def gen_operations_dict():
         'serializer': operation_serializers.OpSowFarrowSerializer,
         'target': 'sow' }
 
-    operations_data['ws3_abort'] = {'qs':  AbortionSow.objects.filter(location__workshop__number=3) \
+    operations_data['ws3_abort'] = {'qs':  AbortionSow.objects \
+            .filter(location__in=ws3_locs) \
             .select_related('sow', 'tour', 'initiator', 'location__workshop', 
                 'location__sowAndPigletsCell__section', 'location__sowAndPigletsCell__workshop') \
             .annotate(oper_name=Value('ws3_abort',  output_field=models.CharField())),
