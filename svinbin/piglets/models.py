@@ -186,6 +186,6 @@ class Piglets(CoreModel):
         if not self.birthday:
             return None
 
-        return (date - self.birthday)
+        return (date - self.birthday).days
 
 

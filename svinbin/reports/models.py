@@ -567,7 +567,8 @@ def gen_operations_dict():
             'target': 'piglets' }
 
         operations_data[f'ws{ws_number}_piglets_inner_trs'] = {'qs': PigletsTransaction.objects
-                .filter(from_location__in=ws_locs, to_location__in=ws_locs)\
+                .filter(from_location__in=ws_locs.exclude(workshop__number=ws_number),
+                		 to_location__in=ws_locs)\
                 .select_related('initiator', 'week_tour',
                     'from_location__pigletsGroupCell__workshop',
                     'from_location__pigletsGroupCell__section',
@@ -600,7 +601,7 @@ def gen_operations_dict():
                             'piglets_group'
                              ) \
                         .annotate(oper_name=Value(f'ws{ws_number}_piglets_spec', output_field=models.CharField())),
-                    'serializer': operation_serializers.OpPigletsCullingSerializer,
+                    'serializer': operation_serializers.OpPigletsSpecSerializer,
                     'target': 'piglets' }
 
             operations_data[f'ws{ws_number}_piglets_to_75'] = {'qs': PigletsTransaction.objects

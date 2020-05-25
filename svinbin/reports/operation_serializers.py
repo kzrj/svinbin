@@ -83,10 +83,6 @@ class OpMarkAsGiltSerializer(OpSowEventSerializer):
         fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'gilt']
 
 
-class OperationsSerializer(serializers.ModelSerializer):
-    oper_name = serializers.ReadOnlyField()
-
-
 class OpPigletsEventSerializer(OperationsSerializer):
     week_tour = serializers.StringRelatedField()
     initiator = serializers.StringRelatedField()
@@ -96,6 +92,13 @@ class OpPigletsEventSerializer(OperationsSerializer):
 
     def get_age_at(self, obj):
         return obj.piglets_group.age_at_date(obj.date)
+
+
+class OpPigletsSpecSerializer(OpPigletsEventSerializer):
+    class Meta:
+        model = CullingPiglets
+        fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
+         'culling_type', 'quantity', 'total_weight', 'average_weight', 'age_at' ]
 
 
 class OpPigletsCullingSerializer(OpPigletsEventSerializer):
