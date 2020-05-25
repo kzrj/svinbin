@@ -94,6 +94,13 @@ class OpPigletsEventSerializer(OperationsSerializer):
         return obj.piglets_group.age_at_date(obj.date)
 
 
+class OpPigletsSpecSerializer(OpPigletsEventSerializer):
+    class Meta:
+        model = CullingPiglets
+        fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
+         'culling_type', 'quantity', 'total_weight', 'average_weight', 'age_at' ]
+
+
 class OpPigletsCullingSerializer(OpPigletsEventSerializer):
     class Meta:
         model = CullingPiglets

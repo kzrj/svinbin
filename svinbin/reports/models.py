@@ -601,7 +601,7 @@ def gen_operations_dict():
                             'piglets_group'
                              ) \
                         .annotate(oper_name=Value(f'ws{ws_number}_piglets_spec', output_field=models.CharField())),
-                    'serializer': operation_serializers.OpPigletsCullingSerializer,
+                    'serializer': operation_serializers.OpPigletsSpecSerializer,
                     'target': 'piglets' }
 
             operations_data[f'ws{ws_number}_piglets_to_75'] = {'qs': PigletsTransaction.objects
