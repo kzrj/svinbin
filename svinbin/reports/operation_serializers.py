@@ -95,6 +95,8 @@ class OpPigletsEventSerializer(OperationsSerializer):
 
 
 class OpPigletsSpecSerializer(OpPigletsEventSerializer):
+    average_weight = serializers.ReadOnlyField()
+    
     class Meta:
         model = CullingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
