@@ -372,6 +372,8 @@ def gen_operations_dict():
         'target': 'sow' }
 
     ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+    ws3_locs_exclude_ws = Location.objects.all().get_workshop_location_by_number(workshop_number=3) \
+    	.exclude(workshop__number=3)
     not_ws3_locs = Location.objects.all().get_locations_exclude_workshop_locations(workshop_number=3)
 
     operations_data['ws3_farrow'] = {'qs':  SowFarrow.objects.all()\
@@ -420,7 +422,7 @@ def gen_operations_dict():
         'target': 'sow' }
 
     operations_data['ws3_sow_inner'] = {'qs':  SowTransaction.objects
-            .filter(from_location__in=ws3_locs, to_location__in=ws3_locs)\
+            .filter(from_location__in=ws3_locs_exclude_ws, to_location__in=ws3_locs_exclude_ws)\
             .select_related('sow', 'tour', 'initiator', 
                 'from_location__workshop',
                 'from_location__sowAndPigletsCell__section', 
@@ -463,7 +465,7 @@ def gen_operations_dict():
         'target': 'piglets' }
 
     operations_data['ws3_piglets_inner_trs'] = {'qs': PigletsTransaction.objects
-            .filter(from_location__in=ws3_locs, to_location__in=ws3_locs)\
+            .filter(from_location__in=ws3_locs_exclude_ws, to_location__in=ws3_locs_exclude_ws)\
             .select_related('initiator', 'week_tour',
                 'from_location__workshop',
                 'from_location__sowAndPigletsCell__workshop',
@@ -491,6 +493,7 @@ def gen_operations_dict():
     
     for ws_number in [4, 8, 5, 6, 7]:
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
+        ws_locs_exclude_ws = ws_locs.exclude(workshop__number=ws_number)
         not_ws_locs = Location.objects.all() \
             .get_locations_exclude_workshop_locations(workshop_number=ws_number)\
             .exclude(Q(
@@ -568,7 +571,7 @@ def gen_operations_dict():
 
         operations_data[f'ws{ws_number}_piglets_inner_trs'] = {'qs': PigletsTransaction.objects
                 .filter(from_location__in=ws_locs.exclude(workshop__number=ws_number),
-                		 to_location__in=ws_locs)\
+                		 to_location__in=ws_locs_exclude_ws)\
                 .select_related('initiator', 'week_tour',
                     'from_location__pigletsGroupCell__workshop',
                     'from_location__pigletsGroupCell__section',
