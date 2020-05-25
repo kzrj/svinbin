@@ -72,7 +72,7 @@ def create_semination_lists(rows, request_user):
 
         if sow.tour and sow.tour != tour:
             # if we meet sow with tour but row_tour is earlier.
-            if sow.tour.week_number < tour.week_number:
+            if sow.tour.week_number < tour.week_number and sow.tour.year < tour.year:
                 # do proholost
                 Ultrasound.objects.create_ultrasound(sow, semination_employee1, False, 30, row[4])
             else:
