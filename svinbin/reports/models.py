@@ -605,7 +605,7 @@ def gen_operations_dict():
                     'target': 'piglets' }
 
             operations_data[f'ws{ws_number}_piglets_to_75'] = {'qs': PigletsTransaction.objects
-                .filter(from_location__in=ws_locs, to_location__in=not_ws_locs)\
+                .filter(from_location__in=ws_locs, to_location__in=ws75_locs)\
                 .select_related('initiator', 'week_tour',
                     'from_location__pigletsGroupCell__workshop',
                     'from_location__pigletsGroupCell__section',
