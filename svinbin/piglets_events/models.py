@@ -339,7 +339,7 @@ class CullingPiglets(PigletsEvent):
     @property
     def average_weight(self):
         if self.quantity and self.total_weight:
-            return self.total_weight / self.quantity
+            return round(self.total_weight / self.quantity, 2)
 
 
 class RecountQuerySet(models.QuerySet):
