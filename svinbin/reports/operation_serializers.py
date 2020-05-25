@@ -83,10 +83,6 @@ class OpMarkAsGiltSerializer(OpSowEventSerializer):
         fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'gilt']
 
 
-class OperationsSerializer(serializers.ModelSerializer):
-    oper_name = serializers.ReadOnlyField()
-
-
 class OpPigletsEventSerializer(OperationsSerializer):
     week_tour = serializers.StringRelatedField()
     initiator = serializers.StringRelatedField()
