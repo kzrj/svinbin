@@ -641,6 +641,9 @@ def gen_megalist(request_json):
             if request_json['filters']['end_date']:
                 qs = qs.filter(date__date__lte=request_json['filters']['end_date'])
 
+            # if request_json['filters']['week_tour']:
+            #     qs = qs.filter(=request_json['filters']['week_tour'])
+
             serializer = operations_data[operation_key]['serializer']
             data = serializer(qs, many=True).data
             
