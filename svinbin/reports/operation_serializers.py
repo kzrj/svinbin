@@ -72,7 +72,7 @@ class OpSowTransactionSerializer(OpSowEventSerializer):
 class OpMarkAsNurseSerializer(OpSowEventSerializer):
     class Meta:
         model = MarkAsNurse
-        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour']
+        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'location']
 
 
 class OpMarkAsGiltSerializer(OpSowEventSerializer):
@@ -80,7 +80,7 @@ class OpMarkAsGiltSerializer(OpSowEventSerializer):
 
     class Meta:
         model = MarkAsGilt
-        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'gilt']
+        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'gilt', 'location']
 
 
 class OpPigletsEventSerializer(OperationsSerializer):
