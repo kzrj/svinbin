@@ -95,6 +95,8 @@ class OpPigletsEventSerializer(OperationsSerializer):
 
 
 class OpPigletsSpecSerializer(OpPigletsEventSerializer):
+    average_weight = serializers.ReadOnlyField()
+
     class Meta:
         model = CullingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
@@ -109,13 +111,14 @@ class OpPigletsCullingSerializer(OpPigletsEventSerializer):
 
 
 class OpPigletsTransactionSerializer(OpPigletsEventSerializer):
+    quantity = serializers.ReadOnlyField(source='piglets_group.quantity')
     from_location = serializers.ReadOnlyField(source='from_location.get_full_loc')
     to_location = serializers.ReadOnlyField(source='to_location.get_full_loc')
 
     class Meta:
         model = PigletsTransaction
         fields = ['oper_name', 'date', 'initiator', 'week_tour', 'age_at', 'from_location',
-          'to_location', 'location']
+          'to_location', 'location', 'quantity']
 
 
 class OpPigletsWeighingSerializer(OpPigletsEventSerializer):
