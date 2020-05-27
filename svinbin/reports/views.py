@@ -31,7 +31,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_piglets_count_by_ws_week_tour() \
                 .add_gilts_count_by_ws_week_tour() \
                 .add_count_transfer_to_7_5() \
-                .add_culling_percentage()
+                .add_culling_percentage() \
                 .order_by('-year','-week_number', )[:5]
 
     serializer_class = ReportTourSerializer
