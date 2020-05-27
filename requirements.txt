@@ -1,10 +1,6 @@
 Django
 gunicorn
 psycopg2-binary
-mixer
-pytest
-pytest-django
-pytest-cov
 djangorestframework
 django-rest-swagger
 django-filter

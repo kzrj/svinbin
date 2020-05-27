@@ -641,3 +641,27 @@ class OperationDataMegalistTest(TransactionTestCase):
         megalist = gen_megalist(request_json)
         
         self.assertEqual(megalist[0]['date'] > megalist[-1]['date'])
+
+    def test_gen_megalist_sort_by_opername(self):
+        request_json = copy.deepcopy(self.request_json)
+        request_json['operations']['ws1_semination'] = True
+        request_json['operations']['ws1_usound'] = True
+        
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=21)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=21)
+
+        date_10d_ago = timezone.now() - timedelta(10)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=22,
+            date=date_10d_ago)
+
+        date_15d_ago = timezone.now() - timedelta(15)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=23,
+            date=date_15d_ago)
+        sows_testings.create_sow_with_semination_usound(location=self.loc_ws1, week=23,
+            date=date_15d_ago)
+
+        megalist = gen_megalist(request_json)
+        
+        self.assertEqual(megalist[0]['date'] > megalist[-1]['date'])
