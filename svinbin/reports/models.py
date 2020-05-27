@@ -650,15 +650,6 @@ def gen_megalist(request_json):
             for i in data:
                 megalist.append(i)
 
-    ops_sort_list = [
-    'ws1_semination', 'ws1_usound', 'ws1_abort', 'w1_peregon_sow', 'ws1_culling',
-    'ws2_usound', 'ws2_abort', 'w2_peregon_sow', 'ws2_culling',
-    'ws3_sow_rassadka', 'ws3_farrow', 'ws3_sow_inner', 'ws3_mark_as_nurse', 
-    ]
-
-    print(megalist[0]['date'])
-    print(megalist[0]['created_at'])
-
     megalist = sorted(megalist, key=lambda x: (datetime.strptime(x['date'], '%d-%m-%Y %H:%M:%S')),
      reverse=True)
     
