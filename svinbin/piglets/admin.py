@@ -17,7 +17,7 @@ class PigletsAdmin(admin.ModelAdmin):
         'transfer_part_number',
         'active',
         'birthday',
-        'metatour.week_tour'
+        'metatour'
     ]
     list_display = my_fields
     list_filter = ('active', 'modified_at',)
