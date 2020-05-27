@@ -151,13 +151,11 @@ class TourQuerySet(models.QuerySet):
 
     def add_week_weight(self):
         data = dict()
-        piglets_subquery = MetaTour.objects.filter(week_tour__pk=OuterRef(OuterRef('pk'))).values('piglets')
 
         for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
             place_formatted = place.replace('/', '_')
             weights_subquery = piglets_events.models.WeighingPiglets.objects.filter(
-                                    piglets_group__in=Subquery(piglets_subquery),
-                                    place=place,) \
+                                    week_tour__pk=OuterRef('pk'), place=place,) \
                                 .values('place') 
 
             # total weights
@@ -187,11 +185,10 @@ class TourQuerySet(models.QuerySet):
 
     def add_week_weight_ws8_v2(self):
         # avg by week_tour
-        piglets_subquery = MetaTour.objects.filter(week_tour__pk=OuterRef(OuterRef('pk'))).values('piglets')
         weights_subquery = piglets_events.models.WeighingPiglets.objects.filter(
-                                    piglets_group__in=Subquery(piglets_subquery),
+                                    week_tour__pk=OuterRef('pk'),
                                     place__in=['8/5', '8/6', '8/7']) \
-                                .values('piglets_group__metatour__week_tour')
+                                .values('week_tour')
 
         weights_subquery_avg_weight = weights_subquery.annotate(avg_weight=Avg('average_weight')) \
                 .values('avg_weight')
