@@ -465,7 +465,7 @@ def gen_operations_dict():
         'target': 'piglets' }
 
     operations_data['ws3_piglets_inner_trs'] = {'qs': PigletsTransaction.objects
-            .filter(from_location__in=ws3_locs_exclude_ws, to_location__in=ws3_locs_exclude_ws)\
+            .filter(from_location__in=ws3_locs_exclude_ws, to_location__in=ws3_locs)\
             .select_related('initiator', 'week_tour',
                 'from_location__workshop',
                 'from_location__sowAndPigletsCell__workshop',
