@@ -6,7 +6,7 @@ from transactions.models import SowTransaction, PigletsTransaction
 @admin.register(SowTransaction)
 class SowTransactionAdmin(admin.ModelAdmin):
     list_display =  [f.name for f in SowTransaction._meta.fields]
-    search_fields = ['date']
+    search_fields = ['sow__farm_id']
 
 
 @admin.register(PigletsTransaction)
