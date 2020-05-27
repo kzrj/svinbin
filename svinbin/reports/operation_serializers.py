@@ -11,6 +11,7 @@ from transactions.models import SowTransaction, PigletsTransaction
 
 class OperationsSerializer(serializers.ModelSerializer):
     oper_name = serializers.ReadOnlyField()
+    date = serializers.DateTimeField(format='%d-%m-%Y %H:%M:%S')
 
 
 class OpSowEventSerializer(OperationsSerializer):
