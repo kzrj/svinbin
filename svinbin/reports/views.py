@@ -21,8 +21,6 @@ from reports.filters import ReportDateFilter
 
 class TourReportViewSet(viewsets.ModelViewSet):
     queryset = Tour.objects.all() \
-                .filter(year__gte=2020) \
-                .order_by('-year','-week_number', ) \
                 .add_sow_data() \
                 .add_farrow_data() \
                 .add_count_tour_sow() \
@@ -34,6 +32,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_gilts_count_by_ws_week_tour() \
                 .add_count_transfer_to_7_5() \
                 .add_culling_percentage()
+                .order_by('-year','-week_number', )[:5]
 
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
