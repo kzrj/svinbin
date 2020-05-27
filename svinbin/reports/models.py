@@ -656,7 +656,7 @@ def gen_megalist(request_json):
     'ws3_sow_rassadka', 'ws3_farrow', 'ws3_sow_inner', 'ws3_mark_as_nurse', 
     ]
 
-    megalist = sorted(megalist, key=lambda x: (datetime.strptime(x['date'], '%d-%m-%Y %H:%M')),
+    megalist = sorted(megalist, key=lambda x: (datetime.strptime(x['date'], '%d-%m-%Y %H:%M:%S.%f')),
      reverse=True)
     
     return megalist
