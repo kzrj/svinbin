@@ -21,7 +21,7 @@ from reports.filters import ReportDateFilter
 
 class TourReportViewSet(viewsets.ModelViewSet):
     queryset = Tour.objects.all() \
-                .filter(year__lt=2020) \
+                .filter(year__gte=2020) \
                 .order_by('-year','-week_number', ) \
                 .add_sow_data() \
                 .add_farrow_data() \
