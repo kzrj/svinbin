@@ -27,7 +27,7 @@ class OpSeminationSerializer(OpSowEventSerializer):
     class Meta:
         model = Semination
         fields = ['date', 'sow', 'tour', 'initiator', 'semination_employee', 'boar',
-        'oper_name']
+        'oper_name', 'id']
 
 
 class OpUsoundSerializer(OpSowEventSerializer):
@@ -36,27 +36,27 @@ class OpUsoundSerializer(OpSowEventSerializer):
     class Meta:
         model = Ultrasound
         fields = ['oper_name', 'date', 'sow', 'tour', 'initiator', 'u_type', 'result',
-            'location']
+            'location', 'id']
 
 
 class OpAbortSerializer(OpSowEventSerializer):
     class Meta:
         model = AbortionSow
-        fields = ['oper_name','date', 'sow', 'tour', 'initiator', 'location' ]
+        fields = ['oper_name','date', 'sow', 'tour', 'initiator', 'location', 'id' ]
 
 
 class OpCullingSowSerializer(OpSowEventSerializer):
     class Meta:
         model = CullingSow
         fields = ['oper_name','date', 'sow', 'tour', 'location', 'initiator',
-         'culling_type', 'reason', ]
+         'culling_type', 'reason', 'id']
 
 
 class OpSowFarrowSerializer(OpSowEventSerializer):
     class Meta:
         model = SowFarrow
         fields = ['oper_name', 'date', 'location', 'sow', 'alive_quantity', 'dead_quantity',
-         'mummy_quantity', 'tour', 'initiator']
+         'mummy_quantity', 'tour', 'initiator', 'id']
 
 
 class OpSowTransactionSerializer(OpSowEventSerializer):
@@ -66,13 +66,13 @@ class OpSowTransactionSerializer(OpSowEventSerializer):
     class Meta:
         model = SowTransaction
         fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'from_location', 
-            'location', 'to_location']
+            'location', 'to_location', 'id']
 
 
 class OpMarkAsNurseSerializer(OpSowEventSerializer):
     class Meta:
         model = MarkAsNurse
-        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour']
+        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'location', 'id']
 
 
 class OpMarkAsGiltSerializer(OpSowEventSerializer):
@@ -80,7 +80,7 @@ class OpMarkAsGiltSerializer(OpSowEventSerializer):
 
     class Meta:
         model = MarkAsGilt
-        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'gilt']
+        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'gilt', 'location', 'id']
 
 
 class OpPigletsEventSerializer(OperationsSerializer):
@@ -100,14 +100,14 @@ class OpPigletsSpecSerializer(OpPigletsEventSerializer):
     class Meta:
         model = CullingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
-         'culling_type', 'quantity', 'total_weight', 'average_weight', 'age_at' ]
+         'culling_type', 'quantity', 'total_weight', 'average_weight', 'age_at', 'id' ]
 
 
 class OpPigletsCullingSerializer(OpPigletsEventSerializer):
     class Meta:
         model = CullingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
-         'culling_type', 'reason', 'quantity', 'total_weight', 'age_at' ]
+         'culling_type', 'reason', 'quantity', 'total_weight', 'age_at', 'id' ]
 
 
 class OpPigletsTransactionSerializer(OpPigletsEventSerializer):
@@ -118,11 +118,11 @@ class OpPigletsTransactionSerializer(OpPigletsEventSerializer):
     class Meta:
         model = PigletsTransaction
         fields = ['oper_name', 'date', 'initiator', 'week_tour', 'age_at', 'from_location',
-          'to_location', 'location', 'quantity']
+          'to_location', 'location', 'quantity', 'id']
 
 
 class OpPigletsWeighingSerializer(OpPigletsEventSerializer):
     class Meta:
         model = WeighingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
-         'place', 'average_weight', 'piglets_quantity', 'total_weight', 'age_at' ]
+         'place', 'average_weight', 'piglets_quantity', 'total_weight', 'age_at', 'id' ]
