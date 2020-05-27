@@ -139,22 +139,6 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)        
 
-    def add_weight_date(self):
-        subquery_piglets = self.gen_not_mixed_piglets_subquery()
-
-        data = dict()
-        for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
-            subquery = Subquery(
-                piglets_events.models.WeighingPiglets.objects.filter(
-                                    piglets_group__in=Subquery(subquery_piglets), place=place) \
-                                .values('date')[:1]
-
-                ,output_field=models.DateTimeField())
-            place = place.replace('/', '_')
-            data[f'weight_date_{place}'] = subquery
-
-        return self.annotate(**data)
-
     def add_culling_percentage_not_mixed_piglets(self):
         # use only after add_farrow_data, add_culling_qnty_not_mixed_piglets
         data = dict()
