@@ -6,7 +6,7 @@ from piglets.models import Piglets, PigletsStatus
 
 @admin.register(Piglets)
 class PigletsAdmin(admin.ModelAdmin):
-	my_fields = [f.name for f in Piglets._meta.fields] + ['metatour']
+    my_fields = [f.name for f in Piglets._meta.fields] + ['metatour']
     list_display = my_fields
     list_filter = ('active', 'modified_at',)
     search_fields = ['location__id',]
