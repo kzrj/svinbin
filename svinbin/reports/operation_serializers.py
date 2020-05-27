@@ -27,7 +27,7 @@ class OpSeminationSerializer(OpSowEventSerializer):
     class Meta:
         model = Semination
         fields = ['date', 'sow', 'tour', 'initiator', 'semination_employee', 'boar',
-        'oper_name', 'id']
+        'oper_name', 'id', 'created_at']
 
 
 class OpUsoundSerializer(OpSowEventSerializer):
@@ -36,27 +36,28 @@ class OpUsoundSerializer(OpSowEventSerializer):
     class Meta:
         model = Ultrasound
         fields = ['oper_name', 'date', 'sow', 'tour', 'initiator', 'u_type', 'result',
-            'location', 'id']
+            'location', 'id', 'created_at']
 
 
 class OpAbortSerializer(OpSowEventSerializer):
     class Meta:
         model = AbortionSow
-        fields = ['oper_name','date', 'sow', 'tour', 'initiator', 'location', 'id' ]
+        fields = ['oper_name','date', 'sow', 'tour', 'initiator', 'location', 'id',
+         'created_at' ]
 
 
 class OpCullingSowSerializer(OpSowEventSerializer):
     class Meta:
         model = CullingSow
         fields = ['oper_name','date', 'sow', 'tour', 'location', 'initiator',
-         'culling_type', 'reason', 'id']
+         'culling_type', 'reason', 'id', 'created_at']
 
 
 class OpSowFarrowSerializer(OpSowEventSerializer):
     class Meta:
         model = SowFarrow
         fields = ['oper_name', 'date', 'location', 'sow', 'alive_quantity', 'dead_quantity',
-         'mummy_quantity', 'tour', 'initiator', 'id']
+         'mummy_quantity', 'tour', 'initiator', 'id', 'created_at']
 
 
 class OpSowTransactionSerializer(OpSowEventSerializer):
@@ -66,13 +67,14 @@ class OpSowTransactionSerializer(OpSowEventSerializer):
     class Meta:
         model = SowTransaction
         fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'from_location', 
-            'location', 'to_location', 'id']
+            'location', 'to_location', 'id', 'created_at']
 
 
 class OpMarkAsNurseSerializer(OpSowEventSerializer):
     class Meta:
         model = MarkAsNurse
-        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'location', 'id']
+        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'location', 'id',
+         'created_at']
 
 
 class OpMarkAsGiltSerializer(OpSowEventSerializer):
@@ -80,7 +82,8 @@ class OpMarkAsGiltSerializer(OpSowEventSerializer):
 
     class Meta:
         model = MarkAsGilt
-        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'gilt', 'location', 'id']
+        fields = ['oper_name', 'date', 'initiator', 'sow', 'tour', 'gilt', 'location', 'id',
+         'created_at']
 
 
 class OpPigletsEventSerializer(OperationsSerializer):
@@ -100,14 +103,16 @@ class OpPigletsSpecSerializer(OpPigletsEventSerializer):
     class Meta:
         model = CullingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
-         'culling_type', 'quantity', 'total_weight', 'average_weight', 'age_at', 'id' ]
+         'culling_type', 'quantity', 'total_weight', 'average_weight', 'age_at', 'id',
+          'created_at' ]
 
 
 class OpPigletsCullingSerializer(OpPigletsEventSerializer):
     class Meta:
         model = CullingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
-         'culling_type', 'reason', 'quantity', 'total_weight', 'age_at', 'id' ]
+         'culling_type', 'reason', 'quantity', 'total_weight', 'age_at', 'id',
+          'created_at' ]
 
 
 class OpPigletsTransactionSerializer(OpPigletsEventSerializer):
@@ -118,11 +123,12 @@ class OpPigletsTransactionSerializer(OpPigletsEventSerializer):
     class Meta:
         model = PigletsTransaction
         fields = ['oper_name', 'date', 'initiator', 'week_tour', 'age_at', 'from_location',
-          'to_location', 'location', 'quantity', 'id']
+          'to_location', 'location', 'quantity', 'id', 'created_at']
 
 
 class OpPigletsWeighingSerializer(OpPigletsEventSerializer):
     class Meta:
         model = WeighingPiglets
         fields = ['oper_name', 'date', 'initiator', 'location', 'week_tour',
-         'place', 'average_weight', 'piglets_quantity', 'total_weight', 'age_at', 'id' ]
+         'place', 'average_weight', 'piglets_quantity', 'total_weight', 'age_at', 'id',
+          'created_at' ]
