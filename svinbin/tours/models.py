@@ -14,51 +14,6 @@ import transactions
 
 
 class TourQuerySet(models.QuerySet):
-    def gen_not_mixed_piglets_subquery(self, ws_number=None):
-        queryset = MetaTourRecord.objects.filter(tour__pk=OuterRef(OuterRef('pk')), percentage=100)
-
-        if ws_number:
-            queryset = queryset.filter(
-                Q(
-                    Q(metatour__piglets__location__workshop__number=ws_number) |
-                    Q(metatour__piglets__location__section__workshop__number=ws_number) |
-                    Q(metatour__piglets__location__pigletsGroupCell__workshop__number=ws_number) |
-                    Q(metatour__piglets__location__sowAndPigletsCell__workshop__number=ws_number)
-                ))
-
-        return queryset.values('metatour__piglets')
-
-    def gen_piglets_by_week_tour_ws_subquery(self, week_tour_pk, ws_number=None):
-        queryset = piglets_models.Piglets.objects.filter(metatour__week_tour__pk=week_tour_pk)
-
-        if ws_number:
-            queryset = queryset \
-                .filter(Q(
-                        Q(location__workshop__number=ws_number) |
-                        Q(location__section__workshop__number=ws_number) |
-                        Q(location__pigletsGroupCell__workshop__number=ws_number) |
-                        Q(location__sowAndPigletsCell__workshop__number=ws_number)
-                        )
-                )
-
-        return queryset
-
-    def gen_piglets_active_inactive_by_week_tour_ws_subquery(self, week_tour_pk, ws_number=None):
-        queryset = piglets_models.Piglets.objects.get_all().filter(
-            metatour__week_tour__pk=week_tour_pk)
-
-        if ws_number:
-            queryset = queryset \
-                .filter(Q(
-                        Q(location__workshop__number=ws_number) |
-                        Q(location__section__workshop__number=ws_number) |
-                        Q(location__pigletsGroupCell__workshop__number=ws_number) |
-                        Q(location__sowAndPigletsCell__workshop__number=ws_number)
-                        )
-                )
-
-        return queryset
-
     def add_sow_data(self):
         subquery_seminated = events_models.Semination.objects.filter(tour__pk=OuterRef('pk')) \
                             .values('tour') \
@@ -138,16 +93,6 @@ class TourQuerySet(models.QuerySet):
                  output_field=models.IntegerField())
 
         return self.annotate(**data)        
-
-    def add_culling_percentage_not_mixed_piglets(self):
-        # use only after add_farrow_data, add_culling_qnty_not_mixed_piglets
-        data = dict()
-        for c_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
-            data[f'{c_type}_percentage'] = ExpressionWrapper(
-                    F(f'{c_type}_quantity') * 100.0 / F('total_born_alive'), \
-                    output_field=models.FloatField())
-
-        return self.annotate(**data)
 
     def add_week_weight(self):
         data = dict()
@@ -239,19 +184,17 @@ class TourQuerySet(models.QuerySet):
 
     def add_count_transfer_to_7_5(self):
         data = dict()
-        piglets_subquery = self.gen_piglets_active_inactive_by_week_tour_ws_subquery(OuterRef(OuterRef('pk')))
 
         for ws_number in [5, 6, 7]:
             trs_subquery = transactions.models.PigletsTransaction.objects \
-                .filter(piglets_group__in=piglets_subquery) \
-                .filter(to_location__workshop__number=11) \
+                .filter(to_location__workshop__number=11, week_tour=OuterRef('pk')) \
                 .filter(Q(
                         Q(from_location__workshop__number=ws_number) |
                         Q(from_location__section__workshop__number=ws_number) |
                         Q(from_location__pigletsGroupCell__workshop__number=ws_number) |
                         Q(from_location__sowAndPigletsCell__workshop__number=ws_number)
                     )) \
-                .values('piglets_group__metatour__week_tour') \
+                .values('week_tour') \
                 .annotate(qnty=models.Sum('quantity')) \
                 .values('qnty')
 
