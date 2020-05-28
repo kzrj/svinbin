@@ -8,3 +8,4 @@ django-cors-headers
 djangorestframework-jwt
 PyJWT
 xlrd
+mixer
