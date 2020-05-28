@@ -28,7 +28,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_week_weight_ws8_v2() \
                 .add_culling_data_by_week_tour() \
                 .add_count_transfer_to_7_5() \
-                # .add_culling_percentage() \
+                .add_culling_percentage() \
                 # .order_by('-year','-week_number', ) \
                 # .filter(year__gte=2020)
 
