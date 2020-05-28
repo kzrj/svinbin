@@ -212,7 +212,7 @@ class TourQuerySet(models.QuerySet):
                         then=ExpressionWrapper(
                             F('ws3_padej_quantity') * 100.0 / F('total_born_alive'),
                             output_field=models.FloatField())
-                    ), output_field=FloatField()
+                    ), output_field=models.FloatField()
                 ),
 
             # ws3_padej_percentage=ExpressionWrapper(
