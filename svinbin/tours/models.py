@@ -225,95 +225,40 @@ class TourQuerySet(models.QuerySet):
                 )
 
         for ws_number, place_number in zip([4, 8, 5, 6, 7], ['3_4', '4_8', '8_5', '8_6', '8_7']):
-            padej_lookup1 = {f'week_weight_qnty_{place_number}__isnull': True, }
-            padej_lookup2 = {f'week_weight_qnty_{place_number}': 0, }
-            padej_lookup3 = {f'week_weight_qnty_{place_number}__gt': 0, }
+            lookup1 = {f'week_weight_qnty_{place_number}__isnull': True, }
+            lookup2 = {f'week_weight_qnty_{place_number}': 0, }
+            lookup3 = {f'week_weight_qnty_{place_number}__gt': 0, }
 
             data[f'ws{ws_number}_padej_percentage'] = Case(
-                When(Q(**padej_lookup1) | Q(**padej_lookup2), then=0.0),
-                When(**padej_lookup3, 
+                When(Q(**lookup1) | Q(**lookup2), then=0.0),
+                When(**lookup3, 
                         then=ExpressionWrapper(
                             F(f'ws{ws_number}_padej_quantity') * 100.0 / F(f'week_weight_qnty_{place_number}'),
                             output_field=models.FloatField())
                     ), output_field=models.FloatField()
                 )
 
-            # ws4_prirezka_percentage=Case(
-            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
-            #     When(week_weight_qnty_3_4__gt=0, 
-            #             then=ExpressionWrapper(
-            #                 F('ws4_prirezka_quantity') * 100.0 / F('week_weight_qnty_3_4'),
-            #                 output_field=models.FloatField())
-            #         ), output_field=models.FloatField()
-            #     ),
-            # ws4_vinuzhd_percentage=Case(
-            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
-            #     When(week_weight_qnty_3_4__gt=0, 
-            #             then=ExpressionWrapper(
-            #                 F('ws4_vinuzhd_quantity') * 100.0 / F('week_weight_qnty_3_4'),
-            #                 output_field=models.FloatField())
-            #         ), output_field=models.FloatField()
-            #     ),
+            if ws_number != 4:
+                data[f'ws{ws_number}_vinuzhd_percentage'] = Case(
+                    When(Q(**lookup1) | Q(**lookup2), then=0.0),
+                    When(**lookup3, 
+                            then=ExpressionWrapper(
+                                F(f'ws{ws_number}_vinuzhd_quantity') * 100.0 / F(f'week_weight_qnty_{place_number}'),
+                                output_field=models.FloatField())
+                        ), output_field=models.FloatField()
+                    )
 
+            if ws_number in [4, 8]:
+                data[f'ws{ws_number}_prirezka_percentage'] = Case(
+                    When(Q(**lookup1) | Q(**lookup2), then=0.0),
+                    When(**lookup3, 
+                            then=ExpressionWrapper(
+                                F(f'ws{ws_number}_prirezka_quantity') * 100.0 / F(f'week_weight_qnty_{place_number}'),
+                                output_field=models.FloatField())
+                        ), output_field=models.FloatField()
+                    )
 
-
-        return self.annotate(**data
-            # ws3_padej_percentage=test,
-            # ws3_prirezka_percentage=Case(
-            #     When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
-            #     When(total_born_alive__gt=0, 
-            #             then=ExpressionWrapper(
-            #                 F('ws3_prirezka_quantity') * 100.0 / F('total_born_alive'),
-            #                 output_field=models.FloatField())
-            #         ), output_field=models.FloatField()
-            #     ),
-
-            # ws4_padej_percentage=Case(
-            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
-            #     When(week_weight_qnty_3_4__gt=0, 
-            #             then=ExpressionWrapper(
-            #                 F('ws4_padej_quantity') * 100.0 / F('week_weight_qnty_3_4'),
-            #                 output_field=models.FloatField())
-            #         ), output_field=models.FloatField()
-            #     ),
-            # ws4_prirezka_percentage=Case(
-            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
-            #     When(week_weight_qnty_3_4__gt=0, 
-            #             then=ExpressionWrapper(
-            #                 F('ws4_prirezka_quantity') * 100.0 / F('week_weight_qnty_3_4'),
-            #                 output_field=models.FloatField())
-            #         ), output_field=models.FloatField()
-            #     ),
-            # ws4_vinuzhd_percentage=Case(
-            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
-            #     When(week_weight_qnty_3_4__gt=0, 
-            #             then=ExpressionWrapper(
-            #                 F('ws4_vinuzhd_quantity') * 100.0 / F('week_weight_qnty_3_4'),
-            #                 output_field=models.FloatField())
-            #         ), output_field=models.FloatField()
-            #     ),
-
-
-            # ws8_padej_percentage=ExpressionWrapper(
-            #     F('ws8_padej_quantity') * 100.0 / F('week_weight_qnty_4_8'), output_field=models.FloatField()),
-            # ws8_vinuzhd_percentage=ExpressionWrapper(
-            #     F('ws8_vinuzhd_quantity') * 100.0 / F('week_weight_qnty_4_8'), output_field=models.FloatField()),
-
-            # ws5_padej_percentage=ExpressionWrapper(
-            #     F('ws5_padej_quantity') * 100.0 / F('week_weight_qnty_8_5'), output_field=models.FloatField()),
-            # ws5_vinuzhd_percentage=ExpressionWrapper(
-            #     F('ws5_vinuzhd_quantity') * 100.0 / F('week_weight_qnty_8_5'), output_field=models.FloatField()),
-
-            # ws6_padej_percentage=ExpressionWrapper(
-            #     F('ws6_padej_quantity') * 100.0 / F('week_weight_qnty_8_6'), output_field=models.FloatField()),
-            # ws6_vinuzhd_percentage=ExpressionWrapper(
-            #     F('ws6_vinuzhd_quantity') * 100.0 / F('week_weight_qnty_8_6'), output_field=models.FloatField()),   
-
-            # ws7_padej_percentage=ExpressionWrapper(
-            #     F('ws7_padej_quantity') * 100.0 / F('week_weight_qnty_8_7'), output_field=models.FloatField()),
-            # ws7_vinuzhd_percentage=ExpressionWrapper(
-            #     F('ws7_vinuzhd_quantity') * 100.0 / F('week_weight_qnty_8_7'), output_field=models.FloatField())
-            )
+        return self.annotate(**data)
 
 
 class TourManager(CoreModelManager):
