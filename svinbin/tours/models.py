@@ -204,9 +204,9 @@ class TourQuerySet(models.QuerySet):
         return self.annotate(**data)
 
     def add_culling_percentage(self):
-        # self
+        data = dict()
 
-        test = Case(
+        data['ws3_padej_percentage'] = Case(
                 When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
                 When(total_born_alive__gt=0, 
                         then=ExpressionWrapper(
@@ -215,41 +215,83 @@ class TourQuerySet(models.QuerySet):
                     ), output_field=models.FloatField()
                 )
 
-        return self.annotate(
-            ws3_padej_percentage=test,
-            ws3_prirezka_percentage=Case(
+        data['ws3_prirezka_percentage'] = Case(
                 When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
                 When(total_born_alive__gt=0, 
                         then=ExpressionWrapper(
                             F('ws3_prirezka_quantity') * 100.0 / F('total_born_alive'),
                             output_field=models.FloatField())
                     ), output_field=models.FloatField()
-                ),
+                )
 
-            ws4_padej_percentage=Case(
-                When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
-                When(week_weight_qnty_3_4__gt=0, 
+        for ws_number, place_number in zip([4, 8, 5, 6, 7], ['3_4', '4_8', '8_5', '8_6', '8_7']):
+            padej_lookup1 = {f'week_weight_qnty_{place_number}__isnull': True, }
+            padej_lookup2 = {f'week_weight_qnty_{place_number}': 0, }
+            padej_lookup3 = {f'week_weight_qnty_{place_number}__gt': 0, }
+
+            data[f'ws{ws_number}_padej_percentage'] = Case(
+                When(Q(**padej_lookup1) | Q(**padej_lookup2), then=0.0),
+                When(**padej_lookup3, 
                         then=ExpressionWrapper(
-                            F('ws4_padej_quantity') * 100.0 / F('week_weight_qnty_3_4'),
+                            F(f'ws{ws_number}_padej_quantity') * 100.0 / F(f'week_weight_qnty_{place_number}'),
                             output_field=models.FloatField())
                     ), output_field=models.FloatField()
-                ),
-            ws4_prirezka_percentage=Case(
-                When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
-                When(week_weight_qnty_3_4__gt=0, 
-                        then=ExpressionWrapper(
-                            F('ws4_prirezka_quantity') * 100.0 / F('week_weight_qnty_3_4'),
-                            output_field=models.FloatField())
-                    ), output_field=models.FloatField()
-                ),
-            ws4_vinuzhd_percentage=Case(
-                When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
-                When(week_weight_qnty_3_4__gt=0, 
-                        then=ExpressionWrapper(
-                            F('ws4_vinuzhd_quantity') * 100.0 / F('week_weight_qnty_3_4'),
-                            output_field=models.FloatField())
-                    ), output_field=models.FloatField()
-                ),
+                )
+
+            # ws4_prirezka_percentage=Case(
+            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
+            #     When(week_weight_qnty_3_4__gt=0, 
+            #             then=ExpressionWrapper(
+            #                 F('ws4_prirezka_quantity') * 100.0 / F('week_weight_qnty_3_4'),
+            #                 output_field=models.FloatField())
+            #         ), output_field=models.FloatField()
+            #     ),
+            # ws4_vinuzhd_percentage=Case(
+            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
+            #     When(week_weight_qnty_3_4__gt=0, 
+            #             then=ExpressionWrapper(
+            #                 F('ws4_vinuzhd_quantity') * 100.0 / F('week_weight_qnty_3_4'),
+            #                 output_field=models.FloatField())
+            #         ), output_field=models.FloatField()
+            #     ),
+
+
+
+        return self.annotate(**data
+            # ws3_padej_percentage=test,
+            # ws3_prirezka_percentage=Case(
+            #     When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
+            #     When(total_born_alive__gt=0, 
+            #             then=ExpressionWrapper(
+            #                 F('ws3_prirezka_quantity') * 100.0 / F('total_born_alive'),
+            #                 output_field=models.FloatField())
+            #         ), output_field=models.FloatField()
+            #     ),
+
+            # ws4_padej_percentage=Case(
+            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
+            #     When(week_weight_qnty_3_4__gt=0, 
+            #             then=ExpressionWrapper(
+            #                 F('ws4_padej_quantity') * 100.0 / F('week_weight_qnty_3_4'),
+            #                 output_field=models.FloatField())
+            #         ), output_field=models.FloatField()
+            #     ),
+            # ws4_prirezka_percentage=Case(
+            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
+            #     When(week_weight_qnty_3_4__gt=0, 
+            #             then=ExpressionWrapper(
+            #                 F('ws4_prirezka_quantity') * 100.0 / F('week_weight_qnty_3_4'),
+            #                 output_field=models.FloatField())
+            #         ), output_field=models.FloatField()
+            #     ),
+            # ws4_vinuzhd_percentage=Case(
+            #     When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
+            #     When(week_weight_qnty_3_4__gt=0, 
+            #             then=ExpressionWrapper(
+            #                 F('ws4_vinuzhd_quantity') * 100.0 / F('week_weight_qnty_3_4'),
+            #                 output_field=models.FloatField())
+            #         ), output_field=models.FloatField()
+            #     ),
 
 
             # ws8_padej_percentage=ExpressionWrapper(
