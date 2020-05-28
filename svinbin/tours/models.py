@@ -200,53 +200,40 @@ class TourQuerySet(models.QuerySet):
 
         for ws_number in [3, 4, 5, 6, 7, 8]:
             for c_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
-                piglets_subquery = MetaTour.objects.filter(
-                    week_tour__pk=OuterRef(OuterRef('pk'))) \
+                culling_subquery = piglets_events.models.CullingPiglets.objects \
                     .filter(
-                    Q(
-                        Q(piglets__location__workshop__number=ws_number) |
-                        Q(piglets__location__section__workshop__number=ws_number) |
-                        Q(piglets__location__pigletsGroupCell__workshop__number=ws_number) |
-                        Q(piglets__location__sowAndPigletsCell__workshop__number=ws_number)
-                    )).values('piglets')
-
-                culling_subquery = piglets_events.models.CullingPiglets.objects.filter(
-                    piglets_group__in=Subquery(piglets_subquery),
-                    culling_type=c_type
+                        Q(
+                            Q(location__workshop__number=ws_number) |
+                            Q(location__section__workshop__number=ws_number) |
+                            Q(location__pigletsGroupCell__workshop__number=ws_number) |
+                            Q(location__sowAndPigletsCell__workshop__number=ws_number)
+                        )
                     ) \
+                    .filter(
+                        culling_type=c_type,
+                        week_tour__pk=OuterRef('pk')
+                    )
+                        
+                culling_subquery_qnty = culling_subquery \
                     .values('culling_type') \
                     .annotate(qnty=Sum('quantity')) \
                     .values('qnty')
 
-                data[f'ws{ws_number}_{c_type}_quantity'] = Subquery(culling_subquery, output_field=models.IntegerField())
+                data[f'ws{ws_number}_{c_type}_quantity'] = Subquery(culling_subquery_qnty,
+                     output_field=models.IntegerField())
 
                 if ws_number in [5, 6, 7]:
                     if c_type == 'prirezka':
                         continue
 
                     if c_type == 'spec':
-                        culling_subquery_avg_weight = piglets_events.models.CullingPiglets.objects.filter(
-                            piglets_group__in=Subquery(piglets_subquery),
-                            culling_type=c_type
-                            ) \
+                        culling_subquery_avg_weight = culling_subquery \
                             .values('culling_type') \
                             .annotate(avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())) \
                             .values('avg_weight')
 
                         data[f'ws{ws_number}_{c_type}_avg_weight'] = Subquery(culling_subquery_avg_weight,
                          output_field=models.FloatField())
-
-        return self.annotate(**data)
-
-    def add_piglets_count_by_ws_week_tour(self):
-        data = dict()
-        for ws_number in [5, 6, 7]:
-            count_subquery = self.gen_piglets_by_week_tour_ws_subquery(OuterRef('pk'), ws_number) \
-                .values('metatour__week_tour') \
-                .annotate(total_qnty=Sum('quantity')) \
-                .values('total_qnty')
-
-            data[f'ws{ws_number}_piglets_qnty_now'] = Subquery(count_subquery, output_field=models.IntegerField())
 
         return self.annotate(**data)
 
