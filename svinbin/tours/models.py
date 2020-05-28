@@ -178,11 +178,6 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def add_greatest_weight_date_otkorm(self):
-        return self.annotate(
-            weight_date_last_ws8=Greatest(F('weight_date_8_5'), F('weight_date_8_6'), F('weight_date_8_7'))
-            )
-
     def add_week_weight_ws8_v2(self):
         # avg by week_tour
         weights_subquery = piglets_events.models.WeighingPiglets.objects.filter(

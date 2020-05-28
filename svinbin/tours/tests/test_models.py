@@ -390,28 +390,7 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             self.assertEqual(tours[0].week_weight_avg_3_4, 10.5)
             self.assertEqual(tours[0].week_weight_qnty_3_4, 200)
 
-    def test_add_greatest_weight_date_otkorm(self):
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws5, 100)
-        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1100, 
-            place='8/5')
-
-        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws5, 100)
-        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=2600, 
-            place='8/6', date=datetime.datetime.now() + datetime.timedelta(days=10))
-
-        last = WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=2600, 
-            place='8/7', date=datetime.datetime.now() + datetime.timedelta(days=21))
-
-        with self.assertNumQueries(1):
-            tours = Tour.objects.all() \
-                .add_weight_date() \
-                .add_greatest_weight_date_otkorm()
-            bool(tours)
-            self.assertEqual(tours[0].weight_date_last_ws8, last.date)
-
-    def test_add_week_weight_ws8_v1(self):
+    def test_add_week_weight_ws8_v2(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws5, 100)
         WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1100, 
