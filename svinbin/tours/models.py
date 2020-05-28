@@ -237,18 +237,6 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def add_gilts_count_by_ws_week_tour(self):
-        data = dict()
-        for ws_number in [3, 4, 5, 6, 7, 8]:
-            count_subquery = self.gen_piglets_by_week_tour_ws_subquery(OuterRef('pk'), ws_number) \
-                .values('metatour__week_tour') \
-                .annotate(total_gilts_qnty=Sum('gilts_quantity')) \
-                .values('total_gilts_qnty')
-
-            data[f'ws{ws_number}_gilts_qnty_now'] = Subquery(count_subquery, output_field=models.IntegerField())
-
-        return self.annotate(**data)
-
     def add_count_transfer_to_7_5(self):
         data = dict()
         piglets_subquery = self.gen_piglets_active_inactive_by_week_tour_ws_subquery(OuterRef(OuterRef('pk')))
