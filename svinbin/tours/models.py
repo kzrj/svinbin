@@ -208,17 +208,29 @@ class TourQuerySet(models.QuerySet):
         return self.annotate(
             ws3_padej_percentage=Case(
                 When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
-                When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), 
+                When(total_born_alive__gt=0, 
                         then=ExpressionWrapper(
                             F('ws3_padej_quantity') * 100.0 / F('total_born_alive'),
                             output_field=models.FloatField())
                     ), output_field=models.FloatField()
                 ),
+            ws3_prirezka_percentage=Case(
+                When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
+                When(total_born_alive__gt=0, 
+                        then=ExpressionWrapper(
+                            F('ws3_prirezka_quantity') * 100.0 / F('total_born_alive'),
+                            output_field=models.FloatField())
+                    ), output_field=models.FloatField()
+                ),
 
-            # ws3_padej_percentage=ExpressionWrapper(
-            #      F('ws3_padej_quantity') * 100.0 / F('total_born_alive'), output_field=models.FloatField()),
-            # ws3_prirezka_percentage=ExpressionWrapper(
-            #     F('ws3_prirezka_quantity') * 100.0 / F('total_born_alive'), output_field=models.FloatField()),
+            ws4_padej_percentage=Case(
+                When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
+                When(week_weight_qnty_3_4__gt=0), 
+                        then=ExpressionWrapper(
+                            F('ws4_padej_percentage') * 100.0 / F('week_weight_qnty_3_4'),
+                            output_field=models.FloatField())
+                    ), output_field=models.FloatField()
+                ),
 
             # ws4_padej_percentage=ExpressionWrapper(
             #     F('ws4_padej_quantity') * 100.0 / F('week_weight_qnty_3_4'), output_field=models.FloatField()),
