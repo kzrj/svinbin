@@ -225,7 +225,7 @@ class TourQuerySet(models.QuerySet):
 
             ws4_padej_percentage=Case(
                 When(Q(week_weight_qnty_3_4__isnull=True) | Q(week_weight_qnty_3_4=0), then=0.0),
-                When(week_weight_qnty_3_4__gt=0), 
+                When(week_weight_qnty_3_4__gt=0, 
                         then=ExpressionWrapper(
                             F('ws4_padej_percentage') * 100.0 / F('week_weight_qnty_3_4'),
                             output_field=models.FloatField())
