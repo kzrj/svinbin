@@ -30,7 +30,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_count_transfer_to_7_5() \
                 .add_culling_percentage() \
                 .order_by('-year','-week_number', ) \
-                .filter(year__gte=2020)
+                # .filter(year__gte=2020)
 
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
