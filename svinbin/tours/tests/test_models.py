@@ -384,7 +384,7 @@ class TourQuerysetAddPigletsDataTest(TestCase):
         merged_piglets1.deactivate()
 
         with self.assertNumQueries(1):
-            tours = Tour.objects.all().add_weight_date().add_week_weight()
+            tours = Tour.objects.all().add_week_weight()
             bool(tours)
             self.assertEqual(tours[0].week_weight_3_4, 2100)
             self.assertEqual(tours[0].week_weight_avg_3_4, 10.5)
@@ -427,7 +427,6 @@ class TourQuerysetAddPigletsDataTest(TestCase):
 
         with self.assertNumQueries(1):
             tours = Tour.objects.all() \
-                .add_weight_date() \
                 .add_week_weight() \
                 .add_week_weight_ws8_v2()
             bool(tours)
