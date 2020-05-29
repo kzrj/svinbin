@@ -622,9 +622,11 @@ def gen_operations_dict():
     return operations_data
 
 
-def gen_megalist(request_json):
+def gen_megadict(request_json):
+    final_dict = {'additional_data': {}, 'results': []}
     megalist = list()
     operations_data = gen_operations_dict()
+    culling_piglets_padej_qss = CullingPiglets.objects.none()
 
     for operation_key in request_json['operations'].keys():
         if request_json['operations'][operation_key]:
@@ -646,6 +648,9 @@ def gen_megalist(request_json):
 
             serializer = operations_data[operation_key]['serializer']
             data = serializer(qs, many=True).data
+
+            if 'piglets_padej' in operation_key:
+                culling_piglets_padej_qss = culling_piglets_padej_qss | qs                
             
             for i in data:
                 megalist.append(i)
@@ -653,4 +658,26 @@ def gen_megalist(request_json):
     megalist = sorted(megalist, key=lambda x: (datetime.strptime(x['date'], '%d-%m-%Y %H:%M:%S'),
      datetime.strptime(x['created_at'], '%d-%m-%Y %H:%M:%S')), reverse=True)
     
-    return megalist
+    final_dict['additional_data'] = {'padej_data':
+        culling_piglets_padej_qss.aggregate(total_qnty=models.Sum('quantity'), 
+            total_weight=models.Sum('total_weight'))
+    } 
+    final_dict['results'] = megalist
+
+    return final_dict
+
+
+# to do: Refract to class
+class OperationsData():
+    def __init__(self, operations_init_dict, request_operations):
+        self.operations_to_show = dict()
+
+        for operation_key in request_operations.keys():
+            if request_operations[operation_key]:
+                self.operations_to_show[operation_key] = operations_init_dict[operation_key]
+
+        self.megalist = []
+        self.additional_data = {}
+
+    def filter_qs(self, request_filters):
+        pass

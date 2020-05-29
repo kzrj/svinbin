@@ -9,7 +9,7 @@ from rest_framework.pagination import LimitOffsetPagination
 from tours.filters import TourFilter
 
 from tours.models import Tour
-from reports.models import ReportDate, gen_operations_dict, gen_megalist
+from reports.models import ReportDate, gen_operations_dict, gen_megadict
 from locations.models import Location
 from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt )
 from piglets_events.models import CullingPiglets, WeighingPiglets
@@ -94,6 +94,6 @@ class OperationsDataView(views.APIView):
 
     def post(self, request):
         operations_data = gen_operations_dict()
-        megalist = gen_megalist(request.data)
-        return Response(megalist)
+        megadict = gen_megadict(request.data)
+        return Response(megadict)
         # return Response(self.pagination.get_paginated_response(data=megalist))

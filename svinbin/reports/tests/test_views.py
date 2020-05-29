@@ -57,5 +57,5 @@ class ReportDateViewSetTest(APITestCase):
         request_json['operations']['ws1_semination'] = True
 
         response = self.client.post('/api/reports/operations/', request_json, format='json')
-        print(response.data)
+        # print(response.data)
         # self.assertEqual(len(response.data['results']) > 0, True)
