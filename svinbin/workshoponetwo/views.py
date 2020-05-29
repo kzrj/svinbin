@@ -199,6 +199,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         if serializer.is_valid():
             wb = import_farm.init_wb(serializer.validated_data['file'])
             rows = import_farm.get_semenation_rows(wb)
+            import_farm.is_there_single_tour_in_file()
             seminated_list, already_seminated_in_tour, sows_in_another_tour, proholost_list = \
                 import_farm.create_semination_lists(rows, request.user)
 

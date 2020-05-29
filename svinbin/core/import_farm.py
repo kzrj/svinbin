@@ -3,6 +3,8 @@ from xlrd import open_workbook, xldate_as_tuple
 import re
 import datetime
 
+from django.core.exceptions import ValidationError as DjangoValidationError
+
 from sows.models import Sow, Boar
 from tours.models import Tour
 from staff.models import WorkShopEmployee
@@ -43,11 +45,21 @@ def get_semenation_rows(workbook): # to test
             for col in range(s.ncols):
                 if len(str(s.cell(row,col).value).strip()) > 0:
                     row_values.append(s.cell(row, col).value)
-            if define_match_row_and_convert_datetime(row_values):
+            if define_match_row_and_convert_datetime(row_values=row_values):
                 # if ro
-                row_values = normalize_row(row_values, workbook)
+                row_values = normalize_row(row=row_values, workbook=workbook)
                 rows.append(row_values)
     return rows
+
+def is_there_single_tour_in_file(rows):
+    tour = rows[0][3]
+
+    for row in rows:
+        if row[3] != tour:
+            raise DjangoValidationError(message='В файле несколько туров.')
+
+    return True
+
 
 def create_semination_lists(rows, request_user):
     seminated_list = list()
@@ -58,15 +70,15 @@ def create_semination_lists(rows, request_user):
     count = 0
 
     for row in rows:
-        tour = Tour.objects.create_or_return_by_raw(row[3], row[4])
-        sow, created = Sow.objects.create_or_return(row[0])
+        tour = Tour.objects.create_or_return_by_raw(raw_tour=row[3], start_date=row[4])
+        sow, created = Sow.objects.create_or_return(farm_id=row[0])
 
         if sow.alive == False:
             continue
 
         try:
-            semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(row[6])
-            semination_employee2 = WorkShopEmployee.objects.get_seminator_by_farm_name(row[8])
+            semination_employee1 = WorkShopEmployee.objects.get_seminator_by_farm_name(farm_name=row[6])
+            semination_employee2 = WorkShopEmployee.objects.get_seminator_by_farm_name(farm_name=row[8])
         except:
             semination_employee1, semination_employee2 = None, None
 
@@ -74,13 +86,14 @@ def create_semination_lists(rows, request_user):
             # if we meet sow with tour but row_tour is earlier.
             if sow.tour.week_number < tour.week_number and sow.tour.year < tour.year:
                 # do proholost
-                Ultrasound.objects.create_ultrasound(sow, semination_employee1, False, 30, row[4])
+                Ultrasound.objects.create_ultrasound(sow=sow, initiator=semination_employee1,
+                    result=False, days=30, date=row[4])
             else:
                 sows_in_another_tour.append(sow)
                 continue
             
-        boar1 = Boar.objects.get_or_create_boar(row[5])
-        boar2 = Boar.objects.get_or_create_boar(row[7])
+        boar1 = Boar.objects.get_or_create_boar(birth_id=row[5])
+        boar2 = Boar.objects.get_or_create_boar(birth_id=row[7])
 
         # if usouded by hand and then file updated. It is to avoid double usound, semination
         if 'Рег. Пов тор' in row or 'Не рег. пов тор' in row \
@@ -97,13 +110,14 @@ def create_semination_lists(rows, request_user):
         if 'Рег. Пов тор' in row or 'Не рег. пов тор' in row:
         # рег повтор не рег повтор. Прохолост
         # проверить была ли свинья уже осеменена в этом туре.
-            Ultrasound.objects.create_ultrasound(sow, semination_employee1, False, 30, row[4])
+            Ultrasound.objects.create_ultrasound(sow=sow, initiator=semination_employee1, 
+                result=False, days=30, date=row[4])
             proholost_list.append(sow)
             continue
 
         # Аборт
         if 'Абортировали' in row:
-            AbortionSow.objects.create_abortion(sow, semination_employee1, row[4])      
+            AbortionSow.objects.create_abortion(sow=sow, initiator=semination_employee1, date=row[4])      
             proholost_list.append(sow)
             continue
 
