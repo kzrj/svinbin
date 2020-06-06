@@ -240,13 +240,13 @@ class WeaningSowManager(CoreModelManager):
          initiator=initiator, date=date)
 
         # when set tour to None
-        sow.tour = None
+        # sow.tour = None
         sow.change_status_to(status_title='Отъем')
         return weaning
 
 
 class WeaningSow(SowEvent):
-    piglets = models.OneToOneField('piglets.Piglets', on_delete=models.SET_NULL, null=True)
+    piglets = models.ForeignKey('piglets.Piglets', on_delete=models.SET_NULL, null=True)
     quantity = models.IntegerField()
 
     objects = WeaningSowManager()
