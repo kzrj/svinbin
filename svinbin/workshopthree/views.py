@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from django.utils import timezone
+
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -24,7 +26,8 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
                 alive_quantity=serializer.validated_data['alive_quantity'],
                 dead_quantity=serializer.validated_data['dead_quantity'],
                 mummy_quantity=serializer.validated_data['mummy_quantity'],
-                initiator=request.user
+                initiator=request.user,
+                date=timezone.now()
                 )
             
             return Response(
