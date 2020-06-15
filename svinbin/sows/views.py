@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db.models import Prefetch
+from django.utils import timezone
 
 from rest_framework import viewsets, status
 from rest_framework.response import Response
@@ -100,8 +101,9 @@ class WorkShopSowViewSet(SowViewSet):
         serializer = sows_events_serializers.CreateCullingSowPkSerializer(data=request.data)
         if serializer.is_valid():
             culling = sows_events_models.CullingSow.objects.create_culling(
-                sow, serializer.validated_data['culling_type'],
-                serializer.validated_data['reason'], request.user)
+                sow=sow, culling_type=serializer.validated_data['culling_type'],
+                reason=serializer.validated_data['reason'], initiator=request.user,
+                date=timezone.now())
             return Response(
                 {
                     "culling": sows_events_serializers.CullingSowSerializer(culling).data,
@@ -136,7 +138,7 @@ class WorkShopSowViewSet(SowViewSet):
     def abortion(self, request, pk=None):
         sow = self.get_object()
         abortion = sows_events_models.AbortionSow.objects.create_abortion(
-            sow=sow, initiator=request.user)
+            sow=sow, initiator=request.user, date=timezone.now())
         return Response(
             {
                 "abortion": sows_events_serializers.AbortionSowSerializer(abortion).data,

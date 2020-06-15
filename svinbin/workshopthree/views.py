@@ -43,7 +43,7 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
         serializer = serializers.MarkSowAsNurseSerializer(data=request.data)
         if serializer.is_valid():
             sow = self.get_object()
-            sow.markasnurse_set.create_nurse_event(sow=sow, initiator=request.user)
+            sow.markasnurse_set.create_nurse_event(sow=sow, initiator=request.user, date=timezone.now())
             sow.refresh_from_db()
             
             return Response(

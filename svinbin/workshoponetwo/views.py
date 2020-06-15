@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.utils import timezone
 
 from rest_framework import status, viewsets
 from rest_framework.response import Response
@@ -110,10 +111,12 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         serializer = sows_events_serializers.CreateUltrasoundSerializer(data=request.data)
         if serializer.is_valid():
             ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
-                 sow,
-                 request.user,
-                 serializer.validated_data['result'],
-                 serializer.validated_data['days'],)
+                 sow=sow,
+                 initiator=request.user,
+                 result=serializer.validated_data['result'],
+                 days=serializer.validated_data['days'],
+                 date=timezone.now()
+                 )
             return Response(
                 {
                     "ultrasound": sows_events_serializers.UltrasoundSerializer(ultrasound).data,

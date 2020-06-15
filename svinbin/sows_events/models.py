@@ -235,9 +235,9 @@ class CullingSow(SowEvent):
 
 
 class WeaningSowManager(CoreModelManager):
-    def create_weaning(self, sow, piglets, tour=None, initiator=None, date=timezone.now()):
+    def create_weaning(self, sow, piglets, tour=None, initiator=None):
         weaning = self.create(sow=sow, tour=tour, piglets=piglets, quantity=piglets.quantity,
-         initiator=initiator, date=date)
+         initiator=initiator, date=timezone.now())
 
         # when set tour to None
         # sow.tour = None
@@ -254,7 +254,8 @@ class WeaningSow(SowEvent):
 
 class AbortionSowManager(CoreModelManager):
     def create_abortion(self, sow, initiator=None, date=timezone.now()):
-        abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date, location=sow.location)
+        abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date,
+             location=sow.location)
         sow.tour = None
         sow.change_status_to(status_title='Аборт')
         return abortion

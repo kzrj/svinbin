@@ -15,7 +15,7 @@ class Transaction(Event):
 
 
 class SowTransactionManager(CoreModelManager):
-    def create_transaction(self, sow, to_location,  initiator=None):
+    def create_transaction(self, sow, to_location,  initiator=None,):
         if isinstance(to_location.get_location, SowAndPigletsCell) and not to_location.is_sow_empty:
             raise DjangoValidationError(message='Клетка №{} не пустая'. \
                 format(to_location.sowAndPigletsCell.number))
@@ -93,7 +93,7 @@ class PigletsTransactionManager(CoreModelManager):
         return transaction
 
     def transaction_with_split_and_merge(self, piglets, to_location, new_amount=None, gilts_contains=False,
-         reverse=False, merge=False, initiator=None):
+         reverse=False, merge=False, initiator=None, date=None):
         # move second piglets from split, new_amount piglets
 
         split_event = None
@@ -114,7 +114,8 @@ class PigletsTransactionManager(CoreModelManager):
                 moved_piglets = piglets1
                 stayed_piglets = piglets2_new_amount
 
-        transaction = self.create_transaction(to_location, moved_piglets, initiator)
+        transaction = self.create_transaction(to_location=to_location, piglets_group=moved_piglets,
+         initiator=initiator, date=date)
 
         if merge:            
             moved_piglets = PigletsMerger.objects.merge_piglets_in_location(
@@ -149,7 +150,7 @@ class PigletsTransactionManager(CoreModelManager):
 
         return piglets
 
-    def transaction_gilts_to_7_5(self, piglets, gilts_amount=None, initiator=None):
+    def transaction_gilts_to_7_5(self, piglets, gilts_amount=None, initiator=None, date=None):
         # split or not
         if gilts_amount and gilts_amount < piglets.quantity:
             # split check amount
@@ -165,7 +166,8 @@ class PigletsTransactionManager(CoreModelManager):
         piglets_to_transfer.save()
 
         to_location = Location.objects.get(workshop__number=11)
-        return self.create_transaction(to_location, piglets_to_transfer, initiator)
+        return self.create_transaction(to_location=to_location, piglets_group=piglets_to_transfer,
+         initiator=initiator, date=date)
 
 
 class PigletsTransaction(Transaction):

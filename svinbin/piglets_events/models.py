@@ -350,9 +350,9 @@ class RecountManager(CoreModelManager):
     def get_queryset(self):
         return RecountQuerySet(self.model, using=self._db)
 
-    def create_recount(self, piglets, new_quantity, comment=None, initiator=None):
+    def create_recount(self, piglets, new_quantity, comment=None, initiator=None, date=None):
         recount = self.create(piglets=piglets, quantity_before=piglets.quantity, quantity_after=new_quantity,
-            balance=new_quantity - piglets.quantity, initiator=initiator, comment=comment)
+            balance=new_quantity - piglets.quantity, initiator=initiator, comment=comment, date=date)
         piglets.quantity = new_quantity
         piglets.save()
         piglets.metatour.records.recount_records_by_total_quantity(new_quantity)

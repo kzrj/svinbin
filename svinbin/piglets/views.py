@@ -1,4 +1,6 @@
 # # -*- coding: utf-8 -*-
+from django.utils import timezone
+
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -43,7 +45,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
             new_location = locations_models.Location.objects.get(workshop__number=3)
             merged_piglets = piglets_events_models.PigletsMerger.objects.create_from_merging_list(
                 merging_list=serializer.validated_data['records'], new_location=new_location,
-                initiator=request.user)
+                initiator=request.user, date=timezone.now())
             merged_piglets.change_status_to('Готовы ко взвешиванию')
 
             if serializer.validated_data.get('transfer_part_number', None):
@@ -51,7 +53,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
 
             to_location = locations_models.Location.objects.get(workshop__number=4)
             transaction = transactions_models.PigletsTransaction.objects.create_transaction(
-                to_location=to_location, piglets_group=merged_piglets, initiator=request.user)
+                to_location=to_location, piglets_group=merged_piglets,
+                initiator=request.user, date=timezone.now())
             return Response(
                 {
                   "message": 'Партия создана и перемещена в Цех4.',
@@ -65,6 +68,10 @@ class PigletsViewSet(viewsets.ModelViewSet):
     def culling(self, request, pk=None):
         serializer = piglets_events_serializers.CullingPigletsSerializer(data=request.data)
         if serializer.is_valid():
+            date = timezone.now()
+            if not serializer.validated_data['date']:
+                date = serializer.validated_data['date']
+
             piglets_events_models.CullingPiglets.objects.create_culling_piglets(
                 piglets_group=self.get_object(),
                 culling_type=serializer.validated_data['culling_type'],
@@ -72,7 +79,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 is_it_gilt=serializer.validated_data['is_it_gilt'],
                 quantity=serializer.validated_data['quantity'],
                 total_weight=serializer.validated_data['total_weight'],
-                date=serializer.validated_data['date'],
+                date=date,
                 initiator=request.user
                 )
             return Response(
@@ -93,7 +100,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 piglets_group=piglets_group,
                 total_weight=serializer.validated_data['total_weight'],
                 place=serializer.validated_data['place'],
-                initiator=request.user
+                initiator=request.user,
+                date=timezone.now()
                 )
 
             return Response(
@@ -123,7 +131,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
                         reverse=True,
                         merge=False,
                         gilts_contains=True,
-                        initiator=request.user
+                        initiator=request.user,
+                        date=timezone.now()
                     )
                 moved_piglets.change_status_to('Взвешены, готовы к заселению')
                 message = "Взвешивание прошло успешно. Возврат поросят прошел успешно."
@@ -158,7 +167,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 piglets_group=piglets_group,
                 total_weight=serializer.validated_data['total_weight'],
                 place=serializer.validated_data['place'],
-                initiator=request.user
+                initiator=request.user,
+                date=timezone.now()
                 )
 
             return Response(
@@ -182,7 +192,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
                     new_amount=serializer.validated_data.get('new_amount', None),
                     gilts_contains=serializer.validated_data.get('gilts_contains', False),
                     merge=serializer.validated_data['merge'],
-                    initiator=request.user
+                    initiator=request.user,
+                    date=timezone.now()
                     )
 
             return Response(
@@ -202,7 +213,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
             transaction = transactions_models.PigletsTransaction.objects.transaction_gilts_to_7_5(
                     piglets= self.get_object(),
                     gilts_amount=serializer.validated_data.get('gilts_amount', None),                    
-                    initiator=request.user
+                    initiator=request.user,
+                    date=timezone.now()
                     )
 
             return Response(
@@ -222,6 +234,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                     piglets= self.get_object(),
                     to_location=serializer.validated_data['to_location'],
                     new_amount=serializer.validated_data.get('new_amount', None),
+                    date=timezone.now()
                     )
 
             # create sows-gilts count = moved_piglets.quantity. location ws1
@@ -258,8 +271,12 @@ class PigletsViewSet(viewsets.ModelViewSet):
             if serializer.validated_data.get('from_location', None) and \
               serializer.validated_data.get('transaction_date', None):
                 transactions_models.PigletsTransaction.objects.create_transaction(
-                    serializer.validated_data['location'], piglets,
-                    request.user, serializer.validated_data.get('transaction_date', None))
+                    serializer.validated_data['location'],
+                    piglets,
+                    request.user,
+                    serializer.validated_data.get('transaction_date', None),
+                    timezone.now()
+                    )
                 
             piglets.change_status_to('Готовы ко взвешиванию')
 
@@ -277,10 +294,13 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = piglets_events_serializers.RecountPigletsSerializer(data=request.data)
         if serializer.is_valid():
             piglets_group = self.get_object()
-            piglets_events_models.Recount.objects.create_recount(piglets_group,
-              serializer.validated_data['new_quantity'],
-              serializer.validated_data.get('comment', None),
-              request.user)
+            piglets_events_models.Recount.objects.create_recount(
+              piglets=piglets_group,
+              new_quantity=serializer.validated_data['new_quantity'],
+              comment=serializer.validated_data.get('comment', None),
+              initiator=request.user,
+              date=timezone.now()
+              )
             return Response(
                 {
                  "message": 'Пересчет прошел успешно.',
@@ -300,7 +320,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
               mother_sow_farm_id=serializer.validated_data['mother_sow_farm_id'],
               piglets=self.get_object()              
               )
-            sows_events_models.MarkAsGilt.objects.create_init_gilt_event(gilt=gilt, initiator=request.user)
+            sows_events_models.MarkAsGilt.objects.create_init_gilt_event(gilt=gilt,
+             initiator=request.user, date=timezone.now())
 
             return Response(
                 {
