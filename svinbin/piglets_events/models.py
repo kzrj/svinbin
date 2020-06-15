@@ -207,7 +207,7 @@ class PigletsMergerManager(CoreModelManager):
             sow_in_cell = weaning_piglets.location.sow_set.all().first()
             if sow_in_cell:
                 sow_in_cell.weaningsow_set.create_weaning(sow=sow_in_cell, piglets=weaning_piglets,
-                 initiator=initiator, date=date)
+                 initiator=initiator)
 
         return self.create_merger_return_group(parent_piglets_ids, new_location, initiator, date)
 

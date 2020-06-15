@@ -271,11 +271,10 @@ class PigletsViewSet(viewsets.ModelViewSet):
             if serializer.validated_data.get('from_location', None) and \
               serializer.validated_data.get('transaction_date', None):
                 transactions_models.PigletsTransaction.objects.create_transaction(
-                    serializer.validated_data['location'],
-                    piglets,
-                    request.user,
-                    serializer.validated_data.get('transaction_date', None),
-                    timezone.now()
+                    to_location=serializer.validated_data['location'],
+                    piglets_group=piglets,
+                    initiator=request.user,
+                    date=serializer.validated_data.get('transaction_date', None),
                     )
                 
             piglets.change_status_to('Готовы ко взвешиванию')
