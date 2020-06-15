@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 
 from reports.models import ReportDate, gen_operations_dict, gen_megadict
 from sows.models import Sow
-from sows_events.models import CullingSow, SowFarrow
+from sows_events.models import CullingSow, SowFarrow, Semination, Ultrasound
 from piglets.models import Piglets
 from piglets_events.models import CullingPiglets
 from tours.models import Tour
@@ -641,7 +641,10 @@ class OperationDataMegalistTest(TransactionTestCase):
 
         megalist = gen_megadict(request_json)['results']
         
-        self.assertEqual(megalist[0]['date'] > megalist[-1]['date'], True)
+        date1 = datetime.strptime(megalist[0]['date'], '%d-%m-%Y %H:%M:%S')
+        date2 = datetime.strptime(megalist[-1]['date'], '%d-%m-%Y %H:%M:%S')
+
+        self.assertEqual(date1 > date2, True)
 
     def test_gen_megadict_sort_by_opername(self):
         request_json = copy.deepcopy(self.request_json)
@@ -664,9 +667,12 @@ class OperationDataMegalistTest(TransactionTestCase):
             date=date_15d_ago)
 
         megalist = gen_megadict(request_json)['results']
-        
-        self.assertEqual(megalist[0]['date'] > megalist[-1]['date'], True)
 
+        date1 = datetime.strptime(megalist[0]['date'], '%d-%m-%Y %H:%M:%S')
+        date2 = datetime.strptime(megalist[-1]['date'], '%d-%m-%Y %H:%M:%S')
+
+        self.assertEqual(date1 > date2, True)
+        
 
 class OperationDataAdditionInfoTest(TransactionTestCase):
     def setUp(self):
