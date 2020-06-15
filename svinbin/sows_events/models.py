@@ -152,7 +152,7 @@ class SowFarrowManager(CoreModelManager):
         return SowFarrowQuerySet(self.model, using=self._db)
 
     def create_sow_farrow(self, sow, initiator=None,
-        alive_quantity=0, dead_quantity=0, mummy_quantity=0, date=timezone.now()):
+        alive_quantity=0, dead_quantity=0, mummy_quantity=0, date=timezone.now):
         
         # validate
         if not sow.tour:
