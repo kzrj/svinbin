@@ -753,3 +753,27 @@ class OperationDataAdditionInfoTest(TransactionTestCase):
 
         self.assertEqual(megadict['additional_data']['padej_data']['total_qnty'], None)
         self.assertEqual(megadict['additional_data']['padej_data']['total_weight'], None)
+
+
+class ReportDateWSReportTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        start_date = date(2020, 1, 1)
+        end_date = timezone.now().date() + timedelta(1)
+        ReportDate.objects.create_bulk_if_none_from_range(start_date, end_date)
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.loc_ws1 = Location.objects.get(workshop__number=1)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+
+        self.loc_ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
+
+
+    def test_add_ws_sow_data(self):
+        pass

@@ -262,6 +262,18 @@ class ReportDateQuerySet(models.QuerySet):
                 avg_priplod=Avg('priplod_by_sow'),
                 )
 
+    def add_ws_sows_data(self, ws_number=3):
+
+        trs_in_sows = Subquery(SowTransaction.objects.filter(
+                            date__date__lte=OuterRef('date'), to_location__workshop__number=ws_number) \
+                                    .values_list('sow', flat=True))
+
+        trs_out_sows = Subquery(SowTransaction.objects.filter(
+                            date__date__lte=OuterRef('date'), to_location__workshop__number=ws_number) \
+                                    .values_list('sow', flat=True))
+        
+        return self.annotate(piglets_transfered=total_qnty)
+
 
 class ReportDateManager(CoreModelManager):
     def get_queryset(self):
@@ -392,7 +404,7 @@ def gen_operations_dict():
         'serializer': operation_serializers.OpAbortSerializer,
         'target': 'sow' }
 
-    operations_data['ws3_sow_culling'] = {'qs':  CullingSow.objects.filter(location__workshop__number=3)\
+    operations_data['ws3_sow_culling'] = {'qs':  CullingSow.objects.filter(location__in=ws3_locs)\
             .select_related('sow', 'tour', 'initiator', 
                 'location__workshop', 
                 'location__sowAndPigletsCell__section',
