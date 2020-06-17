@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, date
 from mixer.backend.django import mixer
 
 from django.test import TestCase, TransactionTestCase
@@ -264,6 +265,32 @@ class SowModelTest(TransactionTestCase):
         sows.update_status(title='Ожидает осеменения')
 
         self.assertEqual(SowStatusRecord.objects.all().count(), 3)
+
+    def test_qs_add_status_at_date(self):
+        date1 = date(2020, 5, 1)
+        date2 = date(2020, 5, 3)
+        date3 = date(2020, 4, 25)
+
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testings.create_sow_and_put_in_workshop_one()
+
+        sows = Sow.objects.all()
+        sows.update_status(title='Ожидает осеменения')
+
+        sows.update_status(title='Осеменена 1')
+
+        s_records = SowStatusRecord.objects.filter(status_after__title='Осеменена 1')
+        s_record = s_records.first()
+
+        s_record.date = date1
+        s_record.save()
+
+        sow = sows.add_status_at_date(date=date2).filter(pk=s_record.sow.pk).first()
+        self.assertEqual(sow.status_at_date, 'Осеменена 1')
+
+        sow = sows.add_status_at_date(date=date3).filter(pk=s_record.sow.pk).first()
+        self.assertEqual(sow.status_at_date, None)
 
 
 class SowQueryTest(TransactionTestCase):

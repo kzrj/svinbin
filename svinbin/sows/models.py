@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from django.db.models import Q, Prefetch
+from django.db.models import Q, Prefetch, Subquery, OuterRef
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
@@ -24,6 +24,9 @@ class SowStatusRecord(CoreModel):
         related_name='records_after')
     sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE, related_name='status_records')
     date = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-date']
 
     def __str__(self):
         return f'sow status record {self.pk}'
@@ -66,6 +69,12 @@ class SowsQuerySet(models.QuerySet):
                 more_than_once_seminated_sows.append(sow.pk)
 
         return self.filter(pk__in=once_seminated_sows), self.filter(pk__in=more_than_once_seminated_sows)
+
+    def add_status_at_date(self, date):
+        status = Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lt=date) \
+            .values('status_after__title')[:1])
+
+        return self.annotate(status_at_date=status)
 
 
 class SowManager(CoreModelManager):

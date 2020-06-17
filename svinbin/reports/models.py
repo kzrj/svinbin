@@ -328,6 +328,10 @@ class ReportDate(CoreModel):
              qs2_values_list=sows_out)
         result = self.substract_qs_values_lists(qs1_values_list=result,
              qs2_values_list=sows_dead)
+
+        sows = Sow.objects.get_queryset_with_not_alive().filter(farm_id__in=result)
+        print(sows)
+
         return sows_in, sows_out, sows_dead, result
     
 
