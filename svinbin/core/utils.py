@@ -231,11 +231,11 @@ def create_sow_status_records(change_date=False):
         last_record = tr.sow.status_records.filter(date__lte=tr.date).order_by('-created_at').first()
         
         if last_record:
-            culling.sow.status_records.create(sow=culling.sow, status_before=last_record.status_after,
-                status_after=status_ozhidaet, date=culling.date)
+            tr.sow.status_records.create(sow=tr.sow, status_before=last_record.status_after,
+                status_after=status_ozhidaet, date=tr.date)
         else:
-            culling.sow.status_records.create(sow=culling.sow, status_before=last_record,
-                status_after=status_ozhidaet, date=culling.date)
+            tr.sow.status_records.create(sow=tr.sow, status_before=last_record,
+                status_after=status_ozhidaet, date=tr.date)
 
     for culling in CullingSow.objects.all().select_related('sow', 'sow__status'):
         if change_date:
