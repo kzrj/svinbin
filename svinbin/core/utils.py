@@ -222,7 +222,7 @@ def create_sow_status_records(change_date=False):
         abort.sow.status_records.create(sow=abort.sow, status_before=status_sup35,
             status_after=status_abort, date=abort.date)
 
-    ws3_locs = Location.objects.get_workshop_location_by_number(workshop_number=3)
+    ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
     for tr in SowTransaction.objects.filter(from_location__in=ws3_locs, to_location__workshop__number=1):
         if change_date:
             tr.date = tr.created_at
@@ -241,7 +241,7 @@ def create_sow_status_records(change_date=False):
         if change_date:
             culling.date = culling.created_at
             culling.save()
-            
+
         last_record = culling.sow.status_records.filter(date__lte=culling.date) \
             .order_by('-created_at').first()
         if last_record:
