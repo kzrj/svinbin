@@ -170,57 +170,57 @@ def create_sow_status_records(change_date=False):
     status_brak = SowStatus.objects.get(title='Брак')
     status_korm = SowStatus.objects.get(title='Кормилица')
 
-    for semination in Semination.objects.all().select_related('sow', 'sow__status'):
-        semination.sow.status_records.create(sow=semination.sow, status_before=status_ozhidaet,
-            status_after=status_osem2, date=semination.date)
+    # for semination in Semination.objects.all().select_related('sow', 'sow__status'):
+    #     semination.sow.status_records.create(sow=semination.sow, status_before=status_ozhidaet,
+    #         status_after=status_osem2, date=semination.date)
 
-    for usound in Ultrasound.objects.all().select_related('sow', 'sow__status', 'u_type'):
-        if change_date:
-            usound.date = usound.created_at
-            usound.save()
+    # for usound in Ultrasound.objects.all().select_related('sow', 'sow__status', 'u_type'):
+    #     if change_date:
+    #         usound.date = usound.created_at
+    #         usound.save()
 
-        if usound.result:
-            if usound.u_type.days == 30:
-                usound.sow.status_records.create(sow=usound.sow, status_before=status_osem2,
-                    status_after=status_sup28, date=usound.date)
-            if usound.u_type.days == 60:
-                usound.sow.status_records.create(sow=usound.sow, status_before=status_sup28,
-                    status_after=status_sup35, date=usound.date)
-        else:
-            usound.sow.status_records.create(sow=usound.sow, status_before=status_sup28,
-                status_after=status_proh, date=usound.date)
+    #     if usound.result:
+    #         if usound.u_type.days == 30:
+    #             usound.sow.status_records.create(sow=usound.sow, status_before=status_osem2,
+    #                 status_after=status_sup28, date=usound.date)
+    #         if usound.u_type.days == 60:
+    #             usound.sow.status_records.create(sow=usound.sow, status_before=status_sup28,
+    #                 status_after=status_sup35, date=usound.date)
+    #     else:
+    #         usound.sow.status_records.create(sow=usound.sow, status_before=status_sup28,
+    #             status_after=status_proh, date=usound.date)
 
-    for farrow in SowFarrow.objects.all().select_related('sow', 'sow__status'):
-        if change_date:
-            farrow.date = farrow.created_at
-            farrow.save()
+    # for farrow in SowFarrow.objects.all().select_related('sow', 'sow__status'):
+    #     if change_date:
+    #         farrow.date = farrow.created_at
+    #         farrow.save()
 
-        farrow.sow.status_records.create(sow=farrow.sow, status_before=status_sup35,
-            status_after=status_oporos, date=farrow.date)
+    #     farrow.sow.status_records.create(sow=farrow.sow, status_before=status_sup35,
+    #         status_after=status_oporos, date=farrow.date)
 
-    for weaning in WeaningSow.objects.all().select_related('sow', 'sow__status'):
-        if change_date:
-            weaning.date = weaning.created_at
-            weaning.save()
+    # for weaning in WeaningSow.objects.all().select_related('sow', 'sow__status'):
+    #     if change_date:
+    #         weaning.date = weaning.created_at
+    #         weaning.save()
 
-        weaning.sow.status_records.create(sow=weaning.sow, status_before=status_oporos,
-            status_after=status_otiem, date=weaning.date)
+    #     weaning.sow.status_records.create(sow=weaning.sow, status_before=status_oporos,
+    #         status_after=status_otiem, date=weaning.date)
 
-    for nurse in MarkAsNurse.objects.all().select_related('sow', 'sow__status'):
-        if change_date:
-            nurse.date = nurse.created_at
-            nurse.save()
+    # for nurse in MarkAsNurse.objects.all().select_related('sow', 'sow__status'):
+    #     if change_date:
+    #         nurse.date = nurse.created_at
+    #         nurse.save()
 
-        nurse.sow.status_records.create(sow=nurse.sow, status_before=status_oporos,
-            status_after=status_korm, date=nurse.date)
+    #     nurse.sow.status_records.create(sow=nurse.sow, status_before=status_oporos,
+    #         status_after=status_korm, date=nurse.date)
 
-    for abort in AbortionSow.objects.all().select_related('sow', 'sow__status'):
-        if change_date:
-            abort.date = abort.created_at
-            abort.save()
+    # for abort in AbortionSow.objects.all().select_related('sow', 'sow__status'):
+    #     if change_date:
+    #         abort.date = abort.created_at
+    #         abort.save()
 
-        abort.sow.status_records.create(sow=abort.sow, status_before=status_sup35,
-            status_after=status_abort, date=abort.date)
+    #     abort.sow.status_records.create(sow=abort.sow, status_before=status_sup35,
+    #         status_after=status_abort, date=abort.date)
 
     ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
     for tr in SowTransaction.objects.filter(from_location__in=ws3_locs, to_location__workshop__number=1):
