@@ -18,7 +18,10 @@ from staff.serializers import WorkshopEmployeeSerializer
 from locations.models import Location
 from tours.models import MetaTourRecord
 from piglets.models import Piglets
-from sows_events.models import SowFarrow
+from sows_events.models import ( SowFarrow, Semination, Ultrasound, CullingSow, WeaningSow, AbortionSow,
+    MarkAsNurse)
+from sows.models import SowStatus, Sow, SowStatusRecord
+from transactions.models import SowTransaction
 
 
 class CustomValidation(exceptions.APIException):
@@ -153,3 +156,97 @@ def fix_plus_age():
             piglets.birthday = correct_birthday
 
         piglets.save()
+
+
+def create_sow_status_records(change_date=False):
+    status_ozhidaet = SowStatus.objects.get(title='Ожидает осеменения')
+    status_osem2 = SowStatus.objects.get(title='Осеменена 2')
+    status_sup28 = SowStatus.objects.get(title='Супорос 28')
+    status_sup35 = SowStatus.objects.get(title='Супорос 35')
+    status_proh = SowStatus.objects.get(title='Прохолост')
+    status_oporos = SowStatus.objects.get(title='Опоросилась')
+    status_otiem = SowStatus.objects.get(title='Отъем')
+    status_abort = SowStatus.objects.get(title='Аборт')
+    status_brak = SowStatus.objects.get(title='Брак')
+    status_korm = SowStatus.objects.get(title='Кормилица')
+
+    for semination in Semination.objects.all().select_related('sow', 'sow__status'):
+        semination.sow.status_records.create(sow=semination.sow, status_before=status_ozhidaet,
+            status_after=status_osem2, date=semination.date)
+
+    for usound in Ultrasound.objects.all().select_related('sow', 'sow__status', 'u_type'):
+        if change_date:
+            usound.date = usound.created_at
+            usound.save()
+
+        if usound.result:
+            if usound.u_type.days == 30:
+                usound.sow.status_records.create(sow=usound.sow, status_before=status_osem2,
+                    status_after=status_sup28, date=usound.date)
+            if usound.u_type.days == 60:
+                usound.sow.status_records.create(sow=usound.sow, status_before=status_sup28,
+                    status_after=status_sup35, date=usound.date)
+        else:
+            usound.sow.status_records.create(sow=usound.sow, status_before=status_sup28,
+                status_after=status_proh, date=usound.date)
+
+    for farrow in SowFarrow.objects.all().select_related('sow', 'sow__status'):
+        if change_date:
+            farrow.date = farrow.created_at
+            farrow.save()
+
+        farrow.sow.status_records.create(sow=farrow.sow, status_before=status_sup35,
+            status_after=status_oporos, date=farrow.date)
+
+    for weaning in WeaningSow.objects.all().select_related('sow', 'sow__status'):
+        if change_date:
+            weaning.date = weaning.created_at
+            weaning.save()
+
+        weaning.sow.status_records.create(sow=weaning.sow, status_before=status_oporos,
+            status_after=status_otiem, date=weaning.date)
+
+    for nurse in MarkAsNurse.objects.all().select_related('sow', 'sow__status'):
+        if change_date:
+            nurse.date = nurse.created_at
+            nurse.save()
+
+        nurse.sow.status_records.create(sow=nurse.sow, status_before=status_oporos,
+            status_after=status_korm, date=nurse.date)
+
+    for abort in AbortionSow.objects.all().select_related('sow', 'sow__status'):
+        if change_date:
+            abort.date = abort.created_at
+            abort.save()
+
+        abort.sow.status_records.create(sow=abort.sow, status_before=status_sup35,
+            status_after=status_abort, date=abort.date)
+
+    ws3_locs = Location.objects.get_workshop_location_by_number(workshop_number=3)
+    for tr in SowTransaction.objects.filter(from_location__in=ws3_locs, to_location__workshop__number=1):
+        if change_date:
+            tr.date = tr.created_at
+            tr.save()
+
+        last_record = tr.sow.status_records.filter(date__lte=tr.date).order_by('-created_at').first()
+        
+        if last_record:
+            culling.sow.status_records.create(sow=culling.sow, status_before=last_record.status_after,
+                status_after=status_ozhidaet, date=culling.date)
+        else:
+            culling.sow.status_records.create(sow=culling.sow, status_before=last_record,
+                status_after=status_ozhidaet, date=culling.date)
+
+    for culling in CullingSow.objects.all().select_related('sow', 'sow__status'):
+        if change_date:
+            culling.date = culling.created_at
+            culling.save()
+            
+        last_record = culling.sow.status_records.filter(date__lte=culling.date) \
+            .order_by('-created_at').first()
+        if last_record:
+            culling.sow.status_records.create(sow=culling.sow, status_before=last_record.status_after,
+                status_after=status_brak, date=culling.date)
+        else:
+            culling.sow.status_records.create(sow=culling.sow, status_before=last_record,
+                status_after=status_brak, date=culling.date)

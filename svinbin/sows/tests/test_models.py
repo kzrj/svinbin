@@ -13,14 +13,14 @@ import sows_events.utils as sows_events_testings
 import piglets.testing_utils as piglets_testing
 
 from locations.models import Location, Section
-from sows.models import Sow, Gilt, Boar
+from sows.models import Sow, Gilt, Boar, SowStatus, SowStatusRecord
 from sows_events.models import SowFarrow, Ultrasound, Semination
 from tours.models import Tour
 
 from sows.serializers import SowManySerializer
 
 
-class SowModelManagerTest(TransactionTestCase):
+class SowModelTest(TransactionTestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
         sows_testings.create_statuses()
@@ -234,6 +234,36 @@ class SowModelManagerTest(TransactionTestCase):
 
         self.assertEqual(Sow.objects.all().count(), 13)
         self.assertEqual(Sow.objects.filter(farm_id__isnull=True).count(), 12)
+
+    def test_change_status_and_create_status_record(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+
+        status1 = SowStatus.objects.get(title='Ожидает осеменения')
+        status2 = SowStatus.objects.get(title='Осеменена 1')
+        status3 = SowStatus.objects.get(title='Супорос 35')
+
+        sow1.change_status_to('Ожидает осеменения')
+
+        self.assertEqual(SowStatusRecord.objects.all().count(), 1)
+        status_record = SowStatusRecord.objects.all().first()
+        self.assertEqual(status_record.status_before, None)
+        self.assertEqual(status_record.status_after.title, 'Ожидает осеменения')
+
+        sow1.change_status_to('Осеменена 1')
+
+        status_record = SowStatusRecord.objects.all().order_by('-created_at').first()
+        self.assertEqual(status_record.status_before.title, 'Ожидает осеменения')
+        self.assertEqual(status_record.status_after.title, 'Осеменена 1')
+
+    def test_qs_update_status(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testings.create_sow_and_put_in_workshop_one()
+
+        sows = Sow.objects.all()
+        sows.update_status(title='Ожидает осеменения')
+
+        self.assertEqual(SowStatusRecord.objects.all().count(), 3)
 
 
 class SowQueryTest(TransactionTestCase):

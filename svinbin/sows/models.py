@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from django.utils import timezone
 from django.db.models import Q, Prefetch
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -16,6 +17,18 @@ class SowStatus(CoreModel):
         return self.title
 
 
+class SowStatusRecord(CoreModel):
+    status_before = models.ForeignKey(SowStatus, null=True, on_delete=models.CASCADE,
+        related_name='records_before')
+    status_after = models.ForeignKey(SowStatus, null=True, on_delete=models.CASCADE,
+        related_name='records_after')
+    sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE, related_name='status_records')
+    date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return f'sow status record {self.pk}'
+
+
 class Pig(CoreModel):
     birth_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
     location = models.ForeignKey("locations.Location", on_delete=models.SET_NULL, null=True)
@@ -26,7 +39,12 @@ class Pig(CoreModel):
 
 class SowsQuerySet(models.QuerySet):
     def update_status(self, title):
-        return self.update(status=SowStatus.objects.get(title=title))
+        status = SowStatus.objects.get(title=title)
+        SowStatusRecord.objects.bulk_create(
+            (SowStatusRecord(sow=sow, status_before=sow.status, status_after=status) for sow in self)
+            )
+            
+        return self.update(status=status)
 
     def get_with_seminations_in_tour(self, tour):
         return self.prefetch_related(
@@ -115,12 +133,12 @@ class Sow(Pig):
         return 'Sow #%s' % self.farm_id
 
     def change_status_to(self, status_title, alive=True):
-        self.status = SowStatus.objects.get(title=status_title)
+        status = SowStatus.objects.get(title=status_title)
+        self.status_records.create(sow=self, status_before=self.status, status_after=status)
+
+        self.status = status
         self.alive = alive
         self.save()
-
-    def change_status_without_save(self, status_title):
-        self.status = SowStatus.objects.get(title=status_title)
 
     def change_sow_current_location(self, to_location):
         self.location = to_location
@@ -179,10 +197,9 @@ class Sow(Pig):
     def update_info_after_semination(self, tour):
         self.tour = tour
         if len(self.semination_set.filter(tour=self.tour)) == 1:
-            self.change_status_without_save('Осеменена 1')
+            self.change_status_to('Осеменена 1')
         if len(self.semination_set.filter(tour=self.tour)) > 1:
-            self.change_status_without_save('Осеменена 2')
-        self.save()
+            self.change_status_to('Осеменена 2')
 
     @property
     def mark_as_nurse(self):

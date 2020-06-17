@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta, date, datetime
+
 from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -37,7 +39,7 @@ class SowTransactionManager(CoreModelManager):
         if sow.status and sow.status.title != 'Супорос 35' and to_location.workshop: 
             if to_location.workshop.number == 3 and sow.location.workshop and \
                 sow.location.workshop.number in [1, 2]:
-                raise DjangoValidationError(message=f'Свиноматка №{sow.farm_id} супорос' )
+                raise DjangoValidationError(message=f'Свиноматка №{sow.farm_id} не супорос' )
 
         sow.change_sow_current_location(to_location)
 
@@ -49,6 +51,14 @@ class SowTransactionManager(CoreModelManager):
             transaction = self.create_transaction(sow, to_location, initiator)
             transactions_ids.append(transaction.pk)
         return transactions_ids
+
+    def trs_in_ws(self, ws_number, ws_locs, start_date=date(2020, 1, 1), end_date=datetime.today()):
+        return self.filter(date__date__gte=start_date, date__date__lte=end_date,
+         to_location__workshop__number=ws_number).exclude(from_location__in=ws_locs)
+
+    def trs_out_ws(self, ws_locs, start_date=date(2020, 1, 1), end_date=datetime.today()):
+                return self.filter(date__date__gte=start_date, date__date__lte=end_date,
+         from_location__in=ws_locs).exclude(to_location__in=ws_locs)
 
 
 class SowTransaction(Transaction):

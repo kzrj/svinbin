@@ -46,7 +46,30 @@ class SowTransactionManagerTest(TestCase):
         transactions = SowTransaction.objects.create_many_transactions([sow1, sow2],
             to_location)
         self.assertEqual(transactions, [1,2])
-           
+
+    def test_trs_in_ws(self):
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testing.create_sow_and_put_in_workshop_one()
+        to_location = Location.objects.get(workshop__number=3)
+
+        transactions = SowTransaction.objects.create_many_transactions([sow1, sow2],
+            to_location)
+
+        ws_locs2 = Location.objects.all().get_workshop_location_by_number(workshop_number=2)
+        ws_locs1 = Location.objects.all().get_workshop_location_by_number(workshop_number=1)
+        ws_locs3 = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+
+        to_location2 = Location.objects.get(workshop__number=2)
+        transaction2 = SowTransaction.objects.create_transaction(
+            to_location=to_location2,
+            initiator=None,
+            sow=sow3
+            )
+
+        self.assertEqual(SowTransaction.objects.trs_in_ws(ws_number=3, ws_locs=ws_locs3).count(), 2)
+        self.assertEqual(SowTransaction.objects.trs_out_ws(ws_locs=ws_locs1).count(), 3)
+                 
 
 class PigletsTransactionManagerTest(TestCase):
     def setUp(self):

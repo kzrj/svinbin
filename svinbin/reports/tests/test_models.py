@@ -776,4 +776,26 @@ class ReportDateWSReportTest(TransactionTestCase):
 
 
     def test_add_ws_sow_data(self):
-        pass
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        to_location3 = Location.objects.get(workshop__number=3)
+        to_location1 = Location.objects.get(workshop__number=1)
+
+        SowTransaction.objects.create_many_transactions([sow1, sow2],
+            to_location3)
+        SowTransaction.objects.create_many_transactions([sow1, sow2],
+            to_location1)
+
+        SowTransaction.objects.create_many_transactions([sow1, sow2],
+            to_location3)
+        SowTransaction.objects.create_many_transactions([sow1, sow2],
+            to_location1)
+
+        SowTransaction.objects.create_many_transactions([sow1, sow2],
+            to_location3)
+        CullingSow.objects.create_culling(sow=sow2, culling_type='padej')
+
+        today_rd = ReportDate.objects.get(date=datetime.today())
+
+        sows = today_rd.count_sows_ws3()
+        print(sows)

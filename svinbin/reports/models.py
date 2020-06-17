@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from operator import itemgetter
+from collections import Counter
 
 from datetime import timedelta, date, datetime
 
@@ -263,16 +264,17 @@ class ReportDateQuerySet(models.QuerySet):
                 )
 
     def add_ws_sows_data(self, ws_number=3):
+        ws3_locs = Location.objects.get_workshop_location_by_number(workshop_number=ws_number)
 
         trs_in_sows = Subquery(SowTransaction.objects.filter(
                             date__date__lte=OuterRef('date'), to_location__workshop__number=ws_number) \
                                     .values_list('sow', flat=True))
 
         trs_out_sows = Subquery(SowTransaction.objects.filter(
-                            date__date__lte=OuterRef('date'), to_location__workshop__number=ws_number) \
+                            date__date__lte=OuterRef('date'), from_location__in=ws3_locs) \
                                     .values_list('sow', flat=True))
         
-        return self.annotate(piglets_transfered=total_qnty)
+        return self.annotate(trs_in_sows=trs_in_sows)
 
 
 class ReportDateManager(CoreModelManager):
@@ -307,6 +309,26 @@ class ReportDate(CoreModel):
 
     def __str__(self):
         return f'{self.date}'
+
+    def substract_qs_values_lists(self, qs1_values_list, qs2_values_list):
+        return list((Counter(qs1_values_list) - Counter(qs2_values_list)).elements())
+
+    def count_sows_ws3(self):
+        from collections import Counter
+
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        sows_in = SowTransaction.objects.trs_in_ws(ws_number=3, ws_locs=ws_locs, end_date=self.date)\
+            .values_list('sow__farm_id', flat=True)
+        sows_out = SowTransaction.objects.trs_out_ws(ws_locs=ws_locs, end_date=self.date)\
+            .values_list('sow__farm_id', flat=True)
+
+        sows_dead = CullingSow.objects.in_ws(ws_locs=ws_locs).values_list('sow__farm_id', flat=True)
+
+        result = self.substract_qs_values_lists(qs1_values_list=sows_in,
+             qs2_values_list=sows_out)
+        result = self.substract_qs_values_lists(qs1_values_list=result,
+             qs2_values_list=sows_dead)
+        return sows_in, sows_out, sows_dead, result
     
 
 # For operations view
@@ -385,7 +407,7 @@ def gen_operations_dict():
 
     ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
     ws3_locs_exclude_ws = Location.objects.all().get_workshop_location_by_number(workshop_number=3) \
-    	.exclude(workshop__number=3)
+        .exclude(workshop__number=3)
     not_ws3_locs = Location.objects.all().get_locations_exclude_workshop_locations(workshop_number=3)
 
     operations_data['ws3_farrow'] = {'qs':  SowFarrow.objects.all()\
@@ -591,7 +613,7 @@ def gen_operations_dict():
 
         operations_data[f'ws{ws_number}_piglets_inner_trs'] = {'qs': PigletsTransaction.objects
                 .filter(from_location__in=ws_locs.exclude(workshop__number=ws_number),
-                		 to_location__in=ws_locs_exclude_ws)\
+                         to_location__in=ws_locs_exclude_ws)\
                 .select_related('initiator', 'week_tour',
                     'from_location__pigletsGroupCell__workshop',
                     'from_location__pigletsGroupCell__section',

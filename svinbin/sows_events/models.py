@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import timedelta, date, datetime
+
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
@@ -221,6 +223,10 @@ class CullingSowManager(CoreModelManager):
          date=date, culling_type=culling_type, location=sow.location)
         sow.change_status_to(status_title='Брак', alive=False)
         return culling
+
+    def in_ws(self, ws_locs, start_date=date(2020, 1, 1), end_date=datetime.today()):
+        return self.filter(date__date__gte=start_date, date__date__lte=end_date,
+            location__in=ws_locs)
 
 
 class CullingSow(SowEvent):
