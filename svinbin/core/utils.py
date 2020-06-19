@@ -258,3 +258,9 @@ def add_sow_statuses_to_cullings():
          status_after__title='Брак').first()
         culling.sow_status = st_record.status_before
         culling.save()
+
+def add_sow_statuses_to_trs():
+    for tr in SowTransaction.objects.all():
+        st_record = tr.sow.status_records.all().filter(date__lte=tr.date).first()
+        tr.sow_status = st_record.status_after
+        tr.save()

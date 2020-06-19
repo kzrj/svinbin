@@ -28,7 +28,8 @@ class SowTransactionManager(CoreModelManager):
                 from_location=sow.location,
                 to_location=to_location,
                 sow=sow,
-                tour=sow.tour
+                tour=sow.tour,
+                sow_status=sow.status
                 )
 
         if sow.status and sow.status.title == 'Опоросилась' and to_location.workshop:
@@ -70,6 +71,8 @@ class SowTransaction(Transaction):
 
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True,
         related_name='sow_transactions')
+
+    sow_status = models.ForeignKey('sows.SowStatus', on_delete=models.SET_NULL, null=True)
 
     objects = SowTransactionManager()
 
