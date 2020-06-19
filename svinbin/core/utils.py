@@ -250,3 +250,11 @@ def create_sow_status_records(change_date=False):
         else:
             culling.sow.status_records.create(sow=culling.sow, status_before=last_record,
                 status_after=status_brak, date=culling.date)
+
+
+def add_sow_statuses_to_cullings():
+    for culling in CullingSow.objects.all().select_related('sow', 'sow__status'):
+        st_record = culling.sow.status_records.all().filter(date__date=culling.date,
+         status_after__title='Брак').first()
+        culling.sow_status = st_record.status_before
+        culling.save()
