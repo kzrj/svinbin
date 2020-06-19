@@ -218,11 +218,11 @@ class SowFarrow(SowEvent):
 
 
 class CullingSowManager(CoreModelManager):
-    def create_culling(self, sow, culling_type, reason=None, initiator=None, date=None):
+    def create_culling(self, sow, culling_type, weight=None, reason=None, initiator=None, date=None):
         if not date:
             date = timezone.now()
-        culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason,
-         date=date, culling_type=culling_type, location=sow.location, sow_status=sow.status)
+        culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason, date=date,
+         culling_type=culling_type, location=sow.location, sow_status=sow.status, weight=weight)
         sow.change_status_to(status_title='Брак', alive=False)
         return culling
 
@@ -240,6 +240,8 @@ class CullingSow(SowEvent):
      related_name='sow_cullings_here')
 
     sow_status = models.ForeignKey('sows.SowStatus', on_delete=models.SET_NULL, null=True, blank=True)
+
+    weight = models.FloatField(null=True)
 
     objects = CullingSowManager()
 

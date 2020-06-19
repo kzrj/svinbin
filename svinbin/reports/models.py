@@ -334,6 +334,40 @@ class ReportDateQuerySet(models.QuerySet):
 
         return self.annotate(tr_out_sup=Subquery(sows_sup_count))
 
+    def add_ws3_sow_cullings_data(self):
+        data = dict()
+
+        for culling_type in ['padej', 'vinuzhd']:
+            data[f'{culling_type}_sup_count'] = CullingSow.objects \
+                            .filter(date__date=OuterRef('date'), culling_type=culling_type) \
+                            .filter(sow_status__title='Супорос 35') \
+                            .values('date__date') \
+                            .annotate(cnt=Count('*')) \
+                            .values('cnt')
+
+            data[f'{culling_type}_sup_weight'] = CullingSow.objects \
+                            .filter(date__date=OuterRef('date'), culling_type=culling_type) \
+                            .filter(sow_status__title='Супорос 35') \
+                            .values('date__date') \
+                            .annotate(total_weight=Sum('weight')) \
+                            .values('total_weight')
+
+            data[f'{culling_type}_podsos_count'] = CullingSow.objects \
+                            .filter(date__date=OuterRef('date'), culling_type=culling_type) \
+                            .filter(sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',]) \
+                            .values('date__date') \
+                            .annotate(cnt=Count('*')) \
+                            .values('cnt')
+
+            data[f'{culling_type}_podsos_weight'] = CullingSow.objects \
+                            .filter(date__date=OuterRef('date'), culling_type=culling_type) \
+                            .filter(sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',]) \
+                            .values('date__date') \
+                            .annotate(total_weight=Sum('weight')) \
+                            .values('total_weight')
+
+        return self.annotate(**data)
+
 
 class ReportDateManager(CoreModelManager):
     def get_queryset(self):
@@ -374,7 +408,7 @@ class ReportDate(CoreModel):
     def count_sows_ws3(self, day=None):
         if not day:
             day = self.date
-            
+
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
         sows_in = SowTransaction.objects.trs_in_ws(ws_number=3, ws_locs=ws_locs, end_date=day)\
             .values_list('sow__farm_id', flat=True)
