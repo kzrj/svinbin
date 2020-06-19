@@ -251,3 +251,22 @@ class ReportDateWSReportTest(TransactionTestCase):
         self.assertEqual(day1_rd.padej_sup_weight, 200)
         self.assertEqual(day1_rd.padej_podsos_count, 2)
         self.assertEqual(day1_rd.padej_podsos_weight, 200)
+
+    def test_add_ws3_sow_trs_data(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow4 = sows_testings.create_sow_and_put_in_workshop_one()
+        to_location3 = Location.objects.get(workshop__number=3)
+        to_location1 = Location.objects.get(workshop__number=1)
+
+        with freeze_time("2020-05-14"):
+            sows = Sow.objects.all()
+            sows.update_status('Супорос 35')
+            SowTransaction.objects.create_many_transactions(sows, to_location3)
+
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        day1_rd = ReportDate.objects.all().add_ws3_sow_trs_data(ws_locs=ws_locs) \
+                    .filter(date=date(2020, 5, 14)).first()
+
+        self.assertEqual(day1_rd.tr_in_from_1_sup_count, 4)

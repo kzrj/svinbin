@@ -243,7 +243,8 @@ class CullingSowManagerTest(TestCase):
 
     def test_create_farrow(self):
         sow = sows_testing.create_sow_and_put_in_workshop_three(1, 1)
-        culling = CullingSow.objects.create_culling(sow, 'spec', 'prichina')
+        culling = CullingSow.objects.create_culling(sow=sow, culling_type='spec',
+         reason='prichina')
         sow.refresh_from_db()
         self.assertEqual(sow.alive, False)
         self.assertEqual(culling.sow, sow)

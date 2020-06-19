@@ -263,77 +263,6 @@ class ReportDateQuerySet(models.QuerySet):
                 avg_priplod=Avg('priplod_by_sow'),
                 )
 
-    def add_sow_tr_out_ws3_data(self):
-        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
-        trs_sow_pks = SowTransaction.objects.filter(date__date=OuterRef(OuterRef('date'))) \
-            .values_list('sow__pk')
-        # print(trs_sow_pks)
-
-        # status = Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
-        #     .values('status_after__title')[:1])
-
-        # return self.annotate(status_at_date=status)
-        # data = {f'count_status_{en_name}': 
-        #     Coalesce(Subquery(
-        #         self.filter(status_at_date=status_title) \
-        #             .values('status_at_date') \
-        #             .annotate(cnt=Count('*')) \
-        #             .values('cnt')
-        #         ), 0)
-        # }
-
-        # status = Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
-        #     .values('status_after__title')[:1])
-
-        # return self.annotate(status_at_date=status)
-
-        sows_sup_count = Sow.objects.filter(pk__in=trs_sow_pks)
-        # sows_sup_count = sows_sup_count.add_status_at_date(date=OuterRef(OuterRef('date')))
-        sows_sup_count = sows_sup_count.annotate(
-                            status_at_date=Subquery(SowStatusRecord.objects
-                                        .filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
-                                        .values('status_after__title')[:1]
-                        ))
-
-        sows_sup_count = sows_sup_count.annotate(
-                            count_status_sup35=sows_sup_count \
-                                .values('status_at_date') \
-                                .annotate(cnt=Count('*')) \
-                                .values('cnt')
-                        )
-
-        # sows_sup_count = sows_sup_count.add_status_at_date_count(status_title='Супорос 35', en_name='sup35')
-
-        sows_sup_count = sows_sup_count \
-                .values('count_status_sup35') \
-                .annotate(cnt=Count('*')) \
-                .values('cnt')[:1]
-                
-
-        # sows_sup_count = Subquery(Sow.objects.filter(pk__in=trs_sow_pks)\
-        #         .annotate(status_at_date=Subquery(
-        #                     SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'),
-        #                                                    date__date__lte=OuterRef(OuterRef('date'))) \
-        #                                            .values('status_after__title')[:1])
-        #                  ) \
-        #         # .add_status_at_date(date=OuterRef('date'))\
-        #         .annotate(
-        #             count_status_sup35=Coalesce(Subquery(
-        #                 Sow.objects.filter(pk__in=trs_sow_pks, status_at_date='Супорос 35') \
-        #                     .values('status_at_date') \
-        #                     .annotate(cnt=Count('*')) \
-        #                     .values('cnt')
-        #                 ), 0)
-        #             )
-        #         # .add_status_at_date_count(status_title='Супорос 35', en_name='sup35')\
-        #         .values('count_status_sup35') \
-        #         # .values('tour') \
-        #         .annotate(cnt=Count('*')) \
-        #         .values('cnt')[:1]
-        #         )
-
-        return self.annotate(tr_out_sup=Subquery(sows_sup_count))
-
     def add_ws3_sow_cullings_data(self):
         data = dict()
 
@@ -366,6 +295,39 @@ class ReportDateQuerySet(models.QuerySet):
                             .annotate(total_weight=Sum('weight')) \
                             .values('total_weight')
 
+        return self.annotate(**data)
+
+    def add_ws3_sow_trs_data(self, ws_locs):
+        data = dict()
+   
+        data['tr_in_from_1_sup_count'] = SowTransaction.objects \
+                        .filter(date__date=OuterRef('date'), 
+                                to_location__workshop__number=3,
+                                from_location__workshop__number=1,
+                                sow_status__title='Супорос 35') \
+                        .values('to_location') \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt')
+
+        data['tr_in_from_2_sup_count'] = SowTransaction.objects \
+                        .filter(date__date=OuterRef('date'), 
+                                to_location__workshop__number=3,
+                                from_location__workshop__number=2,
+                                sow_status__title='Супорос 35') \
+                        .values('to_location') \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt')
+
+        data['tr_in_podsos_count'] = SowTransaction.objects \
+                        .filter(date__date=OuterRef('date'), 
+                                to_location__workshop__number=3,
+                                sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',]) \
+                        .exclude(from_location__in=ws_locs) \
+                        .values('to_location') \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt')
+    
+                        
         return self.annotate(**data)
 
 
