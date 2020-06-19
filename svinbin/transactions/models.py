@@ -54,11 +54,11 @@ class SowTransactionManager(CoreModelManager):
 
     def trs_in_ws(self, ws_number, ws_locs, start_date=date(2020, 1, 1), end_date=datetime.today()):
         return self.filter(date__date__gte=start_date, date__date__lte=end_date,
-         to_location__workshop__number=ws_number).exclude(from_location__in=ws_locs)
+            to_location__workshop__number=ws_number).exclude(from_location__in=ws_locs)
 
     def trs_out_ws(self, ws_locs, start_date=date(2020, 1, 1), end_date=datetime.today()):
-                return self.filter(date__date__gte=start_date, date__date__lte=end_date,
-         from_location__in=ws_locs).exclude(to_location__in=ws_locs)
+        return self.filter(date__date__gte=start_date, date__date__lte=end_date,
+            from_location__in=ws_locs).exclude(to_location__in=ws_locs)
 
 
 class SowTransaction(Transaction):

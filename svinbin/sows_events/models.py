@@ -218,9 +218,11 @@ class SowFarrow(SowEvent):
 
 
 class CullingSowManager(CoreModelManager):
-    def create_culling(self, sow, culling_type, reason=None, initiator=None, date=timezone.now()):
+    def create_culling(self, sow, culling_type, reason=None, initiator=None, date=None):
+        if not date:
+            date = timezone.now()
         culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason,
-         date=date, culling_type=culling_type, location=sow.location)
+         date=date, culling_type=culling_type, location=sow.location, sow_status=sow.status)
         sow.change_status_to(status_title='Брак', alive=False)
         return culling
 
@@ -236,6 +238,8 @@ class CullingSow(SowEvent):
     reason = models.CharField(max_length=300, null=True)
     location = models.ForeignKey('locations.Location', null=True, on_delete=models.SET_NULL,
      related_name='sow_cullings_here')
+
+    sow_status = models.ForeignKey('sows.SowStatus', on_delete=models.SET_NULL, null=True, blank=True)
 
     objects = CullingSowManager()
 
@@ -259,7 +263,9 @@ class WeaningSow(SowEvent):
 
 
 class AbortionSowManager(CoreModelManager):
-    def create_abortion(self, sow, initiator=None, date=timezone.now()):
+    def create_abortion(self, sow, initiator=None, date=None):
+        if not date:
+            date = timezone.now()
         abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date,
              location=sow.location)
         sow.tour = None
@@ -293,7 +299,9 @@ class MarkAsNurse(SowEvent):
 
 
 class MarkAsGiltManager(CoreModelManager):
-    def create_init_gilt_event(self, gilt, initiator=None, date=timezone.now()):
+    def create_init_gilt_event(self, gilt, initiator=None, date=None):
+        if not date:
+            date = timezone.now()
         return self.create(gilt=gilt, sow=gilt.mother_sow, tour=gilt.tour,
          location=gilt.mother_sow.location, initiator=initiator, date=date)      
 

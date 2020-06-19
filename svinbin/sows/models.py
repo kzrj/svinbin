@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from django.db.models import Q, Prefetch, Subquery, OuterRef
+from django.db.models import Q, Prefetch, Subquery, OuterRef, Count, F
+from django.db.models.functions import Coalesce
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
@@ -71,10 +72,29 @@ class SowsQuerySet(models.QuerySet):
         return self.filter(pk__in=once_seminated_sows), self.filter(pk__in=more_than_once_seminated_sows)
 
     def add_status_at_date(self, date):
-        status = Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lt=date) \
+        status = Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
             .values('status_after__title')[:1])
 
         return self.annotate(status_at_date=status)
+
+    def add_status_at_date_count(self, status_title, en_name=''):
+        data = {f'count_status_{en_name}': 
+            Coalesce(Subquery(
+                self.filter(status_at_date=status_title) \
+                    .values('status_at_date') \
+                    .annotate(cnt=Count('*')) \
+                    .values('cnt')
+                ), 0)
+        }
+        return self.annotate(**data)
+
+    def count_sows_by_statuses_at_date(self, date):
+        return self.add_status_at_date(date=date) \
+                .add_status_at_date_count(status_title='Супорос 35', en_name='sup35') \
+                .add_status_at_date_count(status_title='Опоросилась', en_name='oporos') \
+                .add_status_at_date_count(status_title='Отъем', en_name='otiem') \
+                .add_status_at_date_count(status_title='Кормилица', en_name='korm') \
+                .add_status_at_date_count(status_title='Аборт', en_name='abort') \
 
 
 class SowManager(CoreModelManager):

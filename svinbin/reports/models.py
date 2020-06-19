@@ -10,7 +10,7 @@ from django.db.models.functions import Coalesce, Greatest
 from django.utils import timezone
 
 from core.models import CoreModel, CoreModelManager
-from sows.models import Sow
+from sows.models import Sow, SowStatusRecord
 from piglets.models import Piglets
 from locations.models import Location
 from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse,
@@ -263,18 +263,76 @@ class ReportDateQuerySet(models.QuerySet):
                 avg_priplod=Avg('priplod_by_sow'),
                 )
 
-    def add_ws_sows_data(self, ws_number=3):
-        ws3_locs = Location.objects.get_workshop_location_by_number(workshop_number=ws_number)
+    def add_sow_tr_out_ws3_data(self):
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        trs_sow_pks = SowTransaction.objects.filter(date__date=OuterRef(OuterRef('date'))) \
+            .values_list('sow__pk')
+        # print(trs_sow_pks)
 
-        trs_in_sows = Subquery(SowTransaction.objects.filter(
-                            date__date__lte=OuterRef('date'), to_location__workshop__number=ws_number) \
-                                    .values_list('sow', flat=True))
+        # status = Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
+        #     .values('status_after__title')[:1])
 
-        trs_out_sows = Subquery(SowTransaction.objects.filter(
-                            date__date__lte=OuterRef('date'), from_location__in=ws3_locs) \
-                                    .values_list('sow', flat=True))
-        
-        return self.annotate(trs_in_sows=trs_in_sows)
+        # return self.annotate(status_at_date=status)
+        # data = {f'count_status_{en_name}': 
+        #     Coalesce(Subquery(
+        #         self.filter(status_at_date=status_title) \
+        #             .values('status_at_date') \
+        #             .annotate(cnt=Count('*')) \
+        #             .values('cnt')
+        #         ), 0)
+        # }
+
+        # status = Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
+        #     .values('status_after__title')[:1])
+
+        # return self.annotate(status_at_date=status)
+
+        sows_sup_count = Sow.objects.filter(pk__in=trs_sow_pks)
+        # sows_sup_count = sows_sup_count.add_status_at_date(date=OuterRef(OuterRef('date')))
+        sows_sup_count = sows_sup_count.annotate(
+                            status_at_date=Subquery(SowStatusRecord.objects
+                                        .filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
+                                        .values('status_after__title')[:1]
+                        ))
+
+        sows_sup_count = sows_sup_count.annotate(
+                            count_status_sup35=sows_sup_count \
+                                .values('status_at_date') \
+                                .annotate(cnt=Count('*')) \
+                                .values('cnt')
+                        )
+
+        # sows_sup_count = sows_sup_count.add_status_at_date_count(status_title='Супорос 35', en_name='sup35')
+
+        sows_sup_count = sows_sup_count \
+                .values('count_status_sup35') \
+                .annotate(cnt=Count('*')) \
+                .values('cnt')[:1]
+                
+
+        # sows_sup_count = Subquery(Sow.objects.filter(pk__in=trs_sow_pks)\
+        #         .annotate(status_at_date=Subquery(
+        #                     SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'),
+        #                                                    date__date__lte=OuterRef(OuterRef('date'))) \
+        #                                            .values('status_after__title')[:1])
+        #                  ) \
+        #         # .add_status_at_date(date=OuterRef('date'))\
+        #         .annotate(
+        #             count_status_sup35=Coalesce(Subquery(
+        #                 Sow.objects.filter(pk__in=trs_sow_pks, status_at_date='Супорос 35') \
+        #                     .values('status_at_date') \
+        #                     .annotate(cnt=Count('*')) \
+        #                     .values('cnt')
+        #                 ), 0)
+        #             )
+        #         # .add_status_at_date_count(status_title='Супорос 35', en_name='sup35')\
+        #         .values('count_status_sup35') \
+        #         # .values('tour') \
+        #         .annotate(cnt=Count('*')) \
+        #         .values('cnt')[:1]
+        #         )
+
+        return self.annotate(tr_out_sup=Subquery(sows_sup_count))
 
 
 class ReportDateManager(CoreModelManager):
@@ -313,27 +371,121 @@ class ReportDate(CoreModel):
     def substract_qs_values_lists(self, qs1_values_list, qs2_values_list):
         return list((Counter(qs1_values_list) - Counter(qs2_values_list)).elements())
 
-    def count_sows_ws3(self):
-        from collections import Counter
-
+    def count_sows_ws3(self, day=None):
+        if not day:
+            day = self.date
+            
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
-        sows_in = SowTransaction.objects.trs_in_ws(ws_number=3, ws_locs=ws_locs, end_date=self.date)\
+        sows_in = SowTransaction.objects.trs_in_ws(ws_number=3, ws_locs=ws_locs, end_date=day)\
             .values_list('sow__farm_id', flat=True)
-        sows_out = SowTransaction.objects.trs_out_ws(ws_locs=ws_locs, end_date=self.date)\
+        sows_out = SowTransaction.objects.trs_out_ws(ws_locs=ws_locs, end_date=day)\
             .values_list('sow__farm_id', flat=True)
 
-        sows_dead = CullingSow.objects.in_ws(ws_locs=ws_locs).values_list('sow__farm_id', flat=True)
+        sows_dead = CullingSow.objects.in_ws(ws_locs=ws_locs, end_date=day) \
+            .values_list('sow__farm_id', flat=True)
 
         result = self.substract_qs_values_lists(qs1_values_list=sows_in,
              qs2_values_list=sows_out)
         result = self.substract_qs_values_lists(qs1_values_list=result,
              qs2_values_list=sows_dead)
 
-        sows = Sow.objects.get_queryset_with_not_alive().filter(farm_id__in=result)
-        print(sows)
-
-        return sows_in, sows_out, sows_dead, result
+        sows = Sow.objects.get_queryset_with_not_alive() \
+                        .filter(farm_id__in=result) \
+                        .select_related('status') \
+                        .count_sows_by_statuses_at_date(date=day)
+        return sows
     
+    @property
+    def count_sows_ws3_start_date(self):
+        sow = self.count_sows_ws3(day=self.date - timedelta(1)).first()
+        return {
+            'suporos': sow.count_status_sup35 + sow.count_status_abort,
+            'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
+        }
+
+    @property
+    def count_sows_ws3_end_date(self):
+        sow = self.count_sows_ws3(day=self.date + timedelta(1)).first()
+        return {
+            'suporos': sow.count_status_sup35 + sow.count_status_abort,
+            'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
+        }
+
+    @property
+    def count_sows_ws3_today(self):
+        sow = self.count_sows_ws3(day=self.date).first()
+        return {
+            'suporos': sow.count_status_sup35 + sow.count_status_abort,
+            'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
+        }
+
+    @property
+    def count_trs_out_ws3_today(self):
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        trs_sow_pks = SowTransaction.objects.trs_out_ws(ws_locs=ws_locs, start_date=self.date,
+                                                end_date=self.date) \
+                                            .values_list('sow__pk')
+
+        sow_trs_count = Sow.objects.get_queryset_with_not_alive().filter(pk__in=trs_sow_pks) \
+                            .count_sows_by_statuses_at_date(self.date) \
+                            .first()
+
+        if sow_trs_count:
+            suporos = sow_trs_count.count_status_sup35
+            podsos = sow_trs_count.count_status_oporos + sow_trs_count.count_status_otiem \
+                        + sow_trs_count.count_status_korm
+
+        return {
+            'suporos': suporos,
+            'podsos': podsos,
+            }
+
+    @property
+    def count_trs_in_ws3_today(self):
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        trs_sow_pks = SowTransaction.objects.trs_in_ws(ws_locs=ws_locs, start_date=self.date,
+                                                end_date=self.date, ws_number=3) \
+                                            .values_list('sow__pk')
+
+        sow_trs_count = Sow.objects.get_queryset_with_not_alive().filter(pk__in=trs_sow_pks) \
+                            .count_sows_by_statuses_at_date(date=self.date) \
+                            .first()
+
+        suporos, podsos = 0, 0
+
+        if sow_trs_count:
+            suporos = sow_trs_count.count_status_sup35
+            podsos = sow_trs_count.count_status_oporos + sow_trs_count.count_status_otiem \
+                        + sow_trs_count.count_status_korm
+
+        return {
+            'suporos': suporos,
+            'podsos': podsos,
+        }
+
+    @property
+    def count_sow_cullings_in_ws3_today(self):
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        sow_pks = CullingSow.objects.filter(location__in=ws_locs, date__date=self.date) \
+                                            .values_list('sow__pk')
+        print(sow_pks)
+        sow_count = Sow.objects.get_queryset_with_not_alive().filter(pk__in=sow_pks) \
+                            .count_sows_by_statuses_at_date(date=self.date) \
+                            .first()
+        print(Sow.objects.get_queryset_with_not_alive().filter(pk__in=sow_pks))
+        print(sow_count.count_status_sup35)
+        suporos, podsos = 0, 0
+
+        if sow_count:
+            suporos = sow_count.count_status_sup35
+            podsos = sow_count.count_status_oporos + sow_count.count_status_otiem \
+                        + sow_count.count_status_korm
+
+        return {
+            'suporos': suporos,
+            'podsos': podsos
+        }
+        
 
 # For operations view
 def gen_operations_dict():

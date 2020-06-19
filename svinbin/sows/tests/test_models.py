@@ -292,6 +292,10 @@ class SowModelTest(TransactionTestCase):
         sow = sows.add_status_at_date(date=date3).filter(pk=s_record.sow.pk).first()
         self.assertEqual(sow.status_at_date, None)
 
+        sow = sows.add_status_at_date(date=date2).add_status_at_date_count('Осеменена 1', 'osem')\
+            .filter(pk=s_record.sow.pk).first()
+        self.assertEqual(sow.count_status_osem, 1)        
+
 
 class SowQueryTest(TransactionTestCase):
     def setUp(self):
