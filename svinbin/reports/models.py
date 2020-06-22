@@ -540,14 +540,9 @@ class ReportDate(CoreModel):
     @property
     def count_sows_ws3_start_date(self):
         sow = self.count_sows_ws3(day=self.date - timedelta(1)).first()
-        # return {
-        #     'suporos': sow.count_status_sup35 + sow.count_status_abort,
-        #     'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
-        # }
-
         return {
-            'suporos': 10,
-            'podsos': 20
+            'suporos': sow.count_status_sup35 + sow.count_status_abort,
+            'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
         }
 
     @property
