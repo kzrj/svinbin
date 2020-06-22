@@ -46,7 +46,7 @@ class ReportTourSerializer(AnnotateFieldsModelSerializer, serializers.ModelSeria
 
 
 class ReportDateWs3Serializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
-    count_sows_ws3_start_date = serializers.ReadOnlyField()
+    count_sows_ws3_start_date = serializers.JSONField()
     
     class Meta:
         model = ReportDate
