@@ -526,6 +526,7 @@ class ReportDate(CoreModel):
             'suporos': sow.count_status_sup35 + sow.count_status_abort,
             'suporos2': sow.count_status_sup35,
             'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
+            'podsos2': f'{sow.count_status_oporos} , {sow.count_status_otiem} , {sow.count_status_korm}',
         }
 
     @property
