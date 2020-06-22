@@ -269,14 +269,16 @@ class ReportDateQuerySet(models.QuerySet):
         for culling_type in ['padej', 'vinuzhd']:
             data[f'{culling_type}_sup_count'] = CullingSow.objects \
                             .filter(date__date=OuterRef('date'), culling_type=culling_type) \
-                            .filter(sow_status__title='Супорос 35', location__in=ws_locs) \
+                            .filter(sow_status__title_in=['Супорос 35', 'Супорос 28',
+                                 'Осеменена 1', 'Осеменена 2'], location__in=ws_locs) \
                             .values('date__date') \
                             .annotate(cnt=Count('*')) \
                             .values('cnt')
 
             data[f'{culling_type}_sup_weight'] = CullingSow.objects \
                             .filter(date__date=OuterRef('date'), culling_type=culling_type) \
-                            .filter(sow_status__title='Супорос 35', location__in=ws_locs) \
+                            .filter(sow_status__title_in=['Супорос 35', 'Супорос 28', 
+                                'Осеменена 1', 'Осеменена 2'], location__in=ws_locs) \
                             .values('date__date') \
                             .annotate(total_weight=Sum('weight')) \
                             .values('total_weight')
@@ -306,7 +308,8 @@ class ReportDateQuerySet(models.QuerySet):
                         .filter(date__date=OuterRef('date'), 
                                 to_location__workshop__number=3,
                                 from_location__workshop__number=1,
-                                sow_status__title='Супорос 35') \
+                                sow_status__title_in=['Супорос 35', 'Супорос 28', 
+                                    'Осеменена 1', 'Осеменена 2']) \
                         .values('to_location') \
                         .annotate(cnt=Count('*')) \
                         .values('cnt')
@@ -315,7 +318,8 @@ class ReportDateQuerySet(models.QuerySet):
                         .filter(date__date=OuterRef('date'), 
                                 to_location__workshop__number=3,
                                 from_location__workshop__number=2,
-                                sow_status__title='Супорос 35') \
+                                sow_status__title_in=['Супорос 35', 'Супорос 28', 'Осеменена 1',
+                                 'Осеменена 2']) \
                         .values('to_location') \
                         .annotate(cnt=Count('*')) \
                         .values('cnt')
@@ -333,7 +337,8 @@ class ReportDateQuerySet(models.QuerySet):
         data['tr_out_sup_count'] = SowTransaction.objects \
                         .filter(date__date=OuterRef('date'), 
                                 from_location__in=ws_locs,
-                                sow_status__title='Супорос 35') \
+                                sow_status__title_in=['Супорос 35', 'Супорос 28','Осеменена 1',
+                                 'Осеменена 2']) \
                         .exclude(to_location__in=ws_locs) \
                         .values('date__date') \
                         .annotate(cnt=Count('*')) \
