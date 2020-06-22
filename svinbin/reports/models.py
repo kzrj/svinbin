@@ -511,6 +511,9 @@ class ReportDate(CoreModel):
              qs2_values_list=sows_dead)
 
         print(result)
+        print(len(result))
+        print(Sow.objects.get_queryset_with_not_alive() \
+                        .filter(farm_id__in=result).count())
 
         sows = Sow.objects.get_queryset_with_not_alive() \
                         .filter(farm_id__in=result) \
