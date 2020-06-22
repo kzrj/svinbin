@@ -515,6 +515,11 @@ class ReportDate(CoreModel):
         print(Sow.objects.get_queryset_with_not_alive() \
                         .filter(farm_id__in=result).count())
 
+        print(Sow.objects.get_queryset_with_not_alive() \
+                        .filter(farm_id__in=result)\
+                        .add_status_at_date(date=day) \
+                        )
+
         sows = Sow.objects.get_queryset_with_not_alive() \
                         .filter(farm_id__in=result) \
                         .select_related('status') \
@@ -525,15 +530,15 @@ class ReportDate(CoreModel):
     @property
     def count_sows_ws3_start_date(self):
         sow = self.count_sows_ws3(day=self.date - timedelta(1)).first()
-        return {
-            'suporos': sow.count_status_sup35 + sow.count_status_abort,
-            'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
-        }
-
         # return {
-        #     'suporos': 10,
-        #     'podsos': 20
+        #     'suporos': sow.count_status_sup35 + sow.count_status_abort,
+        #     'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
         # }
+
+        return {
+            'suporos': 10,
+            'podsos': 20
+        }
 
     @property
     def count_sows_ws3_end_date(self):
