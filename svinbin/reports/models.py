@@ -522,6 +522,8 @@ class ReportDate(CoreModel):
             print(sow.status_at_date)
             print('_________________')
 
+        print('_+_+_+_+_+_+_+_')
+
         print(Sow.objects.get_queryset_with_not_alive() \
                         .filter(farm_id__in=result)\
                         .add_status_at_date(date=day) \
