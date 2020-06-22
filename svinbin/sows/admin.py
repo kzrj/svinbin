@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 
-from sows.models import Sow, Gilt, Boar, SowStatus
+from sows.models import Sow, Gilt, Boar, SowStatus, SowStatusRecord
 
 @admin.register(Sow)
 class SowAdmin(admin.ModelAdmin):
@@ -17,6 +17,12 @@ class SowAdmin(admin.ModelAdmin):
 @admin.register(SowStatus)
 class SowStatusAdmin(admin.ModelAdmin):
     list_display = [f.name for f in SowStatus._meta.fields]
+
+
+@admin.register(SowStatusRecord)
+class SowStatusRecordAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in SowStatusRecord._meta.fields]
+    search_fields = ['sow__farm_id']
 
 
 @admin.register(Gilt)
