@@ -524,6 +524,7 @@ class ReportDate(CoreModel):
         sow = self.count_sows_ws3(day=self.date - timedelta(1)).first()
         return {
             'suporos': sow.count_status_sup35 + sow.count_status_abort,
+            'suporos2': sow.count_status_sup35,
             'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
         }
 
