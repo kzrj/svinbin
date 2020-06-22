@@ -37,11 +37,18 @@ class ReportDateSerializer(AnnotateFieldsModelSerializer, serializers.ModelSeria
     class Meta:
         model = ReportDate
         fields = '__all__'
-    
 
 
 class ReportTourSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
     class Meta:
         model = Tour
+        fields = '__all__'
+
+
+class ReportDateWs3Serializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
+    count_sows_ws3_start_date = serializers.ReadOnlyField()
+    
+    class Meta:
+        model = ReportDate
         fields = '__all__'
         

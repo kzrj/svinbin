@@ -104,6 +104,9 @@ class UltrasoundType(CoreModel):
 
 class UltrasoundManager(CoreModelManager):
     def create_ultrasound(self, sow, initiator=None, result=False, days=30, date=timezone.now()):
+        if not date:
+            date=timezone.now()
+            
         u_type = UltrasoundType.objects.get(days=days)
 
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
@@ -154,7 +157,9 @@ class SowFarrowManager(CoreModelManager):
         return SowFarrowQuerySet(self.model, using=self._db)
 
     def create_sow_farrow(self, sow, initiator=None,
-        alive_quantity=0, dead_quantity=0, mummy_quantity=0, date=timezone.now()):
+        alive_quantity=0, dead_quantity=0, mummy_quantity=0, date=None):
+        if not date:
+            date=timezone.now()
         
         # validate
         if not sow.tour:

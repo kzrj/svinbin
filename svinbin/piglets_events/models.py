@@ -231,7 +231,9 @@ class PigletsMerger(PigletsEvent):
 
 
 class WeighingPigletsManager(CoreModelManager):
-    def create_weighing(self, piglets_group, total_weight, place, initiator=None, date=timezone.now()):
+    def create_weighing(self, piglets_group, total_weight, place, initiator=None, date=None):
+        if not date:
+            date=timezone.now()
         weighing_record = self.create(
             piglets_group=piglets_group,
             total_weight=total_weight,
@@ -245,24 +247,6 @@ class WeighingPigletsManager(CoreModelManager):
 
         piglets_group.change_status_to('Взвешены, готовы к заселению')
         return weighing_record
-
-    def get_weights_piglets(self, piglets):
-        return self.get_queryset().filter(piglets_group__in=piglets).aggregate(total_weight=Sum('total_weight'),
-            average_weight=Avg('average_weight'))
-
-    def get_weights_mixed_piglets_by_tour(self, piglets, tour):
-        # get tour percentage in each piglets groups
-        subquery = MetaTourRecord.objects.filter(metatour__piglets=OuterRef('piglets_group'), tour=tour) \
-            .annotate(percentages=Sum('percentage')) \
-            .values('percentages')
-
-        # annotate weight by tour to each piglets group, than aggerate that weights
-        return self.get_queryset().filter(piglets_group__in=piglets) \
-            .annotate(weight_by_tour=ExpressionWrapper(
-                    (F('total_weight')  * Subquery(subquery, output_field=models.IntegerField()) / 100),
-                    output_field=models.FloatField())
-                ).aggregate(total_weight_by_tour=Sum('weight_by_tour'),
-                     average_weight_by_tour=Avg('average_weight'))
 
 
 class WeighingPiglets(PigletsEvent):
@@ -283,7 +267,10 @@ class WeighingPiglets(PigletsEvent):
 
 class CullingPigletsManager(CoreModelManager):
     def create_culling_piglets(self, piglets_group, culling_type, is_it_gilt=False, reason=None,
-         initiator=None, date=timezone.now(), quantity=1, total_weight=None):
+         initiator=None, date=None, quantity=1, total_weight=None):
+        if not date:
+            date=timezone.now()
+
         if isinstance(date, str):       	
             date = datetime.datetime.strptime(date, '%Y-%m-%d')
 

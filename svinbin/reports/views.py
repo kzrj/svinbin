@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework import viewsets, views
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.decorators import action
 
 from tours.filters import TourFilter
 
@@ -82,10 +83,27 @@ class ReportDateViewSet(viewsets.ModelViewSet):
             'results': data['results'],
         })
 
+    @action(methods=['get'], detail=False)
+    def ws3_report(self, request):
+        ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        bool(ws3_locs)
+        queryset = ReportDate.objects.all()\
+                            .add_ws3_sow_cullings_data(ws_locs=ws3_locs) \
+                            .add_ws3_sow_trs_data(ws_locs=ws3_locs) \
+                            .add_ws3_sow_farrow_data() \
+                            .add_ws3_count_piglets_end_day(ws_locs=ws3_locs) \
+                            .add_ws3_piglets_trs_out_aka_weighing() \
+                            .add_ws3_piglets_cullings(ws_locs=ws3_locs)
+        queryset = self.filter_queryset(queryset)
+
+        serializer = ReportDateSerializer(queryset, many=True)
+        return Response({
+            'results': serializer.data
+        })
 
 class ReportCountPigsView(views.APIView):
     def get(self, request, format=None):
-        data = Location.objects.all().gen_sections_pigs_count_dict()
+        data = Location.objects.all().gen_sections_pigs_count_dict() 
         return Response(data)
 
 

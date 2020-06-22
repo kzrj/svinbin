@@ -263,34 +263,36 @@ class ReportDateQuerySet(models.QuerySet):
                 avg_priplod=Avg('priplod_by_sow'),
                 )
 
-    def add_ws3_sow_cullings_data(self):
+    def add_ws3_sow_cullings_data(self, ws_locs):
         data = dict()
 
         for culling_type in ['padej', 'vinuzhd']:
             data[f'{culling_type}_sup_count'] = CullingSow.objects \
                             .filter(date__date=OuterRef('date'), culling_type=culling_type) \
-                            .filter(sow_status__title='Супорос 35') \
+                            .filter(sow_status__title='Супорос 35', location__in=ws_locs) \
                             .values('date__date') \
                             .annotate(cnt=Count('*')) \
                             .values('cnt')
 
             data[f'{culling_type}_sup_weight'] = CullingSow.objects \
                             .filter(date__date=OuterRef('date'), culling_type=culling_type) \
-                            .filter(sow_status__title='Супорос 35') \
+                            .filter(sow_status__title='Супорос 35', location__in=ws_locs) \
                             .values('date__date') \
                             .annotate(total_weight=Sum('weight')) \
                             .values('total_weight')
 
             data[f'{culling_type}_podsos_count'] = CullingSow.objects \
                             .filter(date__date=OuterRef('date'), culling_type=culling_type) \
-                            .filter(sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',]) \
+                            .filter(sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',],
+                                location__in=ws_locs) \
                             .values('date__date') \
                             .annotate(cnt=Count('*')) \
                             .values('cnt')
 
             data[f'{culling_type}_podsos_weight'] = CullingSow.objects \
                             .filter(date__date=OuterRef('date'), culling_type=culling_type) \
-                            .filter(sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',]) \
+                            .filter(sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',],
+                                location__in=ws_locs) \
                             .values('date__date') \
                             .annotate(total_weight=Sum('weight')) \
                             .values('total_weight')
@@ -326,9 +328,132 @@ class ReportDateQuerySet(models.QuerySet):
                         .values('to_location') \
                         .annotate(cnt=Count('*')) \
                         .values('cnt')
-    
+
+        data['tr_out_sup_count'] = SowTransaction.objects \
+                        .filter(date__date=OuterRef('date'), 
+                                from_location__in=ws_locs,
+                                sow_status__title='Супорос 35') \
+                        .exclude(to_location__in=ws_locs) \
+                        .values('to_location') \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt')
+
+        data['tr_out_podsos_count'] = SowTransaction.objects \
+                        .filter(date__date=OuterRef('date'), 
+                                from_location__in=ws_locs,
+                                sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',]) \
+                        .exclude(to_location__in=ws_locs) \
+                        .values('to_location') \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt')
                         
         return self.annotate(**data)
+
+    def add_ws3_sow_farrow_data(self):
+        data = dict()
+        data['count_oporos'] = SowFarrow.objects.filter(date__date=OuterRef('date')) \
+                                .values('date__date') \
+                                .annotate(cnt=Count('*')) \
+                                .values('cnt')
+
+        data['count_alive'] = SowFarrow.objects.filter(date__date=OuterRef('date')) \
+                                .values('date__date') \
+                                .annotate(count_alive=Sum('alive_quantity')) \
+                                .values('count_alive')
+
+        return self.annotate(**data)
+
+    def add_ws3_count_piglets_end_day(self, ws_locs):
+        total_alive = Coalesce(
+                        Subquery(SowFarrow.objects \
+                        .filter(date__date__lte=OuterRef('date')) \
+                        .annotate(flag_group=Value(0)) \
+                        .values('flag_group') \
+                        .annotate(total_alive=Sum('alive_quantity')) \
+                        .values('total_alive')), 0)
+
+        trs_out_qnty = Coalesce(
+                        Subquery(PigletsTransaction.objects \
+                        .filter(date__date__lte=OuterRef('date'), from_location__in=ws_locs) \
+                        .exclude(to_location__in=ws_locs) \
+                        .annotate(flag_group=Value(0)) \
+                        .values('flag_group') \
+                        .annotate(trs_out_qnty=Sum('quantity')) \
+                        .values('trs_out_qnty')), 0)
+
+        trs_in_qnty = Coalesce(
+                        Subquery(PigletsTransaction.objects \
+                        .filter(date__date__lte=OuterRef('date'), to_location__in=ws_locs) \
+                        .exclude(from_location__in=ws_locs) \
+                        .annotate(flag_group=Value(0)) \
+                        .values('flag_group') \
+                        .annotate(trs_in_qnty=Sum('quantity')) \
+                        .values('trs_in_qnty')), 0)
+
+        culling_qnty = Coalesce(
+                        Subquery(CullingPiglets.objects \
+                        .filter(date__date__lte=OuterRef('date'), location__in=ws_locs) \
+                        .annotate(flag_group=Value(0)) \
+                        .values('flag_group') \
+                        .annotate(culling_qnty=Sum('quantity')) \
+                        .values('culling_qnty')), 0)
+
+        return self.annotate(count_piglets_at_end=ExpressionWrapper(
+            total_alive - trs_out_qnty + trs_in_qnty - culling_qnty, output_field=models.IntegerField()))
+
+    def add_ws3_piglets_trs_out_aka_weighing(self):
+        data = dict()
+        data['tr_out_aka_weight_qnty'] = Coalesce(Subquery(WeighingPiglets.objects \
+                            .filter(date__date=OuterRef('date'), place='3/4') \
+                            .values('place') \
+                            .annotate(qnty=Sum('piglets_quantity')) \
+                            .values('qnty')), 0)
+
+        data['tr_out_aka_weight_total'] = Coalesce(Subquery(WeighingPiglets.objects \
+                            .filter(date__date=OuterRef('date'), place='3/4') \
+                            .values('place') \
+                            .annotate(total=Sum('total_weight')) \
+                            .values('total')), 0)
+
+        data['tr_out_aka_weight_avg'] = Coalesce(Subquery(WeighingPiglets.objects \
+                            .filter(date__date=OuterRef('date'), place='3/4') \
+                            .values('place') \
+                            .annotate(average=Avg('average_weight')) \
+                            .values('average')), 0)
+
+        return self.annotate(**data)
+
+    def add_ws3_piglets_cullings(self, ws_locs):
+        data = dict()
+        data['piglets_padej_qnty'] = CullingPiglets.objects \
+                    .filter(date__date=OuterRef('date'), culling_type__in=['padej', 'prirezka'],
+                        location__in=ws_locs) \
+                    .values('date__date') \
+                    .annotate(qnty=Sum('quantity')) \
+                    .values('qnty')
+
+        data['piglets_vinuzhd_qnty'] = CullingPiglets.objects \
+                    .filter(date__date=OuterRef('date'), culling_type__in=['vinuzhd'],
+                        location__in=ws_locs) \
+                    .values('date__date') \
+                    .annotate(qnty=Sum('quantity')) \
+                    .values('qnty')
+
+        data['piglets_padej_weight'] = CullingPiglets.objects \
+                    .filter(date__date=OuterRef('date'), culling_type__in=['padej', 'prirezka'],
+                        location__in=ws_locs) \
+                    .values('date__date') \
+                    .annotate(weight=Sum('total_weight')) \
+                    .values('weight')
+
+        data['piglets_vinuzhd_weight'] = CullingPiglets.objects \
+                    .filter(date__date=OuterRef('date'), culling_type__in=['vinuzhd'],
+                        location__in=ws_locs) \
+                    .values('date__date') \
+                    .annotate(weight=Sum('total_weight')) \
+                    .values('weight')
+
+        return self.annotate(**data)        
 
 
 class ReportDateManager(CoreModelManager):
@@ -407,80 +532,8 @@ class ReportDate(CoreModel):
             'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
         }
 
-    @property
-    def count_sows_ws3_today(self):
-        sow = self.count_sows_ws3(day=self.date).first()
-        return {
-            'suporos': sow.count_status_sup35 + sow.count_status_abort,
-            'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
-        }
+    # def count_all_pigs_ws3(self):
 
-    @property
-    def count_trs_out_ws3_today(self):
-        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
-        trs_sow_pks = SowTransaction.objects.trs_out_ws(ws_locs=ws_locs, start_date=self.date,
-                                                end_date=self.date) \
-                                            .values_list('sow__pk')
-
-        sow_trs_count = Sow.objects.get_queryset_with_not_alive().filter(pk__in=trs_sow_pks) \
-                            .count_sows_by_statuses_at_date(self.date) \
-                            .first()
-
-        if sow_trs_count:
-            suporos = sow_trs_count.count_status_sup35
-            podsos = sow_trs_count.count_status_oporos + sow_trs_count.count_status_otiem \
-                        + sow_trs_count.count_status_korm
-
-        return {
-            'suporos': suporos,
-            'podsos': podsos,
-            }
-
-    @property
-    def count_trs_in_ws3_today(self):
-        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
-        trs_sow_pks = SowTransaction.objects.trs_in_ws(ws_locs=ws_locs, start_date=self.date,
-                                                end_date=self.date, ws_number=3) \
-                                            .values_list('sow__pk')
-
-        sow_trs_count = Sow.objects.get_queryset_with_not_alive().filter(pk__in=trs_sow_pks) \
-                            .count_sows_by_statuses_at_date(date=self.date) \
-                            .first()
-
-        suporos, podsos = 0, 0
-
-        if sow_trs_count:
-            suporos = sow_trs_count.count_status_sup35
-            podsos = sow_trs_count.count_status_oporos + sow_trs_count.count_status_otiem \
-                        + sow_trs_count.count_status_korm
-
-        return {
-            'suporos': suporos,
-            'podsos': podsos,
-        }
-
-    @property
-    def count_sow_cullings_in_ws3_today(self):
-        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
-        sow_pks = CullingSow.objects.filter(location__in=ws_locs, date__date=self.date) \
-                                            .values_list('sow__pk')
-        print(sow_pks)
-        sow_count = Sow.objects.get_queryset_with_not_alive().filter(pk__in=sow_pks) \
-                            .count_sows_by_statuses_at_date(date=self.date) \
-                            .first()
-        print(Sow.objects.get_queryset_with_not_alive().filter(pk__in=sow_pks))
-        print(sow_count.count_status_sup35)
-        suporos, podsos = 0, 0
-
-        if sow_count:
-            suporos = sow_count.count_status_sup35
-            podsos = sow_count.count_status_oporos + sow_count.count_status_otiem \
-                        + sow_count.count_status_korm
-
-        return {
-            'suporos': suporos,
-            'podsos': podsos
-        }
         
 
 # For operations view

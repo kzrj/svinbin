@@ -78,7 +78,10 @@ class SowTransaction(Transaction):
 
 
 class PigletsTransactionManager(CoreModelManager):
-    def create_transaction(self, to_location, piglets_group, initiator=None, date=timezone.now()):
+    def create_transaction(self, to_location, piglets_group, initiator=None, date=None):
+        if not date:
+            date= timezone.now()
+
         transaction = PigletsTransaction.objects.create(
                 date=date,
                 initiator=initiator,
@@ -108,7 +111,6 @@ class PigletsTransactionManager(CoreModelManager):
     def transaction_with_split_and_merge(self, piglets, to_location, new_amount=None, gilts_contains=False,
          reverse=False, merge=False, initiator=None, date=None):
         # move second piglets from split, new_amount piglets
-
         split_event = None
         merge_event = None
         stayed_piglets = None
