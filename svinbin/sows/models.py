@@ -73,7 +73,7 @@ class SowsQuerySet(models.QuerySet):
 
     def add_status_at_date(self, date):
         status = Coalesce(Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
-            .values('status_after__title')[:1]), 0)
+            .values('status_after__title')[:1]), 'Супорос 35')
 
         return self.annotate(status_at_date=status)
 
