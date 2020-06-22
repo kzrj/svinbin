@@ -513,6 +513,7 @@ class ReportDate(CoreModel):
         sows = Sow.objects.get_queryset_with_not_alive() \
                         .filter(farm_id__in=result) \
                         .select_related('status') \
+                        .add_status_at_date(date=day) \
                         .count_sows_by_statuses_at_date(date=day)
         return sows
     
