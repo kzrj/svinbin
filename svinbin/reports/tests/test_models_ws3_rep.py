@@ -110,11 +110,12 @@ class ReportDateWSReportTest(TransactionTestCase):
             SowTransaction.objects.create_many_transactions([sow1, sow2, sow3],
                 self.loc_ws3)
 
-        sow3.refresh_from_db()
-        sow3.change_status_to('Опоросилась')
-        CullingSow.objects.create_culling(sow=sow2, culling_type='padej')
+        with freeze_time("2020-05-24"):
+            sow3.refresh_from_db()
+            sow3.change_status_to('Опоросилась')
+            CullingSow.objects.create_culling(sow=sow2, culling_type='padej')
 
-        today_rd = ReportDate.objects.get(date=datetime.today())
+        today_rd = ReportDate.objects.get(date=date(2020,5,24))
 
         sows = today_rd.count_sows_ws3(day=today_rd.date - timedelta(1))
 

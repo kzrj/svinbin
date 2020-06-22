@@ -24,17 +24,17 @@ services:
     build: .
     depends_on:
       - db
-    # command: bash -c "cd svinbin &&
-    #                   python manage.py migrate &&
-    #                   python manage.py makemigrations --no-input &&
-    #                   python manage.py test reports.tests.test_models_ws3_rep.ReportDateWSReportTest.test_serializer"
-
-    restart: unless-stopped
     command: bash -c "cd svinbin &&
-                      python manage.py makemigrations --no-input &&
                       python manage.py migrate &&
-                      python manage.py collectstatic --no-input &&
-                      gunicorn svinbin.wsgi -b 0.0.0.0:8000"        
+                      python manage.py makemigrations --no-input &&
+                      python manage.py test reports.tests.test_models_ws3_rep.ReportDateWSReportTest.test_count_sows_ws3_today"
+
+    # restart: unless-stopped
+    # command: bash -c "cd svinbin &&
+    #                   python manage.py makemigrations --no-input &&
+    #                   python manage.py migrate &&
+    #                   python manage.py collectstatic --no-input &&
+    #                   gunicorn svinbin.wsgi -b 0.0.0.0:8000"        
    
     volumes:
       - .:/code
