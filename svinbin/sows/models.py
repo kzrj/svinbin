@@ -81,7 +81,8 @@ class SowsQuerySet(models.QuerySet):
         data = {f'count_status_{en_name}': 
             Coalesce(Subquery(
                 self.filter(status_at_date=status_title) \
-                    .values('status_at_date') \
+                    .annotate(flag_group=Value(0)) \
+                    .values('flag_group') \
                     .annotate(cnt=Count('*')) \
                     .values('cnt')
                 ), 0)
