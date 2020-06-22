@@ -72,8 +72,8 @@ class SowsQuerySet(models.QuerySet):
         return self.filter(pk__in=once_seminated_sows), self.filter(pk__in=more_than_once_seminated_sows)
 
     def add_status_at_date(self, date):
-        status = Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
-            .values('status_after__title')[:1])
+        status = Coalesce(Subquery(SowStatusRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
+            .values('status_after__title')[:1]), 'Неопределен')
 
         return self.annotate(status_at_date=status)
 
