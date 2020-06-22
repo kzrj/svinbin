@@ -515,6 +515,13 @@ class ReportDate(CoreModel):
         print(Sow.objects.get_queryset_with_not_alive() \
                         .filter(farm_id__in=result).count())
 
+        for sow in Sow.objects.get_queryset_with_not_alive() \
+                        .filter(farm_id__in=result)\
+                        .add_status_at_date(date=day):
+            print(sow.farm_id)
+            print(sow.status_at_date)
+            print('_________________')
+
         print(Sow.objects.get_queryset_with_not_alive() \
                         .filter(farm_id__in=result)\
                         .add_status_at_date(date=day) \
