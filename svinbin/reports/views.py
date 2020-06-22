@@ -16,7 +16,7 @@ from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow
 from piglets_events.models import CullingPiglets, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
 
-from reports.serializers import ReportDateSerializer, ReportTourSerializer
+from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer
 from reports.filters import ReportDateFilter
 
 
@@ -96,7 +96,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                             .add_ws3_piglets_cullings(ws_locs=ws3_locs)
         queryset = self.filter_queryset(queryset)
 
-        serializer = ReportDateSerializer(queryset, many=True)
+        serializer = ReportDateWs3Serializer(queryset, many=True)
         return Response({
             'results': serializer.data
         })
