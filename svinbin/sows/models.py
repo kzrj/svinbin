@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from django.db.models import Q, Prefetch, Subquery, OuterRef, Count, F
+from django.db.models import Q, Prefetch, Subquery, OuterRef, Count, F, Value
 from django.db.models.functions import Coalesce
 from django.core.exceptions import ValidationError as DjangoValidationError
 
