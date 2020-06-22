@@ -323,9 +323,10 @@ class ReportDateQuerySet(models.QuerySet):
         data['tr_in_podsos_count'] = SowTransaction.objects \
                         .filter(date__date=OuterRef('date'), 
                                 to_location__workshop__number=3,
-                                sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',]) \
+                                sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',
+                                 'Ожидает осеменения']) \
                         .exclude(from_location__in=ws_locs) \
-                        .values('to_location') \
+                        .values('date__date') \
                         .annotate(cnt=Count('*')) \
                         .values('cnt')
 
@@ -334,16 +335,17 @@ class ReportDateQuerySet(models.QuerySet):
                                 from_location__in=ws_locs,
                                 sow_status__title='Супорос 35') \
                         .exclude(to_location__in=ws_locs) \
-                        .values('to_location') \
+                        .values('date__date') \
                         .annotate(cnt=Count('*')) \
                         .values('cnt')
 
         data['tr_out_podsos_count'] = SowTransaction.objects \
                         .filter(date__date=OuterRef('date'), 
                                 from_location__in=ws_locs,
-                                sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',]) \
+                                sow_status__title__in=['Опоросилась', 'Отъем', 'Кормилица', 'Аборт',
+                                 'Ожидает осеменения']) \
                         .exclude(to_location__in=ws_locs) \
-                        .values('to_location') \
+                        .values('date__date') \
                         .annotate(cnt=Count('*')) \
                         .values('cnt')
                         
@@ -509,26 +511,6 @@ class ReportDate(CoreModel):
              qs2_values_list=sows_out)
         result = self.substract_qs_values_lists(qs1_values_list=result,
              qs2_values_list=sows_dead)
-
-        print(result)
-        print(len(result))
-        print(Sow.objects.get_queryset_with_not_alive() \
-                        .filter(farm_id__in=result).count())
-
-        for sow in Sow.objects.get_queryset_with_not_alive() \
-                        .filter(farm_id__in=result)\
-                        .add_status_at_date(date=day):
-            print(sow.farm_id)
-            print(sow.status_at_date)
-            print('_________________')
-
-        print('_+_+_+_+_+_+_+_')
-
-        print(Sow.objects.get_queryset_with_not_alive() \
-                        .filter(farm_id__in=result)\
-                        .add_status_at_date(date=day) \
-                        .count_sows_by_statuses_at_date(date=day)
-                        )
 
         sows = Sow.objects.get_queryset_with_not_alive() \
                         .filter(farm_id__in=result) \
