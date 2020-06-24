@@ -242,15 +242,6 @@ class ReportDateQuerySet(models.QuerySet):
         return self.annotate(piglets_transfered=total_qnty)
 
     def dir_rep_aggregate_total_data(self):        
-        last_date = self.order_by('-date').first()
-        pigs_count = 0
-        if last_date:
-            sows_quantity_at_date_end = last_date.sows_quantity_at_date_end \
-                if last_date.sows_quantity_at_date_end else 0
-            piglets_qnty_start_end = last_date.piglets_qnty_start_end \
-                if last_date.piglets_qnty_start_end else 0
-            pigs_count = sows_quantity_at_date_end + piglets_qnty_start_end
-
         return self.aggregate(
                 total_priplod=Sum('born_alive'),
                 total_sows_padej=Sum('piglets_padej_qnty'),
@@ -460,7 +451,42 @@ class ReportDateQuerySet(models.QuerySet):
                     .annotate(weight=Sum('total_weight')) \
                     .values('weight')
 
-        return self.annotate(**data)        
+        return self.annotate(**data)
+
+    def ws3_aggregate_total(self):
+        return self.aggregate(
+                total_tr_in_podsos_count=Sum('tr_in_podsos_count'),
+                total_tr_in_from_1_sup_count=Sum('tr_in_from_1_sup_count'),
+                total_tr_in_from_2_sup_count=Sum('tr_in_from_2_sup_count'),
+
+                total_count_oporos=Sum('count_oporos') ,
+                total_count_alive=Sum('count_alive'),
+
+                total_tr_out_podsos_count=Sum('tr_out_podsos_count'),
+                total_tr_out_sup_count=Sum('tr_out_sup_count'),
+
+                total_padej_podsos_count=Sum('padej_podsos_count'),
+                total_padej_podsos_weight=Sum('padej_podsos_weight'),
+
+                total_padej_sup_count=Sum('padej_sup_count'),
+                total_padej_sup_weight=Sum('padej_sup_weight'),
+
+                total_vinuzhd_podsos_count=Sum('vinuzhd_podsos_count') ,
+                total_vinuzhd_podsos_weight=Sum('vinuzhd_podsos_weight'),
+
+                total_vinuzhd_sup_count=Sum('vinuzhd_sup_count'),
+                total_vinuzhd_sup_weight=Sum('vinuzhd_sup_weight'),
+
+                total_tr_out_aka_weight_qnty=Sum('tr_out_aka_weight_qnty'),
+                total_tr_out_aka_weight_total=Sum('tr_out_aka_weight_total'),
+                avg_priplod=Avg('tr_out_aka_weight_avg'),
+
+                total_piglets_padej_qnty=Sum('piglets_padej_qnty'),
+                total_piglets_padej_weight=Sum('piglets_padej_weight'),
+
+                total_piglets_vinuzhd_qnty=Sum('piglets_vinuzhd_qnty'),
+                total_piglets_vinuzhd_weight=Sum('piglets_vinuzhd_weight'),
+                )
 
 
 class ReportDateManager(CoreModelManager):

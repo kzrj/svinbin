@@ -95,10 +95,12 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                             .add_ws3_piglets_trs_out_aka_weighing() \
                             .add_ws3_piglets_cullings(ws_locs=ws3_locs)
         queryset = self.filter_queryset(queryset)
+        total_data = queryset.ws3_aggregate_total()
 
         serializer = ReportDateWs3Serializer(queryset, many=True)
         return Response({
-            'results': serializer.data
+            'results': serializer.data,
+            'total_info': total_data,
         })
 
 class ReportCountPigsView(views.APIView):
