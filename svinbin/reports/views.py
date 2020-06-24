@@ -91,7 +91,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                             .add_ws3_sow_cullings_data(ws_locs=ws3_locs) \
                             .add_ws3_sow_trs_data(ws_locs=ws3_locs) \
                             .add_ws3_sow_farrow_data() \
-                            .add_ws3_count_piglets_end_day(ws_locs=ws3_locs) \
+                            .add_ws3_count_piglets_start_day(ws_locs=ws3_locs) \
                             .add_ws3_piglets_trs_out_aka_weighing() \
                             .add_ws3_piglets_cullings(ws_locs=ws3_locs)
         queryset = self.filter_queryset(queryset)

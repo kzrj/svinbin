@@ -361,10 +361,11 @@ class ReportDateQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def add_ws3_count_piglets_end_day(self, ws_locs):
+    def add_ws3_count_piglets_start_day(self, ws_locs):
+        # add date__date__gt 24\06
         total_alive = Coalesce(
                         Subquery(SowFarrow.objects \
-                        .filter(date__date__lte=OuterRef('date')) \
+                        .filter(date__date__lt=OuterRef('date')) \
                         .annotate(flag_group=Value(0)) \
                         .values('flag_group') \
                         .annotate(total_alive=Sum('alive_quantity')) \
@@ -372,7 +373,7 @@ class ReportDateQuerySet(models.QuerySet):
 
         trs_out_qnty = Coalesce(
                         Subquery(PigletsTransaction.objects \
-                        .filter(date__date__lte=OuterRef('date'), from_location__in=ws_locs) \
+                        .filter(date__date__lt=OuterRef('date'), from_location__in=ws_locs) \
                         .exclude(to_location__in=ws_locs) \
                         .annotate(flag_group=Value(0)) \
                         .values('flag_group') \
@@ -381,7 +382,7 @@ class ReportDateQuerySet(models.QuerySet):
 
         trs_in_qnty = Coalesce(
                         Subquery(PigletsTransaction.objects \
-                        .filter(date__date__lte=OuterRef('date'), to_location__in=ws_locs) \
+                        .filter(date__date__lt=OuterRef('date'), to_location__in=ws_locs) \
                         .exclude(from_location__in=ws_locs) \
                         .annotate(flag_group=Value(0)) \
                         .values('flag_group') \
@@ -390,34 +391,35 @@ class ReportDateQuerySet(models.QuerySet):
 
         culling_qnty = Coalesce(
                         Subquery(CullingPiglets.objects \
-                        .filter(date__date__lte=OuterRef('date'), location__in=ws_locs) \
+                        .filter(date__date__lt=OuterRef('date'), location__in=ws_locs) \
                         .annotate(flag_group=Value(0)) \
                         .values('flag_group') \
                         .annotate(culling_qnty=Sum('quantity')) \
                         .values('culling_qnty')), 0)
 
+        # + count piglets at 24/06
         return self.annotate(count_piglets_at_end=ExpressionWrapper(
             total_alive - trs_out_qnty + trs_in_qnty - culling_qnty, output_field=models.IntegerField()))
 
     def add_ws3_piglets_trs_out_aka_weighing(self):
         data = dict()
-        data['tr_out_aka_weight_qnty'] = Coalesce(Subquery(WeighingPiglets.objects \
+        data['tr_out_aka_weight_qnty'] = Subquery(WeighingPiglets.objects \
                             .filter(date__date=OuterRef('date'), place='3/4') \
                             .values('place') \
                             .annotate(qnty=Sum('piglets_quantity')) \
-                            .values('qnty')), 0)
+                            .values('qnty'))
 
-        data['tr_out_aka_weight_total'] = Coalesce(Subquery(WeighingPiglets.objects \
+        data['tr_out_aka_weight_total'] = Subquery(WeighingPiglets.objects \
                             .filter(date__date=OuterRef('date'), place='3/4') \
                             .values('place') \
                             .annotate(total=Sum('total_weight')) \
-                            .values('total')), 0)
+                            .values('total'))
 
-        data['tr_out_aka_weight_avg'] = Coalesce(Subquery(WeighingPiglets.objects \
+        data['tr_out_aka_weight_avg'] = Subquery(WeighingPiglets.objects \
                             .filter(date__date=OuterRef('date'), place='3/4') \
                             .values('place') \
                             .annotate(average=Avg('average_weight')) \
-                            .values('average')), 0)
+                            .values('average'))
 
         return self.annotate(**data)
 
@@ -525,7 +527,7 @@ class ReportDate(CoreModel):
     def substract_qs_values_lists(self, qs1_values_list, qs2_values_list):
         return list((Counter(qs1_values_list) - Counter(qs2_values_list)).elements())
 
-    def count_sows_ws3(self, day=None):
+    def count_sows_ws3(self, day=None, start_date=None):
         if not day:
             day = self.date
 
@@ -554,9 +556,9 @@ class ReportDate(CoreModel):
     def count_sows_ws3_start_date(self):
         sow = self.count_sows_ws3(day=self.date - timedelta(1)).first()
         return {
-            'suporos': sow.count_status_sup35 + sow.count_status_abort,
+            'suporos': sow.count_status_sup35 + sow.count_status_abort, # + count sup at 25/06
             'suporos2': sow.count_status_sup35,
-            'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
+            'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm, # + count podsos at 25/06
             'podsos2': f'{sow.count_status_oporos} , {sow.count_status_otiem} , {sow.count_status_korm}',
         }
 
