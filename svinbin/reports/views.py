@@ -98,8 +98,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         total_data = queryset.ws3_aggregate_total()
 
         serializer = ReportDateWs3Serializer(queryset, many=True)
-        print(serializer.data)
-        print('__________________________________________')
+        
         return Response({
             'results': serializer.data,
             'total_info': total_data,
