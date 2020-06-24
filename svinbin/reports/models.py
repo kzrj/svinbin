@@ -399,7 +399,7 @@ class ReportDateQuerySet(models.QuerySet):
 
         # + count piglets at 24/06 
         # - count init piglets 3715
-        return self.annotate(count_piglets_at_end=ExpressionWrapper(
+        return self.annotate(count_piglets_at_start=ExpressionWrapper(
             3715 + total_alive - trs_out_qnty + trs_in_qnty - culling_qnty, output_field=models.IntegerField()))
 
     def add_ws3_piglets_trs_out_aka_weighing(self):

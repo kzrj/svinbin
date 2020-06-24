@@ -73,8 +73,10 @@ def export_to_excel_ws3(filename, data):
     col = 0
 
     for record in data:
-        worksheet.write(row, col,     record[0])
-        worksheet.write(row, col + 1, record[1])
+        worksheet.write(row, col,     record['date'])
+        worksheet.write(row, col + 1, record['count_sows_ws3_start_date']['suporos'])
+        worksheet.write(row, col + 2, record['count_sows_ws3_start_date']['podsos'])
+        worksheet.write(row, col + 3, record['count_piglets_at_start'])
         row += 1
 
     workbook.close()

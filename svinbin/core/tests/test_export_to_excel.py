@@ -1084,4 +1084,4 @@ class ExportToExcelTest(TestCase):
     ]
 
     def test_create_semination_lists(self):
-        pass
+        export_to_excel_ws3('TestWs3.xlsx', data=self.data)
