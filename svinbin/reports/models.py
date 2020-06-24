@@ -479,7 +479,7 @@ class ReportDateQuerySet(models.QuerySet):
 
                 total_tr_out_aka_weight_qnty=Sum('tr_out_aka_weight_qnty'),
                 total_tr_out_aka_weight_total=Sum('tr_out_aka_weight_total'),
-                avg_priplod=Avg('tr_out_aka_weight_avg'),
+                avg_tr_out_weight=Avg('tr_out_aka_weight_avg'),
 
                 total_piglets_padej_qnty=Sum('piglets_padej_qnty'),
                 total_piglets_padej_weight=Sum('piglets_padej_weight'),
