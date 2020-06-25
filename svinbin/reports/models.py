@@ -913,6 +913,7 @@ def gen_megadict(request_json):
     megalist = list()
     operations_data = gen_operations_dict()
     culling_piglets_padej_qss = CullingPiglets.objects.none()
+    sow_farrow_qss = SowFarrow.objects.none()
 
     for operation_key in request_json['operations'].keys():
         if request_json['operations'][operation_key]:
@@ -936,7 +937,10 @@ def gen_megadict(request_json):
             data = serializer(qs, many=True).data
 
             if 'piglets_padej' in operation_key:
-                culling_piglets_padej_qss = culling_piglets_padej_qss | qs                
+                culling_piglets_padej_qss = culling_piglets_padej_qss | qs
+
+            if 'ws3_farrow' in operation_key:
+                sow_farrow_qss = sow_farrow_qss | qs                
             
             for i in data:
                 megalist.append(i)
@@ -944,9 +948,16 @@ def gen_megadict(request_json):
     megalist = sorted(megalist, key=lambda x: (datetime.strptime(x['date'], '%d-%m-%Y %H:%M:%S'),
      datetime.strptime(x['created_at'], '%d-%m-%Y %H:%M:%S')), reverse=True)
     
-    final_dict['additional_data'] = {'padej_data':
-        culling_piglets_padej_qss.aggregate(total_qnty=models.Sum('quantity'), 
-            total_weight=models.Sum('total_weight'))
+    final_dict['additional_data'] = {
+        'padej_data': culling_piglets_padej_qss.aggregate(total_qnty=models.Sum('quantity'), 
+                total_weight=models.Sum('total_weight')),
+
+        'farrow_data': sow_farrow_qss.aggregate(
+            total_count=models.Count('*'), 
+            total_alive_quantity=models.Sum('alive_quantity'),
+            total_dead_quantity=models.Sum('dead_quantity'),
+            total_mummy_quantity=models.Sum('mummy_quantity')
+        ),
     } 
     final_dict['results'] = megalist
 
