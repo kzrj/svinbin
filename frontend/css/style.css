@@ -644,3 +644,22 @@ hr {
     cursor: default;
 	color: red;
 }
+
+.operation-farrow-data-count{
+	font-size: 1.1rem;
+	margin-right: 1rem;
+}
+
+.operation-farrow-data p{
+	font-size: 1.1rem;
+	margin-bottom: .3rem;
+}
+
+.operation-add-data{
+	font-size: 1.1rem;
+	margin-bottom: 1rem;
+}
+
+.badge-warning{
+	background-color: #ecb91d !important;
+}
