@@ -621,7 +621,7 @@ hr {
 	/* word-wrap: break-word; */
 	/* writing-mode: vertical-rl; */
 	/* text-orientation: sideways-right; */
-	word-break: break-word;
+	/* word-break: break-word; */
 }
 
 .report-ws-th-vert{
@@ -637,4 +637,10 @@ hr {
 	width: 100px !important;
 	vertical-align: middle !important;
 	color: #5d506f;	
+}
+
+.a-disabled{
+	pointer-events: none;
+    cursor: default;
+	color: red;
 }
