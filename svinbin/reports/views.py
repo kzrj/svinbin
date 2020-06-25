@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db.models import CharField, Value
 from django.utils import timezone
+from django.http import HttpResponse
 
 from rest_framework import viewsets, views
 from rest_framework.response import Response
