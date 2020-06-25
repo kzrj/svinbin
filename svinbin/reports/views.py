@@ -109,6 +109,14 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         
         return Response(data)
 
+    @action(methods=['get'], detail=None)
+    def get_ws3_report_excel(self, request):      
+        file = open('../data/ws3_output.xlsx')
+        response = HttpResponse(file.read(), content_type="application/file")
+        response['Content-Disposition'] = 'attachment; filename={}'.format('ws3_report.xlsx')
+        return response
+
+
 class ReportCountPigsView(views.APIView):
     def get(self, request, format=None):
         data = Location.objects.all().gen_sections_pigs_count_dict() 
