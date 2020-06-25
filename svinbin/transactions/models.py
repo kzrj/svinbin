@@ -32,7 +32,8 @@ class SowTransactionManager(CoreModelManager):
                 sow_status=sow.status
                 )
 
-        if sow.status and sow.status.title == 'Опоросилась' and to_location.workshop:
+        if sow.status and sow.status.title == 'Опоросилась' or sow.status.title == 'Отьем' \
+         and to_location.workshop:
             if to_location.workshop.number == 1  and sow.location.sowAndPigletsCell:
                 sow.tour = None
                 sow.change_status_to('Ожидает осеменения')
