@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import re
-import xlsxwriter
+# import xlsxwriter
 from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError as DjangoValidationError
