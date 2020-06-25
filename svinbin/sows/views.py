@@ -102,7 +102,9 @@ class WorkShopSowViewSet(SowViewSet):
         if serializer.is_valid():
             culling = sows_events_models.CullingSow.objects.create_culling(
                 sow=sow, culling_type=serializer.validated_data['culling_type'],
-                reason=serializer.validated_data['reason'], initiator=request.user,
+                reason=serializer.validated_data['reason'],
+                weight=serializer.validated_data['weight'],
+                initiator=request.user,
                 date=timezone.now())
             return Response(
                 {

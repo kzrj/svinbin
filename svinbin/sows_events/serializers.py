@@ -63,13 +63,13 @@ class CreateCullingSowSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CullingSow
-        fields = ('farm_id', 'culling_type',)
+        fields = ('farm_id', 'culling_type', )
 
 
 class CreateCullingSowPkSerializer(serializers.ModelSerializer):
     class Meta:
         model = CullingSow
-        fields = ('culling_type', 'reason')        
+        fields = ('culling_type', 'reason' , 'weight')        
  
 
 class CreateSowFarrowSerializer(serializers.ModelSerializer):
