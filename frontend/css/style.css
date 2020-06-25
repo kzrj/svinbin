@@ -612,7 +612,29 @@ hr {
 	line-height: 0.95 !important;
 }
 
-/* .op-list-item-ws { */
-	/* /* width: 60px !important; */ */
-	/* width: 100% !important; */
-/* } */
+.report-ws-th{
+		/* writing-mode: vertical !important; */
+	/* text-orientation: sideways !important; */
+	/* text-align: center !important; */
+	/* vertical-align: middle !important; */
+	font-size: 0.6rem;
+	/* word-wrap: break-word; */
+	/* writing-mode: vertical-rl; */
+	/* text-orientation: sideways-right; */
+	word-break: break-word;
+}
+
+.report-ws-th-vert{
+	writing-mode: horizontal-tb;
+	text-orientation: mixed;
+}
+
+.report-cell-value-ws {
+	display: table-cell;
+	font-size: .7rem;
+	text-align: center !important;
+	/* height: 50px !important; */
+	width: 100px !important;
+	vertical-align: middle !important;
+	color: #5d506f;	
+}
