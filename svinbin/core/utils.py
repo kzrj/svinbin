@@ -65,7 +65,7 @@ def jwt_response_payload_handler(token, user=None, request=None):
     }
 
 
-def export_to_excel_ws3(filename, data):
+# def export_to_excel_ws3(filename, data):
 
     # for record in data:
     #     worksheet.write(row, col,     record['date'])
