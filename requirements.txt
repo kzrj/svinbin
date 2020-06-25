@@ -8,6 +8,6 @@ django-cors-headers
 djangorestframework-jwt
 PyJWT
 xlrd
-xlwings
+openpyxl
 mixer
 freezegun

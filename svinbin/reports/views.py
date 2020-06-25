@@ -7,6 +7,8 @@ from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.decorators import action
 
+from core.utils import export_to_excel_ws3
+
 from tours.filters import TourFilter
 
 from tours.models import Tour
@@ -98,11 +100,14 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         total_data = queryset.ws3_aggregate_total()
 
         serializer = ReportDateWs3Serializer(queryset, many=True)
+
+        data = dict()
+        data['results'] = serializer.data
+        data['total_data'] = total_data
+
+        export_to_excel_ws3(data=data)
         
-        return Response({
-            'results': serializer.data,
-            'total_info': total_data,
-        })
+        return Response(data)
 
 class ReportCountPigsView(views.APIView):
     def get(self, request, format=None):

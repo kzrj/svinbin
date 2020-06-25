@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 import re
-# import xlsxwriter
+from openpyxl import Workbook, load_workbook
 from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -65,51 +65,95 @@ def jwt_response_payload_handler(token, user=None, request=None):
     }
 
 
-# def export_to_excel_ws3(filename, data):
+def export_to_excel_ws3(data, filename='../data/ws3header.xlsx'):
+    wb = load_workbook(filename)
+    sheets = wb.sheetnames
+    Sheet1 = wb[sheets[0]]
 
-    # for record in data:
-    #     worksheet.write(row, col,     record['date'])
-    #     worksheet.write(row, col + 1, record['count_sows_ws3_start_date']['podsos'])
-    #     worksheet.write(row, col + 2, record['count_sows_ws3_start_date']['suporos'])
-    #     worksheet.write(row, col + 3, record['count_piglets_at_start'])
-    #     worksheet.write(row, col + 4, int(record['count_sows_ws3_start_date']['suporos']) \
-    #         + int(record['count_sows_ws3_start_date']['podsos']) \
-    #         + int(record['count_piglets_at_start']))
-    #     worksheet.write(row, col + 5, record['tr_in_podsos_count'])
-    #     worksheet.write(row, col + 6, record['tr_in_from_1_sup_count'])
-    #     worksheet.write(row, col + 7, record['tr_in_from_2_sup_count'])
-    #     worksheet.write(row, col + 8, record['count_oporos'])
-    #     worksheet.write(row, col + 9, record['count_alive'])
-    #     worksheet.write(row, col + 10, record['tr_out_podsos_count'])
-    #     worksheet.write(row, col + 11, record['tr_out_sup_count'])
-    #     worksheet.write(row, col + 12, record['padej_podsos_count'])
-    #     worksheet.write(row, col + 13, record['padej_podsos_weight'])
-    #     worksheet.write(row, col + 14, record['padej_sup_count'])
-    #     worksheet.write(row, col + 15, record['padej_sup_weight'])
-    #     worksheet.write(row, col + 16, record['vinuzhd_podsos_count'])
-    #     worksheet.write(row, col + 17, record['vinuzhd_podsos_weight'])
-    #     worksheet.write(row, col + 18, record['vinuzhd_sup_count'])
-    #     worksheet.write(row, col + 19, record['vinuzhd_sup_weight'])
+    row = 7
+    col = 1
 
-    #     worksheet.write(row, col + 20, record['tr_out_aka_weight_qnty'])
-    #     worksheet.write(row, col + 21, record['tr_out_aka_weight_total'])
-    #     worksheet.write(row, col + 22, record['tr_out_aka_weight_avg'])
+    Sheet1.cell(1, 24).value = data['results'][0]['date']
+    Sheet1.cell(1, 28).value = data['results'][-1]['date']
 
-    #     worksheet.write(row, col + 23, record['piglets_padej_qnty'])
-    #     worksheet.write(row, col + 24, record['piglets_padej_weight'])
+    for record in data['results']:
+        Sheet1.cell(row, col).value = record['date']
+        Sheet1.cell(row, col + 1).value = record['count_sows_ws3_start_date']['podsos']
+        Sheet1.cell(row, col + 2).value = record['count_sows_ws3_start_date']['suporos']
+        Sheet1.cell(row, col + 3).value = record['count_piglets_at_start']
+        Sheet1.cell(row, col + 4).value = int(record['count_sows_ws3_start_date']['suporos']) \
+            + int(record['count_sows_ws3_start_date']['podsos']) \
+            + int(record['count_piglets_at_start'])
+        Sheet1.cell(row, col + 5).value = record['tr_in_podsos_count']
+        Sheet1.cell(row, col + 6).value = record['tr_in_from_1_sup_count']
+        Sheet1.cell(row, col + 7).value = record['tr_in_from_2_sup_count']
+        Sheet1.cell(row, col + 9).value = record['count_oporos']
+        Sheet1.cell(row, col + 10).value = record['count_alive']
+        Sheet1.cell(row, col + 11).value = record['tr_out_podsos_count']
+        Sheet1.cell(row, col + 12).value = record['tr_out_sup_count']
+        Sheet1.cell(row, col + 13).value = record['padej_podsos_count']
+        Sheet1.cell(row, col + 14).value = record['padej_podsos_weight']
+        Sheet1.cell(row, col + 15).value = record['padej_sup_count']
+        Sheet1.cell(row, col + 16).value = record['padej_sup_weight']
+        Sheet1.cell(row, col + 17).value = record['vinuzhd_podsos_count']
+        Sheet1.cell(row, col + 18).value = record['vinuzhd_podsos_weight']
+        Sheet1.cell(row, col + 19).value = record['vinuzhd_sup_count']
+        Sheet1.cell(row, col + 20).value = record['vinuzhd_sup_weight']
 
-    #     worksheet.write(row, col + 25, record['piglets_vinuzhd_qnty'])
-    #     worksheet.write(row, col + 26, record['piglets_vinuzhd_weight'])
+        Sheet1.cell(row, col + 21).value = record['tr_out_aka_weight_qnty']
+        Sheet1.cell(row, col + 22).value = record['tr_out_aka_weight_total']
+        Sheet1.cell(row, col + 23).value = record['tr_out_aka_weight_avg']
 
-    #     worksheet.write(row, col + 27, '')
-    #     worksheet.write(row, col + 28, '')
+        Sheet1.cell(row, col + 24).value = record['piglets_padej_qnty']
+        Sheet1.cell(row, col + 25).value = record['piglets_padej_weight']
 
-    #     worksheet.write(row, col + 29, record['count_sows_ws3_start_date']['suporos'])
-    #     worksheet.write(row, col + 30, record['count_sows_ws3_start_date']['podsos'])
-    #     worksheet.write(row, col + 31, record['count_piglets_at_start'])
-    #     worksheet.write(row, col + 32, int(record['count_sows_ws3_start_date']['suporos']) \
-    #         + int(record['count_sows_ws3_start_date']['podsos']) \
-    #         + int(record['count_piglets_at_start']))
-    #     row += 1
+        Sheet1.cell(row, col + 26).value = record['piglets_vinuzhd_qnty']
+        Sheet1.cell(row, col + 27).value = record['piglets_vinuzhd_weight']
 
-    # workbook.close()
+        Sheet1.cell(row, col + 28).value = ''
+        Sheet1.cell(row, col + 29).value = ''
+
+        Sheet1.cell(row, col + 30).value = record['count_sows_ws3_start_date']['suporos']
+        Sheet1.cell(row, col + 31).value = record['count_sows_ws3_start_date']['podsos']
+        Sheet1.cell(row, col + 32).value = record['count_piglets_at_start']
+        Sheet1.cell(row, col + 33).value = int(record['count_sows_ws3_start_date']['suporos']) \
+            + int(record['count_sows_ws3_start_date']['podsos']) \
+            + int(record['count_piglets_at_start'])
+        row += 1
+
+    Sheet1.cell(row, col).value = 'Итого'
+    Sheet1.cell(row, col + 1).value = '-'
+    Sheet1.cell(row, col + 2).value = '-'
+    Sheet1.cell(row, col + 3).value = '-'
+    Sheet1.cell(row, col + 4).value = '-'
+    Sheet1.cell(row, col + 5).value = data['total_info']['total_tr_in_podsos_count']
+    Sheet1.cell(row, col + 6).value = data['total_info']['total_tr_in_from_1_sup_count']
+    Sheet1.cell(row, col + 7).value = data['total_info']['total_tr_in_from_2_sup_count']
+    Sheet1.cell(row, col + 9).value = data['total_info']['total_count_oporos']
+    Sheet1.cell(row, col + 10).value = data['total_info']['total_count_alive']
+    Sheet1.cell(row, col + 11).value = data['total_info']['total_tr_out_podsos_count']
+    Sheet1.cell(row, col + 12).value = data['total_info']['total_tr_out_sup_count']
+    Sheet1.cell(row, col + 13).value = data['total_info']['total_padej_podsos_count']
+    Sheet1.cell(row, col + 14).value = data['total_info']['total_padej_podsos_weight']
+
+    Sheet1.cell(row, col + 15).value = data['total_info']['total_padej_sup_count']
+    Sheet1.cell(row, col + 16).value = data['total_info']['total_padej_sup_weight']
+    Sheet1.cell(row, col + 17).value = data['total_info']['total_vinuzhd_podsos_count']
+    Sheet1.cell(row, col + 18).value = data['total_info']['total_vinuzhd_podsos_weight']
+    Sheet1.cell(row, col + 19).value = data['total_info']['total_vinuzhd_sup_count']
+    Sheet1.cell(row, col + 20).value = data['total_info']['total_vinuzhd_sup_weight']
+
+    Sheet1.cell(row, col + 21).value = data['total_info']['total_tr_out_aka_weight_qnty']
+    Sheet1.cell(row, col + 22).value = data['total_info']['total_tr_out_aka_weight_total']
+    Sheet1.cell(row, col + 23).value = data['total_info']['avg_tr_out_weight']
+    Sheet1.cell(row, col + 24).value = data['total_info']['total_piglets_padej_qnty']
+    Sheet1.cell(row, col + 25).value = data['total_info']['total_piglets_padej_weight']
+    Sheet1.cell(row, col + 26).value = data['total_info']['total_piglets_vinuzhd_qnty']
+    Sheet1.cell(row, col + 27).value = data['total_info']['total_piglets_vinuzhd_weight']
+
+    Sheet1.cell(row, col + 30).value = '-'
+    Sheet1.cell(row, col + 31).value = '-'
+    Sheet1.cell(row, col + 32).value = '-'
+    Sheet1.cell(row, col + 33).value = '-'
+
+    wb.save("../data/ws3_output.xlsx") 
