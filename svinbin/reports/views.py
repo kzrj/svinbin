@@ -110,7 +110,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         
         return Response(data)
 
-    @action(methods=['get'], detail=None)
+    @action(methods=['get'], detail=False)
     def get_ws3_report_excel(self, request):      
         file = open('../data/ws3_output.xlsx')
         response = HttpResponse(file.read(), content_type="application/file")
