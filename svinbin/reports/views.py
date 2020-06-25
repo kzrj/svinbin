@@ -104,7 +104,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
         data = dict()
         data['results'] = serializer.data
-        data['total_data'] = total_data
+        data['total_info'] = total_data
 
         export_to_excel_ws3(data=data)
         
