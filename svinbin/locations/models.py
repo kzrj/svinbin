@@ -132,7 +132,39 @@ class LocationQuerySet(models.QuerySet):
 
         return data
 
+    def add_pigs_count_by_workshop(self):        
+        locations_subquery = models.Subquery(Location.objects.all().filter(
+                Q(Q(pigletsGroupCell__workshop=OuterRef(OuterRef('workshop'))) | 
+                  Q(workshop=OuterRef(OuterRef('workshop'))) |
+                  Q(section__workshop=OuterRef(OuterRef('workshop'))) |
+                  Q(sowAndPigletsCell__workshop=OuterRef(OuterRef('workshop')))
+                  )).values('pk'))
 
+        piglets = piglets_app.models.Piglets.objects.filter(
+            location__in=locations_subquery, active=True) \
+            .values('active') \
+            .annotate(qnty=Sum('quantity')) \
+            .values('qnty')
+
+        return self.annotate(pigs_count=models.Subquery(piglets, output_field=models.IntegerField()))
+
+    def add_pigs_count_by_sections(self):        
+        locations_subquery = models.Subquery(Location.objects.all().filter(
+                Q(Q(pigletsGroupCell__section=OuterRef(OuterRef('section'))) | 
+                  Q(section=OuterRef(OuterRef('section'))) |
+                  Q(sowAndPigletsCell__section=OuterRef(OuterRef('section')))
+                  )).values('pk'))
+
+        piglets = piglets_app.models.Piglets.objects.filter(
+            location__in=locations_subquery, active=True) \
+            .values('active') \
+            .annotate(qnty=Sum('quantity')) \
+            .values('qnty')
+
+        return self.annotate(
+            pigs_count=models.Subquery(piglets, output_field=models.IntegerField()),
+            )
+        
 class LocationManager(CoreModelManager):
     def get_queryset(self):
         return LocationQuerySet(self.model, using=self._db)

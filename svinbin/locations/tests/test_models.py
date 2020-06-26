@@ -94,7 +94,6 @@ class LocationsTest(TransactionTestCase):
             serializer = SectionSerializer(data, many=True)
             serializer.data
 
-
     def test_add_sows_count_by_sections(self):
         with self.assertNumQueries(1):
             locs = Location.objects \
@@ -108,3 +107,26 @@ class LocationsTest(TransactionTestCase):
         with self.assertNumQueries(2):
             data = Location.objects.all().gen_sections_pigs_count_dict()
             bool(data)
+
+    def test_add_pigs_count_by_sections(self):
+
+        with self.assertNumQueries(1):
+            locs = Location.objects \
+                .filter(section__workshop__number=3, section__isnull=False) \
+                .add_pigs_count_by_sections() 
+
+            bool(locs)
+            self.assertEqual(locs[0].pigs_count, 60)
+
+    def test_add_pigs_count_by_workshop(self):
+        with self.assertNumQueries(1):
+            locs = Location.objects \
+                .filter(workshop__isnull=False) \
+                .add_pigs_count_by_workshop() \
+                .add_sows_count_by_workshop() \
+
+            bool(locs)
+            self.assertEqual(locs[0].pigs_count, None)
+            self.assertEqual(locs[0].sows_count, 0)
+            self.assertEqual(locs[2].pigs_count, 60)
+            self.assertEqual(locs[2].sows_count, 7)
