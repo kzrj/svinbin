@@ -653,6 +653,7 @@ hr {
 .operation-farrow-data p{
 	font-size: 1.1rem;
 	margin-bottom: .3rem;
+	font-weight: 500;
 }
 
 .operation-add-data{
@@ -662,4 +663,8 @@ hr {
 
 .badge-warning{
 	background-color: #ecb91d !important;
+}
+
+.report-ws-count-th{
+	font-size: 0.7rem;
 }
