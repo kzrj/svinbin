@@ -976,7 +976,7 @@ def gen_megadict(request_json):
         'sow_padej_data': culling_sow_padej_qss.aggregate(total_qnty=models.Count('*'), 
                 total_weight=models.Sum('weight')),
 
-        'sow_nurse': ws3_mark_as_nurse.aggregate(total_qnty=models.Count('*')),
+        'sow_nurse': sow_nurse_qss.aggregate(total_qnty=models.Count('*')),
 
         'mark_as_gilt': mark_gilt_qss.aggregate(total_qnty=models.Count('*')),
 
