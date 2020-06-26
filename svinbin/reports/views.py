@@ -117,7 +117,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         ws_number = request.GET.get('ws_number', None)
         data = dict()
 
-        if ws_number == 3:
+        if ws_number == 3 or ws_number == '3':
             ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
             bool(ws3_locs)
             ws3_sows_sup_count = Sow.objects.filter(location__in=ws3_locs, status__title='Супорос 35').count()
