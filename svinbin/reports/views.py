@@ -118,17 +118,18 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         bool(ws3_locs)
         ws3_sows_sup_count = Sow.objects.filter(location__in=ws3_locs, status__title='Супорос 35').count()
         ws3_sows_pods_count = Sow.objects.filter(location__in=ws3_locs,
-            status__title__in=['Опоросилась', 'Отъем']).count()
+            status__title__in=['Опоросилась', 'Отъем', 'Кормилица']).count()
         ws3_sows_nurse_count = Sow.objects.filter(location__in=ws3_locs,
             status__title__in=['Кормилица']).count()
         ws3_piglets_count = Piglets.objects.filter(location__in=ws3_locs).get_total_quantity()
         ws3_gilts_count = Piglets.objects.filter(location__in=ws3_locs).get_total_gilts_quantity()
                 
         data = dict()
+        data['ws_number'] = 3
         data['ws3_sows_sup_count'] = ws3_sows_sup_count
         data['ws3_sows_pods_count'] = ws3_sows_pods_count
         data['ws3_sows_nurse_count'] = ws3_sows_nurse_count
-        data['ws3_piglets_count'] = ws3_piglets_count
+        data['ws_piglets_count'] = ws3_piglets_count
         data['ws3_gilts_count'] = ws3_gilts_count
 
         return Response(data)
