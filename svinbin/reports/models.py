@@ -955,10 +955,10 @@ def gen_megadict(request_json):
                 sow_farrow_qss = sow_farrow_qss | qs
 
             if 'ws3_mark_as_nurse' in operation_key:
-                sow_nurse_qss = MarkAsNurse.objects.none()
+                sow_nurse_qss = sow_nurse_qss | qs
 
             if 'ws3_mark_as_gilt' in operation_key:
-                mark_gilt_qss = MarkAsGilt.objects.none()
+                mark_gilt_qss = mark_gilt_qss | qs
             
             for i in data:
                 megalist.append(i)
