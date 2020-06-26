@@ -3,6 +3,7 @@ from django.db import models
 from django.db.models import Sum, OuterRef, Subquery, Q, Count, Value
 
 from core.models import CoreModel, CoreModelManager
+import piglets as piglets_app
 
 
 class WorkShop(CoreModel):
@@ -164,7 +165,7 @@ class LocationQuerySet(models.QuerySet):
         return self.annotate(
             pigs_count=models.Subquery(piglets, output_field=models.IntegerField()),
             )
-        
+
 class LocationManager(CoreModelManager):
     def get_queryset(self):
         return LocationQuerySet(self.model, using=self._db)
