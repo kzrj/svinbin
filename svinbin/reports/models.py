@@ -913,7 +913,12 @@ def gen_megadict(request_json):
     megalist = list()
     operations_data = gen_operations_dict()
     culling_piglets_padej_qss = CullingPiglets.objects.none()
+    culling_piglets_prirezka_qss = CullingPiglets.objects.none()
+    culling_piglets__qss = CullingPiglets.objects.none()
+    culling_sow_padej_qss = CullingSow.objects.none()
     sow_farrow_qss = SowFarrow.objects.none()
+    sow_nurse_qss = MarkAsNurse.objects.none()
+    mark_gilt_qss = MarkAsGilt.objects.none()
 
     for operation_key in request_json['operations'].keys():
         if request_json['operations'][operation_key]:
@@ -939,8 +944,21 @@ def gen_megadict(request_json):
             if 'piglets_padej' in operation_key:
                 culling_piglets_padej_qss = culling_piglets_padej_qss | qs
 
+            if 'ws1_culling' in operation_key or 'ws2_culling' in operation_key \
+                or 'ws3_sow_culling' in operation_key:
+                culling_sow_padej_qss = culling_sow_padej_qss | qs
+
+            if 'piglets_prirezka' in operation_key:
+                culling_piglets_prirezka_qss = culling_piglets_prirezka_qss | qs    
+
             if 'ws3_farrow' in operation_key:
-                sow_farrow_qss = sow_farrow_qss | qs                
+                sow_farrow_qss = sow_farrow_qss | qs
+
+            if 'ws3_mark_as_nurse' in operation_key:
+                sow_nurse_qss = MarkAsNurse.objects.none()
+
+            if 'ws3_mark_as_gilt' in operation_key:
+                mark_gilt_qss = MarkAsGilt.objects.none()
             
             for i in data:
                 megalist.append(i)
@@ -949,8 +967,18 @@ def gen_megadict(request_json):
      datetime.strptime(x['created_at'], '%d-%m-%Y %H:%M:%S')), reverse=True)
     
     final_dict['additional_data'] = {
-        'padej_data': culling_piglets_padej_qss.aggregate(total_qnty=models.Sum('quantity'), 
+        'piglets_padej_data': culling_piglets_padej_qss.aggregate(total_qnty=models.Sum('quantity'), 
                 total_weight=models.Sum('total_weight')),
+
+        'piglets_prirezka_data': culling_piglets_prirezka_qss.aggregate(total_qnty=models.Sum('quantity'), 
+                total_weight=models.Sum('total_weight')),
+
+        'sow_padej_data': culling_sow_padej_qss.aggregate(total_qnty=models.Count('*'), 
+                total_weight=models.Sum('weight')),
+
+        'sow_nurse': ws3_mark_as_nurse.aggregate(total_qnty=models.Count('*')),
+
+        'mark_as_gilt': mark_gilt_qss.aggregate(total_qnty=models.Count('*')),
 
         'farrow_data': sow_farrow_qss.aggregate(
             total_count=models.Count('*'), 
