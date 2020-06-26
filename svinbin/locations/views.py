@@ -51,13 +51,6 @@ class LocationViewSet(viewsets.ModelViewSet):
                         'piglets__metatour__records__tour',)
             )
 
-        if request.GET.get('sections'):
-            serializer = serializers.LocationSectionSerializer
-            queryset = self.filter_queryset(
-                self.get_queryset()\
-                    .select_related('section__workshop').add_pigs_count_by_sections()
-            )
-
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = serializer(page, many=True)

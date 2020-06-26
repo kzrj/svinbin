@@ -3,7 +3,6 @@ from django.db import models
 from django.db.models import Sum, OuterRef, Subquery, Q, Count, Value
 
 from core.models import CoreModel, CoreModelManager
-import piglets as piglets_app
 
 
 class WorkShop(CoreModel):
@@ -82,23 +81,6 @@ class LocationQuerySet(models.QuerySet):
                 )
             )
 
-    def add_pigs_count_by_sections(self):        
-        locations_subquery = models.Subquery(Location.objects.all().filter(
-                Q(Q(pigletsGroupCell__section=OuterRef(OuterRef('section'))) | 
-                  Q(section=OuterRef(OuterRef('section'))) |
-                  Q(sowAndPigletsCell__section=OuterRef(OuterRef('section')))
-                  )).values('pk'))
-
-        piglets = piglets_app.models.Piglets.objects.filter(
-            location__in=locations_subquery, active=True) \
-            .values('active') \
-            .annotate(qnty=Sum('quantity')) \
-            .values('qnty')
-
-        return self.annotate(
-            pigs_count=models.Subquery(piglets, output_field=models.IntegerField()),
-            )
-
     def add_sows_count_by_sections(self):        
         subquery = Location.objects.all().filter(
             Q(Q(section=OuterRef('section')) |
@@ -108,22 +90,6 @@ class LocationQuerySet(models.QuerySet):
                         .values('all')
 
         return self.annotate(sows_count=models.Subquery(subquery, output_field=models.IntegerField()))
-
-    def add_pigs_count_by_workshop(self):        
-        locations_subquery = models.Subquery(Location.objects.all().filter(
-                Q(Q(pigletsGroupCell__workshop=OuterRef(OuterRef('workshop'))) | 
-                  Q(workshop=OuterRef(OuterRef('workshop'))) |
-                  Q(section__workshop=OuterRef(OuterRef('workshop'))) |
-                  Q(sowAndPigletsCell__workshop=OuterRef(OuterRef('workshop')))
-                  )).values('pk'))
-
-        piglets = piglets_app.models.Piglets.objects.filter(
-            location__in=locations_subquery, active=True) \
-            .values('active') \
-            .annotate(qnty=Sum('quantity')) \
-            .values('qnty')
-
-        return self.annotate(pigs_count=models.Subquery(piglets, output_field=models.IntegerField()))
 
     def add_sows_count_by_workshop(self):        
         subquery = self.get_workshop_location(OuterRef('workshop')) \

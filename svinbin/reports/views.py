@@ -18,6 +18,8 @@ from locations.models import Location
 from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt )
 from piglets_events.models import CullingPiglets, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
+from sows.models import Sow
+from piglets.models import Piglets
 
 from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer
 from reports.filters import ReportDateFilter
@@ -108,6 +110,27 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
         export_to_excel_ws3(data=data)
         
+        return Response(data)
+
+    @action(methods=['get'], detail=False)
+    def ws3_report_count(self, request):
+        ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        bool(ws3_locs)
+        ws3_sows_sup_count = Sow.objects.filter(location__in=ws3_locs, status__title='Супорос 35').count()
+        ws3_sows_pods_count = Sow.objects.filter(location__in=ws3_locs,
+            status__title__in=['Опоросилась', 'Отъем']).count()
+        ws3_sows_nurse_count = Sow.objects.filter(location__in=ws3_locs,
+            status__title__in=['Кормилица']).count()
+        ws3_piglets_count = Piglets.objects.filter(location__in=ws3_locs).get_total_quantity()
+        ws3_gilts_count = Piglets.objects.filter(location__in=ws3_locs).get_total_gilts_quantity()
+                
+        data = dict()
+        data['ws3_sows_sup_count'] = ws3_sows_sup_count
+        data['ws3_sows_pods_count'] = ws3_sows_pods_count
+        data['ws3_sows_nurse_count'] = ws3_sows_nurse_count
+        data['ws3_piglets_count'] = ws3_piglets_count
+        data['ws3_gilts_count'] = ws3_gilts_count
+
         return Response(data)
 
     @action(methods=['get'], detail=False)
