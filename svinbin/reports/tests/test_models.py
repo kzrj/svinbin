@@ -735,8 +735,8 @@ class OperationDataAdditionInfoTest(TransactionTestCase):
 
         megadict = gen_megadict(request_json)
 
-        self.assertEqual(megadict['additional_data']['padej_data']['total_qnty'], 4)
-        self.assertEqual(megadict['additional_data']['padej_data']['total_weight'], 182.6)
+        self.assertEqual(megadict['additional_data']['piglets_padej_data']['total_qnty'], 4)
+        self.assertEqual(megadict['additional_data']['piglets_padej_data']['total_weight'], 182.6)
 
     def test_padej_data_none(self):
         request_json = copy.deepcopy(self.request_json)
