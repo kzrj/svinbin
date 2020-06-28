@@ -1108,6 +1108,7 @@ class ExportToExcelTest(TestCase):
             "total_piglets_vinuzhd_weight": None
         }
     }
-
+    
+    @tag('with_file')
     def test_create_semination_lists(self):
         export_to_excel_ws3('../data/ws3header.xlsx', data=self.data)
