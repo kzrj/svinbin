@@ -116,12 +116,10 @@ class LocationQuerySet(models.QuerySet):
 
         for sec in secs:
             if hasattr(sec, 'pigs_count'):
-                data['sections'][f'sec_{sec.section.number}']
-                    [f'ws{sec.section.workshop.number}_pigs_count'] = sec.pigs_count
+                data['sections'][f'sec_{sec.section.number}'][f'ws{sec.section.workshop.number}_pigs_count'] = sec.pigs_count
 
             if hasattr(sec, 'sows_count'):
-                data['sections'][f'sec_{sec.section.number}']
-                    [f'ws{sec.section.workshop.number}_sows_count'] = sec.sows_count
+                data['sections'][f'sec_{sec.section.number}'][f'ws{sec.section.workshop.number}_sows_count'] = sec.sows_count
 
         workshops = Location.objects.all().filter(workshop__isnull=False) \
             .select_related('workshop') \
