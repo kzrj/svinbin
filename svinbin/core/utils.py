@@ -16,7 +16,7 @@ from django.core.mail import send_mail
 from django.db.utils import IntegrityError as DjangoIntegrityError
 
 from staff.serializers import WorkshopEmployeeSerializer
-from locations.models import Location
+from locations.models import Location, Section, PigletsGroupCell
 from tours.models import MetaTourRecord
 from piglets.models import Piglets
 from sows_events.models import ( SowFarrow, Semination, Ultrasound, CullingSow, WeaningSow, AbortionSow,
