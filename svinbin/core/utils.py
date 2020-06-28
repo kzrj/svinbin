@@ -161,7 +161,7 @@ def export_to_excel_ws3(data, filename='../data/ws3header.xlsx'):
 
 def add_seven_five_section():
     ws7 = Location.objects.get(workshop__number=7)
-    sec7_5 = Section.objects.create(workshop=ws7.workshop, name=f'Секция {workshop.number}-5')
+    sec7_5 = Section.objects.create(workshop=ws7.workshop, name=f'Секция {ws7.workshop.number}-5')
     sec_loc = Location.objects.create(section=sec7_5)
 
     for i in range(0, 5):
