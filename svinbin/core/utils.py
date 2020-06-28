@@ -156,4 +156,14 @@ def export_to_excel_ws3(data, filename='../data/ws3header.xlsx'):
     Sheet1.cell(row, col + 32).value = '-'
     Sheet1.cell(row, col + 33).value = '-'
 
-    wb.save("../data/ws3_output.xlsx") 
+    wb.save("../data/ws3_output.xlsx")
+
+
+def add_seven_five_section():
+    ws7 = Location.objects.get(workshop__number=7)
+    sec7_5 = Section.objects.create(workshop=ws7.workshop, name=f'Секция {workshop.number}-5')
+    sec_loc = Location.objects.create(section=sec7_5)
+
+    for i in range(0, 5):
+        PigletsGroupCell.objects.create(workshop=sec7_5.workshop, section=sec7_5, number=i+1) 
+        Location.objects.create(pigletsGroupCell=cell)
