@@ -365,9 +365,9 @@ class ReportDateWSReportTest(TransactionTestCase):
         self.assertEqual(day1_rd.tr_out_aka_weight_avg, 10)
 
         day0_rd = rds.filter(date=date(2020, 6, 1)).first()
-        self.assertEqual(day0_rd.tr_out_aka_weight_qnty, 0)
-        self.assertEqual(day0_rd.tr_out_aka_weight_total, 0)
-        self.assertEqual(day0_rd.tr_out_aka_weight_avg, 0)
+        self.assertEqual(day0_rd.tr_out_aka_weight_qnty, None)
+        self.assertEqual(day0_rd.tr_out_aka_weight_total, None)
+        self.assertEqual(day0_rd.tr_out_aka_weight_avg, None)
 
     def test_add_ws3_piglets_cullings(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
@@ -398,7 +398,7 @@ class ReportDateWSReportTest(TransactionTestCase):
                 .add_ws3_sow_cullings_data(ws_locs=self.ws3_locs) \
                 .add_ws3_sow_trs_data(ws_locs=self.ws3_locs) \
                 .add_ws3_sow_farrow_data() \
-                .add_ws3_count_piglets_end_day(ws_locs=self.ws3_locs) \
+                .add_ws3_count_piglets_start_day(ws_locs=self.ws3_locs) \
                 .add_ws3_piglets_trs_out_aka_weighing() \
                 .add_ws3_piglets_cullings(ws_locs=self.ws3_locs)
 

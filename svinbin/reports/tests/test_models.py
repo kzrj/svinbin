@@ -464,7 +464,7 @@ class OperationDataTest(TransactionTestCase):
 
         with self.assertNumQueries(1):
             serializer = serializer(qs, many=True)
-            self.assertEqual(serializer.data[0]['age_at'], 9)
+            self.assertEqual(serializer.data[0]['age_at'], 10)
             self.assertEqual(serializer.data[0]['location'], '3/1/1')
             self.assertEqual(serializer.data[0]['week_tour'], 'Тур 1 2020г')
             self.assertEqual(serializer.data[0]['initiator'], initiator.username)
@@ -752,5 +752,5 @@ class OperationDataAdditionInfoTest(TransactionTestCase):
 
         megadict = gen_megadict(request_json)
 
-        self.assertEqual(megadict['additional_data']['padej_data']['total_qnty'], None)
-        self.assertEqual(megadict['additional_data']['padej_data']['total_weight'], None)
+        self.assertEqual(megadict['additional_data']['piglets_padej_data']['total_qnty'], None)
+        self.assertEqual(megadict['additional_data']['piglets_padej_data']['total_weight'], None)

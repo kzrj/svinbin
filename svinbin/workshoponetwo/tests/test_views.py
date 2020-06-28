@@ -72,7 +72,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         semination_employee = staff_testings.create_employee()
 
         response = self.client.post('/api/workshoponetwo/sows/%s/culling/' %
-          sow.pk, {'culling_type': 'padej', 'reason': 'test reason'})
+          sow.pk, {'culling_type': 'padej', 'reason': 'test reason', 'weight': 150})
 
         self.assertEqual(response.data['culling']['reason'], 'test reason')
         self.assertEqual(response.data['sow']['status'], 'Брак')
