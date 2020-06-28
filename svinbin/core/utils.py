@@ -165,5 +165,5 @@ def add_seven_five_section():
     sec_loc = Location.objects.create(section=sec7_5)
 
     for i in range(0, 5):
-        PigletsGroupCell.objects.create(workshop=sec7_5.workshop, section=sec7_5, number=i+1) 
+        cell = PigletsGroupCell.objects.create(workshop=sec7_5.workshop, section=sec7_5, number=i+1) 
         Location.objects.create(pigletsGroupCell=cell)
