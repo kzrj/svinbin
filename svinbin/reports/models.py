@@ -634,8 +634,8 @@ class ReportDateQuerySet(models.QuerySet):
                         .exclude(from_location__in=ws_locs) \
                         .annotate(flag_group=Value(0)) \
                         .values('flag_group') \
-                        .annotate(trs_out_qnty=Sum('quantity')) \
-                        .values('trs_out_qnty'))
+                        .annotate(tr_in_qnty=Sum('quantity')) \
+                        .values('tr_in_qnty'))
 
         data['tr_out_qnty'] = Subquery(PigletsTransaction.objects \
                         .filter(date__date=OuterRef('date'), from_location__in=ws_locs) \
