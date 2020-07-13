@@ -88,7 +88,69 @@ class ReportDateWSReportTest(TransactionTestCase):
 
         day4_rd = rds.filter(date=date(2020, 6, 20)).first()
         self.assertEqual(day4_rd.count_piglets_at_start, 21)
+
+    def test_add_ws_weighing_in(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=self.loc_ws3_cells[0], quantity=10)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=self.loc_ws3_cells[1], quantity=10)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=self.loc_ws3_cells[2], quantity=10)
+
+        with freeze_time("2020-06-3"):
+            for p in Piglets.objects.all():
+                PigletsTransaction.objects.create_transaction(
+                    piglets_group=p, to_location=self.loc_ws4)
+                WeighingPiglets.objects.create_weighing(
+                    piglets_group=p, total_weight=100, place='3/4')
         
+        rds = ReportDate.objects.all().add_ws_weighing_in(ws_number=4)
+
+        day0_rd = rds.filter(date=date(2020, 6, 3)).first()
+        self.assertEqual(day0_rd.tr_in_aka_weight_in_qnty, 30)
+        self.assertEqual(day0_rd.tr_in_aka_weight_in_total, 300)
+        self.assertEqual(day0_rd.tr_in_aka_weight_in_avg, 10)
+
+        day1_rd = rds.filter(date=date(2020, 6, 4)).first()
+        self.assertEqual(day1_rd.tr_in_aka_weight_in_qnty, None)
+        self.assertEqual(day1_rd.tr_in_aka_weight_in_total, None)
+        self.assertEqual(day1_rd.tr_in_aka_weight_in_avg, None)
+
+    def test_add_ws_weighing_out(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=self.loc_ws3_cells[0], quantity=10)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=self.loc_ws3_cells[1], quantity=10)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=self.loc_ws3_cells[2], quantity=10)
+
+        with freeze_time("2020-06-3"):
+            for p in Piglets.objects.all():
+                PigletsTransaction.objects.create_transaction(
+                    piglets_group=p, to_location=self.loc_ws4)
+                WeighingPiglets.objects.create_weighing(
+                    piglets_group=p, total_weight=100, place='3/4')
+
+        with freeze_time("2020-06-6"):
+            for p in Piglets.objects.all():
+                PigletsTransaction.objects.create_transaction(
+                    piglets_group=p, to_location=self.loc_ws8)
+                WeighingPiglets.objects.create_weighing(
+                    piglets_group=p, total_weight=150, place='4/8')
+        
+        rds = ReportDate.objects.all().add_ws_weighing_out(ws_number=4)
+
+        day0_rd = rds.filter(date=date(2020, 6, 3)).first()
+        self.assertEqual(day0_rd.tr_out_aka_weight_in_qnty, None)
+        self.assertEqual(day0_rd.tr_out_aka_weight_in_total, None)
+        self.assertEqual(day0_rd.tr_out_aka_weight_in_avg, None)
+
+        day1_rd = rds.filter(date=date(2020, 6, 6)).first()
+        self.assertEqual(day1_rd.tr_out_aka_weight_in_qnty, 30)
+        self.assertEqual(day1_rd.tr_out_aka_weight_in_total, 450)
+        self.assertEqual(day1_rd.tr_out_aka_weight_in_avg, 15)
+
+        # self.assertEqual(day0_rd.count_piglets_at_start, 0)
 
     # def test_serializer(self):
     #     qs = ReportDate.objects.all()\

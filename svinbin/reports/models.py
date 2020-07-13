@@ -90,6 +90,27 @@ class ReportDateQuerySet(models.QuerySet):
                                 .values('today_born_alive'), output_field=models.IntegerField()),
                         0 )
 
+    def gen_weighing_qnty_subquery(self, date, place):
+        return Subquery(WeighingPiglets.objects \
+                        .filter(date__date=date, place=place) \
+                        .values('place') \
+                        .annotate(qnty=Sum('piglets_quantity')) \
+                        .values('qnty'))
+
+    def gen_weighing_total_subquery(self, date, place):
+        return Subquery(WeighingPiglets.objects \
+                        .filter(date__date=date, place=place) \
+                        .values('place') \
+                        .annotate(total=Sum('total_weight')) \
+                        .values('total'))
+
+    def gen_weighing_avg_subquery(self, date, place):
+        return Subquery(WeighingPiglets.objects \
+                        .filter(date__date=date, place=place) \
+                        .values('place') \
+                        .annotate(average=Avg('average_weight')) \
+                        .values('average'))
+
     def add_today_sows_qnty(self):
         today = timezone.now().date()
         today_padej_subquery = self.gen_sow_culling_cnt_by_date_subquery('padej', today)
@@ -520,6 +541,57 @@ class ReportDateQuerySet(models.QuerySet):
 
         return self.annotate(count_piglets_at_start=ExpressionWrapper(
           trs_in_qnty - trs_out_qnty - culling_qnty, output_field=models.IntegerField()))
+
+    def add_ws_weighing_in(self, ws_number):
+        place = None
+        if ws_number == 4:
+            place = '3/4'
+        elif ws_number == 8:
+            place = '4/8'
+        elif ws_number == 5:
+            place = '8/5'
+        elif ws_number == 6:
+            place = '8/6'
+        elif ws_number == 7:
+            place = '8/7'
+
+        data = dict()
+        data['tr_in_aka_weight_in_qnty'] = self.gen_weighing_qnty_subquery(date=OuterRef('date'),
+            place=place)
+        data['tr_in_aka_weight_in_total'] = self.gen_weighing_total_subquery(date=OuterRef('date'),
+            place=place)
+        data['tr_in_aka_weight_in_avg'] = self.gen_weighing_avg_subquery(date=OuterRef('date'),
+            place=place)
+
+        return self.annotate(**data)
+
+    def add_ws_weighing_out(self, ws_number):
+        place = None
+        if ws_number == 4:
+            place = ['4/8']
+        elif ws_number == 8:
+            place = ['8/5', '8/6', '8/7',]
+        
+        data = dict()
+        data['tr_out_aka_weight_in_qnty'] = Subquery(WeighingPiglets.objects \
+                        .filter(date__date=OuterRef('date'), place__in=place) \
+                        .values('place') \
+                        .annotate(qnty=Sum('piglets_quantity')) \
+                        .values('qnty'))
+
+        data['tr_out_aka_weight_in_total'] = Subquery(WeighingPiglets.objects \
+                        .filter(date__date=OuterRef('date'), place__in=place) \
+                        .values('place') \
+                        .annotate(total=Sum('total_weight')) \
+                        .values('total'))
+
+        data['tr_out_aka_weight_in_avg'] = Subquery(WeighingPiglets.objects \
+                        .filter(date__date=OuterRef('date'), place__in=place) \
+                        .values('place') \
+                        .annotate(average=Avg('average_weight')) \
+                        .values('average'))
+
+        return self.annotate(**data)
 
 
 class ReportDateManager(CoreModelManager):
