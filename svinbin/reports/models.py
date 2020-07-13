@@ -90,6 +90,30 @@ class ReportDateQuerySet(models.QuerySet):
                                 .values('today_born_alive'), output_field=models.IntegerField()),
                         0 )
 
+    def gen_ws_piglets_culling_qnt_subquery(self, culling_type, date, ws_locs):
+        return Coalesce(
+                    Subquery(
+                        CullingPiglets.objects.filter(
+                            date__date=date, culling_type=culling_type,
+                            location__in=ws_locs) \
+                                    .values('culling_type') \
+                                    .annotate(qnty=Sum('quantity')) \
+                                    .values('qnty')
+                        ), 0
+        )
+
+    def gen_ws_piglets_culling_total_weight_subquery(self, culling_type, date, ws_locs):
+        return Coalesce(
+                    Subquery(
+                        CullingPiglets.objects.filter(
+                            date__date=date, culling_type=culling_type,
+                            location__in=ws_locs) \
+                                    .values('culling_type') \
+                                    .annotate(total_weight=Sum('total_weight')) \
+                                    .values('total_weight')
+                        ), 0
+        )
+
     def gen_weighing_qnty_subquery(self, date, place):
         return Subquery(WeighingPiglets.objects \
                         .filter(date__date=date, place=place) \
@@ -592,6 +616,16 @@ class ReportDateQuerySet(models.QuerySet):
                         .values('average'))
 
         return self.annotate(**data)
+
+    def add_ws_piglets_culling_data(self, ws_locs):
+        data = dict()
+        for culling_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
+            data[f'{culling_type}_qnty'] = self.gen_ws_piglets_culling_qnt_subquery(
+                date=OuterRef('date'), culling_type=culling_type, ws_locs=ws_locs)
+            data[f'{culling_type}_total_weight'] = self.gen_ws_piglets_culling_total_weight_subquery(
+                date=OuterRef('date'), culling_type=culling_type, ws_locs=ws_locs)
+
+        return self.annotate(**data)        
 
 
 class ReportDateManager(CoreModelManager):
