@@ -625,7 +625,53 @@ class ReportDateQuerySet(models.QuerySet):
             data[f'{culling_type}_total_weight'] = self.gen_ws_piglets_culling_total_weight_subquery(
                 date=OuterRef('date'), culling_type=culling_type, ws_locs=ws_locs)
 
-        return self.annotate(**data)        
+        return self.annotate(**data)
+
+    def add_ws_piglets_trs_in_out(self, ws_locs):
+        data = dict()
+        data['tr_in_qnty'] = Subquery(PigletsTransaction.objects \
+                        .filter(date__date=OuterRef('date'), to_location__in=ws_locs) \
+                        .exclude(from_location__in=ws_locs) \
+                        .annotate(flag_group=Value(0)) \
+                        .values('flag_group') \
+                        .annotate(trs_out_qnty=Sum('quantity')) \
+                        .values('trs_out_qnty'))
+
+        data['tr_out_qnty'] = Subquery(PigletsTransaction.objects \
+                        .filter(date__date=OuterRef('date'), from_location__in=ws_locs) \
+                        .exclude(to_location__in=ws_locs) \
+                        .annotate(flag_group=Value(0)) \
+                        .values('flag_group') \
+                        .annotate(trs_out_qnty=Sum('quantity')) \
+                        .values('trs_out_qnty'))
+
+        return self.annotate(**data)
+
+    def ws_aggregate_total(self):
+        return self.aggregate(
+                total_tr_in_aka_weight_in_qnty=Sum('tr_in_aka_weight_in_qnty'),
+                total_tr_in_aka_weight_in_total=Sum('tr_in_aka_weight_in_total'),
+                total_tr_in_aka_weight_in_avg=Avg('tr_in_aka_weight_in_avg'),
+
+                total_tr_out_aka_weight_in_qnty=Sum('tr_out_aka_weight_in_qnty'),
+                total_tr_out_aka_weight_in_total=Sum('tr_out_aka_weight_in_total'),
+                total_tr_out_aka_weight_in_avg=Avg('tr_out_aka_weight_in_avg'),
+
+                total_tr_in_qnty=Sum('tr_in_qnty'),
+                total_tr_out_qnty=Sum('tr_out_qnty'),
+
+                total_padej_qnty=Sum('padej_qnty'),
+                total_padej_total_weight=Sum('padej_total_weight'),
+
+                total_prirezka_qnty=Sum('prirezka_qnty'),
+                total_prirezka_total_weight=Sum('prirezka_total_weight'),
+
+                total_vinuzhd_qnty=Sum('vinuzhd_qnty'),
+                total_vinuzhd_total_weight=Sum('vinuzhd_total_weight'),
+
+                total_spec_qnty=Sum('spec_qnty'),
+                total_spec_total_weight=Sum('spec_total_weight'),
+                )
 
 
 class ReportDateManager(CoreModelManager):
