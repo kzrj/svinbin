@@ -491,6 +491,36 @@ class ReportDateQuerySet(models.QuerySet):
                 total_piglets_vinuzhd_weight=Sum('piglets_vinuzhd_weight'),
                 )
 
+    def add_ws_count_piglets_start_day(self, ws_locs):
+        trs_in_qnty = Coalesce(
+                        Subquery(PigletsTransaction.objects \
+                            .filter(date__date__lt=OuterRef('date'), to_location__in=ws_locs) \
+                            .exclude(from_location__in=ws_locs) \
+                            .annotate(flag_group=Value(0)) \
+                            .values('flag_group') \
+                            .annotate(trs_in_qnty=Sum('quantity')) \
+                            .values('trs_in_qnty')), 0)
+
+        trs_out_qnty = Coalesce(
+                        Subquery(PigletsTransaction.objects \
+                            .filter(date__date__lt=OuterRef('date'), from_location__in=ws_locs) \
+                            .exclude(to_location__in=ws_locs) \
+                            .annotate(flag_group=Value(0)) \
+                            .values('flag_group') \
+                            .annotate(trs_out_qnty=Sum('quantity')) \
+                            .values('trs_out_qnty')), 0)
+
+        culling_qnty = Coalesce(
+                        Subquery(CullingPiglets.objects \
+                            .filter(date__date__lt=OuterRef('date'), location__in=ws_locs) \
+                            .annotate(flag_group=Value(0)) \
+                            .values('flag_group') \
+                            .annotate(culling_qnty=Sum('quantity')) \
+                            .values('culling_qnty')), 0)
+
+        return self.annotate(count_piglets_at_start=ExpressionWrapper(
+          trs_in_qnty - trs_out_qnty - culling_qnty, output_field=models.IntegerField()))
+
 
 class ReportDateManager(CoreModelManager):
     def get_queryset(self):
