@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 import re
 from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Font
 from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -158,6 +159,83 @@ def export_to_excel_ws3(data, filename='../data/ws3header.xlsx'):
 
     wb.save("../data/ws3_output.xlsx")
 
+
+def export_to_excel_ws(data, ws_number, filename='../data/ws48header.xlsx'):
+    if ws_number in [5, 6, 7]:
+        filename = '../data/ws567header.xlsx'
+
+    wb = load_workbook(filename)
+    sheets = wb.sheetnames
+    Sheet1 = wb[sheets[0]]
+
+    row = 5
+    col = 1
+
+    Sheet1.cell(1, 18).value = f'цех {ws_number}'
+    Sheet1.cell(1, 23).value = 'с'
+    Sheet1.cell(1, 24).value = data['results'][0]['date']
+    Sheet1.cell(1, 27).value = 'по'
+    Sheet1.cell(1, 28).value = data['results'][-1]['date']
+
+    for idx, record in enumerate(data['results']):
+        Sheet1.cell(row, col).value = record['date']
+        Sheet1.cell(row, col + 1).value = record['count_piglets_at_start']
+        Sheet1.cell(row, col + 2).value = ''
+        Sheet1.cell(row, col + 3).value = record['count_piglets_at_start']
+        Sheet1.cell(row, col + 4).value = ''
+
+        tr_in_qnty = record['tr_in_qnty'] if record['tr_in_qnty'] else ''
+        tr_in_aka_weight_in_qnty = record['tr_in_aka_weight_in_qnty'] if record['tr_in_aka_weight_in_qnty'] else ''
+        tr_in_aka_weight_in_qnty = f"({record['tr_in_aka_weight_in_qnty']})" if record['tr_in_aka_weight_in_qnty'] else ''
+        Sheet1.cell(row, col + 5).value = f"{tr_in_qnty}{tr_in_aka_weight_in_qnty}"
+
+        Sheet1.cell(row, col + 6).value = record['tr_in_aka_weight_in_total']
+
+        tr_out_qnty = record['tr_out_qnty'] if record['tr_out_qnty'] else ''
+        tr_out_aka_weight_in_qnty = f"({record['tr_out_aka_weight_in_qnty']})" if record['tr_out_aka_weight_in_qnty'] else ''
+        Sheet1.cell(row, col + 11).value = f"{tr_out_qnty}{tr_out_aka_weight_in_qnty}"
+
+        Sheet1.cell(row, col + 15).value = record['padej_qnty'] if record['padej_qnty'] > 0 else ''
+        Sheet1.cell(row, col + 16).value = record['padej_total_weight'] if record['padej_total_weight'] > 0 else ''
+
+        Sheet1.cell(row, col + 25).value = record['vinuzhd_qnty'] if record['vinuzhd_qnty'] > 0 else ''
+        Sheet1.cell(row, col + 26).value = record['vinuzhd_total_weight'] if record['vinuzhd_total_weight'] > 0 else ''
+
+        Sheet1.cell(row, col + 29).value = record['prirezka_qnty'] if record['prirezka_qnty'] > 0 else ''
+        Sheet1.cell(row, col + 30).value = record['prirezka_total_weight'] if record['prirezka_total_weight'] > 0 else ''  
+
+        if idx < len(data['results']) - 1:
+            Sheet1.cell(row, col + 31).value = data['results'][idx + 1]['count_piglets_at_start']
+            Sheet1.cell(row, col + 32).value = 0
+            Sheet1.cell(row, col + 33).value = data['results'][idx + 1]['count_piglets_at_start']
+
+        row += 1
+
+    for col_number in range(1, 35):
+        Sheet1.cell(row, col_number).font = Font(name='Arial', size=14, bold=True)
+
+    Sheet1.cell(row, col).value = 'Итого'
+    Sheet1.cell(row, col + 5).value = f"{data['total_info']['total_tr_in_qnty']}({data['total_info']['total_tr_in_aka_weight_in_qnty']})"
+    Sheet1.cell(row, col + 6).value = data['total_info']['total_tr_in_aka_weight_in_total']
+    Sheet1.cell(row, col + 11).value = f"{data['total_info']['total_tr_out_qnty']}({data['total_info']['total_tr_out_aka_weight_in_qnty']})"
+
+    Sheet1.cell(row, col + 15).value = data['total_info']['total_padej_qnty']
+    Sheet1.cell(row, col + 16).value = data['total_info']['total_padej_total_weight']
+
+    Sheet1.cell(row, col + 25).value = data['total_info']['total_vinuzhd_qnty']
+    Sheet1.cell(row, col + 26).value = data['total_info']['total_vinuzhd_total_weight']
+    
+    Sheet1.cell(row, col + 29).value = data['total_info']['total_prirezka_qnty']
+    Sheet1.cell(row, col + 30).value = data['total_info']['total_prirezka_total_weight']
+
+
+    Sheet1.cell(row + 3, col + 11).value = 'Процент падежа от прихода поросят'
+    Sheet1.cell(row + 4, col + 11).value = \
+        100 * (data['total_info']['total_padej_qnty'] + data['total_info']['total_prirezka_qnty'] 
+                + data['total_info']['total_vinuzhd_qnty']) \
+        / data['total_info']['total_tr_in_qnty']
+
+    wb.save(f"../data/ws{ws_number}_output.xlsx")
 
 def add_seven_five_section():
     ws7 = Location.objects.get(workshop__number=7)

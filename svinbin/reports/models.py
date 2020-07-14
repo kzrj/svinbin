@@ -114,6 +114,18 @@ class ReportDateQuerySet(models.QuerySet):
                         ), 0
         )
 
+    def gen_ws_piglets_culling_avg_weight_subquery(self, culling_type, date, ws_locs):
+        return Coalesce(
+                    Subquery(
+                        CullingPiglets.objects.filter(
+                            date__date=date, culling_type=culling_type,
+                            location__in=ws_locs) \
+                                    .values('culling_type') \
+                                    .annotate(avg_weight=Avg(F('total_weight') / F('quantity'))) \
+                                    .values('avg_weight')
+                        ), 0
+        )
+
     def gen_weighing_qnty_subquery(self, date, place):
         return Subquery(WeighingPiglets.objects \
                         .filter(date__date=date, place=place) \
@@ -624,6 +636,8 @@ class ReportDateQuerySet(models.QuerySet):
                 date=OuterRef('date'), culling_type=culling_type, ws_locs=ws_locs)
             data[f'{culling_type}_total_weight'] = self.gen_ws_piglets_culling_total_weight_subquery(
                 date=OuterRef('date'), culling_type=culling_type, ws_locs=ws_locs)
+            data[f'{culling_type}_avg_weight'] = self.gen_ws_piglets_culling_avg_weight_subquery(
+                date=OuterRef('date'), culling_type=culling_type, ws_locs=ws_locs)
 
         return self.annotate(**data)
 
@@ -662,15 +676,19 @@ class ReportDateQuerySet(models.QuerySet):
 
                 total_padej_qnty=Sum('padej_qnty'),
                 total_padej_total_weight=Sum('padej_total_weight'),
+                total_padej_avg_weight=Avg('padej_avg_weight'),
 
                 total_prirezka_qnty=Sum('prirezka_qnty'),
                 total_prirezka_total_weight=Sum('prirezka_total_weight'),
+                total_prirezka_avg_weight=Avg('prirezka_avg_weight'),
 
                 total_vinuzhd_qnty=Sum('vinuzhd_qnty'),
                 total_vinuzhd_total_weight=Sum('vinuzhd_total_weight'),
+                total_vinuzhd_avg_weight=Avg('vinuzhd_avg_weight'),
 
                 total_spec_qnty=Sum('spec_qnty'),
                 total_spec_total_weight=Sum('spec_total_weight'),
+                total_spec_avg_weight=Avg('spec_avg_weight'),
                 )
 
 
