@@ -678,18 +678,18 @@ class ReportDateQuerySet(models.QuerySet):
 
                 total_padej_qnty=Sum('padej_qnty'),
                 total_padej_total_weight=Sum('padej_total_weight'),
-                total_padej_avg_weight=Avg('padej_avg_weight'),
+                # total_padej_avg_weight=Avg('padej_avg_weight'),
 
                 total_prirezka_qnty=Sum('prirezka_qnty'),
                 total_prirezka_total_weight=Sum('prirezka_total_weight'),
-                total_prirezka_avg_weight=Avg('prirezka_avg_weight'),
+                # total_prirezka_avg_weight=Avg('prirezka_avg_weight'),
 
                 total_vinuzhd_qnty=Sum('vinuzhd_qnty'),
                 total_vinuzhd_total_weight=Sum('vinuzhd_total_weight'),
-                total_vinuzhd_avg_weight=Avg('vinuzhd_avg_weight'),
+                # total_vinuzhd_avg_weight=Avg('vinuzhd_avg_weight'),
 
-                # total_spec_qnty=Sum('spec_qnty'),
-                # total_spec_total_weight=Sum('spec_total_weight'),
+                total_spec_qnty=Sum('spec_qnty'),
+                total_spec_total_weight=Sum('spec_total_weight'),
                 # total_spec_avg_weight=Avg('spec_avg_weight', output_field=models.FloatField()),
                 )
 
