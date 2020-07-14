@@ -602,8 +602,15 @@ class ReportDateQuerySet(models.QuerySet):
             place = ['4/8']
         elif ws_number == 8:
             place = ['8/5', '8/6', '8/7',]
-        
+
         data = dict()
+        data['tr_out_aka_weight_in_qnty'] = None
+        data['tr_out_aka_weight_in_total'] = None
+        data['tr_out_aka_weight_in_avg'] = None
+        
+        if not place:
+            return self.annotate(**data)
+        
         data['tr_out_aka_weight_in_qnty'] = Subquery(WeighingPiglets.objects \
                         .filter(date__date=OuterRef('date'), place__in=place) \
                         .values('place') \
