@@ -114,9 +114,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def ws_report(self, request):
-        ws_number = request.GET.get('ws_number', None)
-        # if not ws_number:
-        #     raise error
+        ws_number = int(request.GET.get('ws_number', 0))
 
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
         bool(ws_locs)

@@ -575,15 +575,15 @@ class ReportDateQuerySet(models.QuerySet):
 
     def add_ws_weighing_in(self, ws_number):
         place = None
-        if ws_number == '4':
+        if ws_number == 4:
             place = '3/4'
-        elif ws_number == '8':
+        elif ws_number == 8:
             place = '4/8'
-        elif ws_number == '5':
+        elif ws_number == 5:
             place = '8/5'
-        elif ws_number == '6':
+        elif ws_number == 6:
             place = '8/6'
-        elif ws_number == '7':
+        elif ws_number == 7:
             place = '8/7'
 
         data = dict()
@@ -598,9 +598,9 @@ class ReportDateQuerySet(models.QuerySet):
 
     def add_ws_weighing_out(self, ws_number):
         place = None
-        if ws_number == '4':
+        if ws_number == 4:
             place = ['4/8']
-        elif ws_number == '8':
+        elif ws_number == 8:
             place = ['8/5', '8/6', '8/7',]
         
         data = dict()
