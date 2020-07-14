@@ -666,30 +666,30 @@ class ReportDateQuerySet(models.QuerySet):
     def ws_aggregate_total(self):
         return self.aggregate(
                 total_tr_in_aka_weight_in_qnty=Sum('tr_in_aka_weight_in_qnty'),
-                total_tr_in_aka_weight_in_total=Sum('tr_in_aka_weight_in_total'),
-                total_tr_in_aka_weight_in_avg=Avg('tr_in_aka_weight_in_avg'),
+                # total_tr_in_aka_weight_in_total=Sum('tr_in_aka_weight_in_total'),
+                # total_tr_in_aka_weight_in_avg=Avg('tr_in_aka_weight_in_avg'),
 
-                total_tr_out_aka_weight_in_qnty=Sum('tr_out_aka_weight_in_qnty'),
-                total_tr_out_aka_weight_in_total=Sum('tr_out_aka_weight_in_total'),
-                total_tr_out_aka_weight_in_avg=Avg('tr_out_aka_weight_in_avg'),
+                # total_tr_out_aka_weight_in_qnty=Sum('tr_out_aka_weight_in_qnty'),
+                # total_tr_out_aka_weight_in_total=Sum('tr_out_aka_weight_in_total'),
+                # total_tr_out_aka_weight_in_avg=Avg('tr_out_aka_weight_in_avg'),
 
-                total_tr_in_qnty=Sum('tr_in_qnty'),
-                total_tr_out_qnty=Sum('tr_out_qnty'),
+                # total_tr_in_qnty=Sum('tr_in_qnty'),
+                # total_tr_out_qnty=Sum('tr_out_qnty'),
 
-                total_padej_qnty=Sum('padej_qnty'),
-                total_padej_total_weight=Sum('padej_total_weight'),
+                # total_padej_qnty=Sum('padej_qnty'),
+                # total_padej_total_weight=Sum('padej_total_weight'),
                 # total_padej_avg_weight=Avg('padej_avg_weight'),
 
-                total_prirezka_qnty=Sum('prirezka_qnty'),
-                total_prirezka_total_weight=Sum('prirezka_total_weight'),
+                # total_prirezka_qnty=Sum('prirezka_qnty'),
+                # total_prirezka_total_weight=Sum('prirezka_total_weight'),
                 # total_prirezka_avg_weight=Avg('prirezka_avg_weight'),
 
-                total_vinuzhd_qnty=Sum('vinuzhd_qnty'),
-                total_vinuzhd_total_weight=Sum('vinuzhd_total_weight'),
+                # total_vinuzhd_qnty=Sum('vinuzhd_qnty'),
+                # total_vinuzhd_total_weight=Sum('vinuzhd_total_weight'),
                 # total_vinuzhd_avg_weight=Avg('vinuzhd_avg_weight'),
 
-                total_spec_qnty=Sum('spec_qnty'),
-                total_spec_total_weight=Sum('spec_total_weight'),
+                # total_spec_qnty=Sum('spec_qnty'),
+                # total_spec_total_weight=Sum('spec_total_weight'),
                 # total_spec_avg_weight=Avg('spec_avg_weight', output_field=models.FloatField()),
                 )
 
