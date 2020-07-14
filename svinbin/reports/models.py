@@ -91,32 +91,27 @@ class ReportDateQuerySet(models.QuerySet):
                         0 )
 
     def gen_ws_piglets_culling_qnt_subquery(self, culling_type, date, ws_locs):
-        return Coalesce(
-                    Subquery(
+        return Subquery(
                         CullingPiglets.objects.filter(
                             date__date=date, culling_type=culling_type,
                             location__in=ws_locs) \
                                     .values('culling_type') \
                                     .annotate(qnty=Sum('quantity')) \
                                     .values('qnty')
-                        ), 0
-        )
+                        )
 
     def gen_ws_piglets_culling_total_weight_subquery(self, culling_type, date, ws_locs):
-        return Coalesce(
-                    Subquery(
+        return  Subquery(
                         CullingPiglets.objects.filter(
                             date__date=date, culling_type=culling_type,
                             location__in=ws_locs) \
                                     .values('culling_type') \
                                     .annotate(total_weight=Sum('total_weight')) \
                                     .values('total_weight')
-                        ), 0
-        )
+                    )
 
     def gen_ws_piglets_culling_avg_weight_subquery(self, culling_type, date, ws_locs):
-        return Coalesce(
-                    Subquery(
+        return  Subquery(
                         CullingPiglets.objects.filter(
                             date__date=date, culling_type=culling_type,
                             location__in=ws_locs) \
@@ -124,8 +119,7 @@ class ReportDateQuerySet(models.QuerySet):
                                     .annotate(avg_weight=Avg(F('total_weight') / F('quantity'),
                                          output_field=models.FloatField())) \
                                     .values('avg_weight')
-                        ), 0
-        )
+                )
 
     def gen_weighing_qnty_subquery(self, date, place):
         return Subquery(WeighingPiglets.objects \
