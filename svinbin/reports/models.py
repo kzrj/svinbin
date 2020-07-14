@@ -690,8 +690,7 @@ class ReportDateQuerySet(models.QuerySet):
 
                 total_spec_qnty=Sum('spec_qnty'),
                 total_spec_total_weight=Sum('spec_total_weight'),
-                total_spec_avg_weight=ExpressionWrapper(
-                    Avg('spec_avg_weight'), output_field=models.FloatField()),
+                # total_spec_avg_weight=Avg('spec_avg_weight', output_field=models.FloatField()),
                 )
 
 
