@@ -187,8 +187,8 @@ def export_to_excel_ws(data, ws_number, header_filename='../data/ws567header.xls
         Sheet1.cell(row, col + 4).value = ''
 
         tr_in_qnty = record['tr_in_qnty'] if record['tr_in_qnty'] else ''
-        tr_in_aka_weight_in_qnty = record['tr_in_aka_weight_in_qnty'] if record['tr_in_aka_weight_in_qnty'] else ''
-        tr_in_aka_weight_in_qnty = f"({record['tr_in_aka_weight_in_qnty']})" if record['tr_in_aka_weight_in_qnty'] else ''
+        tr_in_aka_weight_in_qnty = f"({record['tr_in_aka_weight_in_qnty']})" \
+            if record['tr_in_aka_weight_in_qnty'] else ''
         Sheet1.cell(row, col + 5).value = f"{tr_in_qnty}{tr_in_aka_weight_in_qnty}"
 
         Sheet1.cell(row, col + 6).value = record['tr_in_aka_weight_in_total']
@@ -225,7 +225,11 @@ def export_to_excel_ws(data, ws_number, header_filename='../data/ws567header.xls
         Sheet1.cell(row, col_number).border = Border(top=thin, left=thin, right=thin, bottom=thin)
 
     Sheet1.cell(row, col).value = 'Итого'
-    Sheet1.cell(row, col + 5).value = f"{data['total_info']['total_tr_in_qnty']}({data['total_info']['total_tr_in_aka_weight_in_qnty']})"
+    total_tr_in_qnty = data['total_info']['total_tr_in_qnty'] \
+        if data['total_info']['total_tr_in_qnty'] else ''
+    total_tr_in_aka_weight_in_qnty = f"({data['total_info']['total_tr_in_aka_weight_in_qnty']})" \
+        if data['total_info']['total_tr_in_aka_weight_in_qnty'] else ''
+    Sheet1.cell(row, col + 5).value = f"{total_tr_in_qnty}{total_tr_in_aka_weight_in_qnty}"
     Sheet1.cell(row, col + 6).value = data['total_info']['total_tr_in_aka_weight_in_total']
 
     Sheet1.cell(row, col + 11).value = data['total_info']['total_tr_out_qnty']
