@@ -604,9 +604,9 @@ class ReportDateQuerySet(models.QuerySet):
             place = ['8/5', '8/6', '8/7',]
 
         data = dict()
-        data['tr_out_aka_weight_in_qnty'] = Value(None)
-        data['tr_out_aka_weight_in_total'] = Value(None)
-        data['tr_out_aka_weight_in_avg'] = Value(None)
+        data['tr_out_aka_weight_in_qnty'] = Value(0)
+        data['tr_out_aka_weight_in_total'] = Value(0)
+        data['tr_out_aka_weight_in_avg'] = Value(0)
 
         if not place:
             return self.annotate(**data)
