@@ -98,15 +98,15 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                             .add_ws3_sow_farrow_data() \
                             .add_ws3_count_piglets_start_day(ws_locs=ws3_locs) \
                             .add_ws3_piglets_trs_out_aka_weighing() \
-                            # .add_ws3_piglets_cullings(ws_locs=ws3_locs)
+                            .add_ws3_piglets_cullings(ws_locs=ws3_locs)
         queryset = self.filter_queryset(queryset)
-        # total_data = queryset.ws3_aggregate_total()
+        total_data = queryset.ws3_aggregate_total()
 
         serializer = ReportDateWs3Serializer(queryset, many=True)
 
         data = dict()
         data['results'] = serializer.data
-        # data['total_info'] = total_data
+        data['total_info'] = total_data
 
         export_to_excel_ws3(data=data)
         
@@ -122,18 +122,18 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                             .add_ws_count_piglets_start_day(ws_locs=ws_locs) \
                             .add_ws_weighing_in(ws_number=ws_number) \
                             .add_ws_weighing_out(ws_number=ws_number) \
-                            .add_ws_piglets_culling_data(ws_locs=ws_locs) \
                             .add_ws_piglets_trs_in_out(ws_locs=ws_locs) \
+                            # .add_ws_piglets_culling_data(ws_locs=ws_locs) \
 
         queryset = self.filter_queryset(queryset)
-        total_data = queryset.ws_aggregate_total()
-        
+        # total_data = queryset.ws_aggregate_total()
+
 
         serializer = ReportDateSerializer(queryset, many=True)
 
         data = dict()
         data['results'] = serializer.data
-        data['total_info'] = total_data
+        # data['total_info'] = total_data
 
         # export_to_excel_ws3(data=data)
         
