@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.decorators import action
 
-from core.utils import export_to_excel_ws3
+from core.utils import export_to_excel_ws3, export_to_excel_ws
 
 from tours.filters import TourFilter
 
@@ -134,7 +134,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         data['results'] = serializer.data
         data['total_info'] = total_data
 
-        # export_to_excel_ws3(data=data)
+        export_to_excel_ws(data=data, ws_number=ws_number)
         
         return Response(data)
 
@@ -168,6 +168,14 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         file = open('../data/ws3_output.xlsx', 'rb')
         response = HttpResponse(file, content_type="application/file")
         response['Content-Disposition'] = 'attachment; filename={}'.format('ws3_report.xlsx')
+        return response
+
+    @action(methods=['get'], detail=False)
+    def get_ws_report_excel(self, request):
+        ws_number = request.GET.get('ws_number', None)    
+        file = open(f'../data/ws{ws_number}_output.xlsx', 'rb')
+        response = HttpResponse(file, content_type="application/file")
+        response['Content-Disposition'] = 'attachment; filename={}'.format(f'ws{ws_number}_report.xlsx')
         return response
 
 
