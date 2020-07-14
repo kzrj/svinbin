@@ -534,7 +534,7 @@ class ReportDateQuerySet(models.QuerySet):
 
                 total_tr_out_aka_weight_qnty=Sum('tr_out_aka_weight_qnty'),
                 total_tr_out_aka_weight_total=Sum('tr_out_aka_weight_total'),
-                avg_tr_out_weight=Avg('tr_out_aka_weight_avg', output_field=models.FloatField()),
+                avg_tr_out_weight=Avg('tr_out_aka_weight_avg'),
 
                 total_piglets_padej_qnty=Sum('piglets_padej_qnty'),
                 total_piglets_padej_weight=Sum('piglets_padej_weight'),
@@ -690,7 +690,7 @@ class ReportDateQuerySet(models.QuerySet):
 
                 total_spec_qnty=Sum('spec_qnty'),
                 total_spec_total_weight=Sum('spec_total_weight'),
-                total_spec_avg_weight=Avg('spec_avg_weight'),
+                total_spec_avg_weight=Avg('spec_avg_weight', output_field=models.FloatField()),
                 )
 
 
