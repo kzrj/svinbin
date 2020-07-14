@@ -604,9 +604,9 @@ class ReportDateQuerySet(models.QuerySet):
             place = ['8/5', '8/6', '8/7',]
 
         data = dict()
-        data['tr_out_aka_weight_in_qnty'] = Value(0)
-        data['tr_out_aka_weight_in_total'] = Value(0)
-        data['tr_out_aka_weight_in_avg'] = Value(0)
+        data['tr_out_aka_weight_in_qnty'] = ExpressionWrapper(Value(0), output_field=models.IntegerField())
+        data['tr_out_aka_weight_in_total'] = ExpressionWrapper(Value(0), output_field=models.IntegerField())
+        data['tr_out_aka_weight_in_avg'] = ExpressionWrapper(Value(0), output_field=models.IntegerField())
 
         if not place:
             return self.annotate(**data)
