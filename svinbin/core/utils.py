@@ -173,7 +173,7 @@ def export_to_excel_ws(data, ws_number, header_filename='../data/ws567header.xls
     row = 5
     col = 1
 
-    Sheet1.cell(1, 21).value = f'{ws_number}'
+    Sheet1.cell(1, 21).value = f'{ws_number} ЦЕХ'
     Sheet1.cell(1, 23).value = 'с'
     Sheet1.cell(1, 24).value = data['results'][0]['date']
     Sheet1.cell(1, 27).value = 'по'
