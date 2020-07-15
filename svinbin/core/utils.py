@@ -245,10 +245,13 @@ def export_to_excel_ws(data, ws_number, header_filename='../data/ws567header.xls
 
     if ws_number in [4, 8]:
         Sheet1.cell(row + 3, col + 11).value = 'Процент падежа от прихода поросят'
+        padej_qnty = data['total_info']['total_padej_qnty'] if data['total_info']['total_padej_qnty'] else 0
+        prirezka_qnty = data['total_info']['total_prirezka_qnty'] if data['total_info']['total_prirezka_qnty'] else 0
+        vinuzhd_qnty = data['total_info']['total_vinuzhd_qnty'] if data['total_info']['total_vinuzhd_qnty'] else 0
+        trs_in = data['total_info']['total_tr_in_qnty'] if data['total_info']['total_tr_in_qnty'] else 1
+
         Sheet1.cell(row + 4, col + 11).value = \
-            100 * (data['total_info']['total_padej_qnty'] + data['total_info']['total_prirezka_qnty'] 
-                    + data['total_info']['total_vinuzhd_qnty']) \
-            / data['total_info']['total_tr_in_qnty']
+            100 * (padej_qnty + prirezka_qnty +vinuzhd_qnty) / trs_in
 
         Sheet1.cell(row + 5, col + 11).value = 'Ср.вес 1 головы'
         Sheet1.cell(row + 5, col + 14).value = 'падежа'
