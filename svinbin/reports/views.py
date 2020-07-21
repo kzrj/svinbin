@@ -135,7 +135,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         # data['total_info'] = total_data
         data['total_info'] = {}
 
-        export_to_excel_ws(data=data, ws_number=ws_number)
+        # export_to_excel_ws(data=data, ws_number=ws_number)
         
         return Response(data)
 
