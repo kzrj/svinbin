@@ -637,12 +637,35 @@ class ReportDateQuerySet(models.QuerySet):
     def add_ws_piglets_culling_data(self, ws_locs):
         data = dict()
         for culling_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
-            data[f'{culling_type}_qnty'] = self.gen_ws_piglets_culling_qnt_subquery(
-                date=OuterRef('date'), culling_type=culling_type, ws_locs=ws_locs)
-            data[f'{culling_type}_total_weight'] = self.gen_ws_piglets_culling_total_weight_subquery(
-                date=OuterRef('date'), culling_type=culling_type, ws_locs=ws_locs)
-            data[f'{culling_type}_avg_weight'] = self.gen_ws_piglets_culling_avg_weight_subquery(
-                date=OuterRef('date'), culling_type=culling_type, ws_locs=ws_locs)
+            data[f'{culling_type}_qnty'] = Subquery(
+                        CullingPiglets.objects.filter(
+                            date__date=OuterRef('date'), culling_type=culling_type,
+                            location__in=ws_locs) \
+                                    .values('culling_type') \
+                                    .annotate(qnty=Sum('quantity')) \
+                                    .values('qnty')
+                        )
+
+            data[f'{culling_type}_total_weight'] = Subquery(
+                        CullingPiglets.objects.filter(
+                            date__date=OuterRef('date'), culling_type=culling_type,
+                            location__in=ws_locs) \
+                                    .values('culling_type') \
+                                    .annotate(total_weight=Sum('total_weight')) \
+                                    .values('total_weight')
+                    )
+
+            data[f'{culling_type}_avg_weight'] = Subquery(
+                        CullingPiglets.objects.filter(
+                            date__date=OuterRef('date'), culling_type=culling_type,
+                            location__in=ws_locs) \
+                                    .values('culling_type') \
+                                    .annotate(avg_weight=ExpressionWrapper(
+                                            F('total_weight') / F('quantity'),
+                                            output_field=models.FloatField())
+                                    ) \
+                                    .values('avg_weight')
+                )
 
         return self.annotate(**data)
 
