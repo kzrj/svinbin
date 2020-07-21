@@ -11,6 +11,7 @@ from sows_events import serializers as sows_events_serializers
 
 from sows.models import Sow
 from sows_events import models as sows_events_models
+from transactions.models import SowTransaction, PigletsTransaction
 
 from sows.views import WorkShopSowViewSet
 
@@ -50,6 +51,32 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
                 {
                  "sow": sows_serializers.SowSerializer(sow).data,
                  "message": 'Свинья помечена как кормилица.',
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['post'], detail=False)
+    def transfer_sow_and_piglets(self, request):
+        serializer = serializers.MoveSowAndPigletsSerializer(data=request.data)
+        if serializer.is_valid():
+            sow = serializer.validated_data['from_location'].get_sow
+            piglets = serializer.validated_data['from_location'].get_piglets
+
+            SowTransaction.objects.create_transaction(
+                sow=sow,
+                to_location=serializer.validated_data['to_location'],
+                initiator=request.user)
+
+            PigletsTransaction.objects.create_transaction(
+                piglets_group=piglets,
+                to_location=serializer.validated_data['to_location'],
+                initiator=request.user)
+            
+            return Response(
+                {
+                 "message": f"Свиноматка {sow.farm_id} и поросята №{piglets.id} перемещены.",
                 },
                 status=status.HTTP_200_OK)
         else:

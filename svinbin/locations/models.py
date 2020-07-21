@@ -226,7 +226,7 @@ class Location(CoreModel):
 
     @property
     def is_empty(self):
-        if not self.get_located_active_piglets() and \
+        if not self.piglets.all() and \
             not self.sow_set.all() and \
             not self.gilt_set.all():
                 return True
@@ -285,3 +285,11 @@ class Location(CoreModel):
             return f'Цех {self.section.workshop.number}/секция {self.section.number}'
 
         return None
+
+    @property
+    def get_sow(self):
+        return self.sow_set.all().first()
+
+    @property
+    def get_piglets(self):
+        return self.piglets.all().first()

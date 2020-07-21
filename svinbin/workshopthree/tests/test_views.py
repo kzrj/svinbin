@@ -49,3 +49,34 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Кормилица')
         self.assertEqual(response.data['message'], 'Свинья помечена как кормилица.')
+
+    def test_transfer_sow_and_piglets(self):
+        sow = sows_testing.create_sow_seminated_usouded_ws3_section(section_number=1, week=7)
+        location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
+        sow.change_sow_current_location(location)
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+        to_location = Location.objects.filter(sowAndPigletsCell__isnull=False)[1]
+
+        response = self.client.post('/api/workshopthree/sows/transfer_sow_and_piglets/',
+            {'from_location': location, 'to_location': to_location})
+        sow.refresh_from_db()
+
+        self.assertEqual(response.data['message'],
+            f"Свиноматка {sow.farm_id} и поросята №{farrow.piglets_group.id} перемещены.")
+
+    def test_transfer_sow_and_piglets_validate(self):
+        sow1 = sows_testing.create_sow_seminated_usouded_ws3_section(section_number=1, week=7)
+        location1 = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
+        sow1.change_sow_current_location(location1)
+        farrow1 = SowFarrow.objects.create_sow_farrow(sow=sow1, alive_quantity=10)
+
+        sow2 = sows_testing.create_sow_seminated_usouded_ws3_section(section_number=1, week=7)
+        location2 = Location.objects.filter(sowAndPigletsCell__isnull=False)[1]
+        sow2.change_sow_current_location(location2)
+
+        response = self.client.post('/api/workshopthree/sows/transfer_sow_and_piglets/',
+            {'from_location': location1, 'to_location': location2})
+        sow1.refresh_from_db()
+
+        self.assertEqual(response.status_code, 400)
+        # self.assertEqual(str(response.data['message']), f"Клетка {location2.get_full_loc} не пустая. Есть свиноматка или поросята")
