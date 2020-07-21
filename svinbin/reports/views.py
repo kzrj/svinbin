@@ -122,8 +122,8 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                             .add_ws_count_piglets_start_day(ws_locs=ws_locs) \
                             .add_ws_weighing_in(ws_number=ws_number) \
                             .add_ws_piglets_trs_in_out(ws_locs=ws_locs) \
-                            .add_ws_piglets_culling_data(ws_locs=ws_locs) \
                             .add_ws_weighing_out(ws_number=ws_number) \
+                            .add_ws_piglets_culling_data(ws_locs=ws_locs) \
 
         queryset = self.filter_queryset(queryset)
         total_data = queryset.ws_aggregate_total()
