@@ -610,26 +610,27 @@ class ReportDateQuerySet(models.QuerySet):
         data['tr_out_aka_weight_in_total'] = ExpressionWrapper(Value(0), output_field=models.IntegerField())
         data['tr_out_aka_weight_in_avg'] = ExpressionWrapper(Value(0), output_field=models.IntegerField())
 
-        if not place:
-            return self.annotate(**data)
-        
-        data['tr_out_aka_weight_in_qnty'] = Subquery(WeighingPiglets.objects \
-                        .filter(date__date=OuterRef('date'), place__in=place) \
-                        .values('place') \
-                        .annotate(qnty=Sum('piglets_quantity')) \
-                        .values('qnty'))
+        if place:           
+            data['tr_out_aka_weight_in_qnty'] = Subquery(WeighingPiglets.objects \
+                            .filter(date__date=OuterRef('date'), place__in=place) \
+                            .annotate(flag_group=Value(0)) \
+                            .values('flag_group') \
+                            .annotate(qnty=Sum('piglets_quantity')) \
+                            .values('qnty'))
 
-        data['tr_out_aka_weight_in_total'] = Subquery(WeighingPiglets.objects \
-                        .filter(date__date=OuterRef('date'), place__in=place) \
-                        .values('place') \
-                        .annotate(total=Sum('total_weight')) \
-                        .values('total'))
+            data['tr_out_aka_weight_in_total'] = Subquery(WeighingPiglets.objects \
+                            .filter(date__date=OuterRef('date'), place__in=place) \
+                            .annotate(flag_group=Value(0)) \
+                            .values('flag_group') \
+                            .annotate(total=Sum('total_weight')) \
+                            .values('total'))
 
-        data['tr_out_aka_weight_in_avg'] = Subquery(WeighingPiglets.objects \
-                        .filter(date__date=OuterRef('date'), place__in=place) \
-                        .values('place') \
-                        .annotate(average=Avg('average_weight')) \
-                        .values('average'))
+            data['tr_out_aka_weight_in_avg'] = Subquery(WeighingPiglets.objects \
+                            .filter(date__date=OuterRef('date'), place__in=place) \
+                            .annotate(flag_group=Value(0)) \
+                            .values('flag_group') \
+                            .annotate(average=Avg('average_weight')) \
+                            .values('average'))
 
         return self.annotate(**data)
 
