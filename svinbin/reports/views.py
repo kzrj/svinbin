@@ -123,16 +123,17 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                             .add_ws_weighing_in(ws_number=ws_number) \
                             .add_ws_piglets_trs_in_out(ws_locs=ws_locs) \
                             .add_ws_weighing_out(ws_number=ws_number) \
-                            .add_ws_piglets_culling_data(ws_locs=ws_locs) \
+                            # .add_ws_piglets_culling_data(ws_locs=ws_locs) \
 
         queryset = self.filter_queryset(queryset)
-        total_data = queryset.ws_aggregate_total()
+        # total_data = queryset.ws_aggregate_total()
 
         serializer = ReportDateSerializer(queryset, many=True)
 
         data = dict()
         data['results'] = serializer.data
-        data['total_info'] = total_data
+        # data['total_info'] = total_data
+        data['total_info'] = {}
 
         export_to_excel_ws(data=data, ws_number=ws_number)
         
