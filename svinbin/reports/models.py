@@ -90,39 +90,6 @@ class ReportDateQuerySet(models.QuerySet):
                                 .values('today_born_alive'), output_field=models.IntegerField()),
                         0 )
 
-    def gen_ws_piglets_culling_qnt_subquery(self, culling_type, date, ws_locs):
-        return Subquery(
-                        CullingPiglets.objects.filter(
-                            date__date=date, culling_type=culling_type,
-                            location__in=ws_locs) \
-                                    .values('culling_type') \
-                                    .annotate(qnty=Sum('quantity')) \
-                                    .values('qnty')
-                        )
-
-    def gen_ws_piglets_culling_total_weight_subquery(self, culling_type, date, ws_locs):
-        return  Subquery(
-                        CullingPiglets.objects.filter(
-                            date__date=date, culling_type=culling_type,
-                            location__in=ws_locs) \
-                                    .values('culling_type') \
-                                    .annotate(total_weight=Sum('total_weight')) \
-                                    .values('total_weight')
-                    )
-
-    def gen_ws_piglets_culling_avg_weight_subquery(self, culling_type, date, ws_locs):
-        return  Subquery(
-                        CullingPiglets.objects.filter(
-                            date__date=date, culling_type=culling_type,
-                            location__in=ws_locs) \
-                                    .values('culling_type') \
-                                    .annotate(avg_weight=ExpressionWrapper(
-                                            F('total_weight') / F('quantity'),
-                                            output_field=models.FloatField())
-                                    ) \
-                                    .values('avg_weight')
-                )
-
     def gen_weighing_qnty_subquery(self, date, place):
         return Subquery(WeighingPiglets.objects \
                         .filter(date__date=date, place=place) \
