@@ -646,14 +646,14 @@ class ReportDateQuerySet(models.QuerySet):
                                     .values('qnty')
                         )
 
-            # data[f'{culling_type}_total_weight'] = Subquery(
-            #             CullingPiglets.objects.filter(
-            #                 date__date=OuterRef('date'), culling_type=culling_type,
-            #                 location__in=ws_locs) \
-            #                         .values('culling_type') \
-            #                         .annotate(all_total_weight=Sum('total_weight')) \
-            #                         .values('all_total_weight')
-            #         )
+            data[f'{culling_type}_total_weight'] = Subquery(
+                        CullingPiglets.objects.filter(
+                            date__date=OuterRef('date'), culling_type=culling_type,
+                            location__in=ws_locs) \
+                                    .values('culling_type') \
+                                    .annotate(all_total_weight=Sum('total_weight')) \
+                                    .values('all_total_weight')
+                    )
 
             # data[f'{culling_type}_avg_weight'] = Subquery(
             #             CullingPiglets.objects.filter(
