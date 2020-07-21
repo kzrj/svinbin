@@ -660,7 +660,7 @@ class ReportDateQuerySet(models.QuerySet):
                             date__date=OuterRef('date'), culling_type=culling_type,
                             location__in=ws_locs) \
                                     .values('culling_type') \
-                                    .annotate(avg_weight=ExpressionWrapper(
+                                    .annotate(avg_weight=Avg(
                                             F('total_weight') / F('quantity'),
                                             output_field=models.FloatField())
                                     ) \
