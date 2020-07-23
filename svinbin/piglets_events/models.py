@@ -40,8 +40,9 @@ class PigletsSplitManager(CoreModelManager):
         
         # validate
         if new_amount >= parent_piglets.quantity:
-            raise DjangoValidationError(message=f'new_amount >= parent_piglets.quantity.\
-                Группа {parent_piglets.pk}')
+            raise DjangoValidationError(
+                message=f'Отделяемое количество поросят больше или равно чем есть в группе.\
+                {new_amount} >= {parent_piglets.quantity}. Группа {parent_piglets.pk}')
 
         # if gilts to new. Check parent gilts quantity should be less or equal new amount
         if gilts_to_new and parent_piglets.gilts_quantity > new_amount:
