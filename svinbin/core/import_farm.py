@@ -24,7 +24,7 @@ def normalize_row(row, workbook): # to test
     if row[5] == '*' or row[5] == '**':
         del row[5] # delete *
     row[5] = row[5].strip()
-    row[7] = int(row[7])
+    row[7] = row[5].strip()
 
     return row
 
