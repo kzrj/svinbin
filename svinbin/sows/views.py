@@ -177,7 +177,7 @@ class BoarViewSet(viewsets.ModelViewSet):
                 date=timezone.now())
             return Response(
                 {
-                    "message": f"Выбраковка прошла успешно. Хряк №{boar.birth_id}."
+                    "message": f"Выбраковка прошла успешно. Хряк №{boar.birth_id}.",
                     "boar": sows_serializers.BoarSerializer(boar).data
                 },
                 status=status.HTTP_200_OK)
