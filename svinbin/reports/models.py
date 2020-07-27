@@ -972,6 +972,8 @@ def gen_operations_dict():
         'target': 'piglets' }
 
     ws75_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=11)
+    ws12_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=2) |  \
+        Location.objects.all().get_workshop_location_by_number(workshop_number=1)
     
     for ws_number in [4, 8, 5, 6, 7]:
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
@@ -1089,7 +1091,7 @@ def gen_operations_dict():
                     'target': 'piglets' }
 
             operations_data[f'ws{ws_number}_piglets_to_75'] = {'qs': PigletsTransaction.objects
-                .filter(from_location__in=ws_locs, to_location__in=ws75_locs)\
+                .filter(from_location__in=ws_locs, to_location__in=ws12_locs)\
                 .select_related('initiator', 'week_tour',
                     'from_location__pigletsGroupCell__workshop',
                     'from_location__pigletsGroupCell__section',

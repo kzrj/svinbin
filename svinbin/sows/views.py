@@ -157,7 +157,8 @@ class BoarViewSet(viewsets.ModelViewSet):
                 birth_id=serializer.validated_data['birth_id'])
             return Response(
                 {
-                    "message": f"Хряк №{boar.birth_id} создан."
+                    "message": f"Хряк №{boar.birth_id} создан.",
+                    "boar": sows_serializers.BoarSerializer(boar).data
                 },
                 status=status.HTTP_200_OK)
         else:
@@ -177,6 +178,7 @@ class BoarViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                     "message": f"Выбраковка прошла успешно. Хряк №{boar.birth_id}."
+                    "boar": sows_serializers.BoarSerializer(boar).data
                 },
                 status=status.HTTP_200_OK)
         else:
