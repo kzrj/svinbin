@@ -5,7 +5,7 @@ from django.core.exceptions import ValidationError
 
 from sows_events.models import (
     Semination, Ultrasound, SowFarrow, CullingSow,
-    UltrasoundType, AbortionSow, MarkAsNurse, MarkAsGilt)
+    UltrasoundType, AbortionSow, MarkAsNurse, MarkAsGilt, CullingBoar)
 from sows.models import Sow, Boar, Gilt
 from piglets.models import Piglets
 from locations.models import Location
@@ -369,3 +369,21 @@ class MarkAsGiltTest(TestCase):
         self.assertEqual(marks_as_gilt_event.gilt, gilt)
         self.assertEqual(marks_as_gilt_event.sow, gilt.mother_sow)
         self.assertEqual(marks_as_gilt_event.tour, gilt.tour)
+
+
+class BoarEventTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_testing.create_boars()
+        sows_events_testing.create_types()
+        self.boar1 = Boar.objects.all().first()
+
+    def test_culling_boar(self):
+        boar = Boar.objects.all().first()
+        culling = CullingBoar.objects.create_culling_boar(boar=boar,
+         culling_type='padej', reason='test reason', weight=100)
+
+        self.assertEqual(culling.boar, boar)
+        self.assertEqual(culling.culling_type, 'padej')
+        self.assertEqual(culling.reason, 'test reason')

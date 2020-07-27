@@ -183,6 +183,7 @@ class SowViewSetTest(APITestCase):
                 result_sow['id'] in [sow1.pk, seminated_sow5.pk],
                 True)
 
+
 class BoarViewSetTest(APITestCase):
     def setUp(self):
         self.client = APIClient()
@@ -195,3 +196,18 @@ class BoarViewSetTest(APITestCase):
         self.client.force_authenticate(user=self.user)
         response = self.client.get('/api/boars/')
         self.assertEqual(response.data['count'], 2)
+
+    def test_culling_boars(self):
+        self.client.force_authenticate(user=self.user)
+        boar = Boar.objects.all().first()
+        response = self.client.post('/api/boars/%s/culling/' % boar.pk, 
+            {'culling_type': 'padej', 'reason': 'test reason', 'weight': 100})
+        self.assertEqual(response.data['message'], f"Выбраковка прошла успешно. Хряк №{boar.birth_id}.")
+        boar.refresh_from_db()
+        self.assertEqual(boar.active, False)
+
+    def test_create_boars(self):
+        self.client.force_authenticate(user=self.user)
+        boar = Boar.objects.all().first()
+        response = self.client.post('/api/boars/', {'birth_id': 123})
+        self.assertEqual(response.data['message'], f"Хряк №123 создан.")

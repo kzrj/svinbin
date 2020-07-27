@@ -72,11 +72,6 @@ class SowViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-class BoarViewSet(viewsets.ModelViewSet):
-    queryset = sows_models.Boar.objects.all()
-    serializer_class = sows_serializers.BoarSerializer
-
-
 class WorkShopSowViewSet(SowViewSet):
     @action(methods=['post'], detail=True)
     def move_to(self, request, pk=None):
@@ -148,3 +143,41 @@ class WorkShopSowViewSet(SowViewSet):
                 "message": f'Аборт у свиньи №{sow.farm_id}.'
             },
             status=status.HTTP_200_OK)
+
+
+class BoarViewSet(viewsets.ModelViewSet):
+    queryset = sows_models.Boar.objects.filter(active=True)
+    serializer_class = sows_serializers.BoarSerializer
+    # filter_class = SowFilter
+
+    def create(self, request):
+        serializer = sows_serializers.BoarCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            boar = sows_models.Boar.objects.create_boar(
+                birth_id=serializer.validated_data['birth_id'])
+            return Response(
+                {
+                    "message": f"Хряк №{boar.birth_id} создан."
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def culling(self, request, pk=None):
+        boar = self.get_object()        
+        serializer = sows_events_serializers.CullingBoarSerializer(data=request.data)
+        if serializer.is_valid():
+            sows_events_models.CullingBoar.objects.create_culling_boar(
+                boar=boar, culling_type=serializer.validated_data['culling_type'],
+                reason=serializer.validated_data['reason'],
+                weight=serializer.validated_data['weight'],
+                initiator=request.user,
+                date=timezone.now())
+            return Response(
+                {
+                    "message": f"Выбраковка прошла успешно. Хряк №{boar.birth_id}."
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

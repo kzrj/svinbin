@@ -6,12 +6,6 @@ from sows_events.models import Semination
 from locations.models import Location
 
 
-class BoarSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Boar
-        fields = '__all__'
-
-
 class SowSerializer(serializers.ModelSerializer):
     location = serializers.ReadOnlyField(source='get_location')
     status = serializers.StringRelatedField()
@@ -80,3 +74,13 @@ class GiltSerializer(serializers.ModelSerializer):
 class GiltCreateSerializer(serializers.Serializer):
     birth_id = serializers.CharField()
     mother_sow_farm_id = serializers.IntegerField()
+
+
+class BoarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Boar
+        fields = ['id', 'birth_id', 'location']
+
+
+class BoarCreateSerializer(serializers.Serializer):
+    birth_id = serializers.CharField()

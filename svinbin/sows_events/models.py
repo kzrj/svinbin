@@ -322,3 +322,29 @@ class MarkAsGilt(SowEvent):
 
     class Meta:
         ordering = ['date']
+
+
+class CullingBoarManager(CoreModelManager):
+    def create_culling_boar(self, boar, culling_type, reason, weight=None,
+         initiator=None, date=None):
+        if not date:
+            date = timezone.now()
+        boar.active = False
+        boar.save()
+        return self.create(boar=boar, location=boar.location, initiator=initiator,
+         culling_type=culling_type, reason=reason, date=date)
+
+
+class CullingBoar(Event):
+    boar = models.ForeignKey('sows.Boar', on_delete=models.CASCADE)
+
+    CULLING_TYPES = [('padej', 'padej'), ('vinuzhd', 'vinuzhdennii uboi')]
+    culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
+    reason = models.CharField(max_length=300, null=True)
+
+    location = models.ForeignKey('locations.Location', null=True, on_delete=models.SET_NULL,
+     related_name='boar_cullings_here')
+
+    weight = models.FloatField(null=True)
+
+    objects = CullingBoarManager()

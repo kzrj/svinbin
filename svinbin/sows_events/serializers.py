@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow
+from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow, CullingBoar
 
 from sows.serializers import SowSerializer
 
@@ -94,3 +94,9 @@ class AbortionSowSerializer(serializers.ModelSerializer):
     class Meta:
         model = AbortionSow
         fields = '__all__'
+
+
+class CullingBoarSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CullingBoar
+        fields = ('culling_type', 'reason', 'weight')

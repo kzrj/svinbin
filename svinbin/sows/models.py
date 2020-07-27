@@ -280,6 +280,9 @@ class Gilt(Pig):
 
 class BoarManager(CoreModelManager):
     def create_boar(self, birth_id):
+        if self.filter(birth_id=birth_id).first():
+            raise DjangoValidationError(message=f'Хряк с номером {birth_id} уже существует или уже забракован')
+
         return self.create(birth_id=birth_id, location=Location.objects.get(workshop__number=1))
 
     def get_or_create_boar(self, birth_id):
@@ -287,4 +290,5 @@ class BoarManager(CoreModelManager):
 
 
 class Boar(Pig):
+    active = models.BooleanField(default=True)
     objects = BoarManager()

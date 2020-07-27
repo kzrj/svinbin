@@ -99,5 +99,5 @@ def create_gilt(birth_id):
 
 def create_boars():
     if Boar.objects.all().count() < 1:
-        Boar.objects.create_boar(1)
-        Boar.objects.create_boar(2)
+        Boar.objects.create_boar(random.randint(1, FARM_ID_COUNT))
+        Boar.objects.create_boar(random.randint(100, FARM_ID_COUNT))
