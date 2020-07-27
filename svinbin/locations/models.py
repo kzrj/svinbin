@@ -187,6 +187,9 @@ class Location(CoreModel):
 
     objects = LocationManager()
 
+    class Meta:
+        ordering = ['pk']
+
     def __str__(self):
         return str(self.pk)
 
