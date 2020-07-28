@@ -79,3 +79,11 @@ class SowFilter(filters.FilterSet):
     class Meta:
         model = Sow
         fields = '__all__'
+
+
+class BoarFilter(filters.FilterSet):
+    birth_id_starts = filters.NumberFilter(field_name='birth_id', lookup_expr='startswith')
+
+    class Meta:
+        model = Boar
+        fields = '__all__'

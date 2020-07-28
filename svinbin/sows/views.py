@@ -17,7 +17,7 @@ import transactions.models as transactions_models
 import locations.models as locations_models
 import tours.models as tours_models
 
-from sows.filters import SowFilter
+from sows.filters import SowFilter, BoarFilter
 
 
 class SowViewSet(viewsets.ModelViewSet):
@@ -148,7 +148,7 @@ class WorkShopSowViewSet(SowViewSet):
 class BoarViewSet(viewsets.ModelViewSet):
     queryset = sows_models.Boar.objects.filter(active=True)
     serializer_class = sows_serializers.BoarSerializer
-    # filter_class = SowFilter
+    filter_class = BoarFilter
 
     def create(self, request):
         serializer = sows_serializers.BoarCreateSerializer(data=request.data)
