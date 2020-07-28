@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 
-from sows.models import Sow, Gilt, Boar, SowStatus, SowStatusRecord
+from sows.models import Sow, Gilt, Boar, SowStatus, SowStatusRecord, BoarBreed
 
 @admin.register(Sow)
 class SowAdmin(admin.ModelAdmin):
@@ -33,3 +33,8 @@ class GiltAdmin(admin.ModelAdmin):
 @admin.register(Boar)
 class BoarAdmin(admin.ModelAdmin):
     list_display = [f.name for f in Boar._meta.fields]
+
+
+@admin.register(BoarBreed)
+class BoarBreedAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in BoarBreed._meta.fields]
