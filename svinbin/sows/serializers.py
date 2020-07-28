@@ -77,6 +77,8 @@ class GiltCreateSerializer(serializers.Serializer):
 
 
 class BoarSerializer(serializers.ModelSerializer):
+    breed = serializers.StringRelatedField()
+    
     class Meta:
         model = Boar
         fields = ['id', 'birth_id', 'location', 'breed']
