@@ -5,14 +5,17 @@ from django.utils import timezone
 
 from locations.models import Location, SowSingleCell, SowGroupCell, Section, WorkShop, \
     SowAndPigletsCell, PigletsGroupCell
-from sows.models import Sow, SowStatus, Gilt, Boar
+from sows.models import Sow, SowStatus, Gilt, Boar, BoarBreed
 from sows_events.models import Semination, SowFarrow, Ultrasound
 
 
 FARM_ID_COUNT = 100000
 
 def create_boar():
-    return Boar.objects.get_or_create_boar(birth_id=random.randint(1, FARM_ID_COUNT))
+    breed = BoarBreed.objects.all().first()
+
+    return Boar.objects.get_or_create_boar(birth_id=random.randint(1, FARM_ID_COUNT),
+         breed=breed)
 
 def create_statuses():
     if SowStatus.objects.all().count() < 1:
@@ -98,6 +101,10 @@ def create_gilt(birth_id):
     return gilt
 
 def create_boars():
+    if BoarBreed.objects.all().count() < 1:
+        BoarBreed.objects.create(title='first breed')
+
     if Boar.objects.all().count() < 1:
-        Boar.objects.create_boar(random.randint(1, FARM_ID_COUNT))
-        Boar.objects.create_boar(random.randint(100, FARM_ID_COUNT))
+        breed = BoarBreed.objects.all().first()
+        Boar.objects.create_boar(birth_id=random.randint(1, FARM_ID_COUNT), breed=breed)
+        Boar.objects.create_boar(birth_id=random.randint(100, FARM_ID_COUNT), breed=breed)

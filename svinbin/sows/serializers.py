@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from rest_framework import serializers
 
-from sows.models import Sow, Boar, Gilt
+from sows.models import Sow, Boar, Gilt, BoarBreed
 from sows_events.models import Semination
 from locations.models import Location
 
@@ -79,8 +79,9 @@ class GiltCreateSerializer(serializers.Serializer):
 class BoarSerializer(serializers.ModelSerializer):
     class Meta:
         model = Boar
-        fields = ['id', 'birth_id', 'location']
+        fields = ['id', 'birth_id', 'location', 'breed']
 
 
 class BoarCreateSerializer(serializers.Serializer):
     birth_id = serializers.CharField()
+    breed = serializers.PrimaryKeyRelatedField(queryset=BoarBreed.objects.all())

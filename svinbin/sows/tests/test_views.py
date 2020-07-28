@@ -18,7 +18,7 @@ import piglets.testing_utils as piglets_testing
 from locations.models import Location
 from transactions.models import SowTransaction
 from sows_events.models import Ultrasound, Semination, SowFarrow, UltrasoundType
-from sows.models import Boar, Sow
+from sows.models import Boar, Sow, BoarBreed
 
 
 class SowViewSetTest(APITestCase):
@@ -208,6 +208,10 @@ class BoarViewSetTest(APITestCase):
 
     def test_create_boars(self):
         self.client.force_authenticate(user=self.user)
-        boar = Boar.objects.all().first()
-        response = self.client.post('/api/boars/', {'birth_id': 123})
+        breed = BoarBreed.objects.all().first()
+        response = self.client.post('/api/boars/', {'birth_id': 123, 'breed': breed.pk})
         self.assertEqual(response.data['message'], f"Хряк №123 создан.")
+
+        boar = Boar.objects.filter(birth_id='123').first()
+        self.assertEqual(boar.birth_id, '123')
+        self.assertEqual(boar.breed.title, 'first breed')

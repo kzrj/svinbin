@@ -278,17 +278,25 @@ class Gilt(Pig):
         return 'Gilt #%s' % self.birth_id
 
 
+class BoarBreed(CoreModel):
+    title = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
+
+
 class BoarManager(CoreModelManager):
-    def create_boar(self, birth_id):
+    def create_boar(self, birth_id, breed=None):
         if self.filter(birth_id=birth_id).first():
             raise DjangoValidationError(message=f'Хряк с номером {birth_id} уже существует или уже забракован')
 
-        return self.create(birth_id=birth_id, location=Location.objects.get(workshop__number=1))
+        return self.create(birth_id=birth_id, location=Location.objects.get(workshop__number=1), breed=breed)
 
     def get_or_create_boar(self, birth_id):
         return self.get_or_create(birth_id=birth_id, location=Location.objects.get(workshop__number=1))[0]
 
 
 class Boar(Pig):
+    breed = models.ForeignKey(BoarBreed, on_delete=models.SET_NULL, null=True)
     active = models.BooleanField(default=True)
     objects = BoarManager()
