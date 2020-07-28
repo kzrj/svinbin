@@ -85,3 +85,9 @@ class BoarSerializer(serializers.ModelSerializer):
 class BoarCreateSerializer(serializers.Serializer):
     birth_id = serializers.CharField()
     breed = serializers.PrimaryKeyRelatedField(queryset=BoarBreed.objects.all())
+
+
+class BoarBreedSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoarBreed
+        fields = ['id', 'title']

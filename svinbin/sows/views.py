@@ -185,3 +185,8 @@ class BoarViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class BoarBreedViewSet(viewsets.ModelViewSet):
+    queryset = sows_models.BoarBreed.objects.all()
+    serializer_class = sows_serializers.BoarBreedSerializer

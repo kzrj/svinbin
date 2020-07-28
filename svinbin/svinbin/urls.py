@@ -34,6 +34,7 @@ router.register(r'transactions/pigletstransactions', transaction_views.PigletsTr
 # pigs
 router.register(r'sows', sows_views.SowViewSet, basename='sows')
 router.register(r'boars', sows_views.BoarViewSet, basename='boars')
+router.register(r'boar_breed', sows_views.BoarBreedViewSet, basename='boar_breed')
 
 # piglets
 router.register(r'piglets', piglets_views.PigletsViewSet, basename='piglets')
