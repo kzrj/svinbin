@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.contrib.auth.models import User
 from django_filters import rest_framework as filters
 
-from sows.models import Sow, SowStatus
+from sows.models import Sow, SowStatus, Boar
 from sows_events.models import Semination
 from locations.models import Location
 
