@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
+from datetime import timedelta, date
 import random
 from mixer.backend.django import mixer
 
@@ -215,3 +215,14 @@ class BoarViewSetTest(APITestCase):
         boar = Boar.objects.filter(birth_id='123').first()
         self.assertEqual(boar.birth_id, '123')
         self.assertEqual(boar.breed.title, 'first breed')
+
+    def test_create_boars(self):
+        self.client.force_authenticate(user=self.user)
+        boar = Boar.objects.all().first()
+        response = self.client.post('/api/boars/%s/semen_boar/' % boar.pk,
+         {'a': 1000, 'b': 1, 'd': 50, 'morphology_score': 1, 'final_motility_score': 50,
+            'date': date(2020, 7, 1)})
+
+        print(response.data)
+        self.assertEqual(response.data['message'], f"Запись создана. Хряк №{boar.birth_id}.")
+        

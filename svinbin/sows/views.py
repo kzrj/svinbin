@@ -186,6 +186,30 @@ class BoarViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['post'], detail=True)
+    def semen_boar(self, request, pk=None):
+        boar = self.get_object()        
+        serializer = sows_events_serializers.SemenBoarCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            sows_events_models.SemenBoar.objects.create_semen_boar(
+                boar=boar, 
+                a=serializer.validated_data['a'],
+                b=serializer.validated_data['b'],
+                d=serializer.validated_data['d'],
+                morphology_score=serializer.validated_data['morphology_score'],
+                final_motility_score=serializer.validated_data['final_motility_score'],
+                date=serializer.validated_data['date'],
+                initiator=request.user,
+                )
+            return Response(
+                {
+                    "message": f"Запись создана. Хряк №{boar.birth_id}.",
+                    "boar": sows_serializers.BoarSerializer(boar).data
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class BoarBreedViewSet(viewsets.ModelViewSet):
     queryset = sows_models.BoarBreed.objects.all()
