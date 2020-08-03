@@ -90,4 +90,4 @@ class SowFarrowViewSet(viewsets.ModelViewSet):
 class SemenBoarViewSet(viewsets.ModelViewSet):
     queryset = SemenBoar.objects.all()
     serializer_class = serializers.SemenBoarSerializer
-    filter_class = 
+    filter_class = SemenBoarFilter
