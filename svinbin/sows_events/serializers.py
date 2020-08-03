@@ -111,7 +111,7 @@ class SemenBoarCreateSerializer(serializers.ModelSerializer):
 
 
 class SemenBoarSerializer(serializers.ModelSerializer):
-    date = serializers.DateField(format="%Y-%m-%d")
+    date = serializers.DateTimeField(format="%Y-%m-%d")
     boar = BoarSerializer()
 
     class Meta:
