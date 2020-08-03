@@ -103,8 +103,8 @@ class CullingBoarSerializer(serializers.ModelSerializer):
 
 
 class SemenBoarCreateSerializer(serializers.ModelSerializer):
-    date = serializers.DateTimeField(format="%Y-%m-%d")
-    
+    date = serializers.DateField(format="%Y-%m-%d")
+
     class Meta:
         model = SemenBoar
         fields = ('a', 'b', 'd', 'morphology_score', 'final_motility_score', 'date')
