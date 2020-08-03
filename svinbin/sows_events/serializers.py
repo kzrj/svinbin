@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow, CullingBoar, SemenBoar
 
-from sows.serializers import SowSerializer
+from sows.serializers import SowSerializer, BoarSerializer
 
 
 class SeminationSerializer(serializers.ModelSerializer):
@@ -112,7 +112,7 @@ class SemenBoarCreateSerializer(serializers.ModelSerializer):
 
 class SemenBoarSerializer(serializers.ModelSerializer):
     date = serializers.DateField(format="%Y-%m-%d")
-    boar = serializers.StringRelatedField()
+    boar = BoarSerializer()
 
     class Meta:
         model = SemenBoar
