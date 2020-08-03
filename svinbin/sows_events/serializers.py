@@ -111,6 +111,9 @@ class SemenBoarCreateSerializer(serializers.ModelSerializer):
 
 
 class SemenBoarSerializer(serializers.ModelSerializer):
+    date = serializers.DateField(format="%Y-%m-%d")
+    boar = serializers.StringRelatedField()
+
     class Meta:
         model = SemenBoar
         exclude = ('created_at', 'modified_at', 'id')
