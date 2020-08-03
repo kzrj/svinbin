@@ -8,8 +8,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import action, api_view
 from rest_framework import status, exceptions
 
-from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow
+from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, SemenBoar
 from sows_events import serializers
+from sows_events.filters import SemenBoarFilter
+
 
 
 class SeminationViewSet(viewsets.ModelViewSet):
@@ -83,3 +85,9 @@ class CullingSowViewSet(viewsets.ModelViewSet):
 class SowFarrowViewSet(viewsets.ModelViewSet):
     queryset = SowFarrow.objects.all()
     serializer_class = serializers.SowFarrowSerializer
+
+
+class SemenBoarViewSet(viewsets.ModelViewSet):
+    queryset = SemenBoar.objects.all()
+    serializer_class = serializers.SemenBoarSerializer
+    filter_class = 
