@@ -122,6 +122,13 @@ class SowManager(CoreModelManager):
 
         return sow, False
         
+    def create_bulk_sows_from_event(self, event):
+        status = SowStatus.objects.get(title='Ремонтная')
+        location = Location.objects.get(workshop__number=1)
+        self.bulk_create([
+            Sow(status=status, creation_event=event, location=location) 
+                for i in range(0, event.quantity)])
+
 
 class Sow(Pig):
     farm_id = models.IntegerField(null=True, unique=True)

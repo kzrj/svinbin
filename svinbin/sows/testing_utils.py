@@ -31,6 +31,7 @@ def create_statuses():
             SowStatus(title='Опоросилась'),
             SowStatus(title='Кормилица'),
             SowStatus(title='Ожидает осеменения'),
+            SowStatus(title='Ремонтная'),
             ])
 
 

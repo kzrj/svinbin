@@ -330,10 +330,7 @@ class PigletsToSowsEventManager(CoreModelManager):
             date = timezone.now()
 
         event = self.create(piglets=piglets, metatour=piglets.metatour, quantity=piglets.quantity)
-        # create sows
-        # event.sows.
-
-
+        event.sows.create_bulk_sows_from_event(event=event)
         return event
 
 

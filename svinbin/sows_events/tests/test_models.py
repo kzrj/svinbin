@@ -5,7 +5,8 @@ from django.core.exceptions import ValidationError
 
 from sows_events.models import (
     Semination, Ultrasound, SowFarrow, CullingSow,
-    UltrasoundType, AbortionSow, MarkAsNurse, MarkAsGilt, CullingBoar, SemenBoar)
+    UltrasoundType, AbortionSow, MarkAsNurse, MarkAsGilt, CullingBoar,
+    SemenBoar, PigletsToSowsEvent)
 from sows.models import Sow, Boar, Gilt
 from piglets.models import Piglets
 from locations.models import Location
@@ -418,4 +419,24 @@ class BoarEventTest(TestCase):
         self.assertEqual(semen_boar.h, h)
         self.assertEqual(semen_boar.morphology_score, morphology_score)
         self.assertEqual(semen_boar.final_motility_score, final_motility_score)
+
+
+class PigletsToSowsEventTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_events_testing.create_types()
+
+    def test_create_event(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
+        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour, location=location, quantity=50)
+
+        event = PigletsToSowsEvent.objects.create_event(piglets=piglets)
+
+        self.assertEqual(event.piglets, piglets)
+        self.assertEqual(event.metatour, piglets.metatour)
+        self.assertEqual(event.sows.all().count(), 50)
+        self.assertEqual(Sow.objects.all().count(), 50)
 
