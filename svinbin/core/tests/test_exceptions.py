@@ -33,4 +33,5 @@ class SowViewSetTest(APITestCase):
         response = self.client.post('/api/piglets/%s/move_piglets/' % piglets.pk,
             {'to_location': location2.pk, 'merge': False, 'new_amount': 100})
 
-        self.assertEqual('new_amount' in response.data['message'], True)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual('Отделяемое' in response.data['message'], True)

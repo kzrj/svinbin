@@ -183,20 +183,20 @@ class ReportDateWSReportTest(TransactionTestCase):
         rds = ReportDate.objects.all().add_ws_piglets_culling_data(ws_locs=self.ws4_locs)
 
         day0_rd = rds.filter(date=date(2020, 6, 3)).first()
-        self.assertEqual(day0_rd.padej_qnty, 0)
-        self.assertEqual(day0_rd.padej_total_weight, 0)
-        self.assertEqual(day0_rd.prirezka_qnty, 0)
-        self.assertEqual(day0_rd.prirezka_total_weight, 0)
-        self.assertEqual(day0_rd.vinuzhd_qnty, 0)
-        self.assertEqual(day0_rd.vinuzhd_total_weight, 0)
+        self.assertEqual(day0_rd.padej_qnty, None)
+        self.assertEqual(day0_rd.padej_total_weight, None)
+        self.assertEqual(day0_rd.prirezka_qnty, None)
+        self.assertEqual(day0_rd.prirezka_total_weight, None)
+        self.assertEqual(day0_rd.vinuzhd_qnty, None)
+        self.assertEqual(day0_rd.vinuzhd_total_weight, None)
 
         day1_rd = rds.filter(date=date(2020, 6, 5)).first()
         self.assertEqual(day1_rd.padej_qnty, 3)
         self.assertEqual(day1_rd.padej_total_weight, 30)
-        self.assertEqual(day1_rd.prirezka_qnty, 0)
-        self.assertEqual(day1_rd.prirezka_total_weight, 0)
-        self.assertEqual(day1_rd.vinuzhd_qnty, 0)
-        self.assertEqual(day1_rd.vinuzhd_total_weight, 0)
+        self.assertEqual(day1_rd.prirezka_qnty, None)
+        self.assertEqual(day1_rd.prirezka_total_weight, None)
+        self.assertEqual(day1_rd.vinuzhd_qnty, None)
+        self.assertEqual(day1_rd.vinuzhd_total_weight, None)
     
     def test_add_ws_piglets_trs_in_out(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
