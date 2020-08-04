@@ -30,7 +30,14 @@ class LocationCellSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Location
-        fields = ['id', 'cell', 'sow_set', 'piglets', 'is_empty', 'is_sow_empty', 'is_piglets_empty']
+        fields = [
+            'id',
+            'cell',
+            'sow_set',
+            'piglets',
+            'is_empty',
+            'is_sow_empty',
+            'is_piglets_empty']
 
 
 class LocationSectionSerializer(serializers.ModelSerializer):

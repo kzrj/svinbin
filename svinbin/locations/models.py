@@ -230,8 +230,7 @@ class Location(CoreModel):
     @property
     def is_empty(self):
         if not self.piglets.all() and \
-            not self.sow_set.all() and \
-            not self.gilt_set.all():
+            not self.sow_set.all():
                 return True
         return False
 
