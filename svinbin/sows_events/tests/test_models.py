@@ -28,7 +28,7 @@ class SeminationModelManagerTest(TestCase):
         self.boar = Boar.objects.all().first()
 
     def test_create_semination(self):
-        sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
+        sow = Sow.objects.create_new_and_put_in_workshop_one(1)
         boar = Boar.objects.all().first()
         semination = Semination.objects.create_semination(sow=sow, week=1,
          initiator=None, semination_employee=None, boar=boar)
@@ -55,7 +55,7 @@ class SeminationModelManagerTest(TestCase):
         self.assertEqual(sow1.tour.week_number, 1)
 
     def test_is_there_semination(self):
-        sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
+        sow = Sow.objects.create_new_and_put_in_workshop_one(1)
         boar = Boar.objects.all().first()
         semination = Semination.objects.create_semination(sow=sow, week=54,
          initiator=None, semination_employee=None, boar=boar)
@@ -68,7 +68,7 @@ class SeminationModelManagerTest(TestCase):
         self.assertEqual(is_there_semination2, False)
 
     def test_double_semination_or_not(self):
-        sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
+        sow = Sow.objects.create_new_and_put_in_workshop_one(1)
 
         shmigina = staff_testings.create_employee('ШМЫГИ')
         ivanov = staff_testings.create_employee('ИВАНО')
@@ -108,7 +108,7 @@ class UltrasoundModelManagerTest(TestCase):
         sows_events_testing.create_types()
 
     def test_create_ultrasound(self):
-        sow = Sow.objects.create_new_from_gilt_and_put_in_workshop_one(1)
+        sow = Sow.objects.create_new_and_put_in_workshop_one(1)
         semination = Semination.objects.create_semination(sow=sow, week=1,
          initiator=None, semination_employee=None)
 

@@ -109,16 +109,10 @@ class SowManager(CoreModelManager):
         return self.create(farm_id=farm_id,
             location=Location.objects.get(workshop__number=1))
 
-    def create_new_from_gilt_and_put_in_workshop_one(self, farm_id):
-        # DECREASE GILT QUANTITY!!!
-        
-        return self.create(farm_id=farm_id,
-            location=Location.objects.get(workshop__number=1))
-
     def get_or_create_by_farm_id(self, farm_id):
         sow = self.get_queryset().filter(farm_id=farm_id).first()
         if not sow:
-            return self.create_new_from_gilt_and_put_in_workshop_one(farm_id)
+            return self.create_new_and_put_in_workshop_one(farm_id)
         return sow
 
     def get_without_farm_id_in_workshop(self, workshop):
