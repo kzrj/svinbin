@@ -105,16 +105,6 @@ class SowManager(CoreModelManager):
     def get_queryset_with_not_alive(self):
         return SowsQuerySet(self.model, using=self._db)
 
-    def create_new_from_noname(self, farm_id, workshop):
-        noname_sow = self.get_without_farm_id_in_workshop(workshop).first()
-        if noname_sow:
-            noname_sow.assing_farm_id(farm_id)
-        return noname_sow
-
-    def create_new_from_gilt_without_farm_id(self):
-        # For init
-        return self.create(location=Location.objects.get(workshop__number=1))
-
     def create_new_and_put_in_workshop_one(self, farm_id):
         return self.create(farm_id=farm_id,
             location=Location.objects.get(workshop__number=1))
@@ -143,11 +133,6 @@ class SowManager(CoreModelManager):
             return self.create_new_and_put_in_workshop_one(farm_id), True
 
         return sow, False
-
-    def create_from_gilts_group(self, piglets):
-        # if gilt birth id = sow.farm_id
-        for i in range(0, piglets.quantity):
-            self.create_new_from_gilt_without_farm_id()
         
 
 class Sow(Pig):

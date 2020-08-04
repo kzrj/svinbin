@@ -40,33 +40,6 @@ class SowModelTest(TransactionTestCase):
         self.assertEqual(Sow.objects.all().count(), 100)        
         self.assertEqual(Sow.objects.filter(farm_id=120).count(), 1)
 
-    def test_create_new_from_gilt_without_farm_id(self):
-        sow_noname = Sow.objects.create_new_from_gilt_without_farm_id()
-        self.assertEqual(sow_noname.farm_id, None)
-
-    def test_get_without_farm_id_in_workshop(self):
-        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
-        seminated_sow1 = sows_testings.create_sow_with_semination(sow1.location)
-        seminated_sow3 = sows_testings.create_sow_with_semination(sow1.location)
-        sow_noname = Sow.objects.create_new_from_gilt_without_farm_id()
-
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow1,
-         initiator=None, result=True)
-        Ultrasound.objects.create_ultrasound(sow=seminated_sow3,
-         initiator=None, result=False)
-        qs = Sow.objects.get_without_farm_id_in_workshop(workshop=sow1.location.workshop)        
-        self.assertEqual(list(qs.values_list(flat=True)), [sow_noname.pk])
-
-    def test_create_new_from_noname(self):
-        noname_sow1 = Sow.objects.create_new_from_gilt_without_farm_id()
-
-        named_sow1 = Sow.objects.create_new_from_noname(900, noname_sow1.location.workshop)
-        self.assertEqual(named_sow1.farm_id, 900)
-        self.assertEqual(named_sow1.location.workshop.number, 1)
-
-        named_sow2 = Sow.objects.create_new_from_noname(901, named_sow1.location.workshop)
-        self.assertEqual(named_sow2, None)
-
     def test_get_by_tour(self):
         sow = sows_testings.create_sow_and_put_in_workshop_one()
         Semination.objects.create_semination(sow=sow, week=1, initiator=None,
@@ -224,17 +197,6 @@ class SowModelTest(TransactionTestCase):
         sow, created = Sow.objects.create_or_return(123)
         self.assertEqual(sow.farm_id, 123)
         self.assertEqual(created, False)
-
-    def test_create_from_gilts_group(self):
-        tour = Tour.objects.get_or_create_by_week(3, 2020)
-        location = Location.objects.get(sowAndPigletsCell__number=1, 
-             sowAndPigletsCell__section__number=1)
-        gilts_piglets = piglets_testing.create_from_sow_farrow(tour, location, 12)
-
-        Sow.objects.create_from_gilts_group(gilts_piglets)
-
-        self.assertEqual(Sow.objects.all().count(), 13)
-        self.assertEqual(Sow.objects.filter(farm_id__isnull=True).count(), 12)
 
     def test_change_status_and_create_status_record(self):
         sow1 = sows_testings.create_sow_and_put_in_workshop_one()

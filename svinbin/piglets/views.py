@@ -225,32 +225,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=True)
-    def move_gilts_to_ws1(self, request, pk=None):        
-        serializer = piglets_serializers.MovePigletsSerializer(data=request.data)
-        if serializer.is_valid():
-            transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
-                transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
-                    piglets= self.get_object(),
-                    to_location=serializer.validated_data['to_location'],
-                    new_amount=serializer.validated_data.get('new_amount', None),
-                    date=timezone.now()
-                    )
-
-            # create sows-gilts count = moved_piglets.quantity. location ws1
-            sows_models.Sow.objects.create_from_gilts_group(moved_piglets)
-
-            # moved_piglets deactivate
-            moved_piglets.deactivate()
-
-            return Response(
-                {
-                 "message": 'Перевод прошел успешно. Ремонтные свинки стали свиноматками.',
-                 },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     @action(methods=['post'], detail=False)
     def init_piglets_from_farrow(self, request, pk=None):        
         serializer = piglets_serializers.InitPigletsSerializer(data=request.data)
