@@ -84,28 +84,6 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
 
         self.assertEqual(response.data['sow']['id'], sow.pk)
 
-    def test_create_new_without_farm_id(self):
-        self.client.force_authenticate(user=self.user)
-        response = self.client.post('/api/workshoponetwo/sows/create_new_without_farm_id/')
-        self.assertEqual(response.data['sow']['farm_id'], None)
-        self.assertEqual(response.data['noname_sows_count'], 1)
-
-        response = self.client.post('/api/workshoponetwo/sows/create_new_without_farm_id/')
-        self.assertEqual(response.data['noname_sows_count'], 2)
-
-    def test_create_new(self):
-        self.client.force_authenticate(user=self.user)
-        response = self.client.post('/api/workshoponetwo/sows/create_new_without_farm_id/')
-
-        response = self.client.post('/api/workshoponetwo/sows/create_new/', 
-            {'farm_id': 99999})
-        self.assertEqual(response.data['sow']['farm_id'], 99999)
-
-        response = self.client.post('/api/workshoponetwo/sows/create_new/', 
-            {'farm_id': 99998})
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.data['message'], 'Нет ремонтных свиноматок. Создайте свиноматку без номера.')
-
     def test_mass_semination(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         sow2 = sows_testing.create_sow_and_put_in_workshop_one()
