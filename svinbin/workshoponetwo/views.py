@@ -31,33 +31,6 @@ from sows.views import WorkShopSowViewSet
 
 class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
     @action(methods=['post'], detail=False)
-    def create_new(self, request):
-        workshop = locations_models.WorkShop.objects.get(number=1)
-        serializer = serializers.CreateFarmIdSerializer(data=request.data)
-        if serializer.is_valid():
-            sow = sows_models.Sow.objects.create_new_from_noname(
-                serializer.validated_data['farm_id'],
-                workshop
-                )
-            if sow:
-                return Response(
-                    {
-                        "sow": sows_serializers.SowSerializer(sow).data,
-                        "message": 'Создана свиноматка с номером {}.' \
-                            .format(serializer.validated_data['farm_id']),
-                    },
-                    status=status.HTTP_200_OK)
-            else:
-                return Response(
-                    {
-                        "sow": None,
-                        "message": 'Нет ремонтных свиноматок. Создайте свиноматку без номера.',
-                    },
-                    status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['post'], detail=False)
     def create_new_without_farm_id(self, request):
         workshop = locations_models.WorkShop.objects.get(number=1)    
         sow = sows_models.Sow.objects.create_new_from_gilt_without_farm_id()

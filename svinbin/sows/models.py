@@ -155,6 +155,9 @@ class Sow(Pig):
     status = models.ForeignKey(SowStatus, on_delete=models.SET_NULL, null=True)
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
         related_name='sows')
+    creation_event = models.ForeignKey('sows_events.PigletsToSowsEvent', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='sows')
+
     alive = models.BooleanField(default=True)
 
     objects = SowManager()

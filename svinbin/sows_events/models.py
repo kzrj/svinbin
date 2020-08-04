@@ -324,6 +324,28 @@ class MarkAsGilt(SowEvent):
         ordering = ['date']
 
 
+class PigletsToSowsEventManager(CoreModelManager):
+    def create_event(self, piglets, initiator=None, date=None):
+        if not date:
+            date = timezone.now()
+
+        event = self.create(piglets=piglets, metatour=piglets.metatour, quantity=piglets.quantity)
+        # create sows
+        # event.sows.
+
+
+        return event
+
+
+class PigletsToSowsEvent(Event):
+    piglets = models.OneToOneField('piglets.Piglets', on_delete=models.SET_NULL, null=True)
+    metatour = models.OneToOneField('tours.MetaTour', on_delete=models.SET_NULL, null=True)
+    quantity = models.IntegerField()
+
+    objects = PigletsToSowsEventManager()
+
+
+# Boar Events
 class CullingBoarManager(CoreModelManager):
     def create_culling_boar(self, boar, culling_type, reason, weight=None,
          initiator=None, date=None):
