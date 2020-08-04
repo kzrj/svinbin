@@ -115,12 +115,6 @@ class SowManager(CoreModelManager):
             return self.create_new_and_put_in_workshop_one(farm_id)
         return sow
 
-    def get_without_farm_id_in_workshop(self, workshop):
-        return self.get_queryset().filter(
-            farm_id__isnull=True,            
-            location=workshop.location
-            )
-
     def create_or_return(self, farm_id):
         sow = self.get_queryset_with_not_alive().filter(farm_id=farm_id).first()
         if not sow:

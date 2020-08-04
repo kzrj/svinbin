@@ -256,22 +256,6 @@ class PigletsViewSetTest(APITestCase):
             {'total_weight': 580, 'place': '3/4'})
         self.assertEqual(response.data['message'], 'Взвешивание прошло успешно.')
 
-    def test_init_piglets_from_farrow(self):
-        location = Location.objects.get(workshop__number=4)
-        from_location = Location.objects.get(workshop__number=3)
-        response = self.client.post('/api/piglets/init_piglets_from_farrow/', 
-            {
-                'farrow_date': '2020-03-1', 'location': location.pk, 'quantity': 102,
-                'from_location': from_location.pk, 'transaction_date': '2020-03-09',
-            })
-        self.assertEqual(response.data['message'], 'Свиньи успешно созданы.')
-        self.assertEqual(Piglets.objects.filter(quantity=102, location=location).count(), 1)
-        transaction = PigletsTransaction.objects.all().first()
-
-        self.assertEqual(transaction.piglets_group.quantity, 102)
-        self.assertEqual(transaction.from_location, from_location)
-        self.assertEqual(transaction.to_location, location)
-
     def test_recount_piglets(self):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
