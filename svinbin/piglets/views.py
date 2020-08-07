@@ -230,7 +230,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = sows_serializers.GiltCreateSerializer(data=request.data)
         if serializer.is_valid():
 
-            gilt = sows_models.Gilt.objects.create_gilt(
+            gilt = sows_models.Gilt.objects.transaction_with_split_and_merge(
               birth_id=serializer.validated_data['birth_id'],
               mother_sow_farm_id=serializer.validated_data['mother_sow_farm_id'],
               piglets=self.get_object()              
@@ -241,6 +241,34 @@ class PigletsViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                  "message": 'Ремонтная свинка создана успешно.',
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def move_gilts_to_12(self, request, pk=None):        
+        serializer = piglets_serializers.MoveGiltsToWs12Serializer(data=request.data)
+        if serializer.is_valid():
+            piglets = self.get_object()
+            to_location = locations_models.Location.objects.get(workshop__number=2)
+
+            transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
+                piglets=piglets,
+                to_location=to_location,
+                new_amount=serializer.validated_data.get('new_amount', None),
+                gilts_contains=True,
+                merge=False,
+                initiator=request.user,
+                date=timezone.now()          
+              )
+
+            sows_events_models.PigletsToSowsEvent.objects.create_event(piglets=piglets,
+             initiator=request.user, date=timezone.now())
+
+            return Response(
+                {
+                 "message": 'Ремонтные свинки переведены успешно.',
                  },
                 status=status.HTTP_200_OK)
         else:

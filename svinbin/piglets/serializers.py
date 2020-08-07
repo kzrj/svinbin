@@ -45,8 +45,8 @@ class MovePigletsSerializer(serializers.Serializer):
     merge = serializers.BooleanField(default=False)
 
 
-class MoveGiltsToWs75Serializer(serializers.Serializer):
-    gilts_amount = serializers.IntegerField(required=False)
+class MoveGiltsToWs12Serializer(serializers.Serializer):
+    new_amount = serializers.IntegerField(allow_null=True, default=None)
 
 
 class InitPigletsSerializer(serializers.Serializer):

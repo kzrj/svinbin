@@ -264,6 +264,16 @@ class PigletsViewSetTest(APITestCase):
             {'mother_sow_farm_id': sow.farm_id, 'birth_id': '1s'})
         self.assertEqual(response.data['message'], 'Ремонтная свинка создана успешно.')
 
+    def test_move_gilts_to_12(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
+        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour, location=location, quantity=50)
+
+        response = self.client.post('/api/piglets/%s/move_gilts_to_12/' % piglets.pk,
+            {})
+        self.assertEqual(response.data['message'], 'Ремонтные свинки переведены успешно.')
+
 
 class PigletsFilterTest(APITestCase):
     def setUp(self):
