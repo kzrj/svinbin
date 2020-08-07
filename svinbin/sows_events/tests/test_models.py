@@ -439,4 +439,5 @@ class PigletsToSowsEventTest(TestCase):
         self.assertEqual(event.metatour, piglets.metatour)
         self.assertEqual(event.sows.all().count(), 50)
         self.assertEqual(Sow.objects.all().count(), 50)
-
+        self.assertEqual(Sow.objects.all().first().status.title, 'Ремонтная')
+        self.assertEqual(Sow.objects.all().first().location.workshop.number, 1)

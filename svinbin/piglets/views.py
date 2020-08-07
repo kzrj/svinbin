@@ -205,27 +205,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['post'], detail=True)
-    def move_gilts_to_ws75(self, request, pk=None):        
-        serializer = piglets_serializers.MoveGiltsToWs75Serializer(data=request.data)
-        if serializer.is_valid():
-            piglets = piglets_models.Piglets.objects.select_related('location', 'status').get(pk=pk)
-            
-            transaction = transactions_models.PigletsTransaction.objects.transaction_gilts_to_7_5(
-                    piglets= self.get_object(),
-                    gilts_amount=serializer.validated_data.get('gilts_amount', None),                    
-                    initiator=request.user,
-                    date=timezone.now()
-                    )
-
-            return Response(
-                {
-                 "message": 'Перевод прошел успешно.',
-                 },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['post'], detail=True)
     def recount_piglets(self, request, pk=None):        
         serializer = piglets_events_serializers.RecountPigletsSerializer(data=request.data)
         if serializer.is_valid():

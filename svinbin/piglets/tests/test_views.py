@@ -254,21 +254,6 @@ class PigletsViewSetTest(APITestCase):
             {'new_quantity': 106,})
         self.assertEqual(response.data['message'], 'Пересчет прошел успешно.')
 
-    def test_move_gilts_to_ws75(self):
-        piglets5_1 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-30',
-         location=self.loc_ws_5, quantity=93, gilts_quantity=10)
-        piglets5_2 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31',
-         location=self.loc_ws_5, quantity=94, gilts_quantity=12)
-        piglets5_3 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-25',
-         location=self.loc_ws_5, quantity=100, gilts_quantity=0)
-
-        response = self.client.post('/api/piglets/%s/move_gilts_to_ws75/' % piglets5_1.pk, 
-            {'gilts_amount': 5})
-        self.assertEqual(response.data['message'], 'Перевод прошел успешно.')
-
-        response = self.client.post('/api/piglets/%s/move_gilts_to_ws75/' % piglets5_2.pk)
-        self.assertEqual(response.data['message'], 'Перевод прошел успешно.')
-
     def test_create_gilt(self):
         location = Location.objects.filter(sowAndPigletsCell__number=1).first()
         sow = sows_testing.create_sow_with_semination_usound(location, 1)
