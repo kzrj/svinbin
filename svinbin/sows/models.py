@@ -164,13 +164,15 @@ class SowsQuerySet(models.QuerySet):
         }
         return self.annotate(**data)
 
-    def get_tours(self, workshop_number):
+    def get_tours_pks(self, workshop_number):
         if workshop_number in [1, 2]:
-            return self.filter(location__workshop__number=workshop_number).values('tour').distinct()
+            return self.filter(location__workshop__number=workshop_number).values_list('tour__pk', flat=True)\
+                .distinct()
         if workshop_number == 3:
             return self.filter(
-                Q(location__sowAndPigletsCell__isnull=False) | Q(location__workshop__number=workshop_number))\
-                    .values('tour')
+                    Q(location__sowAndPigletsCell__isnull=False) 
+                    | Q(location__workshop__number=workshop_number))\
+                    .values_list('tour__pk', flat=True).distinct()
 
 
 class SowManager(CoreModelManager):
