@@ -6,19 +6,14 @@ from django.contrib.auth.models import User
 from django_filters import rest_framework as filters
 
 from tours.models import Tour
+from sows.models import Sow
 
 
 class TourFilter(filters.FilterSet):
-    by_workshop_number = filters.NumberFilter(field_name='location',
-     method='filter_by_workshop_number')
-
-    last_n = filters.NumberFilter(field_name='week_number', method='filter_by_workshop_number')
+    by_workshop_number = filters.NumberFilter(method='filter_by_workshop_number')
 
     def filter_by_workshop_number(self, queryset, name, value):
-        return queryset.filter(location__workshop__number=value)
-
-    def filter_last_n(self, queryset, name, value):
-        return queryset[:value]
+        return Sow.objects.all().get_tours(workshop_number=value)
 
     class Meta:
         model = Tour

@@ -354,6 +354,28 @@ class SowQueryTest(TransactionTestCase):
             serializer = SowManySerializer(data, many=True)
             serializer.data
 
+    def test_get_tours(self):
+        location1 = Location.objects.filter(workshop__number=1).first()
+        sow1 = sows_testings.create_sow_with_semination_usound(location=location1, week=1)
+        sow2 = sows_testings.create_sow_with_semination_usound(location=location1, week=1)
+        sow3 = sows_testings.create_sow_with_semination_usound(location=location1, week=2)
+
+        location2 = Location.objects.filter(workshop__number=2).first()
+        sow4 = sows_testings.create_sow_with_semination_usound(location=location2, week=2)
+        sow5 = sows_testings.create_sow_with_semination_usound(location=location2, week=3)
+
+        location6 = Location.objects.filter(sowAndPigletsCell__number=6).first()
+        sow6 = sows_testings.create_sow_with_semination_usound(location=location6, week=4)
+        location7 = Location.objects.filter(sowAndPigletsCell__number=6).first()
+        sow7 = sows_testings.create_sow_with_semination_usound(location=location7, week=5)
+
+        ws1_tours = Sow.objects.all().get_tours(workshop_number=1)
+        print(ws1_tours)
+        ws2_tours = Sow.objects.all().get_tours(workshop_number=2)
+        print(ws2_tours)
+        ws3_tours = Sow.objects.all().get_tours(workshop_number=3)
+        print(ws3_tours)
+
 
 class GiltModelManagerTest(TransactionTestCase):
     def setUp(self):
