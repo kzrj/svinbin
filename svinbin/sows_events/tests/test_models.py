@@ -9,7 +9,7 @@ from sows_events.models import (
     Semination, Ultrasound, SowFarrow, CullingSow,
     UltrasoundType, AbortionSow, MarkAsNurse, MarkAsGilt, CullingBoar,
     SemenBoar, PigletsToSowsEvent)
-from sows.models import Sow, Boar, Gilt, SowStatusRecord
+from sows.models import Sow, Boar, Gilt, SowStatusRecord, SowGroupRecord
 from piglets.models import Piglets
 from locations.models import Location
 from transactions.models import SowTransaction
@@ -47,6 +47,8 @@ class SeminationModelManagerTest(TestCase):
         sow2 = sows_testing.create_sow_and_put_in_workshop_one()
         sow3 = sows_testing.create_sow_and_put_in_workshop_one()
 
+        sow3.change_group_to('Ремонтная')
+
         sows_qs = Sow.objects.filter(pk__in=[sow1.pk, sow2.pk, sow3.pk])
         Semination.objects.mass_semination(sows_qs=sows_qs, week=1,
          initiator=None, semination_employee=None, boar=self.boar)
@@ -56,6 +58,10 @@ class SeminationModelManagerTest(TestCase):
         sow1.refresh_from_db()
         self.assertEqual(sow1.status.title, 'Осеменена 1')
         self.assertEqual(sow1.tour.week_number, 1)
+        self.assertEqual(sow1.sow_group, None)
+
+        sow3.refresh_from_db()
+        self.assertEqual(sow3.sow_group.title, 'Проверяемая')
 
     def test_is_there_semination(self):
         sow = Sow.objects.create_new_and_put_in_workshop_one(1)
@@ -443,9 +449,14 @@ class PigletsToSowsEventTest(TestCase):
         self.assertEqual(event.metatour, piglets.metatour)
         self.assertEqual(event.sows.all().count(), 50)
         self.assertEqual(Sow.objects.all().count(), 51)
-        self.assertEqual(Sow.objects.all()[1].status.title, 'Ремонтная')
-        self.assertEqual(Sow.objects.all()[1].location.workshop.number, 1)
+
+        sow1 = Sow.objects.all()[1]
+        self.assertEqual(sow1.status.title, 'Ремонтная')
+        self.assertEqual(sow1.location.workshop.number, 1)
+        self.assertEqual(sow1.sow_group.title, 'Ремонтная')
+
         self.assertEqual(SowStatusRecord.objects.all().count(), 50)
+        self.assertEqual(SowGroupRecord.objects.all().count(), 50)
         piglets.refresh_from_db()
         self.assertEqual(piglets.active, False)
 

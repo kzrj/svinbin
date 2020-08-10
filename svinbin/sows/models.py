@@ -187,8 +187,9 @@ class SowManager(CoreModelManager):
         self.bulk_create([
             Sow(creation_event=event, location=location) 
                 for i in range(0, event.quantity)])
-        event.sows.all().update_status(title='Ремонтная', date=event.date)
-
+        sows = event.sows.all()
+        sows.update_status(title='Ремонтная', date=event.date)
+        sows.update_group(group_title='Ремонтная', date=event.date)
 
     def get_sows_at_date(self, date):
         init_events = PigletsToSowsEvent.objects.filter(date__date__lte=date)
@@ -235,6 +236,13 @@ class Sow(Pig):
     def change_group_to(self, group_title, alive=True, date=None):
         if not date:
             date=timezone.now()
+
+        if group_title == 'Проверяемая':
+            if not self.sow_group or self.sow_group.title != 'Ремонтная':
+                return None
+
+        if group_title == 'С опоросом' and self.sow_group and self.sow_group.title == 'С опоросом':
+            return None
             
         sow_group = SowGroup.objects.get(title=group_title)
         self.group_records.create(sow=self, group_before=self.sow_group, group_after=sow_group, date=date)
@@ -302,6 +310,7 @@ class Sow(Pig):
         self.tour = tour
         if len(self.semination_set.filter(tour=self.tour)) == 1:
             self.change_status_to(status_title='Осеменена 1', date=date)
+            self.change_group_to(group_title='Проверяемая', date=date)
         if len(self.semination_set.filter(tour=self.tour)) > 1:
             self.change_status_to(status_title='Осеменена 2', date=date)
 

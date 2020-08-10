@@ -530,14 +530,56 @@ class SowGroupTest(TransactionTestCase):
 
     def test_model_change_group_to(self):
         sow1 = sows_testings.create_sow_and_put_in_workshop_one()
-        sow1.change_group_to('Проверяемая')
+        sow1.change_group_to('Ремонтная')
  
         sow1.refresh_from_db()
-        self.assertEqual(sow1.sow_group.title, 'Проверяемая')
+        self.assertEqual(sow1.sow_group.title, 'Ремонтная')
 
         self.assertEqual(sow1.group_records.all().count(), 1)
 
         sow1_group_record = sow1.group_records.all().first()
         self.assertEqual(sow1_group_record.group_before, None)
-        self.assertEqual(sow1_group_record.group_after.title, 'Проверяемая')
+        self.assertEqual(sow1_group_record.group_after.title, 'Ремонтная')
+
+    def test_model_change_group_to_restrict1(self):
+        # should not change to Проверяемая if not Ремонтная
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow1.change_group_to('Проверяемая')
  
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group, None)
+        self.assertEqual(sow1.group_records.all().count(), 0)
+
+        sow1.change_group_to('Ремонтная')
+        sow1.change_group_to('Проверяемая')
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'Проверяемая')
+        self.assertEqual(sow1.group_records.all().count(), 2)
+
+        sow1_group_record = sow1.group_records.all().first()
+        self.assertEqual(sow1_group_record.group_before.title, 'Ремонтная')
+        self.assertEqual(sow1_group_record.group_after.title, 'Проверяемая')
+
+    def test_model_change_group_to_restrict2(self):
+        # should not create new records if С опоросом already
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+
+        sow1.change_group_to('Ремонтная')
+        sow1.change_group_to('Проверяемая')
+        sow1.change_group_to('С опоросом')
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'С опоросом')
+        self.assertEqual(sow1.group_records.all().count(), 3)
+
+        sow1_group_record = sow1.group_records.all().first()
+        self.assertEqual(sow1_group_record.group_before.title, 'Проверяемая')
+        self.assertEqual(sow1_group_record.group_after.title, 'С опоросом') 
+
+        sow1.change_group_to('С опоросом')
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'С опоросом')
+        self.assertEqual(sow1.group_records.all().count(), 3)
+
+        sow1_group_record = sow1.group_records.all().first()
+        self.assertEqual(sow1_group_record.group_before.title, 'Проверяемая')
+        self.assertEqual(sow1_group_record.group_after.title, 'С опоросом') 

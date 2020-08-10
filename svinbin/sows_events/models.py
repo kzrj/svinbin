@@ -15,6 +15,7 @@ from piglets_events.models import PigletsMerger
 class SowEvent(Event):
     sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE)
     tour = models.ForeignKey('tours.Tour', null=True, on_delete=models.CASCADE)
+    sow_group = models.ForeignKey('sows.SowGroup', on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -28,7 +29,7 @@ class SeminationManager(CoreModelManager):
             date=timezone.now()
 
         semination = self.create(sow=sow, tour=tour, initiator=initiator,
-         semination_employee=semination_employee, date=date, boar=boar)
+         semination_employee=semination_employee, date=date, boar=boar, sow_group=sow.sow_group)
 
         sow.update_info_after_semination(tour=tour, date=date)
 
@@ -51,7 +52,7 @@ class SeminationManager(CoreModelManager):
         seminations = list()
         for sow in sows_qs:
             seminations.append(Semination(sow=sow, tour=tour, initiator=initiator,
-             semination_employee=semination_employee, boar=boar, date=date))    
+             semination_employee=semination_employee, boar=boar, date=date, sow_group=sow.sow_group))    
 
         self.bulk_create(seminations)
 
@@ -61,6 +62,8 @@ class SeminationManager(CoreModelManager):
             sows_qs.get_list_of_qs_by_seminations_in_tour(tour)
 
         once_seminated_sows_qs.update_status(title='Осеменена 1', date=date)
+        once_seminated_sows_qs.filter(sow_group__title='Ремонтная') \
+            .update_group(group_title='Проверяемая', date=date)
         more_than_once_seminated_sows_qs.update_status(title='Осеменена 2', date=date)
 
     def is_there_semination(self, sow, tour):
@@ -110,7 +113,7 @@ class UltrasoundManager(CoreModelManager):
         u_type = UltrasoundType.objects.get(days=days)
 
         ultrasound = self.create(sow=sow, tour=sow.tour, initiator=initiator,
-         date=date, result=result, u_type=u_type, location=sow.location)
+         date=date, result=result, u_type=u_type, location=sow.location, sow_group=sow.sow_group)
         if result:
             if days == 30:
                 sow.change_status_to(status_title='Супорос 28', date=date)
@@ -129,7 +132,7 @@ class UltrasoundManager(CoreModelManager):
         ultrasounds = list()
         for sow in sows_qs:
             ultrasounds.append(Ultrasound(sow=sow, tour=sow.tour, initiator=initiator,
-             date=date, result=result, u_type=u_type, location=sow.location))
+             date=date, result=result, u_type=u_type, location=sow.location, sow_group=sow.sow_group))
         Ultrasound.objects.bulk_create(ultrasounds)
 
         if result:
@@ -193,10 +196,11 @@ class SowFarrowManager(CoreModelManager):
         farrow = self.create(sow=sow, tour=sow.tour, initiator=initiator,
                 date=date, alive_quantity=alive_quantity,
                 dead_quantity=dead_quantity, mummy_quantity=mummy_quantity,
-                piglets_group=piglets, location=sow.location
+                piglets_group=piglets, location=sow.location, sow_group=sow.sow_group
                 )
 
         sow.change_status_to(status_title='Опоросилась', date=date)
+        sow.change_group_to(group_title='С опоросом', date=date)
 
         if alive_quantity <= 0:
             piglets.deactivate()
@@ -230,7 +234,8 @@ class CullingSowManager(CoreModelManager):
         if not date:
             date = timezone.now()
         culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason, date=date,
-         culling_type=culling_type, location=sow.location, sow_status=sow.status, weight=weight)
+         culling_type=culling_type, location=sow.location, sow_status=sow.status, weight=weight,
+         sow_group=sow.sow_group)
         sow.change_status_to(status_title='Брак', alive=False, date=date)
         return culling
 
@@ -259,7 +264,7 @@ class WeaningSowManager(CoreModelManager):
         if not date:
             date = timezone.now()
         weaning = self.create(sow=sow, tour=tour, piglets=piglets, quantity=piglets.quantity,
-         initiator=initiator, date=date)
+         initiator=initiator, date=date, sow_group=sow.sow_group)
 
         # when set tour to None
         # sow.tour = None
@@ -279,7 +284,7 @@ class AbortionSowManager(CoreModelManager):
         if not date:
             date = timezone.now()
         abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date,
-             location=sow.location)
+             location=sow.location, sow_group=sow.sow_group)
         sow.tour = None
         sow.change_status_to(status_title='Аборт', date=date)
         return abortion
