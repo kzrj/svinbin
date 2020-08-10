@@ -60,8 +60,8 @@ class SeminationManager(CoreModelManager):
         once_seminated_sows_qs, more_than_once_seminated_sows_qs = \
             sows_qs.get_list_of_qs_by_seminations_in_tour(tour)
 
-        once_seminated_sows_qs.update_status('Осеменена 1')
-        more_than_once_seminated_sows_qs.update_status('Осеменена 2')
+        once_seminated_sows_qs.update_status(title='Осеменена 1', date=date)
+        more_than_once_seminated_sows_qs.update_status(title='Осеменена 2', date=date)
 
     def is_there_semination(self, sow, tour):
         if self.get_queryset().filter(sow=sow, tour=tour).first():
