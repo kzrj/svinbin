@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
-from django.db.models import Q, Prefetch, Subquery, OuterRef, Count, F, Value
+from django.db.models import Q, Prefetch, Subquery, OuterRef, Count, F, Value, Exists
 from django.db.models.functions import Coalesce
 from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location
-from sows_events.models import Semination
+from sows_events.models import Semination, AssingFarmIdEvent, PigletsToSowsEvent, CullingSow, SowFarrow
 from tours.models import Tour
 
 
@@ -42,10 +42,10 @@ class Pig(CoreModel):
 
 
 class SowsQuerySet(models.QuerySet):
-    def update_status(self, title):
+    def update_status(self, title, date=None):
         status = SowStatus.objects.get(title=title)
         SowStatusRecord.objects.bulk_create(
-            (SowStatusRecord(sow=sow, status_before=sow.status, status_after=status) for sow in self)
+            (SowStatusRecord(sow=sow, status_before=sow.status, status_after=status, date=date) for sow in self)
             )
             
         return self.update(status=status)
@@ -97,6 +97,12 @@ class SowsQuerySet(models.QuerySet):
                 .add_status_at_date_count(status_title='Кормилица', en_name='korm') \
                 .add_status_at_date_count(status_title='Аборт', en_name='abort') \
 
+    def add_label_is_oporos_before(self, date):
+        # pass
+        subquery = Exists(
+            SowFarrow.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date))
+        return self.annotate(is_oporos_before=subquery)
+
 
 class SowManager(CoreModelManager):
     def get_queryset(self):
@@ -105,29 +111,54 @@ class SowManager(CoreModelManager):
     def get_queryset_with_not_alive(self):
         return SowsQuerySet(self.model, using=self._db)
 
-    def create_new_and_put_in_workshop_one(self, farm_id):
-        return self.create(farm_id=farm_id,
+    def create_new_and_put_in_workshop_one(self, farm_id, birth_id=None):
+        return self.create(farm_id=farm_id, birth_id=birth_id,
             location=Location.objects.get(workshop__number=1))
 
-    def get_or_create_by_farm_id(self, farm_id):
+    def get_or_create_by_farm_id(self, farm_id, birth_id=None):
         sow = self.get_queryset().filter(farm_id=farm_id).first()
         if not sow:
-            return self.create_new_and_put_in_workshop_one(farm_id)
+            return self.create_new_and_put_in_workshop_one(farm_id, birth_id)
         return sow
 
-    def create_or_return(self, farm_id):
+    def create_or_return_then_assing_farm_id(self, farm_id, birth_id=None, initiator=None):
         sow = self.get_queryset_with_not_alive().filter(farm_id=farm_id).first()
         if not sow:
-            return self.create_new_and_put_in_workshop_one(farm_id), True
-
-        return sow, False
+            sow = self.filter(farm_id__isnull=True, location__workshop__number__in=[1, 2]).first()
+            if sow:
+                sow.assing_farm_id(farm_id=farm_id, birth_id=birth_id)
+                AssingFarmIdEvent.objects.create_event(sow=sow, assing_type='gilt',
+                    farm_id=farm_id, birth_id=sow.birth_id)
+            else:
+                sow = self.create_new_and_put_in_workshop_one(farm_id=farm_id, birth_id=birth_id)
+                AssingFarmIdEvent.objects.create_event(sow=sow, assing_type='nowhere',
+                    farm_id=farm_id, birth_id=birth_id)
+        else:
+            if not sow.birth_id:
+                sow.birth_id = birth_id
+                sow.save()
+        return sow
         
     def create_bulk_sows_from_event(self, event):
-        status = SowStatus.objects.get(title='Ремонтная')
         location = Location.objects.get(workshop__number=1)
         self.bulk_create([
-            Sow(status=status, creation_event=event, location=location) 
+            Sow(creation_event=event, location=location) 
                 for i in range(0, event.quantity)])
+        event.sows.all().update_status(title='Ремонтная', date=event.date)
+
+
+    def get_sows_at_date(self, date):
+        init_events = PigletsToSowsEvent.objects.filter(date__date__lte=date)
+        all_init_sows_pk = self.get_queryset_with_not_alive().filter(creation_event__in=init_events) \
+            .values_list('pk', flat=True)
+
+        all_culls_sows_pk = CullingSow.objects.filter(date__date__lte=date).values_list('sow__pk', flat=True)
+        pks = [sow_pk for sow_pk in all_init_sows_pk if sow_pk not in all_culls_sows_pk]
+
+        # all_sows = all_init_sows.difference(all_culls_sows)
+        # after difference you cant use annotate
+
+        return self.get_queryset_with_not_alive().filter(pk__in=pks)
 
 
 class Sow(Pig):
@@ -145,9 +176,12 @@ class Sow(Pig):
     def __str__(self):
         return 'Sow #%s' % self.farm_id
 
-    def change_status_to(self, status_title, alive=True):
+    def change_status_to(self, status_title, alive=True, date=None):
+        if not date:
+            date=timezone.now()
+            
         status = SowStatus.objects.get(title=status_title)
-        self.status_records.create(sow=self, status_before=self.status, status_after=status)
+        self.status_records.create(sow=self, status_before=self.status, status_after=status, date=date)
 
         self.status = status
         self.alive = alive
@@ -161,8 +195,10 @@ class Sow(Pig):
     def get_last_farrow(self):
         return self.sowfarrow_set.all().order_by('-created_at').first()
 
-    def assing_farm_id(self, farm_id):
+    def assing_farm_id(self, farm_id, birth_id=None):
         self.farm_id = farm_id
+        if not self.birth_id:
+            self.birth_id = birth_id
         self.status = SowStatus.objects.get(title='Ожидает осеменения')
         self.save()
 

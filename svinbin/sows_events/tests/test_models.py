@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, date
+
 from django.utils import timezone
 from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
@@ -7,7 +9,7 @@ from sows_events.models import (
     Semination, Ultrasound, SowFarrow, CullingSow,
     UltrasoundType, AbortionSow, MarkAsNurse, MarkAsGilt, CullingBoar,
     SemenBoar, PigletsToSowsEvent)
-from sows.models import Sow, Boar, Gilt
+from sows.models import Sow, Boar, Gilt, SowStatusRecord
 from piglets.models import Piglets
 from locations.models import Location
 from transactions.models import SowTransaction
@@ -428,6 +430,8 @@ class PigletsToSowsEventTest(TestCase):
         sows_events_testing.create_types()
 
     def test_create_event(self):
+        sow = Sow.objects.create_new_and_put_in_workshop_one(farm_id=123)
+
         tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
         location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
         piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(
@@ -438,6 +442,12 @@ class PigletsToSowsEventTest(TestCase):
         self.assertEqual(event.piglets, piglets)
         self.assertEqual(event.metatour, piglets.metatour)
         self.assertEqual(event.sows.all().count(), 50)
-        self.assertEqual(Sow.objects.all().count(), 50)
-        self.assertEqual(Sow.objects.all().first().status.title, 'Ремонтная')
-        self.assertEqual(Sow.objects.all().first().location.workshop.number, 1)
+        self.assertEqual(Sow.objects.all().count(), 51)
+        self.assertEqual(Sow.objects.all()[1].status.title, 'Ремонтная')
+        self.assertEqual(Sow.objects.all()[1].location.workshop.number, 1)
+        self.assertEqual(SowStatusRecord.objects.all().count(), 50)
+        piglets.refresh_from_db()
+        self.assertEqual(piglets.active, False)
+
+        sows = Sow.objects.all().add_status_at_date(date=datetime.today())
+        self.assertEqual(sows[1].status_at_date, 'Ремонтная')

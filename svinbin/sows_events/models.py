@@ -193,7 +193,7 @@ class SowFarrowManager(CoreModelManager):
                 piglets_group=piglets, location=sow.location
                 )
 
-        sow.change_status_to('Опоросилась')
+        sow.change_status_to(status_title='Опоросилась', date=date)
 
         if alive_quantity <= 0:
             piglets.deactivate()
@@ -329,8 +329,10 @@ class PigletsToSowsEventManager(CoreModelManager):
         if not date:
             date = timezone.now()
 
-        event = self.create(piglets=piglets, metatour=piglets.metatour, quantity=piglets.quantity)
+        event = self.create(piglets=piglets, metatour=piglets.metatour, quantity=piglets.quantity,
+            initiator=initiator, date=date)
         event.sows.create_bulk_sows_from_event(event=event)
+        piglets.deactivate()
         return event
 
 
@@ -340,6 +342,26 @@ class PigletsToSowsEvent(Event):
     quantity = models.IntegerField()
 
     objects = PigletsToSowsEventManager()
+
+
+class AssingFarmIdEventManager(CoreModelManager):
+    def create_event(self, sow, assing_type, farm_id, birth_id=None, initiator=None, date=None):
+        if not date:
+            date = timezone.now()
+
+        event = self.create(sow=sow, assing_type=assing_type, farm_id=farm_id, birth_id=birth_id,
+         initiator=initiator)
+        return event
+
+
+class AssingFarmIdEvent(Event):
+    sow = models.OneToOneField('sows.Sow', on_delete=models.SET_NULL, null=True)
+    ASSING_TYPES = [('gilt', 'from gilt'), ('nowhere', 'nowhere')]
+    assing_type = models.CharField(max_length=10, choices=ASSING_TYPES)
+    farm_id = models.IntegerField(null=True)
+    birth_id = models.CharField(max_length=10, null=True) 
+
+    objects = AssingFarmIdEventManager()
 
 
 # Boar Events

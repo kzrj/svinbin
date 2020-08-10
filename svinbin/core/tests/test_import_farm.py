@@ -106,6 +106,8 @@ class FarmImportXlsTest(TestCase):
             import_farm.create_semination_lists(rows, shmigina)
 
         self.assertEqual(Sow.objects.filter(tour__week_number=6).count(), 75)
+        sow = Sow.objects.get(farm_id=19403)
+        self.assertEqual(sow.birth_id, 'A0278')
 
     @tag('with_file')
     def test_repeated_seminations_v2(self):

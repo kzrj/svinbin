@@ -20,6 +20,7 @@ def init_wb(file_from_request): # to test
 
 def normalize_row(row, workbook): # to test
     row[0] = int(row[0]) # farm_id to int
+    row[1] = row[1].strip()
     row[4] = datetime.datetime(*xldate_as_tuple(row[4], workbook.datemode))
     if row[5] == '*' or row[5] == '**':
         del row[5] # delete *
@@ -71,7 +72,8 @@ def create_semination_lists(rows, request_user):
 
     for row in rows:
         tour = Tour.objects.create_or_return_by_raw(raw_tour=row[3], start_date=row[4])
-        sow, created = Sow.objects.create_or_return(farm_id=row[0])
+        sow = Sow.objects.create_or_return_then_assing_farm_id(farm_id=row[0], birth_id=row[1],
+         initiator=request_user)
 
         if sow.alive == False:
             continue
