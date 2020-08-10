@@ -582,4 +582,82 @@ class SowGroupTest(TransactionTestCase):
 
         sow1_group_record = sow1.group_records.all().first()
         self.assertEqual(sow1_group_record.group_before.title, 'Проверяемая')
-        self.assertEqual(sow1_group_record.group_after.title, 'С опоросом') 
+        self.assertEqual(sow1_group_record.group_after.title, 'С опоросом')
+
+    def test_qs_add_group_at_date(self):
+        date1 = date(2020, 5, 1)
+        date2 = date(2020, 5, 15)
+        date3 = date(2020, 6, 25)
+
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testings.create_sow_and_put_in_workshop_one()
+
+        sows = Sow.objects.all()
+        sows.update_group(group_title='Ремонтная', date=date1)
+        sows.update_group(group_title='Проверяемая', date=date2)
+        sows.update_group(group_title='С опоросом', date=date3)
+
+        sows = sows.add_group_at_date(date=date1)
+        sow = sows.first()
+        self.assertEqual(sow.sow_group.title, 'С опоросом')
+        self.assertEqual(sow.group_at_date, 'Ремонтная')
+
+        sows = sows.add_group_at_date(date=date2)
+        sow = sows.first()
+        self.assertEqual(sow.sow_group.title, 'С опоросом')
+        self.assertEqual(sow.group_at_date, 'Проверяемая')
+
+        sows = sows.add_group_at_date(date=date3)
+        sow = sows.first()
+        self.assertEqual(sow.sow_group.title, 'С опоросом')
+        self.assertEqual(sow.group_at_date, 'С опоросом')
+        
+        self.assertEqual(sow.group_records.all().count(), 3)
+        sow = sows.first()
+        sow.change_group_to(group_title='С опоросом')
+        self.assertEqual(sow.group_records.all().count(), 3)
+
+    def test_qs_add_group_count_at_date(self):
+        date1 = date(2020, 5, 1)
+        date2 = date(2020, 5, 15)
+        date3 = date(2020, 6, 25)
+
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testings.create_sow_and_put_in_workshop_one()
+
+        sows = Sow.objects.all()
+        sows.update_group(group_title='Ремонтная', date=date1)
+        sows.update_group(group_title='Проверяемая', date=date2)
+        sows.update_group(group_title='С опоросом', date=date3)
+
+        sows = sows.add_group_at_date(date=date1) \
+                   .add_group_at_date_count('Ремонтная', 'rem') \
+                   .add_group_at_date_count('Проверяемая', 'check') \
+                   .add_group_at_date_count('С опоросом', 'oporos')
+
+        sow = sows.first()
+        self.assertEqual(sow.count_group_rem, 3)
+        self.assertEqual(sow.count_group_check, 0)
+        self.assertEqual(sow.count_group_oporos, 0)
+
+        sows = sows.add_group_at_date(date=date2) \
+                   .add_group_at_date_count('Ремонтная', 'rem') \
+                   .add_group_at_date_count('Проверяемая', 'check') \
+                   .add_group_at_date_count('С опоросом', 'oporos')
+
+        sow = sows.first()
+        self.assertEqual(sow.count_group_rem, 0)
+        self.assertEqual(sow.count_group_check, 3)
+        self.assertEqual(sow.count_group_oporos, 0)
+
+        sows = sows.add_group_at_date(date=date3) \
+                   .add_group_at_date_count('Ремонтная', 'rem') \
+                   .add_group_at_date_count('Проверяемая', 'check') \
+                   .add_group_at_date_count('С опоросом', 'oporos')
+
+        sow = sows.first()
+        self.assertEqual(sow.count_group_rem, 0)
+        self.assertEqual(sow.count_group_check, 0)
+        self.assertEqual(sow.count_group_oporos, 3)

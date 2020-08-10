@@ -146,6 +146,24 @@ class SowsQuerySet(models.QuerySet):
 
         return self.annotate(is_checking=subquery)
 
+    def add_group_at_date(self, date):
+        group = Subquery(SowGroupRecord.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date) \
+            .values('group_after__title')[:1])
+
+        return self.annotate(group_at_date=group)
+
+    def add_group_at_date_count(self, group_title, en_name=''):
+        data = {f'count_group_{en_name}': 
+            Coalesce(Subquery(
+                self.filter(group_at_date=group_title) \
+                    .annotate(flag_group=Value(0)) \
+                    .values('flag_group') \
+                    .annotate(cnt=Count('*')) \
+                    .values('cnt')
+                ), 0)
+        }
+        return self.annotate(**data)
+
 
 class SowManager(CoreModelManager):
     def get_queryset(self):

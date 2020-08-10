@@ -29,7 +29,8 @@ class SowTransactionManager(CoreModelManager):
                 to_location=to_location,
                 sow=sow,
                 tour=sow.tour,
-                sow_status=sow.status
+                sow_status=sow.status,
+                sow_group=sow.sow_group
                 )
 
         if sow.status and (sow.status.title == 'Опоросилась' or sow.status.title == 'Отъем') and to_location.workshop:
@@ -73,6 +74,7 @@ class SowTransaction(Transaction):
         related_name='sow_transactions')
 
     sow_status = models.ForeignKey('sows.SowStatus', on_delete=models.SET_NULL, null=True)
+    sow_group = models.ForeignKey('sows.SowGroup', on_delete=models.SET_NULL, null=True, blank=True)
 
     objects = SowTransactionManager()
 
