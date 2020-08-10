@@ -13,7 +13,7 @@ class TourFilter(filters.FilterSet):
     by_workshop_number = filters.NumberFilter(method='filter_by_workshop_number')
 
     def filter_by_workshop_number(self, queryset, name, value):
-        pks = Sow.objects.all().get_tours(workshop_number=value)
+        pks = Sow.objects.all().get_tours_pks(workshop_number=value)
         return queryset.filter(pk__in=pks)
 
     class Meta:
