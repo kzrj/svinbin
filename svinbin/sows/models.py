@@ -98,10 +98,17 @@ class SowsQuerySet(models.QuerySet):
                 .add_status_at_date_count(status_title='Аборт', en_name='abort') \
 
     def add_label_is_oporos_before(self, date):
-        # pass
         subquery = Exists(
             SowFarrow.objects.filter(sow__pk=OuterRef('pk'), date__date__lte=date))
         return self.annotate(is_oporos_before=subquery)
+
+    def add_label_is_checking(self):
+        # use after add_label_is_oporos_before
+        subquery = Exists(self.filter(pk=OuterRef('pk'), is_oporos_before=False, 
+          status__title__in=["Ожидат осеменения", "Осеменена 1", 
+          "Осеменена 2", "Супорос 28", "Супорос 35", "Прохолост", "Аборт"]))
+
+        return self.annotate(is_checking=subquery)
 
 
 class SowManager(CoreModelManager):
@@ -243,12 +250,12 @@ class Sow(Pig):
     def get_tours_pk(self):
         return self.semination_set.all().values_list('tour', flat=True).distinct()
 
-    def update_info_after_semination(self, tour):
+    def update_info_after_semination(self, tour, date=None):
         self.tour = tour
         if len(self.semination_set.filter(tour=self.tour)) == 1:
-            self.change_status_to('Осеменена 1')
+            self.change_status_to(status_title='Осеменена 1', date=date)
         if len(self.semination_set.filter(tour=self.tour)) > 1:
-            self.change_status_to('Осеменена 2')
+            self.change_status_to(status_title='Осеменена 2', date=date)
 
     @property
     def mark_as_nurse(self):

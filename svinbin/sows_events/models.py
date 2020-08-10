@@ -30,7 +30,7 @@ class SeminationManager(CoreModelManager):
         semination = self.create(sow=sow, tour=tour, initiator=initiator,
          semination_employee=semination_employee, date=date, boar=boar)
 
-        sow.update_info_after_semination(tour)
+        sow.update_info_after_semination(tour=tour, date=date)
 
         return semination
 

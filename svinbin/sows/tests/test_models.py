@@ -438,9 +438,65 @@ class Sow24fReportTest(TransactionTestCase):
         self.assertEqual(len(sows), 10)
 
         sows = sows.add_label_is_oporos_before(date=date2).add_status_at_date(date=date2)
-        # print(sows.first())
-        for sow in sows:
-            print(sow, sow.pk, sow.is_oporos_before, sow.status_at_date)
-            
+
+        sow1  = sows.get(farm_id=123)
+        self.assertEqual(sow1.is_oporos_before, True)
+        self.assertEqual(sow1.status_at_date, 'Опоросилась')
+
+        sow2  = sows.filter(farm_id__isnull=True).first()
+        self.assertEqual(sow2.is_oporos_before, False)
+        self.assertEqual(sow2.status_at_date, 'Ремонтная')
+
+    def test_qs_add_label_is_checking(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
+        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour, location=location, quantity=10)
+
+        date0 = date(2020, 6, 5)
+        event = PigletsToSowsEvent.objects.create_event(piglets=piglets1, date=date0)
+
+        # one sow farrow
+        date01 = date(2020, 6, 10)
+        sow1 = Sow.objects.all().first()
+        sow1.farm_id = '123'
+        sow1.tour = tour
+        sow1.location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
+        sow1.save()
+        event = SowFarrow.objects.create_sow_farrow(sow=sow1, alive_quantity=11, date=date01)
+
+        # one sow semination
+        date02 = date(2020, 6, 12)
+        sow2 = Sow.objects.filter(farm_id__isnull=True).first()
+        sow2.farm_id = '124'
+        sow2.save()
+        event = Semination.objects.create_semination_tour(sow=sow2, tour=tour, date=date02)
+
+        date2 = date(2020, 7, 2)
+        sows = Sow.objects.get_sows_at_date(date=date2)
+        self.assertEqual(len(sows), 10)
+
+        sows = sows.add_label_is_oporos_before(date=date2) \
+                   .add_status_at_date(date=date2) \
+                   .add_label_is_checking()
+
+        sow1  = sows.get(farm_id=123)
+        self.assertEqual(sow1.is_oporos_before, True)
+        self.assertEqual(sow1.status_at_date, 'Опоросилась')
+        self.assertEqual(sow1.is_checking, False)
+
+        sow2  = sows.get(farm_id=124)
+        self.assertEqual(sow2.is_oporos_before, False)
+        self.assertEqual(sow2.is_checking, True)
+        self.assertEqual(sow2.status_at_date, 'Осеменена 1')
+
+        sow3  = sows.filter(farm_id__isnull=True).first()
+        self.assertEqual(sow3.is_oporos_before, False)
+        self.assertEqual(sow3.status_at_date, 'Ремонтная')
+        self.assertEqual(sow3.is_checking, False)
+
+        # for sow in sows:
+        #     print(sow, sow.pk, sow.is_oporos_before, sow.status_at_date, sow.is_checking, sow.tour)
+
 
         
