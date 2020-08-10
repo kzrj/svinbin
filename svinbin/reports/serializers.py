@@ -44,4 +44,9 @@ class ReportDateWs3Serializer(AnnotateFieldsModelSerializer, serializers.ModelSe
     class Meta:
         model = ReportDate
         fields = '__all__'
+
+
+class StartDateEndDateSerializer(serializers.Serializer):
+    start_date = serializers.DateField(format="%Y-%m-%d")
+    end_date = serializers.DateField(format="%Y-%m-%d")
         

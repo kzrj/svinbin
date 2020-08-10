@@ -21,7 +21,8 @@ from transactions.models import SowTransaction, PigletsTransaction
 from sows.models import Sow
 from piglets.models import Piglets
 
-from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer
+from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer, \
+    StartDateEndDateSerializer
 from reports.filters import ReportDateFilter
 
 
@@ -65,6 +66,31 @@ class ReportDateViewSet(viewsets.ModelViewSet):
     filter_class = ReportDateFilter
 
     def list(self, request):
+        queryset = self.filter_queryset(self.queryset)
+
+        serializer = ReportDateSerializer(queryset, many=True)
+
+        total_data = queryset.dir_rep_aggregate_total_data()
+
+        last_date = queryset.order_by('-date').first()
+        pigs_count = 0
+        if last_date:
+            sows_quantity_at_date_end = last_date.sows_quantity_at_date_end \
+                if last_date.sows_quantity_at_date_end else 0
+            piglets_qnty_start_end = last_date.piglets_qnty_start_end \
+                if last_date.piglets_qnty_start_end else 0
+            pigs_count = sows_quantity_at_date_end + piglets_qnty_start_end
+
+        data = {'results': serializer.data, 'total_info': total_data, 'pigs_count': pigs_count}
+
+        return Response({
+            'total_info': data['total_info'],
+            'pigs_count': data['pigs_count'],
+            'results': data['results'],
+        })
+
+    @action(methods=['get'], detail=False)
+    def director(self, request):
         queryset = self.filter_queryset(self.queryset)
 
         serializer = ReportDateSerializer(queryset, many=True)
@@ -177,6 +203,33 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         response = HttpResponse(file, content_type="application/file")
         response['Content-Disposition'] = 'attachment; filename={}'.format(f'ws{ws_number}_report.xlsx')
         return response
+
+    @action(methods=['get'], detail=False, serializer_class=StartDateEndDateSerializer)
+    def ws_24f_report(self, request):
+        serializer = StartDateEndDateSerializer(data=request.data)
+        if serializer.is_valid():
+            start_date = serializer.validated_data['start_date']
+            start_date_sows = Sow.objects.get_sows_at_date(date=start_date) \
+                                         .add_group_at_date(date=start_date) \
+                                         .add_group_at_date_count()
+
+            end_date = serializer.validated_data['end_date']
+            end_date_sows = Sow.objects.get_sows_at_date(date=end_date) \
+                                         .add_group_at_date(date=end_date) \
+                                         .add_group_at_date_count()
+
+            # todo:
+            # count boars start end
+            # count piglets start end
+            
+            # count cullings by group, boar, piglets
+            # count transactions by group, boar, piglets
+
+            # rest
+
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class ReportCountPigsView(views.APIView):
