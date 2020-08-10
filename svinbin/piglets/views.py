@@ -230,7 +230,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = sows_serializers.GiltCreateSerializer(data=request.data)
         if serializer.is_valid():
 
-            gilt = sows_models.Gilt.objects.transaction_with_split_and_merge(
+            gilt = sows_models.PigletsTransaction.objects.transaction_with_split_and_merge(
               birth_id=serializer.validated_data['birth_id'],
               mother_sow_farm_id=serializer.validated_data['mother_sow_farm_id'],
               piglets=self.get_object()              
