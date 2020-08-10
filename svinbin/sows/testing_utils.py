@@ -5,7 +5,7 @@ from django.utils import timezone
 
 from locations.models import Location, SowSingleCell, SowGroupCell, Section, WorkShop, \
     SowAndPigletsCell, PigletsGroupCell
-from sows.models import Sow, SowStatus, Gilt, Boar, BoarBreed
+from sows.models import Sow, SowStatus, Gilt, Boar, BoarBreed, SowGroup
 from sows_events.models import Semination, SowFarrow, Ultrasound
 
 
@@ -32,6 +32,13 @@ def create_statuses():
             SowStatus(title='Кормилица'),
             SowStatus(title='Ожидает осеменения'),
             SowStatus(title='Ремонтная'),
+            ])
+
+    if SowGroup.objects.all().count() < 1:
+        SowGroup.objects.bulk_create([
+            SowGroup(title='Ремонтная'),
+            SowGroup(title='Проверяемая'),
+            SowGroup(title='С опоросом'),
             ])
 
 

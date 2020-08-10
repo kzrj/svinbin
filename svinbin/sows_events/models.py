@@ -231,7 +231,7 @@ class CullingSowManager(CoreModelManager):
             date = timezone.now()
         culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason, date=date,
          culling_type=culling_type, location=sow.location, sow_status=sow.status, weight=weight)
-        sow.change_status_to(status_title='Брак', alive=False)
+        sow.change_status_to(status_title='Брак', alive=False, date=date)
         return culling
 
     def in_ws(self, ws_locs, start_date=date(2020, 1, 1), end_date=datetime.today()):
@@ -255,13 +255,15 @@ class CullingSow(SowEvent):
 
 
 class WeaningSowManager(CoreModelManager):
-    def create_weaning(self, sow, piglets, tour=None, initiator=None):
+    def create_weaning(self, sow, piglets, tour=None, initiator=None, date=None):
+        if not date:
+            date = timezone.now()
         weaning = self.create(sow=sow, tour=tour, piglets=piglets, quantity=piglets.quantity,
-         initiator=initiator, date=timezone.now())
+         initiator=initiator, date=date)
 
         # when set tour to None
         # sow.tour = None
-        sow.change_status_to(status_title='Отъем')
+        sow.change_status_to(status_title='Отъем', date=date)
         return weaning
 
 
@@ -279,7 +281,7 @@ class AbortionSowManager(CoreModelManager):
         abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date,
              location=sow.location)
         sow.tour = None
-        sow.change_status_to(status_title='Аборт')
+        sow.change_status_to(status_title='Аборт', date=date)
         return abortion
 
 

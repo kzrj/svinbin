@@ -33,6 +33,28 @@ class SowStatusRecord(CoreModel):
         return f'sow status record {self.pk}'
 
 
+class SowGroup(CoreModel):
+    title = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.title
+
+
+class SowGroupRecord(CoreModel):
+    group_before = models.ForeignKey(SowGroup, null=True, on_delete=models.CASCADE,
+        related_name='records_before')
+    group_after = models.ForeignKey(SowGroup, null=True, on_delete=models.CASCADE,
+        related_name='records_after')
+    sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE, related_name='group_records')
+    date = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+        return f'sow group record {self.pk}'
+
+
 class Pig(CoreModel):
     birth_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
     location = models.ForeignKey("locations.Location", on_delete=models.SET_NULL, null=True)
@@ -45,13 +67,24 @@ class SowsQuerySet(models.QuerySet):
     def update_status(self, title, date=None):
         if not date:
             date=timezone.now()
-            
+
         status = SowStatus.objects.get(title=title)
         SowStatusRecord.objects.bulk_create(
             (SowStatusRecord(sow=sow, status_before=sow.status, status_after=status, date=date) for sow in self)
             )
             
         return self.update(status=status)
+
+    def update_group(self, group_title, date=None):
+        if not date:
+            date=timezone.now()
+
+        sow_group = SowGroup.objects.get(title=group_title)
+        SowGroupRecord.objects.bulk_create(
+            (SowGroupRecord(sow=sow, group_before=sow.sow_group, group_after=sow_group, date=date) for sow in self)
+            )
+            
+        return self.update(sow_group=sow_group)
 
     def get_with_seminations_in_tour(self, tour):
         return self.prefetch_related(
@@ -179,6 +212,8 @@ class Sow(Pig):
     creation_event = models.ForeignKey('sows_events.PigletsToSowsEvent', on_delete=models.SET_NULL,
         null=True, blank=True, related_name='sows')
 
+    sow_group = models.ForeignKey(SowGroup, on_delete=models.SET_NULL, null=True, blank=True)
+
     alive = models.BooleanField(default=True)
 
     objects = SowManager()
@@ -195,6 +230,16 @@ class Sow(Pig):
 
         self.status = status
         self.alive = alive
+        self.save()
+
+    def change_group_to(self, group_title, alive=True, date=None):
+        if not date:
+            date=timezone.now()
+            
+        sow_group = SowGroup.objects.get(title=group_title)
+        self.group_records.create(sow=self, group_before=self.sow_group, group_after=sow_group, date=date)
+
+        self.sow_group = sow_group
         self.save()
 
     def change_sow_current_location(self, to_location):

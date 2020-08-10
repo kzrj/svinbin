@@ -499,4 +499,45 @@ class Sow24fReportTest(TransactionTestCase):
         #     print(sow, sow.pk, sow.is_oporos_before, sow.status_at_date, sow.is_checking, sow.tour)
 
 
-        
+class SowGroupTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_qs_update_group(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+
+        sows = Sow.objects.all()
+        sows.update_group(group_title='Ремонтная')
+
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'Ремонтная')
+        self.assertEqual(sow2.sow_group.title, 'Ремонтная')
+
+        self.assertEqual(sow1.group_records.all().count(), 1)
+        self.assertEqual(sow2.group_records.all().count(), 1)
+
+        sow1_group_record = sow1.group_records.all().first()
+        sow2_group_record = sow2.group_records.all().first()
+        self.assertEqual(sow1_group_record.group_before, None)
+        self.assertEqual(sow1_group_record.group_after.title, 'Ремонтная')
+        self.assertEqual(sow2_group_record.group_before, None)
+        self.assertEqual(sow2_group_record.group_after.title, 'Ремонтная')
+
+    def test_model_change_group_to(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow1.change_group_to('Проверяемая')
+ 
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'Проверяемая')
+
+        self.assertEqual(sow1.group_records.all().count(), 1)
+
+        sow1_group_record = sow1.group_records.all().first()
+        self.assertEqual(sow1_group_record.group_before, None)
+        self.assertEqual(sow1_group_record.group_after.title, 'Проверяемая')
+ 
