@@ -43,6 +43,9 @@ class Pig(CoreModel):
 
 class SowsQuerySet(models.QuerySet):
     def update_status(self, title, date=None):
+        if not date:
+            date=timezone.now()
+            
         status = SowStatus.objects.get(title=title)
         SowStatusRecord.objects.bulk_create(
             (SowStatusRecord(sow=sow, status_before=sow.status, status_after=status, date=date) for sow in self)

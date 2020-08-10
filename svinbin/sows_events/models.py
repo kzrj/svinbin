@@ -113,30 +113,33 @@ class UltrasoundManager(CoreModelManager):
          date=date, result=result, u_type=u_type, location=sow.location)
         if result:
             if days == 30:
-                sow.change_status_to('Супорос 28')
+                sow.change_status_to(status_title='Супорос 28', date=date)
             if days == 60:
-                sow.change_status_to('Супорос 35')
+                sow.change_status_to(status_title='Супорос 35', date=date)
         else:
             sow.tour = None
-            sow.change_status_to('Прохолост')
+            sow.change_status_to(status_title='Прохолост', date=date)
         return ultrasound
 
-    def mass_ultrasound(self, sows_qs, initiator=None, result=False, days=None):
+    def mass_ultrasound(self, sows_qs, initiator=None, result=False, days=None, date=None):
+        if not date:
+            date=timezone.now()
+
         u_type = UltrasoundType.objects.get(days=days)
         ultrasounds = list()
         for sow in sows_qs:
             ultrasounds.append(Ultrasound(sow=sow, tour=sow.tour, initiator=initiator,
-             date=timezone.now(), result=result, u_type=u_type, location=sow.location))
+             date=date, result=result, u_type=u_type, location=sow.location))
         Ultrasound.objects.bulk_create(ultrasounds)
 
         if result:
             if days == 30:
-                sows_qs.update_status('Супорос 28')
+                sows_qs.update_status(title='Супорос 28', date=date)
             if days == 60:
-                sows_qs.update_status('Супорос 35')
+                sows_qs.update_status(title='Супорос 35', date=date)
         else:
             sows_qs.update(tour=None)
-            sows_qs.update_status('Прохолост')
+            sows_qs.update_status(title='Прохолост', date=date)
 
 
 class Ultrasound(SowEvent):

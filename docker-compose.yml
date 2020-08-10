@@ -27,7 +27,7 @@ services:
     command: bash -c "cd svinbin &&
                       python manage.py migrate &&
                       python manage.py makemigrations --no-input &&
-                      python manage.py test sows_events.tests.test_models.SeminationModelManagerTest"
+                      python manage.py test sows_events.tests.test_models"
 
     # restart: unless-stopped
     # command: bash -c "cd svinbin &&
