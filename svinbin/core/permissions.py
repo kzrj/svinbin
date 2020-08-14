@@ -22,6 +22,8 @@ class ObjAndUserSameLocationPermissions(permissions.BasePermission):
         elif request.method == 'POST':
             if request.user.is_staff:
                 return True
+            if not hasattr(request.user, 'employee'):
+                return False
             return obj.location.get_workshop == request.user.employee.workshop
 
         elif request.method == 'PATCH': 
