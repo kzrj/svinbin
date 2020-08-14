@@ -25,7 +25,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
     queryset = piglets_models.Piglets.objects.all()
     serializer_class = piglets_serializers.PigletsSerializer
     filter_class = PigletsFilter
-    permission_classes = [IsAuthenticated, ObjAndUserSameLocationPermissions]
+    permission_classes = [ObjAndUserSameLocationPermissions]
 
     # if overwrite get_permissions then permissions on actions will not work
     
