@@ -6,7 +6,7 @@ class ObjAndUserSameLocationPermissions(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
-            return request.user.id
+            return True
         elif request.method == 'POST':
             return True
         elif request.method == 'PATCH':
@@ -17,7 +17,7 @@ class ObjAndUserSameLocationPermissions(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
-            return request.user.id
+            return True
 
         elif request.method == 'POST':
             if request.user.is_staff:
@@ -36,7 +36,7 @@ class WS3Permissions(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
-            return request.user.id
+            return True
 
         elif request.method == 'POST':
             if request.user.is_staff:
@@ -53,7 +53,7 @@ class WS3Permissions(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
-            return request.user.id
+            return True
         elif request.method == 'POST':
             if request.user.is_staff:
                 return request.user.is_staff
@@ -70,7 +70,7 @@ class WS12Permissions(permissions.BasePermission):
 
     def has_permission(self, request, view):
         if request.method in permissions.SAFE_METHODS:
-            return request.user.id
+            return True
 
         elif request.method == 'POST':
             if request.user.is_staff:
@@ -87,7 +87,7 @@ class WS12Permissions(permissions.BasePermission):
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
-            return request.user.id
+            return True
         elif request.method == 'POST':
             if request.user.is_staff:
                 return request.user.is_staff

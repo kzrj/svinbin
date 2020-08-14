@@ -28,7 +28,7 @@ class SowViewSet(viewsets.ModelViewSet):
     queryset = sows_models.Sow.objects.all()
     serializer_class = sows_serializers.SowSerializer
     filter_class = SowFilter
-    permission_classes = [IsAuthenticated, ObjAndUserSameLocationPermissions]
+    permission_classes = [ObjAndUserSameLocationPermissions]
 
     def retrieve(self, request, pk=None):
         sow = self.get_object()
@@ -154,7 +154,7 @@ class BoarViewSet(viewsets.ModelViewSet):
     queryset = sows_models.Boar.objects.filter(active=True)
     serializer_class = sows_serializers.BoarSerializer
     filter_class = BoarFilter
-    permission_classes = [IsAuthenticated, WS12Permissions]
+    permission_classes = [WS12Permissions]
 
     def create(self, request):
         serializer = sows_serializers.BoarCreateSerializer(data=request.data)
@@ -220,4 +220,4 @@ class BoarViewSet(viewsets.ModelViewSet):
 class BoarBreedViewSet(viewsets.ModelViewSet):
     queryset = sows_models.BoarBreed.objects.all()
     serializer_class = sows_serializers.BoarBreedSerializer
-    permission_classes = [IsAuthenticated, ReadOrAdminOnlyPermissions]
+    permission_classes = [ReadOrAdminOnlyPermissions]

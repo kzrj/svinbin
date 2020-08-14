@@ -32,7 +32,7 @@ class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = serializers.LocationCellSerializer
     filter_class = LocationFilter
-    permission_classes = [IsAuthenticated, ReadOrAdminOnlyPermissions]
+    permission_classes = [ReadOrAdminOnlyPermissions]
 
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
@@ -74,4 +74,4 @@ class SectionViewSet(viewsets.ModelViewSet):
     queryset = Section.objects.all().select_related('location')
     serializer_class = serializers.SectionSerializer
     filter_class = SectionFilter
-    permission_classes = [IsAuthenticated, ReadOrAdminOnlyPermissions]
+    permission_classes = [ReadOrAdminOnlyPermissions]
