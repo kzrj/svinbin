@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-     
+from django.contrib.auth.models import User
+
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
@@ -20,11 +22,13 @@ class SowViewSetTest(APITestCase):
         sows_testing.create_boars()
         sows_events_testing.create_types()
         piglets_testing.create_piglets_statuses()
+        staff_testing.create_svinbin_users()
         self.user = staff_testing.create_employee()
+        self.brig3 = User.objects.get(username='brigadir3')
         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(1)
-        
+
     def test_handler_model_exception(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.brig3)
         location = Location.objects.filter(sowAndPigletsCell__number=1).first()
         piglets = piglets_testing.create_from_sow_farrow(self.tour1, location)
 
