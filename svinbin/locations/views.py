@@ -2,6 +2,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -12,6 +13,7 @@ import staff.testing_utils as staff_testing
 from locations.models import Location, Section
 from locations import serializers
 from locations.filters import LocationFilter, SectionFilter
+from core.permissions import ReadOrAdminOnlyPermissions
 
 
 class CreateWorkshopsView(APIView):
@@ -30,6 +32,7 @@ class LocationViewSet(viewsets.ModelViewSet):
     queryset = Location.objects.all()
     serializer_class = serializers.LocationCellSerializer
     filter_class = LocationFilter
+    permission_classes = [IsAuthenticated, ReadOrAdminOnlyPermissions]
 
     def list(self, request):
         queryset = self.filter_queryset(self.get_queryset())
@@ -71,3 +74,4 @@ class SectionViewSet(viewsets.ModelViewSet):
     queryset = Section.objects.all().select_related('location')
     serializer_class = serializers.SectionSerializer
     filter_class = SectionFilter
+    permission_classes = [IsAuthenticated, ReadOrAdminOnlyPermissions]

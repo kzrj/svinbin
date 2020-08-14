@@ -26,10 +26,10 @@ from reports import views as reports_views
 router = routers.DefaultRouter()
 
 # transactions
-router.register(r'transactions/sowtransactions', transaction_views.SowTransactionsViewSet,
-    basename='sowtransactions')
-router.register(r'transactions/pigletstransactions', transaction_views.PigletsTransactionsViewSet,
-    basename='pigletstransactions')
+# router.register(r'transactions/sowtransactions', transaction_views.SowTransactionsViewSet,
+#     basename='sowtransactions')
+# router.register(r'transactions/pigletstransactions', transaction_views.PigletsTransactionsViewSet,
+#     basename='pigletstransactions')
 
 # pigs
 router.register(r'sows', sows_views.SowViewSet, basename='sows')
@@ -58,8 +58,8 @@ router.register(r'tours', tours_views.TourViewSet, \
  basename='tours')
 
 # users
-router.register(r'users', staff_views.UsersViewSet, \
- basename='users')
+# router.register(r'users', staff_views.UsersViewSet, \
+#  basename='users')
 
 # by workshops
 # workshop one two

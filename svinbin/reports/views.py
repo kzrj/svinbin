@@ -2,6 +2,7 @@
 from django.db.models import CharField, Value
 from django.utils import timezone
 from django.http import HttpResponse
+from rest_framework.permissions import IsAuthenticated
 
 from rest_framework import viewsets, views
 from rest_framework.response import Response
@@ -24,6 +25,7 @@ from piglets.models import Piglets
 from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer, \
     StartDateEndDateSerializer
 from reports.filters import ReportDateFilter
+from core.permissions import ReadOrAdminOnlyPermissions
 
 
 class TourReportViewSet(viewsets.ModelViewSet):
@@ -41,6 +43,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
 
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
+    permission_classes = [ReadOrAdminOnlyPermissions]
 
 
 class ReportDateViewSet(viewsets.ModelViewSet):
@@ -64,6 +67,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
     serializer_class = ReportDateSerializer
     filter_class = ReportDateFilter
+    permission_classes = [ReadOrAdminOnlyPermissions]
 
     def list(self, request):
         queryset = self.filter_queryset(self.queryset)
