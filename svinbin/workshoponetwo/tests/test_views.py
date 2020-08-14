@@ -80,6 +80,18 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.assertEqual(response.data['sow']['status'], 'Брак')
         self.client.logout()
 
+    def test_culling_brig2(self):
+        self.client.force_authenticate(user=self.brig2)
+        sow = sows_testing.create_sow_and_put_in_workshop_one()
+        semination_employee = staff_testing.create_employee()
+
+        response = self.client.post('/api/workshoponetwo/sows/%s/culling/' %
+          sow.pk, {'culling_type': 'padej', 'reason': 'test reason', 'weight': 150})
+
+        self.assertEqual(response.data['culling']['reason'], 'test reason')
+        self.assertEqual(response.data['sow']['status'], 'Брак')
+        self.client.logout()
+
     def test_get_one(self):
         self.client.force_authenticate(user=self.brig1)
         sow = sows_testing.create_sow_and_put_in_workshop_one()
@@ -150,6 +162,18 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.assertEqual(response.data['sow']['status'], 'Аборт')
         self.client.logout()
 
+    def test_abortion_brig2(self):
+        self.client.force_authenticate(user=self.brig2)        
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()        
+        Semination.objects.create_semination(sow=sow1, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow=sow1,
+         initiator=None, result=True, days=30)
+
+        response = self.client.post('/api/workshoponetwo/sows/%s/abortion/' % sow1.pk)
+        self.assertEqual(response.data['sow']['status'], 'Аборт')
+        self.client.logout()
+
     def test_double_semination(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         self.client.force_authenticate(user=self.brig1)
@@ -207,6 +231,14 @@ class WS12SowViewSetPermissionsTest(APITestCase):
 
     def test_move_to_permissions_200(self):
         self.client.force_authenticate(user=self.brig1)
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        response = self.client.post('/api/workshoponetwo/sows/%s/move_to/' % sow1.pk,
+         {'location': self.loc_ws2})
+        self.assertEqual(response.status_code, 200)
+        self.client.logout()
+
+    def test_move_to_permissions_200_br2(self):
+        self.client.force_authenticate(user=self.brig2)
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         response = self.client.post('/api/workshoponetwo/sows/%s/move_to/' % sow1.pk,
          {'location': self.loc_ws2})

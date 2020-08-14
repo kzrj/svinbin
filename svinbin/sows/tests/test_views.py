@@ -101,9 +101,6 @@ class SowViewSetTest(APITestCase):
         self.assertEqual(response.data['tours_info'][1]['ultrasounds'][0]['result'], False)
         self.client.logout()
 
-        response = self.client.get('/api/sows/%s/' % sow.pk)
-        self.assertEqual(response.status_code, 401)
-
     def test_status_title_in_not_in(self):
         self.client.force_authenticate(user=self.brig1)
 
@@ -173,9 +170,6 @@ class SowViewSetTest(APITestCase):
                 True)
 
         self.client.logout()
-
-        response = self.client.get('/api/sows/?status_title_not_in=Осеменена 1&status_title_not_in=Супорос 35')
-        self.assertEqual(response.status_code, 401)
 
     def test_to_seminate(self):
         self.client.force_authenticate(user=self.brig1)
