@@ -229,24 +229,48 @@ class BoarViewSetTest(APITestCase):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         sows_testing.create_boars()
-        self.user = staff_testing.create_employee()
+        staff_testing.create_svinbin_users()
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+
+        self.loc_ws1 = Location.objects.get(workshop__number=1)
+        self.loc_ws2 = Location.objects.get(workshop__number=2)
+
+        self.brig1 = User.objects.get(username='brigadir1')
+        self.brig2 = User.objects.get(username='brigadir2')
+        self.brig3 = User.objects.get(username='brigadir3')
         
     def test_get_boars(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.brig1)
         response = self.client.get('/api/boars/')
         self.assertEqual(response.data['count'], 2)
+        self.client.logout()
 
     def test_culling_boars(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.brig1)
         boar = Boar.objects.all().first()
         response = self.client.post('/api/boars/%s/culling/' % boar.pk, 
             {'culling_type': 'padej', 'reason': 'test reason', 'weight': 100})
         self.assertEqual(response.data['message'], f"Выбраковка прошла успешно. Хряк №{boar.birth_id}.")
         boar.refresh_from_db()
         self.assertEqual(boar.active, False)
+        self.client.logout()
+
+    def test_culling_boars_401(self):
+        boar = Boar.objects.all().first()
+        response = self.client.post('/api/boars/%s/culling/' % boar.pk, 
+            {'culling_type': 'padej', 'reason': 'test reason', 'weight': 100})
+        self.assertEqual(response.status_code, 401)
+
+    def test_culling_boars_403(self):
+        self.client.force_authenticate(user=self.brig3)
+        boar = Boar.objects.all().first()
+        response = self.client.post('/api/boars/%s/culling/' % boar.pk, 
+            {'culling_type': 'padej', 'reason': 'test reason', 'weight': 100})
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
 
     def test_create_boars(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.brig1)
         breed = BoarBreed.objects.all().first()
         response = self.client.post('/api/boars/', {'birth_id': 123, 'breed': breed.pk})
         self.assertEqual(response.data['message'], f"Хряк №123 создан.")
@@ -254,14 +278,43 @@ class BoarViewSetTest(APITestCase):
         boar = Boar.objects.filter(birth_id='123').first()
         self.assertEqual(boar.birth_id, '123')
         self.assertEqual(boar.breed.title, 'first breed')
+        self.client.logout()
 
-    def test_create_boars(self):
-        self.client.force_authenticate(user=self.user)
+    def test_create_boars_401(self):
+        breed = BoarBreed.objects.all().first()
+        response = self.client.post('/api/boars/', {'birth_id': 123, 'breed': breed.pk})
+        self.assertEqual(response.status_code, 401)
+
+    def test_create_boars_403(self):
+        self.client.force_authenticate(user=self.brig3)
+        breed = BoarBreed.objects.all().first()
+        response = self.client.post('/api/boars/', {'birth_id': 123, 'breed': breed.pk})
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
+
+    def test_semen_boar(self):
+        self.client.force_authenticate(user=self.brig1)
         boar = Boar.objects.all().first()
         response = self.client.post('/api/boars/%s/semen_boar/' % boar.pk,
          {'a': 1000, 'b': 1, 'd': 50, 'morphology_score': 1, 'final_motility_score': 50,
             'date': date(2020, 7, 1)})
 
-        print(response.data)
         self.assertEqual(response.data['message'], f"Запись создана. Хряк №{boar.birth_id}.")
+        self.client.logout()
+
+    def test_semen_boar_401(self):
+        boar = Boar.objects.all().first()
+        response = self.client.post('/api/boars/%s/semen_boar/' % boar.pk,
+         {'a': 1000, 'b': 1, 'd': 50, 'morphology_score': 1, 'final_motility_score': 50,
+            'date': date(2020, 7, 1)})
+        self.assertEqual(response.status_code, 401)
+
+    def test_semen_boar_403(self):
+        self.client.force_authenticate(user=self.brig3)
+        boar = Boar.objects.all().first()
+        response = self.client.post('/api/boars/%s/semen_boar/' % boar.pk,
+         {'a': 1000, 'b': 1, 'd': 50, 'morphology_score': 1, 'final_motility_score': 50,
+            'date': date(2020, 7, 1)})
+        self.assertEqual(response.status_code, 403)
+        self.client.logout()
         
