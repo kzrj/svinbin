@@ -4,6 +4,7 @@ from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 import piglets.serializers as piglets_serializers
 import piglets_events.serializers as piglets_events_serializers
@@ -17,12 +18,26 @@ import transactions.models as transactions_models
 import locations.models as locations_models
 
 from piglets.filters import PigletsFilter
+from core.permissions import ObjAndUserSameLocationPermissions, WS3Permissions, ReadOrAdminOnlyPermissions
 
 
 class PigletsViewSet(viewsets.ModelViewSet):
     queryset = piglets_models.Piglets.objects.all()
     serializer_class = piglets_serializers.PigletsSerializer
     filter_class = PigletsFilter
+    permission_classes = [IsAuthenticated, ObjAndUserSameLocationPermissions]
+
+    # if overwrite get_permissions then permissions on actions will not work
+    
+    # def get_permissions(self):
+    #     if self.action == 'list':
+    #         permission_classes = [IsAuthenticated]
+    #     elif self.action == 'create' or self.action == 'delete' or self.action == 'put' \
+    #         or self.action == 'patch':
+    #         permission_classes = [ReadOrAdminOnlyPermissions]
+    #     else:
+    #         permission_classes = [IsAuthenticated, ObjAndUserSameLocationPermissions]
+    #     return [permission() for permission in permission_classes]
 
     def list(self, request):
         queryset = self.filter_queryset(
@@ -38,7 +53,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = piglets_serializers.PigletsSimpleSerializer(queryset, many=True)
         return Response(serializer.data)
 
-    @action(methods=['post'], detail=False)
+    @action(methods=['post'], detail=False, permission_classes=[IsAuthenticated, WS3Permissions])
     def create_from_merging_list_and_move_to_ws4(self, request):
         serializer = piglets_serializers.MergeFromListSerializer(data=request.data)
         if serializer.is_valid():
@@ -204,7 +219,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=True)
+    @action(methods=['post'], detail=True, permission_classes=[ReadOrAdminOnlyPermissions])
     def recount_piglets(self, request, pk=None):        
         serializer = piglets_events_serializers.RecountPigletsSerializer(data=request.data)
         if serializer.is_valid():
@@ -225,7 +240,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-    @action(methods=['post'], detail=True)
+    @action(methods=['post'], detail=True, permission_classes=[IsAuthenticated, WS3Permissions])
     def create_gilt(self, request, pk=None):        
         serializer = sows_serializers.GiltCreateSerializer(data=request.data)
         if serializer.is_valid():

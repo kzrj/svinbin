@@ -40,10 +40,10 @@ router.register(r'boar_breed', sows_views.BoarBreedViewSet, basename='boar_breed
 router.register(r'piglets', piglets_views.PigletsViewSet, basename='piglets')
 
 # events
-router.register(r'sows_events/seminations', sows_events_views.SeminationViewSet, basename='seminations')
-router.register(r'sows_events/ultrasounds', sows_events_views.UltrasoundViewSet, basename='ultrasounds')
-router.register(r'sows_events/farrows', sows_events_views.SowFarrowViewSet, basename='farrows')
-router.register(r'sows_events/spec_uboi', sows_events_views.CullingSowViewSet, basename='spec_uboi')
+# router.register(r'sows_events/seminations', sows_events_views.SeminationViewSet, basename='seminations')
+# router.register(r'sows_events/ultrasounds', sows_events_views.UltrasoundViewSet, basename='ultrasounds')
+# router.register(r'sows_events/farrows', sows_events_views.SowFarrowViewSet, basename='farrows')
+# router.register(r'sows_events/spec_uboi', sows_events_views.CullingSowViewSet, basename='spec_uboi')
 
 router.register(r'boar_events/semen', sows_events_views.SemenBoarViewSet, basename='semen_boar')
 

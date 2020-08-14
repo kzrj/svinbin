@@ -21,6 +21,7 @@ class WorkShopEmployee(CoreModel):
 
     is_officer = models.BooleanField(default=False)
     is_seminator = models.BooleanField(default=False)
+    is_admin = models.BooleanField(default=False)
 
     objects = WorkShopEmployeeModelManager()
 

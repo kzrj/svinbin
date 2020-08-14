@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 from core import import_farm
 
@@ -27,9 +28,12 @@ import tours.models as tours_models
 import staff.models as staff_models
 
 from sows.views import WorkShopSowViewSet
+from core.permissions import ObjAndUserSameLocationPermissions, ReadOrAdminOnlyPermissions, WS12Permissions
     
 
 class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
+    permission_classes = [IsAuthenticated, WS12Permissions]
+
     @action(methods=['post'], detail=True)
     def assing_farm_id(self, request, pk=None):
         sow = self.get_object()

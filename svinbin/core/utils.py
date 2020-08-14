@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 
 from django.core.exceptions import ValidationError as DjangoValidationError
 from rest_framework.exceptions import ValidationError as DRFValidationError
+from rest_framework.exceptions import PermissionDenied, NotAuthenticated
 
 from rest_framework import status, exceptions
 from rest_framework.views import exception_handler as drf_exception_handler
@@ -39,6 +40,11 @@ class CustomValidation(exceptions.APIException):
 
 
 def custom_exception_handler(exc, context):
+    if isinstance(exc, PermissionDenied):
+        exc = PermissionDenied(detail={'message': 'Ошибка доступа. У вас нет прав.'})
+
+    if isinstance(exc, NotAuthenticated):
+        exc = NotAuthenticated(detail={'message': 'Ошибка доступа. Вы не авторизованы'})
     
     if isinstance(exc, CustomValidation):
         field = list(exc.detail.keys())[0]

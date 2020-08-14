@@ -5,6 +5,7 @@ from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 import sows.serializers as sows_serializers
 import sows_events.serializers as sows_events_serializers
@@ -19,11 +20,15 @@ import tours.models as tours_models
 
 from sows.filters import SowFilter, BoarFilter
 
+from core.permissions import ObjAndUserSameLocationPermissions, WS3Permissions, ReadOrAdminOnlyPermissions,\
+  WS12Permissions
+
 
 class SowViewSet(viewsets.ModelViewSet):
     queryset = sows_models.Sow.objects.all()
     serializer_class = sows_serializers.SowSerializer
     filter_class = SowFilter
+    permission_classes = [IsAuthenticated, ObjAndUserSameLocationPermissions]
 
     def retrieve(self, request, pk=None):
         sow = self.get_object()
@@ -149,6 +154,7 @@ class BoarViewSet(viewsets.ModelViewSet):
     queryset = sows_models.Boar.objects.filter(active=True)
     serializer_class = sows_serializers.BoarSerializer
     filter_class = BoarFilter
+    permission_classes = [IsAuthenticated, WS12Permissions]
 
     def create(self, request):
         serializer = sows_serializers.BoarCreateSerializer(data=request.data)
@@ -214,3 +220,4 @@ class BoarViewSet(viewsets.ModelViewSet):
 class BoarBreedViewSet(viewsets.ModelViewSet):
     queryset = sows_models.BoarBreed.objects.all()
     serializer_class = sows_serializers.BoarBreedSerializer
+    permission_classes = [IsAuthenticated, ReadOrAdminOnlyPermissions]

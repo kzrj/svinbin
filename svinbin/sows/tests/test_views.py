@@ -16,6 +16,7 @@ import staff.testing_utils as staff_testing
 import piglets.testing_utils as piglets_testing
 
 from locations.models import Location
+from tours.models import Tour
 from transactions.models import SowTransaction
 from sows_events.models import Ultrasound, Semination, SowFarrow, UltrasoundType
 from sows.models import Boar, Sow, BoarBreed
@@ -29,11 +30,40 @@ class SowViewSetTest(APITestCase):
         sows_testing.create_boars()
         sows_events_testing.create_types()
         piglets_testing.create_piglets_statuses()
+        staff_testing.create_svinbin_users()
         self.user = staff_testing.create_employee()
         self.boar = Boar.objects.all().first()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.tour3 = Tour.objects.get_or_create_by_week_in_current_year(week_number=3)
+        self.tour4 = Tour.objects.get_or_create_by_week_in_current_year(week_number=4)
+
+        self.loc_ws1 = Location.objects.get(workshop__number=1)
+        self.loc_ws2 = Location.objects.get(workshop__number=2)
+
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.loc_ws3_sec1 = Location.objects.get(section__workshop__number=3, section__number=1)
+        self.loc_ws3_sec2 = Location.objects.get(section__workshop__number=3, section__number=2)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_ws4_cell1 = Location.objects.filter(pigletsGroupCell__isnull=False)[0]
+        self.loc_ws4_cell2 = Location.objects.filter(pigletsGroupCell__isnull=False)[1]
+
+        self.loc_ws8 = Location.objects.get(workshop__number=8)
+
+        self.loc_ws5 = Location.objects.get(workshop__number=5)
+        self.loc_ws6 = Location.objects.get(workshop__number=6)
+        self.loc_ws7 = Location.objects.get(workshop__number=7)
+
+        self.brig1 = User.objects.get(username='brigadir1')
+        self.brig2 = User.objects.get(username='brigadir2')
+        self.brig3 = User.objects.get(username='brigadir3')
+        self.brig4 = User.objects.get(username='brigadir4')
+        self.brig5 = User.objects.get(username='brigadir5')
         
     def test_get_sow(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.brig5)
         sow = sows_testing.create_sow_and_put_in_workshop_one()
         boar = Boar.objects.all().first()
 
@@ -69,10 +99,13 @@ class SowViewSetTest(APITestCase):
         Ultrasound.objects.create_ultrasound(sow, self.user, False)
         response = self.client.get('/api/sows/%s/' % sow.pk)
         self.assertEqual(response.data['tours_info'][1]['ultrasounds'][0]['result'], False)
+        self.client.logout()
 
+        response = self.client.get('/api/sows/%s/' % sow.pk)
+        self.assertEqual(response.status_code, 401)
 
     def test_status_title_in_not_in(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.brig1)
 
         # not seminated sow
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
@@ -139,8 +172,13 @@ class SowViewSetTest(APITestCase):
                 result_sow['id'] in [sow1.pk, seminated_sow2.pk, seminated_sow3.pk, seminated_sow5.pk],
                 True)
 
+        self.client.logout()
+
+        response = self.client.get('/api/sows/?status_title_not_in=Осеменена 1&status_title_not_in=Супорос 35')
+        self.assertEqual(response.status_code, 401)
+
     def test_to_seminate(self):
-        self.client.force_authenticate(user=self.user)
+        self.client.force_authenticate(user=self.brig1)
 
         # not seminated sow
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
@@ -182,6 +220,7 @@ class SowViewSetTest(APITestCase):
             self.assertEqual(
                 result_sow['id'] in [sow1.pk, seminated_sow5.pk],
                 True)
+        self.client.logout()
 
 
 class BoarViewSetTest(APITestCase):

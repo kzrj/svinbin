@@ -4,6 +4,7 @@ from django.utils import timezone
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 
 from workshopthree import serializers
 from sows import serializers as sows_serializers
@@ -14,9 +15,12 @@ from sows_events import models as sows_events_models
 from transactions.models import SowTransaction, PigletsTransaction
 
 from sows.views import WorkShopSowViewSet
+from core.permissions import ObjAndUserSameLocationPermissions, WS3Permissions, ReadOrAdminOnlyPermissions
 
 
 class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
+    permission_classes = [IsAuthenticated, WS3Permissions]
+
     @action(methods=['post'], detail=True)
     def sow_farrow(self, request, pk=None):
         serializer = sows_events_serializers.CreateSowFarrowSerializer(data=request.data)
