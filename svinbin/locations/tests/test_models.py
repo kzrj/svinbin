@@ -118,6 +118,8 @@ class LocationsTest(TransactionTestCase):
         with self.assertNumQueries(2):
             data = Location.objects.all().gen_sections_pigs_count_dict()
             bool(data)
+            # 70p-10p from farrows + 94p from inits + 7s = 161
+            self.assertEqual(data['ws_total'], 161)
 
     def test_add_pigs_count_by_sections(self):
 

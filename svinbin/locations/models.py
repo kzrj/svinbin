@@ -135,10 +135,16 @@ class LocationQuerySet(models.QuerySet):
             .add_pigs_count_by_workshop() \
             .add_sows_count_by_workshop()
 
+        count_all = 0
+
         for ws in workshops:
             data['workshops'][f'ws{ws.workshop.number}'] = {}
             data['workshops'][f'ws{ws.workshop.number}']['pigs_count'] = ws.pigs_count
-            data['workshops'][f'ws{ws.workshop.number}']['sows_count'] = ws.sows_count              
+            data['workshops'][f'ws{ws.workshop.number}']['sows_count'] = ws.sows_count
+            count_all += ws.pigs_count if ws.pigs_count else 0
+            count_all += ws.sows_count if ws.sows_count else 0
+
+        data['ws_total'] = count_all
 
         return data
 
