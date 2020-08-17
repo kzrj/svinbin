@@ -82,21 +82,28 @@ class LocationQuerySet(models.QuerySet):
                 )
             )
 
-    def add_sows_count_by_sections(self):        
+    # def get_all_locations_in_section(self, section):
+    #     return self.all().filter(
+    #         Q(Q(section=section) |
+    #           Q(sowAndPigletsCell__section=section)))
+
+    def add_sows_count_by_sections(self):       
+        alive_sows = Count('sow', filter=Q(sow__alive=True))
         subquery = Location.objects.all().filter(
             Q(Q(section=OuterRef('section')) |
               Q(sowAndPigletsCell__section=OuterRef('section')))) \
                         .values('workshop') \
-                        .annotate(all=Count('sow'))\
+                        .annotate(all=alive_sows)\
                         .values('all')
 
         return self.annotate(sows_count=models.Subquery(subquery, output_field=models.IntegerField()))
 
-    def add_sows_count_by_workshop(self):        
+    def add_sows_count_by_workshop(self):     
+        alive_sows = Count('sow', filter=Q(sow__alive=True))   
         subquery = self.get_workshop_location(OuterRef('workshop')) \
                         .annotate(flag=Value(0)) \
                         .values('flag') \
-                        .annotate(all=Count('sow'))\
+                        .annotate(all=alive_sows)\
                         .values('all')
 
         return self.annotate(sows_count=models.Subquery(subquery, output_field=models.IntegerField()))
@@ -116,10 +123,12 @@ class LocationQuerySet(models.QuerySet):
 
         for sec in secs:
             if hasattr(sec, 'pigs_count'):
-                data['sections'][f'sec_{sec.section.number}'][f'ws{sec.section.workshop.number}_pigs_count'] = sec.pigs_count
+                data['sections'][f'sec_{sec.section.number}'][f'ws{sec.section.workshop.number}_pigs_count'] \
+                    = sec.pigs_count
 
             if hasattr(sec, 'sows_count'):
-                data['sections'][f'sec_{sec.section.number}'][f'ws{sec.section.workshop.number}_sows_count'] = sec.sows_count
+                data['sections'][f'sec_{sec.section.number}'][f'ws{sec.section.workshop.number}_sows_count'] \
+                    = sec.sows_count
 
         workshops = Location.objects.all().filter(workshop__isnull=False) \
             .select_related('workshop') \

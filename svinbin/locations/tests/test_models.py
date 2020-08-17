@@ -94,14 +94,25 @@ class LocationsTest(TransactionTestCase):
             serializer = SectionSerializer(data, many=True)
             serializer.data
 
+    # def test_get_all_locations_in_section(self):
+    #     Location.objects.get_all_locations_in_section()
+
     def test_add_sows_count_by_sections(self):
+        location8 = Location.objects.filter(sowAndPigletsCell__number=8).first()
+        sow8 = sows_testing.create_sow_with_semination_usound(location=location8, week=5)
+
+        location9 = Location.objects.filter(sowAndPigletsCell__number=9).first()
+        sow9 = sows_testing.create_sow_with_semination_usound(location=location9, week=5)
+        sow9.alive = False
+        sow9.save()
+
         with self.assertNumQueries(1):
             locs = Location.objects \
                 .filter(section__workshop__number=3, section__isnull=False) \
                 .add_sows_count_by_sections() 
 
             bool(locs)
-            self.assertEqual(locs[0].sows_count, 7)
+            self.assertEqual(locs[0].sows_count, 8)
 
     def test_gen_sections_pigs_count_dict(self):
         with self.assertNumQueries(2):
@@ -119,6 +130,14 @@ class LocationsTest(TransactionTestCase):
             self.assertEqual(locs[0].pigs_count, 60)
 
     def test_add_pigs_count_by_workshop(self):
+        location8 = Location.objects.filter(sowAndPigletsCell__number=8).first()
+        sow8 = sows_testing.create_sow_with_semination_usound(location=location8, week=5)
+
+        location9 = Location.objects.filter(sowAndPigletsCell__number=9).first()
+        sow9 = sows_testing.create_sow_with_semination_usound(location=location9, week=5)
+        sow9.alive = False
+        sow9.save()
+
         with self.assertNumQueries(1):
             locs = Location.objects \
                 .filter(workshop__isnull=False) \
@@ -129,4 +148,4 @@ class LocationsTest(TransactionTestCase):
             self.assertEqual(locs[0].pigs_count, None)
             self.assertEqual(locs[0].sows_count, 0)
             self.assertEqual(locs[2].pigs_count, 60)
-            self.assertEqual(locs[2].sows_count, 7)
+            self.assertEqual(locs[2].sows_count, 8)
