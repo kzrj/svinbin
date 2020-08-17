@@ -56,7 +56,7 @@ class SowFilter(filters.FilterSet):
 
     not_in_tour = filters.BooleanFilter(field_name='tour', lookup_expr='isnull')
 
-    include_not_alive = filters.BooleanFilter(field_name='alive')
+    include_not_alive = filters.BooleanFilter(field_name='alive', method='filter_include_not_alive')
 
     def filter_by_section(self, queryset, name, value):
         return queryset.filter(location__section__pk=value)
