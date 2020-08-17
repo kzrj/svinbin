@@ -25,7 +25,7 @@ from core.permissions import ObjAndUserSameLocationPermissions, WS3Permissions, 
 
 
 class SowViewSet(viewsets.ModelViewSet):
-    queryset = sows_models.Sow.objects.all()
+    queryset = sows_models.Sow.objects.get_queryset_with_not_alive()
     serializer_class = sows_serializers.SowSerializer
     filter_class = SowFilter
     permission_classes = [ObjAndUserSameLocationPermissions]
