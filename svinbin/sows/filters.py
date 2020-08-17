@@ -81,7 +81,7 @@ class SowFilter(filters.FilterSet):
     def filter_include_not_alive(self, queryset, name, value):
         if value:
             print(queryset)
-            queryset = Sow.objects.get_queryset_with_not_alive().filter(pk__in=queryset)
+            queryset = Sow.objects.get_queryset_with_not_alive()
             print(queryset)
             print('___________')
         return queryset
