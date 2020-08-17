@@ -79,7 +79,8 @@ class SowFilter(filters.FilterSet):
         return queryset.filter(location__in=ws_locs)
 
     def filter_include_not_alive(self, queryset, name, value):
-        return queryset.filter(alive=value)
+        queryset = Sow.objects.get_queryset_with_not_alive(pk__in=queryset)
+        return queryset
         # get_queryset_with_not_alive
 
     class Meta:
