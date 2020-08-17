@@ -56,7 +56,7 @@ class SowFilter(filters.FilterSet):
 
     not_in_tour = filters.BooleanFilter(field_name='tour', lookup_expr='isnull')
 
-    include_not_alive = filters.BooleanFilter()
+    include_not_alive = filters.BooleanFilter(field_name='alive')
 
     def filter_by_section(self, queryset, name, value):
         return queryset.filter(location__section__pk=value)
@@ -78,9 +78,12 @@ class SowFilter(filters.FilterSet):
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=value)
         return queryset.filter(location__in=ws_locs)
 
-    def filter_include_not_alive(self, queryset, value):
+    def filter_include_not_alive(self, queryset, name, value):
         if value:
+            print(queryset)
             queryset = Sow.objects.get_queryset_with_not_alive(pk__in=queryset)
+            print(queryset)
+            print('___________')
         return queryset
         # get_queryset_with_not_alive
 
