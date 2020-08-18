@@ -88,7 +88,8 @@ class WorkShopSowViewSet(SowViewSet):
             return Response(
                 {
                     "transaction": transactions_serializers.SowTransactionSerializer(transaction).data,
-                    "sow": sows_serializers.SowSerializer(sow).data, 
+                    "sow": sows_serializers.SowSerializer(sow).data,
+                    "message": f'Свиноматка {sow.farm_id} переведена'
                 },
                 status=status.HTTP_200_OK)
         else:
@@ -110,6 +111,7 @@ class WorkShopSowViewSet(SowViewSet):
                 {
                     "culling": sows_events_serializers.CullingSowSerializer(culling).data,
                     "sow": sows_serializers.SowSerializer(sow).data, 
+                    "message": f'Свиноматка {sow.farm_id} выбракована'
                 },
                 status=status.HTTP_200_OK)
         else:
@@ -166,7 +168,7 @@ class BoarViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                     "message": f"Хряк №{boar.birth_id} создан.",
-                    "boar": sows_serializers.BoarSerializer(boar).data
+                    "boar": sows_serializers.BoarSerializer(boar).data,
                 },
                 status=status.HTTP_200_OK)
         else:

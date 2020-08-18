@@ -44,7 +44,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
             return Response(
                 {
                     "sow": sows_serializers.SowSerializer(sow).data,
-                    "message": 'ok',
+                    "message": f'Свиноматка {sow.farm_id} помечена.',
                 },
                 status=status.HTTP_200_OK)
         else:
@@ -63,7 +63,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                 {
                     "semination": sows_events_serializers.SeminationSerializer(semination).data,
                     "sow": sows_serializers.SowSerializer(sow).data, 
-                    "message": "ok"
+                    "message": f'Свиноматка {sow.farm_id} осеменена.',
                 },
                 status=status.HTTP_200_OK)
         else:
@@ -85,7 +85,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                 {
                     "ultrasound": sows_events_serializers.UltrasoundSerializer(ultrasound).data,
                     "sow": sows_serializers.SowSerializer(sow).data, 
-                    "message": "ok"
+                    "message": f'Свиноматка {sow.farm_id} прошла УЗИ.',
                 },
                 status=status.HTTP_200_OK)
         else:
@@ -106,7 +106,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
 
             return Response(
                 {
-                    "message": "ok"
+                    "message": "Осеменение проведено."
                 },
                 status=status.HTTP_200_OK)
         else:
