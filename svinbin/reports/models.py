@@ -542,6 +542,8 @@ class ReportDateQuerySet(models.QuerySet):
         additonal_count = 0
         if ws_number == 4:
             additonal_count = 2892
+        if ws_number == 8:
+            additonal_count = 4137
 
         return self.annotate(count_piglets_at_start=ExpressionWrapper(
           additonal_count + trs_in_qnty - trs_out_qnty - culling_qnty, output_field=models.IntegerField()))
