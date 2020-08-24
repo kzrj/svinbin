@@ -540,7 +540,7 @@ class ReportDateQuerySet(models.QuerySet):
                             .values('culling_qnty')), 0)
 
         return self.annotate(count_piglets_at_start=ExpressionWrapper(
-          trs_in_qnty - trs_out_qnty - culling_qnty, output_field=models.IntegerField()))
+          2167 - trs_in_qnty - trs_out_qnty - culling_qnty, output_field=models.IntegerField()))
 
     def add_ws_weighing_in(self, ws_number):
         place = None
