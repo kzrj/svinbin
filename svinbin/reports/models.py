@@ -512,7 +512,7 @@ class ReportDateQuerySet(models.QuerySet):
                 total_piglets_vinuzhd_weight=Sum('piglets_vinuzhd_weight'),
                 )
 
-    def add_ws_count_piglets_start_day(self, ws_locs):
+    def add_ws_count_piglets_start_day(self, ws_locs, ws_number=None):
         trs_in_qnty = Coalesce(
                         Subquery(PigletsTransaction.objects \
                             .filter(date__date__lt=OuterRef('date'), to_location__in=ws_locs) \
@@ -539,8 +539,12 @@ class ReportDateQuerySet(models.QuerySet):
                             .annotate(culling_qnty=Sum('quantity')) \
                             .values('culling_qnty')), 0)
 
+        additonal_count = 0
+        if ws_number == 4:
+            additonal_count = 2892
+
         return self.annotate(count_piglets_at_start=ExpressionWrapper(
-          trs_in_qnty - trs_out_qnty - culling_qnty, output_field=models.IntegerField()))
+          additonal_count - trs_in_qnty - trs_out_qnty - culling_qnty, output_field=models.IntegerField()))
 
     def add_ws_weighing_in(self, ws_number):
         place = None

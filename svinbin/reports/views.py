@@ -149,7 +149,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
         bool(ws_locs)
         queryset = ReportDate.objects.all()\
-                            .add_ws_count_piglets_start_day(ws_locs=ws_locs) \
+                            .add_ws_count_piglets_start_day(ws_locs=ws_locs, ws_number=ws_number) \
                             .add_ws_weighing_in(ws_number=ws_number) \
                             .add_ws_piglets_trs_in_out(ws_locs=ws_locs) \
                             .add_ws_weighing_out(ws_number=ws_number) \
