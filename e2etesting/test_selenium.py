@@ -23,7 +23,7 @@ class SeleniumTestCase(unittest.TestCase):
 
     def test_login_page(self):
         self.client.get('http://46.229.212.205/')
-        driver.find_element_by_xpath('//input[@name="username"]').send_keys("test_admin1")
-        driver.find_element_by_xpath('//input[@name="password"]').send_keys("svinbin123")
-        driver.find_element_by_xpath('//div[@class="input-group"]/button').click()
+        client.find_element_by_xpath('//input[@name="username"]').send_keys("test_admin1")
+        client.find_element_by_xpath('//input[@name="password"]').send_keys("svinbin123")
+        client.find_element_by_xpath('//div[@class="input-group"]/button').click()
         print('Test text')
