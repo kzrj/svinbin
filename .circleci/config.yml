@@ -21,14 +21,14 @@ jobs:
           key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
           paths:
             - "venv"
-      # - run:
-      #     name: Running tests
-      #     command: |
-      #       . venv/bin/activate
-      #       cd svinbin
-      #       python manage.py migrate --settings=svinbin.circleci_settings
-      #       python manage.py makemigrations --no-input --settings=svinbin.circleci_settings
-      #       python manage.py test --settings=svinbin.circleci_settings --exclude-tag=with_file
+      - run:
+          name: Running tests
+          command: |
+            . venv/bin/activate
+            cd svinbin
+            python manage.py migrate --settings=svinbin.circleci_settings
+            python manage.py makemigrations --no-input --settings=svinbin.circleci_settings
+            python manage.py test --settings=svinbin.circleci_settings --exclude-tag=with_file
       - run:
           name: Running Selenium tests
           command: |
