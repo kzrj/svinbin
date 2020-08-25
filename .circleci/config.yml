@@ -37,6 +37,6 @@ jobs:
             cd e2etesting
             python test_selenium.py
             
-        - store_artifacts:
-          path: test-reports/
-          destination: python_app
+      - store_artifacts:
+        path: test-reports/
+        destination: python_app
