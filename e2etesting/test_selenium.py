@@ -17,4 +17,12 @@ from selenium import webdriver
 # print('2')
 
 
-# class SeleniumTestCase(unittest.TestCase):
+class SeleniumTestCase(unittest.TestCase):
+    def setUp(self):
+        self.client.get('http://46.229.212.205/')
+
+    def test_login_page(self):
+        driver.find_element_by_xpath('//input[@name="username"]').send_keys("test_admin1")
+        driver.find_element_by_xpath('//input[@name="password"]').send_keys("svinbin123")
+        driver.find_element_by_xpath('//div[@class="input-group"]/button').click()
+        print('Test text')

@@ -11,3 +11,4 @@ xlrd
 openpyxl
 mixer
 freezegun
+selenium
