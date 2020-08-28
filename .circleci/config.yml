@@ -35,7 +35,7 @@ jobs:
             . venv/bin/activate
             ls
             cd e2etesting
-            python -m unittest test_selenium
+          # python -m unittest test_selenium
       - store_artifacts:
           path: test-reports/
           destination: python_app
