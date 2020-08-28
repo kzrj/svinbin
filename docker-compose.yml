@@ -7,7 +7,7 @@ services:
     restart: unless-stopped
     ports:
       - "80:8080"
-      - "5432:5432"
+      - "5432"
     volumes:
       - .:/code
       - ./nginx:/etc/nginx/conf.d
@@ -19,7 +19,8 @@ services:
     restart: unless-stopped
     image: postgres:10.1-alpine
     ports: 
-      - "5432:5432"
+      # - "5432:5432"
+      - "5432"
 
   backend:
     build: .
