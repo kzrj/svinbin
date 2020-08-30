@@ -32,3 +32,8 @@ class AbortionSowAdmin(admin.ModelAdmin):
     list_display = [f.name for f in models.AbortionSow._meta.fields]
     search_fields = ['sow__farm_id']
 
+
+@admin.register(models.MarkAsGilt)
+class MarkAsGiltAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in models.MarkAsGilt._meta.fields]
+    search_fields = ['sow__farm_id']
