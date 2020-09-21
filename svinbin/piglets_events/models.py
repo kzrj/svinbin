@@ -278,7 +278,7 @@ class CullingPigletsManager(CoreModelManager):
         if not date:
             date=timezone.now()
 
-        if isinstance(date, str):       	
+        if isinstance(date, str):           
             date = datetime.datetime.strptime(date, '%Y-%m-%d')
 
         if is_it_gilt:
@@ -346,12 +346,19 @@ class RecountManager(CoreModelManager):
 
     def create_recount(self, piglets, new_quantity, comment=None, initiator=None, date=None):
         recount = self.create(piglets=piglets, quantity_before=piglets.quantity, quantity_after=new_quantity,
-            balance=new_quantity - piglets.quantity, initiator=initiator, comment=comment, date=date)
+            balance=new_quantity - piglets.quantity, initiator=initiator, comment=comment, date=date,
+            location=piglets.location)
+        
         piglets.quantity = new_quantity
+        if new_quantity == 0:
+            piglets.deactivate()
         piglets.save()
         piglets.metatour.records.recount_records_by_total_quantity(new_quantity)
         
         return recount
+
+    def sum_balances_by_locations(self, locations):
+        return self.filter(location__in=locations).aggregate(total_balance=models.Sum('balance'))['total_balance']
 
 
 class Recount(PigletsEvent):
@@ -359,6 +366,9 @@ class Recount(PigletsEvent):
     quantity_before = models.IntegerField()
     quantity_after = models.IntegerField()
     balance = models.IntegerField()
+
+    location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL, null=True, blank=True, 
+        related_name="recounts")
 
     comment = models.TextField(null=True)
 

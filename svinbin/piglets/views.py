@@ -219,7 +219,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=True, permission_classes=[ReadOrAdminOnlyPermissions])
+    @action(methods=['post'], detail=True, permission_classes=[ObjAndUserSameLocationPermissions])
     def recount_piglets(self, request, pk=None):        
         serializer = piglets_events_serializers.RecountPigletsSerializer(data=request.data)
         if serializer.is_valid():

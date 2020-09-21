@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
+from django.db import models
 
 from piglets.models import Piglets
 from piglets_events.models import (
@@ -613,6 +614,8 @@ class RecountManagerTest(TestCase):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(1)
+        self.ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
 
     def test_create_recount(self):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
@@ -629,6 +632,36 @@ class RecountManagerTest(TestCase):
         self.assertEqual(recount.quantity_before, 100)
         self.assertEqual(recount.quantity_after, 110)
         self.assertEqual(recount.balance, 10)
+        self.assertEqual(recount.location, location)
 
         piglets.refresh_from_db()
         self.assertEqual(piglets.quantity, 110)
+
+    def test_sum_balances_by_locations(self):
+        #section 1
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            quantity=10, tour=self.tour1, location=self.ws3_cells[0])
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            quantity=15, tour=self.tour1, location=self.ws3_cells[1])
+
+        # section 2
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            quantity=11, tour=self.tour1, location=self.ws3_cells[50])
+
+        recount1 = Recount.objects.create_recount(piglets=piglets1, new_quantity=9)
+        recount2 = Recount.objects.create_recount(piglets=piglets2, new_quantity=13)
+        recount3 = Recount.objects.create_recount(piglets=piglets3, new_quantity=14)
+
+        ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        self.assertEqual(
+            Recount.objects.sum_balances_by_locations(locations=ws3_locs), 0)
+
+        sec1 = Location.objects.filter(section__number=1, 
+                section__workshop__number=3).first().section
+        sec1_locs = Location.objects.all().get_locations_in_section(sec1)
+        self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec1_locs), -3)
+
+        sec2 = Location.objects.filter(section__number=2, 
+                section__workshop__number=3).first().section
+        sec2_locs = Location.objects.all().get_locations_in_section(sec2)
+        self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec2_locs), 3)

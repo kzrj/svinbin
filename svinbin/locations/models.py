@@ -82,10 +82,15 @@ class LocationQuerySet(models.QuerySet):
                 )
             )
 
-    # def get_all_locations_in_section(self, section):
-    #     return self.all().filter(
-    #         Q(Q(section=section) |
-    #           Q(sowAndPigletsCell__section=section)))
+    def get_locations_in_section(self, section):
+
+        return self.filter(
+            Q(
+              Q(section=section) |
+              Q(sowAndPigletsCell__section=section) |
+              Q(pigletsGroupCell__section=section)
+              )
+            )   
 
     def add_sows_count_by_sections(self):       
         alive_sows = Count('sow', filter=Q(sow__alive=True))
