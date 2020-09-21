@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 
 from piglets_events.models import Recount
-from locations.models import Section
+from locations.models import Section, Location
 
 
 class RecountViewSet(viewsets.ViewSet):
