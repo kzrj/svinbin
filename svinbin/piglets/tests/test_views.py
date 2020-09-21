@@ -417,7 +417,7 @@ class PigletsViewSetTest(APITestCase):
         record1 = meta_tour.records.create_record(meta_tour, tour, 60, piglets.quantity)
         record2 = meta_tour.records.create_record(meta_tour, tour2, 40, piglets.quantity)
 
-        self.client.force_authenticate(user=self.brig3)
+        self.client.force_authenticate(user=self.brig2)
         response = self.client.post('/api/piglets/%s/recount_piglets/' % piglets.pk, 
             {'new_quantity': 105, 'comment': 'xz'})
         self.assertEqual(response.status_code, 403)
