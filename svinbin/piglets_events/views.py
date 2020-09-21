@@ -16,10 +16,13 @@ class RecountViewSet(viewsets.ViewSet):
 
         ws_locations = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
         data['ws_balance'] = Recount.objects.sum_balances_by_locations(locations=ws_locations)
+        dat['sections'] = list()
 
         for section in Section.objects.filter(workshop__number=ws_number):
             sec_locations = Location.objects.all().get_locations_in_section(section=section)
-            data[f'section_{section.number}_balance'] = \
-                Recount.objects.sum_balances_by_locations(locations=sec_locations)
+            data['sections'].append(
+                {'number': section.number,
+                 'balance': Recount.objects.sum_balances_by_locations(locations=sec_locations)}
+                )
 
         return Response(data)
