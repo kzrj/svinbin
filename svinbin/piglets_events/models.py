@@ -346,7 +346,7 @@ class RecountManager(CoreModelManager):
 
     def create_recount(self, piglets, new_quantity, comment=None, initiator=None, date=None):
         recount = self.create(piglets=piglets, quantity_before=piglets.quantity, quantity_after=new_quantity,
-            balance=new_quantity - piglets.quantity, initiator=initiator, comment=comment, date=date,
+            balance=piglets.quantity - new_quantity, initiator=initiator, comment=comment, date=date,
             location=piglets.location)
         
         piglets.quantity = new_quantity
