@@ -23,5 +23,11 @@ class PigletsSplitAdmin(admin.ModelAdmin):
 
 @admin.register(models.PigletsMerger)
 class PigletsMergerAdmin(admin.ModelAdmin):
-    # search_fields = ['sow__farm_id']
+    # search_fields = ['piglets__id']
     list_display = [f.name for f in models.PigletsMerger._meta.fields]
+
+
+@admin.register(models.Recount)
+class RecountAdmin(admin.ModelAdmin):
+    search_fields = ['piglets__id']
+    list_display = [f.name for f in models.Recount._meta.fields]
