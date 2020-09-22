@@ -75,7 +75,7 @@ class CreateCullingSowPkSerializer(serializers.ModelSerializer):
 class CreateSowFarrowSerializer(serializers.ModelSerializer):
     class Meta:
         model = SowFarrow
-        fields = ['alive_quantity', 'dead_quantity', 'mummy_quantity']
+        fields = ['alive_quantity', 'dead_quantity', 'mummy_quantity', 'date']
 
 
 class SowFarrowSerializer(serializers.ModelSerializer):

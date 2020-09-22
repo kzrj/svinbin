@@ -32,7 +32,7 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
                 dead_quantity=serializer.validated_data['dead_quantity'],
                 mummy_quantity=serializer.validated_data['mummy_quantity'],
                 initiator=request.user,
-                date=timezone.now()
+                date=serializer.validated_data['date']
                 )
             
             return Response(
