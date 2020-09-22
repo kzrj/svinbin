@@ -211,7 +211,7 @@ class SowManager(CoreModelManager):
         return sow
         
     def create_bulk_sows_from_event(self, event):
-        location = Location.objects.get(workshop__number=1)
+        location = Location.objects.get(workshop__number=2)
         self.bulk_create([
             Sow(creation_event=event, location=location) 
                 for i in range(0, event.quantity)])

@@ -268,17 +268,18 @@ class PigletsViewSet(viewsets.ModelViewSet):
             piglets = self.get_object()
             to_location = locations_models.Location.objects.get(workshop__number=2)
 
-            transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
-                piglets=piglets,
-                to_location=to_location,
-                new_amount=serializer.validated_data.get('new_amount', None),
-                gilts_contains=True,
-                merge=False,
-                initiator=request.user,
-                date=timezone.now()          
-              )
+            transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
+                transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
+                    piglets=piglets,
+                    to_location=to_location,
+                    new_amount=serializer.validated_data.get('new_amount', None),
+                    gilts_contains=True,
+                    merge=False,
+                    initiator=request.user,
+                    date=timezone.now()          
+                  )
 
-            sows_events_models.PigletsToSowsEvent.objects.create_event(piglets=piglets,
+            sows_events_models.PigletsToSowsEvent.objects.create_event(piglets=moved_piglets,
              initiator=request.user, date=timezone.now())
 
             return Response(
