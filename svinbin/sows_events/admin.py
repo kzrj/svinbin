@@ -37,3 +37,15 @@ class AbortionSowAdmin(admin.ModelAdmin):
 class MarkAsGiltAdmin(admin.ModelAdmin):
     list_display = [f.name for f in models.MarkAsGilt._meta.fields]
     search_fields = ['sow__farm_id']
+
+
+@admin.register(models.AssingFarmIdEvent)
+class AssingFarmIdEventAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in models.AssingFarmIdEvent._meta.fields]
+    search_fields = ['sow__farm_id']
+
+
+@admin.register(models.PigletsToSowsEvent)
+class PigletsToSowsEventAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in models.PigletsToSowsEvent._meta.fields]
+    search_fields = ['piglets__pk']
