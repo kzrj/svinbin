@@ -73,7 +73,7 @@ class CreateCullingSowPkSerializer(serializers.ModelSerializer):
  
 
 class CreateSowFarrowSerializer(serializers.ModelSerializer):
-    date = serializers.DateTimeField(format="%Y-%m-%d")
+    date = serializers.DateTimeField(format="%Y-%m-%dT00:00")
 
     class Meta:
         model = SowFarrow
