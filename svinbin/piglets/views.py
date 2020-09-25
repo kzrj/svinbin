@@ -276,7 +276,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
                     gilts_contains=True,
                     merge=False,
                     initiator=request.user,
-                    date=timezone.now()          
+                    date=timezone.now(),
+                    allow_split_gilt=True
                   )
 
             sows_events_models.PigletsToSowsEvent.objects.create_event(piglets=moved_piglets,

@@ -35,8 +35,8 @@ class PigletsEvent(Event):
 
 
 class PigletsSplitManager(CoreModelManager):
-    def split_return_groups(self, parent_piglets, new_amount, gilts_to_new=False, initiator=None,
-         date=timezone.now()):
+    def split_return_groups(self, parent_piglets, new_amount, gilts_to_new=False, 
+        initiator=None, date=timezone.now(), allow_split_gilt=False):
         
         # validate
         if new_amount >= parent_piglets.quantity:
@@ -45,7 +45,8 @@ class PigletsSplitManager(CoreModelManager):
                 {new_amount} > {parent_piglets.quantity}. Группа {parent_piglets.pk}')
 
         # if gilts to new. Check parent gilts quantity should be less or equal new amount
-        if gilts_to_new and parent_piglets.gilts_quantity > new_amount:
+        if not allow_split_gilt and gilts_to_new and \
+                parent_piglets.gilts_quantity > new_amount:
             raise DjangoValidationError(message=f'new_amount должно быть больше количества ремонток \
                 в родительской группе #{parent_piglets.pk}. Клетка {parent_piglets.location.get_location}')
 
