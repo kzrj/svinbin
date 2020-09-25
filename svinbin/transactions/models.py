@@ -111,7 +111,7 @@ class PigletsTransactionManager(CoreModelManager):
         return transaction
 
     def transaction_with_split_and_merge(self, piglets, to_location, new_amount=None, gilts_contains=False,
-         reverse=False, merge=False, initiator=None, date=None):
+         reverse=False, merge=False, initiator=None, date=None, allow_split_gilt=False):
         # move second piglets from split, new_amount piglets
         split_event = None
         merge_event = None
@@ -121,7 +121,7 @@ class PigletsTransactionManager(CoreModelManager):
         if new_amount:
             piglets1, piglets2_new_amount = PigletsSplit.objects.split_return_groups( \
                 parent_piglets=piglets, new_amount=new_amount, gilts_to_new=gilts_contains,\
-                initiator=initiator)
+                initiator=initiator, allow_split_gilt=allow_split_gilt)
             
             moved_piglets = piglets2_new_amount
             stayed_piglets = piglets1
