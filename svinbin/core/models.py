@@ -4,7 +4,11 @@ from django.conf import settings
 
 
 class CoreModelManager(models.Manager):
-    pass
+    def create(self, *args, **kwargs):
+        last_pk = self.get_all().order_by('-pk').first().pk
+        kwargs['id'] = last_pk + 1
+        print(kwargs)
+        return super(PigletsManager, self).create(*args, **kwargs)
 
 
 class CoreModel(models.Model):

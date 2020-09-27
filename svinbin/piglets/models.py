@@ -70,14 +70,14 @@ class PigletsQuerySet(models.QuerySet):
 
 
 class PigletsManager(CoreModelManager):
-    def create(self, *args, **kwargs):
-        # try:
-        #     super(PigletsManager, self).create(*args, **kwargs)
-        # except:
-        last_pk = self.get_all().order_by('-pk').first().pk
-        kwargs['id'] = last_pk + 1
-        print(kwargs)
-        return super(PigletsManager, self).create(*args, **kwargs)
+    # def create(self, *args, **kwargs):
+    #     # try:
+    #     #     super(PigletsManager, self).create(*args, **kwargs)
+    #     # except:
+    #     last_pk = self.get_all().order_by('-pk').first().pk
+    #     kwargs['id'] = last_pk + 1
+    #     print(kwargs)
+    #     return super(PigletsManager, self).create(*args, **kwargs)
 
     def get_queryset(self):
         return PigletsQuerySet(self.model, using=self._db).select_related('metatour').active()
