@@ -75,7 +75,7 @@ class PigletsManager(CoreModelManager):
             super(PigletsManager, self).create(*args, **kwargs)
         except:
             last_pk = self.get_all().order_by('-pk').first().pk
-            kwargs['id'] = last_pk + 1
+            # kwargs['id'] = last_pk + 1
             print(kwargs)
             super(PigletsManager, self).create(*args, **kwargs)
 
