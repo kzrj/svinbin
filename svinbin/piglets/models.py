@@ -70,7 +70,7 @@ class PigletsQuerySet(models.QuerySet):
 
 
 class PigletsManager(CoreModelManager):
-    def create(self, *args, kwargs):
+    def create(self, *args, **kwargs):
         try:
             super(PigletsManager, self).create(*args, **kwargs)
         except:
