@@ -126,7 +126,10 @@ class PigletsSplit(PigletsEvent):
 
 class PigletsMergerManager(CoreModelManager):
     def create_merger_return_group(self, parent_piglets, new_location, initiator=None,
-         date=timezone.now()):
+         date=None):
+        if not date:
+            date=timezone.now()
+
         if isinstance(parent_piglets, list):
             if isinstance(parent_piglets[0], int):
                 parent_piglets = Piglets.objects.filter(pk__in=parent_piglets)
@@ -178,7 +181,9 @@ class PigletsMergerManager(CoreModelManager):
             return self.create_merger_return_group(parent_piglets=piglets, new_location=location,
                         initiator=initiator)
 
-    def create_from_merging_list(self, merging_list, new_location, initiator=None, date=timezone.now()):
+    def create_from_merging_list(self, merging_list, new_location, initiator=None, date=None):
+        if not date:
+            date=timezone.now()
         # parse and parentpiglets
         parent_piglets_ids = list()
         for merging_record in merging_list:
@@ -198,13 +203,6 @@ class PigletsMergerManager(CoreModelManager):
                     date=date)
                 weaning_piglets = merging_piglets
                 parent_piglets_ids.append(merging_piglets.id)
-
-            # sow weaning
-            # if hasattr(piglets, 'farrow') :
-            #     sow = piglets.farrow.sow
-            #     if sow.status.title == 'Опоросилась':
-            #         sow.weaningsow_set.create_weaning(sow=sow, piglets=weaning_piglets, initiator=initiator,
-            #             date=date)
 
             sow_in_cell = weaning_piglets.location.sow_set.all().first()
             if sow_in_cell:
