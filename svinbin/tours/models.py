@@ -269,7 +269,9 @@ class TourManager(CoreModelManager):
         start_week_number_pre = str(year) + '-W' + str(week_number)
         return datetime.datetime.strptime(start_week_number_pre + '-1', "%Y-W%W-%w")
 
-    def get_or_create_by_week(self, week_number, year, start_date=timezone.now()):
+    def get_or_create_by_week(self, week_number, year, start_date=None):
+        if not start_date:
+            start_date=timezone.now()
         tour = self.get_queryset().filter(week_number=week_number, year=year).first()
         if not tour:
             tour = self.create(start_date=start_date, week_number=week_number, year=year)

@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.decorators import action
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -68,6 +69,55 @@ class LocationViewSet(viewsets.ModelViewSet):
 
         serializer = serializer(queryset, many=True)
         return Response(serializer.data)
+
+    @action(methods=['get'], detail=False)
+    def ws3_and_sections(self, request):
+        today = datetime.today()
+        
+        ws3 = Location.objects.filter(workshop__number=3) \
+                .select_related('workshop') \
+                .add_sows_count_by_workshop() \
+                .add_pigs_count_by_workshop() \
+                .add_pigs_count_by_workshop3_by_age(date=today) \
+                .first()
+
+        section_locs = Location.objects.filter(section__workshop__number=3,
+             section__isnull=False) \
+                .select_related('section') \
+                .add_sows_count_by_sections() \
+                .add_pigs_count_by_sections() \
+                .add_pigs_count_by_ws3_sections_by_age(date=today)
+
+        data = dict()
+        data['ws'] = {
+            'sows_count': ws3.sows_count, 
+            'sows_sup_count': ws3.sows_sup_count,
+            'pigs_count': ws3.pigs_count,
+            'count_piglets_0_7': ws3.count_piglets_0_7,
+            'count_piglets_8_14': ws3.count_piglets_8_14,
+            'count_piglets_15_21': ws3.count_piglets_15_21,
+            'count_piglets_21_28': ws3.count_piglets_21_28
+            'count_piglets_28_plus': ws3.count_piglets_28_plus
+            'gilts_count': ws3.gilts_count,
+
+            }
+
+        data['sections'] = list()
+        for section in section_locs:
+            data['sections'].append({
+                'section_number': section.number,
+                'sows_count': section.sows_count,
+                'sows_sup_count': section.sows_count,
+                'piglets_count': section.pigs_count,
+                'count_piglets_0_7': section.count_piglets_0_7,
+                'count_piglets_8_14': section.count_piglets_8_14,
+                'count_piglets_15_21': section.count_piglets_15_21,
+                'count_piglets_21_28': section.count_piglets_21_28
+                'count_piglets_28_plus': section.count_piglets_28_plus
+                'gilts_count': section.gilts_count,
+            })
+
+        return Response(data)
 
 
 class SectionViewSet(viewsets.ModelViewSet):

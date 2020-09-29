@@ -250,3 +250,9 @@ class OperationsDataView(views.APIView):
         megadict = gen_megadict(request.data)
         return Response(megadict)
         # return Response(self.pagination.get_paginated_response(data=megalist))
+
+
+# class ReportWsPopulation(viewsets.ViewSet):
+#     def ws_and_sections(self, request):
+#         ws_number = request.GET['ws_number']
+#         ws = Location.objects.filter(workshop__number=workshop_number)

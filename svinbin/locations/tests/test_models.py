@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
+
 from django.test import TransactionTestCase
 from django.db import models
 
@@ -10,6 +12,7 @@ import sows_events.utils as sows_events_testing
 from locations.models import  Location, Section
 from sows_events.models import SowFarrow
 from piglets.models import Piglets
+from tours.models import Tour
 
 from locations.serializers import (
     LocationCellSerializer, LocationSectionSerializer, SectionSerializer
@@ -22,6 +25,8 @@ class LocationsTest(TransactionTestCase):
         sows_testing.create_statuses()
         piglets_testing.create_piglets_statuses()
         sows_events_testing.create_types()
+
+        self.ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
 
         location1 = Location.objects.filter(sowAndPigletsCell__number=1).first()
         sow1 = sows_testing.create_sow_with_semination_usound(location=location1, week=1)
@@ -94,9 +99,6 @@ class LocationsTest(TransactionTestCase):
             serializer = SectionSerializer(data, many=True)
             serializer.data
 
-    # def test_get_all_locations_in_section(self):
-    #     Location.objects.get_all_locations_in_section()
-
     def test_add_sows_count_by_sections(self):
         location8 = Location.objects.filter(sowAndPigletsCell__number=8).first()
         sow8 = sows_testing.create_sow_with_semination_usound(location=location8, week=5)
@@ -131,23 +133,116 @@ class LocationsTest(TransactionTestCase):
             bool(locs)
             self.assertEqual(locs[0].pigs_count, 60)
 
-    def test_add_pigs_count_by_workshop(self):
-        location8 = Location.objects.filter(sowAndPigletsCell__number=8).first()
-        sow8 = sows_testing.create_sow_with_semination_usound(location=location8, week=5)
 
-        location9 = Location.objects.filter(sowAndPigletsCell__number=9).first()
-        sow9 = sows_testing.create_sow_with_semination_usound(location=location9, week=5)
-        sow9.alive = False
-        sow9.save()
+class LocationQsPopulationTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+        sows_events_testing.create_types()
 
-        with self.assertNumQueries(1):
-            locs = Location.objects \
-                .filter(workshop__isnull=False) \
+        self.ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
+
+        tour1 = Tour.objects.get_or_create_by_week_in_current_year(1)
+
+        sow1 = sows_testing.create_sow_with_location(location=self.ws3_cells[0])
+        sow1.change_status_to('Супорос 35')
+
+        sow2 = sows_testing.create_sow_with_location(location=self.ws3_cells[1])
+        sow2.change_status_to('Супорос 35')
+
+        sow3 = sows_testing.create_sow_with_location(location=self.ws3_cells[2])
+        sow3.change_status_to('Супорос 35')
+
+        sow4 = sows_testing.create_sow_with_location(location=self.ws3_cells[3])
+        sow4.change_status_to('Опоросилась')
+
+        sow5 = sows_testing.create_sow_with_location(location=self.ws3_cells[4])
+        sow5.change_status_to('Кормилица')
+
+        sow6 = sows_testing.create_sow_with_location(location=self.ws3_cells[50])
+        sow6.change_status_to('Кормилица')
+
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.ws3_cells[0], quantity=15,
+            gilts_quantity=0,
+            birthday=(datetime.today() - timedelta(days=1))
+            )
+
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.ws3_cells[1], quantity=16,
+            gilts_quantity=5,
+            birthday=(datetime.today() - timedelta(days=5))
+            )
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.ws3_cells[2], quantity=17,
+            gilts_quantity=5,
+            birthday=(datetime.today() - timedelta(days=8))
+            )
+
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.ws3_cells[3], quantity=18,
+            gilts_quantity=0,
+            birthday=(datetime.today() - timedelta(days=20))
+            )
+
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.ws3_cells[46], quantity=19,
+            gilts_quantity=6,
+            birthday=(datetime.today() - timedelta(days=30))
+            )
+
+    def test_add_sows_count_by_workshop(self):
+        ws3 = Location.objects.filter(workshop__number=3) \
+                .add_sows_count_by_workshop().first()
+
+        self.assertEqual(ws3.sows_count, 6,)
+        self.assertEqual(ws3.sows_sup_count, 3)
+
+    def test_add_sows_count_by_sections(self):
+        section_locs = Location.objects.filter(section__workshop__number=3,
+             section__isnull=False).add_sows_count_by_sections()
+        bool(section_locs)
+
+        self.assertEqual(section_locs[0].sows_count, 5)
+        self.assertEqual(section_locs[0].sows_sup_count, 3)
+
+        self.assertEqual(section_locs[1].sows_count, 1)
+        self.assertEqual(section_locs[1].sows_sup_count, 0)
+    
+    def test_add_pigs_count_by_workshop3_by_age(self):
+        today = datetime.today()
+        ws3 = Location.objects.filter(workshop__number=3) \
                 .add_pigs_count_by_workshop() \
-                .add_sows_count_by_workshop() \
+                .add_pigs_count_by_workshop3_by_age(date=today) \
+                .first()
 
-            bool(locs)
-            self.assertEqual(locs[0].pigs_count, None)
-            self.assertEqual(locs[0].sows_count, 0)
-            self.assertEqual(locs[2].pigs_count, 60)
-            self.assertEqual(locs[2].sows_count, 8)
+        self.assertEqual(ws3.pigs_count, (15 + 16 + 17 + 18 + 19))
+        self.assertEqual(ws3.count_piglets_0_7, (15 + 16))
+        self.assertEqual(ws3.count_piglets_8_14, 17)
+        self.assertEqual(ws3.count_piglets_15_21, 18)
+        self.assertEqual(ws3.count_piglets_28_plus, 19)
+
+        self.assertEqual(ws3.gilts_count, (5 + 5 + 6))
+
+    def test_add_pigs_count_by_ws3_sections_by_age(self):
+        today = datetime.today()
+        section_locs = Location.objects.filter(section__workshop__number=3,
+             section__isnull=False) \
+                .add_pigs_count_by_sections() \
+                .add_pigs_count_by_ws3_sections_by_age(date=today)
+
+        bool(section_locs)
+
+        self.assertEqual(section_locs[0].pigs_count, (15 + 16 + 17 + 18))
+        self.assertEqual(section_locs[0].count_piglets_0_7, (15 + 16))
+        self.assertEqual(section_locs[0].count_piglets_8_14, 17)
+        self.assertEqual(section_locs[0].count_piglets_15_21, 18)
+        self.assertEqual(section_locs[0].count_piglets_28_plus, None)
+        self.assertEqual(section_locs[0].gilts_count, (5 + 5))
+        
+        self.assertEqual(section_locs[1].pigs_count, 19)
+        self.assertEqual(section_locs[1].count_piglets_0_7, None)
+        self.assertEqual(section_locs[1].count_piglets_28_plus, 19)
+        self.assertEqual(section_locs[1].gilts_count, 6)

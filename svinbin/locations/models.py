@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime, timedelta
+
 from django.db import models
 from django.db.models import Sum, OuterRef, Subquery, Q, Count, Value
 
 from core.models import CoreModel, CoreModelManager
-import piglets as piglets_app
 
 
 class WorkShop(CoreModel):
@@ -83,8 +84,7 @@ class LocationQuerySet(models.QuerySet):
             )
 
     def get_locations_in_section(self, section):
-
-        return self.filter(
+        return Location.objects.all().filter(
             Q(
               Q(section=section) |
               Q(sowAndPigletsCell__section=section) |
@@ -94,14 +94,21 @@ class LocationQuerySet(models.QuerySet):
 
     def add_sows_count_by_sections(self):       
         alive_sows = Count('sow', filter=Q(sow__alive=True))
-        subquery = Location.objects.all().filter(
-            Q(Q(section=OuterRef('section')) |
-              Q(sowAndPigletsCell__section=OuterRef('section')))) \
+        subquery_sows_count = self.get_locations_in_section(OuterRef('section')) \
                         .values('workshop') \
                         .annotate(all=alive_sows)\
                         .values('all')
 
-        return self.annotate(sows_count=models.Subquery(subquery, output_field=models.IntegerField()))
+        alive_sup_sows = Count('sow', filter=Q(sow__alive=True, sow__status__title='Супорос 35'))
+        subquery_sows_sup_count = self.get_locations_in_section(OuterRef('section')) \
+                        .values('workshop') \
+                        .annotate(alive_sup_sows=alive_sup_sows)\
+                        .values('alive_sup_sows')
+
+        return self.annotate(
+            sows_count=models.Subquery(subquery_sows_count, output_field=models.IntegerField()),
+            sows_sup_count=models.Subquery(subquery_sows_sup_count, output_field=models.IntegerField())
+        )
 
     def add_sows_count_by_workshop(self):     
         alive_sows = Count('sow', filter=Q(sow__alive=True))   
@@ -111,8 +118,143 @@ class LocationQuerySet(models.QuerySet):
                         .annotate(all=alive_sows)\
                         .values('all')
 
-        return self.annotate(sows_count=models.Subquery(subquery, output_field=models.IntegerField()))
+        alive_sup_sows = Count('sow', filter=Q(sow__alive=True, sow__status__title='Супорос 35'))
+        subquery_sows_sup_count = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=alive_sup_sows)\
+                        .values('all')
 
+        return self.annotate(
+            sows_count=models.Subquery(subquery, output_field=models.IntegerField()),
+            sows_sup_count=models.Subquery(subquery_sows_sup_count, output_field=models.IntegerField())
+        )
+
+    def add_pigs_count_by_workshop(self):    
+        alive_piglets = Sum('piglets__quantity', filter=Q(piglets__active=True))    
+        subquery = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=alive_piglets)\
+                        .values('all')
+
+        alive_gilts = Sum('piglets__gilts_quantity', filter=Q(piglets__active=True))
+        subquery_gilts_count = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=alive_gilts)\
+                        .values('all')
+
+        return self.annotate(
+            pigs_count=models.Subquery(subquery, output_field=models.IntegerField()),
+            gilts_count=models.Subquery(subquery_gilts_count, output_field=models.IntegerField())
+            )
+
+    def gen_piglets_count_by_age_subqueries_ws3_locs(self, locs, date):
+        data = dict()
+
+        alive_piglets_0_7 = Sum('piglets__quantity',
+             filter=Q(
+                piglets__active=True,
+                piglets__birthday__gte=(date-timedelta(days=7)),
+                piglets__birthday__lte=(date-timedelta(days=0))
+                )
+             )
+        subquery_0_7 = locs \
+                    .annotate(flag=Value(0)) \
+                    .values('flag') \
+                    .annotate(all=alive_piglets_0_7)\
+                    .values('all')
+        data['count_piglets_0_7'] = models.Subquery(subquery_0_7, output_field=models.IntegerField())
+
+        alive_piglets_8_14 = Sum('piglets__quantity',
+             filter=Q(
+                piglets__active=True,
+                piglets__birthday__gte=(date-timedelta(days=14)),
+                piglets__birthday__lte=(date-timedelta(days=8))
+                )
+             )
+        subquery_8_14 = locs \
+                    .annotate(flag=Value(0)) \
+                    .values('flag') \
+                    .annotate(all=alive_piglets_8_14)\
+                    .values('all')
+        data['count_piglets_8_14'] = models.Subquery(subquery_8_14, output_field=models.IntegerField())
+
+        alive_piglets_15_21 = Sum('piglets__quantity',
+             filter=Q(
+                piglets__active=True,
+                piglets__birthday__gte=(date-timedelta(days=21)),
+                piglets__birthday__lte=(date-timedelta(days=15))
+                )
+             )
+        subquery_15_21 = locs \
+                    .annotate(flag=Value(0)) \
+                    .values('flag') \
+                    .annotate(all=alive_piglets_15_21)\
+                    .values('all')
+        data['count_piglets_15_21'] = models.Subquery(subquery_15_21, output_field=models.IntegerField())
+
+        alive_piglets_22_28 = Sum('piglets__quantity',
+             filter=Q(
+                piglets__active=True,
+                piglets__birthday__gte=(date-timedelta(days=28)),
+                piglets__birthday__lte=(date-timedelta(days=21))
+                )
+             )
+        subquery_22_28 = locs \
+                    .annotate(flag=Value(0)) \
+                    .values('flag') \
+                    .annotate(all=alive_piglets_22_28)\
+                    .values('all')
+        data['count_piglets_22_28'] = models.Subquery(subquery_22_28, output_field=models.IntegerField())
+
+        alive_piglets_28_plus = Sum('piglets__quantity',
+             filter=Q(
+                piglets__active=True,
+                piglets__birthday__lte=(date-timedelta(days=28))
+                )
+             )
+        subquery_28_plus = locs \
+                    .annotate(flag=Value(0)) \
+                    .values('flag') \
+                    .annotate(all=alive_piglets_28_plus)\
+                    .values('all')
+        data['count_piglets_28_plus'] = models.Subquery(subquery_28_plus, output_field=models.IntegerField())
+
+        return data
+
+    def add_pigs_count_by_workshop3_by_age(self, date):
+        locs = self.get_workshop_location(OuterRef('workshop'))
+        data = self.gen_piglets_count_by_age_subqueries_ws3_locs(locs=locs, date=date)
+
+        return self.annotate(**data)
+
+    def add_pigs_count_by_sections(self):
+        alive_piglets = Sum('piglets__quantity', filter=Q(piglets__active=True))
+        subquery_piglets_count = self.get_locations_in_section(OuterRef('section')) \
+                        .values('workshop') \
+                        .annotate(all=alive_piglets)\
+                        .values('all')
+
+        alive_gilts = Sum('piglets__gilts_quantity', filter=Q(piglets__active=True))
+        subquery_gilts_count = self.get_locations_in_section(OuterRef('section')) \
+                        .values('workshop') \
+                        .annotate(all=alive_gilts)\
+                        .values('all')
+
+        return self.annotate(
+            pigs_count=models.Subquery(subquery_piglets_count),
+            gilts_count=models.Subquery(subquery_gilts_count),
+            )
+
+    def add_pigs_count_by_ws3_sections_by_age(self, date):
+        locs = self.get_locations_in_section(OuterRef('section'))
+        data = self.gen_piglets_count_by_age_subqueries_ws3_locs(locs=locs, date=date)
+
+        return self.annotate(**data)
+
+    # uses in All population report
     def gen_sections_pigs_count_dict(self):
         secs = Location.objects.all().filter(section__isnull=False) \
             .select_related('section__workshop') \
@@ -153,38 +295,6 @@ class LocationQuerySet(models.QuerySet):
 
         return data
 
-    def add_pigs_count_by_workshop(self):        
-        locations_subquery = models.Subquery(Location.objects.all().filter(
-                Q(Q(pigletsGroupCell__workshop=OuterRef(OuterRef('workshop'))) | 
-                  Q(workshop=OuterRef(OuterRef('workshop'))) |
-                  Q(section__workshop=OuterRef(OuterRef('workshop'))) |
-                  Q(sowAndPigletsCell__workshop=OuterRef(OuterRef('workshop')))
-                  )).values('pk'))
-
-        piglets = piglets_app.models.Piglets.objects.filter(
-            location__in=locations_subquery, active=True) \
-            .values('active') \
-            .annotate(qnty=Sum('quantity')) \
-            .values('qnty')
-
-        return self.annotate(pigs_count=models.Subquery(piglets, output_field=models.IntegerField()))
-
-    def add_pigs_count_by_sections(self):        
-        locations_subquery = models.Subquery(Location.objects.all().filter(
-                Q(Q(pigletsGroupCell__section=OuterRef(OuterRef('section'))) | 
-                  Q(section=OuterRef(OuterRef('section'))) |
-                  Q(sowAndPigletsCell__section=OuterRef(OuterRef('section')))
-                  )).values('pk'))
-
-        piglets = piglets_app.models.Piglets.objects.filter(
-            location__in=locations_subquery, active=True) \
-            .values('active') \
-            .annotate(qnty=Sum('quantity')) \
-            .values('qnty')
-
-        return self.annotate(
-            pigs_count=models.Subquery(piglets, output_field=models.IntegerField()),
-            )
 
 class LocationManager(CoreModelManager):
     def get_queryset(self):
