@@ -98,10 +98,9 @@ class LocationViewSet(viewsets.ModelViewSet):
             'count_piglets_0_7': ws3.count_piglets_0_7,
             'count_piglets_8_14': ws3.count_piglets_8_14,
             'count_piglets_15_21': ws3.count_piglets_15_21,
-            'count_piglets_21_28': ws3.count_piglets_21_28,
+            'count_piglets_22_28': ws3.count_piglets_22_28,
             'count_piglets_28_plus': ws3.count_piglets_28_plus,
             'gilts_count': ws3.gilts_count,
-
             }
 
         data['sections'] = list()
@@ -114,7 +113,7 @@ class LocationViewSet(viewsets.ModelViewSet):
                 'count_piglets_0_7': section.count_piglets_0_7,
                 'count_piglets_8_14': section.count_piglets_8_14,
                 'count_piglets_15_21': section.count_piglets_15_21,
-                'count_piglets_21_28': section.count_piglets_21_28,
+                'count_piglets_22_28': section.count_piglets_22_28,
                 'count_piglets_28_plus': section.count_piglets_28_plus,
                 'gilts_count': section.gilts_count,
             })
