@@ -106,8 +106,8 @@ class LocationViewSet(viewsets.ModelViewSet):
         data['sections'] = list()
         for section in section_locs:
             data['sections'].append({
-                'section_number': section.number,
-                'sows_count': section.sows_count,
+                'section_number': section.section.number,
+                'sows_count': section.section.sows_count,
                 'sows_sup_count': section.sows_count,
                 'piglets_count': section.pigs_count,
                 'count_piglets_0_7': section.count_piglets_0_7,
