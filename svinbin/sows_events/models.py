@@ -402,18 +402,17 @@ class CullingBoar(Event):
 
 
 class SemenBoarManager(CoreModelManager):
-    def create_semen_boar(self, boar, a, b, d, morphology_score=0, final_motility_score=0,
+    def create_semen_boar(self, boar, a, b, d, final_motility_score=0,
          initiator=None, date=None):
         if not date:
             date = timezone.now()
         c = a * b / 1000
         e = c * d / 100
         f = e / 2.0
-        f2 = (e / 2.1) / (e / 1.8)
         g = f * 90
         h = g - a
-        return self.create(boar=boar, a=a, b=b, c=c, d=d, e=e, f=f, f2=f2, g=g, h=h,
-         morphology_score=morphology_score, final_motility_score=final_motility_score,
+        return self.create(boar=boar, a=a, b=b, c=c, d=d, e=e, f=f, g=g, h=h,
+         final_motility_score=final_motility_score,
          initiator=initiator, date=date)
 
 
@@ -426,11 +425,9 @@ class SemenBoar(Event):
     d = models.FloatField(verbose_name='Motility Score')
     e = models.FloatField(verbose_name='Total Viable Sperms in Ejaculate (billion)')
     f = models.FloatField(verbose_name='Doses from this Collection v1')
-    f2 = models.FloatField(verbose_name='Doses from this Collection v2')
     g = models.FloatField(verbose_name='Actual Volume of Diluted Semen Required  ')
     h = models.FloatField(verbose_name='Actual Volume of Diluent Required')
 
-    morphology_score = models.FloatField()
     final_motility_score = models.FloatField()
 
     objects = SemenBoarManager()

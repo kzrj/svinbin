@@ -84,7 +84,7 @@ class SowFilter(filters.FilterSet):
 
 
 class BoarFilter(filters.FilterSet):
-    birth_id_starts = filters.NumberFilter(field_name='birth_id', lookup_expr='startswith')
+    farm_id_starts = filters.NumberFilter(field_name='farm_id', lookup_expr='startswith')
 
     class Meta:
         model = Boar

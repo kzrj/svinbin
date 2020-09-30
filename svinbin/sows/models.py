@@ -398,18 +398,19 @@ class BoarBreed(CoreModel):
 
 
 class BoarManager(CoreModelManager):
-    def create_boar(self, birth_id, breed=None):
-        if self.filter(birth_id=birth_id).first():
-            raise DjangoValidationError(message=f'Хряк с номером {birth_id} уже существует или уже забракован')
+    def create_boar(self, farm_id, birth_id=None, breed=None):
+        if self.filter(farm_id=farm_id).first():
+            raise DjangoValidationError(message=f'Хряк с номером {farm_id} уже существует или уже забракован')
 
-        return self.create(birth_id=birth_id, location=Location.objects.get(workshop__number=1), breed=breed)
+        return self.create(farm_id=farm_id, birth_id=birth_id, location=Location.objects.get(workshop__number=1), breed=breed)
 
-    def get_or_create_boar(self, birth_id, breed=None):
-        return self.get_or_create(birth_id=birth_id, breed=breed,
+    def get_or_create_boar(self, farm_id, breed=None):
+        return self.get_or_create(farm_id=farm_id, breed=breed,
             location=Location.objects.get(workshop__number=1))[0]
 
 
 class Boar(Pig):
+    farm_id = models.IntegerField(null=True, unique=True)
     breed = models.ForeignKey(BoarBreed, on_delete=models.SET_NULL, null=True)
     active = models.BooleanField(default=True)
     objects = BoarManager()

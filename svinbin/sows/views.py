@@ -162,12 +162,13 @@ class BoarViewSet(viewsets.ModelViewSet):
         serializer = sows_serializers.BoarCreateSerializer(data=request.data)
         if serializer.is_valid():
             boar = sows_models.Boar.objects.create_boar(
+                farm_id=serializer.validated_data['farm_id'],
                 birth_id=serializer.validated_data['birth_id'],
                 breed=serializer.validated_data['breed'],
                 )
             return Response(
                 {
-                    "message": f"Хряк №{boar.birth_id} создан.",
+                    "message": f"Хряк №{boar.farm_id} создан.",
                     "boar": sows_serializers.BoarSerializer(boar).data,
                 },
                 status=status.HTTP_200_OK)
@@ -187,7 +188,7 @@ class BoarViewSet(viewsets.ModelViewSet):
                 date=timezone.now())
             return Response(
                 {
-                    "message": f"Выбраковка прошла успешно. Хряк №{boar.birth_id}.",
+                    "message": f"Выбраковка прошла успешно. Хряк №{boar.farm_id}.",
                     "boar": sows_serializers.BoarSerializer(boar).data
                 },
                 status=status.HTTP_200_OK)
@@ -204,14 +205,14 @@ class BoarViewSet(viewsets.ModelViewSet):
                 a=serializer.validated_data['a'],
                 b=serializer.validated_data['b'],
                 d=serializer.validated_data['d'],
-                morphology_score=serializer.validated_data['morphology_score'],
+                # morphology_score=serializer.validated_data['morphology_score'],
                 final_motility_score=serializer.validated_data['final_motility_score'],
                 date=serializer.validated_data['date'],
                 initiator=request.user,
                 )
             return Response(
                 {
-                    "message": f"Запись создана. Хряк №{boar.birth_id}.",
+                    "message": f"Запись создана. Хряк №{boar.farm_id}.",
                     "boar": sows_serializers.BoarSerializer(boar).data
                 },
                 status=status.HTTP_200_OK)

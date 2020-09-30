@@ -81,10 +81,11 @@ class BoarSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Boar
-        fields = ['id', 'birth_id', 'location', 'breed']
+        fields = ['id', 'farm_id', 'birth_id', 'location', 'breed']
 
 
 class BoarCreateSerializer(serializers.Serializer):
+    farm_id = serializers.CharField()
     birth_id = serializers.CharField()
     breed = serializers.PrimaryKeyRelatedField(queryset=BoarBreed.objects.all())
 
