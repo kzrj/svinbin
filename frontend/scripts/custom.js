@@ -45,8 +45,7 @@ $(document).ready(function(){
             ["gray1","#F5F7FA","#E6E9ED","#c2c5c9"],
             ["gray2","#CCD1D9","#AAB2BD","#88919d"],
             ["dark1","#656D78","#434A54","#242b34"],
-            ["dark2","#3C3B3D","#323133","#1c191f"],
-            ["mainDark", "#313131", "#313131", "#313131"]
+            ["dark2","#3C3B3D","#323133","#1c191f"]
         ];
         var socialColorArray = [
             ["facebook","#3b5998"], 
@@ -1517,19 +1516,6 @@ $(document).ready(function(){
         });
     }
 
-    //Activate Development mode. Keeps caches clear.
-    if(isDevelopment === true){
-        if(!$('.reloader').length){$('body').append('<a href="#" class="reloader" style="position:fixed; background-color:#000; color:#FFF; z-index:9999; bottom:80px; left:50%; margin-left:-105px; border-radius:10px; width:210px; line-height:40px; text-align:center;">Developer Mode - Tap to Reload</a>');}
-        $('.reloader').on('click',function(){window.location.reload(true);})
-        caches.delete('workbox-runtime').then(function(){});
-        localStorage.clear();
-        sessionStorage.clear()
-        caches.keys().then(cacheNames => {
-          cacheNames.forEach(cacheName => {
-            caches.delete(cacheName);
-          });
-        });
-    }
     
     //Activate the PWA    
     if(isPWA === true){
