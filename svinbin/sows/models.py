@@ -58,6 +58,7 @@ class SowGroupRecord(CoreModel):
 class Pig(CoreModel):
     birth_id = models.CharField(max_length=10, unique=True, null=True, blank=True)
     location = models.ForeignKey("locations.Location", on_delete=models.SET_NULL, null=True)
+    birthday = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         abstract = True
