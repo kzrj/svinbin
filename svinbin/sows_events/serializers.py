@@ -106,6 +106,7 @@ class CullingBoarSerializer(serializers.ModelSerializer):
 
 class SemenBoarCreateSerializer(serializers.ModelSerializer):
     date = serializers.DateField(format="%Y-%m-%d")
+    f_denom = serializers.FloatField()
 
     class Meta:
         model = SemenBoar

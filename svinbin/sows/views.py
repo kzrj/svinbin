@@ -205,6 +205,7 @@ class BoarViewSet(viewsets.ModelViewSet):
                 a=serializer.validated_data['a'],
                 b=serializer.validated_data['b'],
                 d=serializer.validated_data['d'],
+                f_denom=serializer.validated_data['f_denom'],
                 # morphology_score=serializer.validated_data['morphology_score'],
                 final_motility_score=serializer.validated_data['final_motility_score'],
                 date=serializer.validated_data['date'],

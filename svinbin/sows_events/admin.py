@@ -49,3 +49,9 @@ class AssingFarmIdEventAdmin(admin.ModelAdmin):
 class PigletsToSowsEventAdmin(admin.ModelAdmin):
     list_display = [f.name for f in models.PigletsToSowsEvent._meta.fields]
     search_fields = ['piglets__pk']
+
+
+@admin.register(models.SemenBoar)
+class SemenBoarAdmin(admin.ModelAdmin):
+    list_display = [f.name for f in models.SemenBoar._meta.fields]
+    search_fields = ['boar__far_id']

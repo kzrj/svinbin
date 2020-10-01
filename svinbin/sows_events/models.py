@@ -402,13 +402,13 @@ class CullingBoar(Event):
 
 
 class SemenBoarManager(CoreModelManager):
-    def create_semen_boar(self, boar, a, b, d, final_motility_score=0,
+    def create_semen_boar(self, boar, a, b, d, f_denom=2.0, final_motility_score=0,
          initiator=None, date=None):
         if not date:
             date = timezone.now()
         c = a * b / 1000
         e = c * d / 100
-        f = e / 2.0
+        f = e / f_denom
         g = f * 90
         h = g - a
         return self.create(boar=boar, a=a, b=b, c=c, d=d, e=e, f=f, g=g, h=h,
