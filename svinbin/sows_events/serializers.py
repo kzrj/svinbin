@@ -110,7 +110,7 @@ class SemenBoarCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SemenBoar
-        fields = ('a', 'b', 'd', 'final_motility_score', 'date')
+        fields = ('a', 'b', 'd', 'f_denom', 'final_motility_score', 'date')
 
 
 class SemenBoarSerializer(serializers.ModelSerializer):
