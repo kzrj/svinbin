@@ -406,8 +406,12 @@ class BoarManager(CoreModelManager):
         return self.create(farm_id=farm_id, birth_id=birth_id, location=Location.objects.get(workshop__number=1), breed=breed)
 
     def get_or_create_boar(self, farm_id, breed=None):
-        return self.get_or_create(farm_id=farm_id, breed=breed,
-            location=Location.objects.get(workshop__number=1))[0]
+        boar, created = self.get_or_create(farm_id=farm_id)
+        if created:
+            boar.location = Location.objects.get(workshop__number=1)
+            boar.breed = breed
+            boar.save()
+        return boar
 
 
 class Boar(Pig):
