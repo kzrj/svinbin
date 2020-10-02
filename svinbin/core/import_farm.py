@@ -94,8 +94,8 @@ def create_semination_lists(rows, request_user):
                 sows_in_another_tour.append(sow)
                 continue
             
-        boar1 = Boar.objects.get_or_create_boar(birth_id=row[5])
-        boar2 = Boar.objects.get_or_create_boar(birth_id=row[7])
+        boar1 = Boar.objects.get_or_create_boar(farm_id=row[5])
+        boar2 = Boar.objects.get_or_create_boar(farm_id=row[7])
 
         # if usouded by hand and then file updated. It is to avoid double usound, semination
         if 'Рег. Пов тор' in row or 'Не рег. пов тор' in row \
