@@ -2,6 +2,7 @@ from django.contrib import admin
 
 from sows_events import models
 from piglets.models import Piglets
+from sows.models import Sow
 
 
 @admin.register(models.Semination)
@@ -24,6 +25,8 @@ class SowFarrowAdmin(admin.ModelAdmin):
     def render_change_form(self, request, context, *args, **kwargs):
         context['adminform'].form.fields['piglets_group'].queryset = \
             Piglets.objects.get_all()
+        context['adminform'].form.fields['sow'].queryset = \
+            Sow.objects.get_queryset_with_not_alive()
         return super(SowFarrowAdmin, self).render_change_form(request, context, *args, **kwargs)
 
 
