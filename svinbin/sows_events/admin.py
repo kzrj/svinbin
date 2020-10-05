@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from sows_events import models
+from piglets.models import Piglets
 
 
 @admin.register(models.Semination)
@@ -19,6 +20,11 @@ class UltrasoundAdmin(admin.ModelAdmin):
 class SowFarrowAdmin(admin.ModelAdmin):
     list_display = [f.name for f in models.SowFarrow._meta.fields]
     search_fields = ['sow__farm_id']
+
+    def render_change_form(self, request, context, *args, **kwargs):
+        context['adminform'].form.fields['piglets__group'].queryset = \
+            Piglets.objects.get_all()
+        return super(SowFarrowAdmin, self).render_change_form(request, context, *args, **kwargs)
 
 
 @admin.register(models.CullingSow)
