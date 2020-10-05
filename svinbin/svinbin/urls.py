@@ -46,6 +46,10 @@ router.register(r'sections', locations_views.SectionViewSet, \
 router.register(r'tours', tours_views.TourViewSet, \
  basename='tours')
 
+# users
+router.register(r'users', staff_views.UsersViewSet, \
+ basename='users')
+
 # by workshops
 # workshop one two
 router.register(r'workshoponetwo/sows', workshoponetwo_views.WorkShopOneTwoSowViewSet, \
