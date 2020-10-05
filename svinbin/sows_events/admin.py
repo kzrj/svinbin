@@ -22,7 +22,7 @@ class SowFarrowAdmin(admin.ModelAdmin):
     search_fields = ['sow__farm_id']
 
     def render_change_form(self, request, context, *args, **kwargs):
-        context['adminform'].form.fields['piglets__group'].queryset = \
+        context['adminform'].form.fields['piglets_group'].queryset = \
             Piglets.objects.get_all()
         return super(SowFarrowAdmin, self).render_change_form(request, context, *args, **kwargs)
 
