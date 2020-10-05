@@ -7,9 +7,12 @@ from .models import WorkShopEmployee
 
 
 class UserSerializer(serializers.ModelSerializer):
+	farm_name = serializers.ReadOnlyField(source='employee.farm_name')
+
     class Meta:
         model = User
-        fields = "__all__"
+        # fields = "__all__"
+        fields = ['id', 'username', 'farm_name']
 
 
 class WorkshopEmployeeSerializer(serializers.ModelSerializer):
