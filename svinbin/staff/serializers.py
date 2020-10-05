@@ -7,7 +7,7 @@ from .models import WorkShopEmployee
 
 
 class UserSerializer(serializers.ModelSerializer):
-	farm_name = serializers.ReadOnlyField(source='employee.farm_name')
+    farm_name = serializers.ReadOnlyField(source='employee.farm_name')
 
     class Meta:
         model = User
@@ -16,9 +16,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class WorkshopEmployeeSerializer(serializers.ModelSerializer):
-	user = serializers.StringRelatedField()
-	workshop_number = serializers.IntegerField(source='workshop.number', allow_null=True)
+    user = serializers.StringRelatedField()
+    workshop_number = serializers.IntegerField(source='workshop.number', allow_null=True)
 
-	class Meta:
-		model = WorkShopEmployee
-		fields = ['user', 'workshop_number', 'is_officer', 'is_seminator']
+    class Meta:
+        model = WorkShopEmployee
+        fields = ['user', 'workshop_number', 'is_officer', 'is_seminator']
