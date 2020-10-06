@@ -95,7 +95,8 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
     def double_semination(self, request):
         serializer = sows_events_serializers.CreateDoubleSeminationSerializer(data=request.data)
         if serializer.is_valid():
-            sow = Sow.objects.get_queryset_with_not_alive().filter(farm_id=data['farm_id']).first()
+            sow = sows_models.Sow.objects.get_queryset_with_not_alive() \
+                .filter(farm_id=data['farm_id']).first()
             sow.prepare_for_double_semenation()
 
             semination1 = sows_events_models.Semination.objects.create_semination(
