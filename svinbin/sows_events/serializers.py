@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow, CullingBoar, SemenBoar
+from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow,\
+     CullingBoar, SemenBoar
+from sows.models import Sow
 
 from sows.serializers import SowSerializer, BoarSerializer
 
@@ -21,12 +24,22 @@ class SimpleSeminationSerializer(serializers.ModelSerializer):
         fields = ['date', 'semination_employee', 'boar']
 
 
-class CreateSeminationSerializer(serializers.ModelSerializer):
+class CreateDoubleSeminationSerializer(serializers.Serializer):
+    farm_id = serializers.IntegerField()
     week = serializers.IntegerField()
+    date = serializers.DateTimeField()
 
-    class Meta:
-        model = Semination
-        fields = ['week', 'semination_employee', 'boar']
+    boar1 = serializers.IntegerField()
+    seminator1 = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    boar2 = serializers.IntegerField()
+    seminator2 = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+
+    def validate(self, data):
+        sow = Sow.objects.get_queryset_with_not_alive().filter(farm_id=data['farm_id']).first()
+        if not sow:
+            raise serializers.ValidationError(f"Свиноматки с {farm_id} нет.")
+        return data
 
 
 class UltrasoundSerializer(serializers.ModelSerializer):

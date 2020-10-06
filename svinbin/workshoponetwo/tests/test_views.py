@@ -39,35 +39,6 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.brig4 = User.objects.get(username='brigadir4')
         self.brig5 = User.objects.get(username='brigadir5')
 
-    def test_semination(self):
-        self.client.force_authenticate(user=self.brig1)
-        sow = sows_testing.create_sow_and_put_in_workshop_one()
-        boar = Boar.objects.all().first()
-        semination_employee = staff_testing.create_employee()
-
-        response = self.client.post('/api/workshoponetwo/sows/%s/semination/' %
-          sow.pk, {'week': 7, 'semination_employee': semination_employee.pk, 'boar': boar.pk})
-
-        self.assertNotEqual(response.data['semination']['id'], None)
-        self.assertEqual(response.data['sow']['status'], 'Осеменена 1')
-        self.assertEqual(response.data['semination']['boar'], boar.pk)
-        self.client.logout()
-
-    def test_ultrasound(self):
-        self.client.force_authenticate(user=self.brig1)
-        sow = sows_testing.create_sow_and_put_in_workshop_one()
-        semination_employee = staff_testing.create_employee()
-        boar = Boar.objects.all().first()
-        response = self.client.post('/api/workshoponetwo/sows/%s/semination/' %
-          sow.pk, {'week': 7, 'semination_employee': semination_employee.pk, 'boar': boar.pk})
-
-        response = self.client.post('/api/workshoponetwo/sows/%s/ultrasound/' %
-          sow.pk, {'result': True, 'days': 30})
-
-        # self.assertEqual(response.data['ultrasound']['id'], 2)
-        self.assertEqual(response.data['sow']['status'], 'Супорос 28')
-        self.client.logout()
-
     def test_culling(self):
         self.client.force_authenticate(user=self.brig1)
         sow = sows_testing.create_sow_and_put_in_workshop_one()

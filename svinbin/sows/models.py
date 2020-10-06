@@ -355,6 +355,14 @@ class Sow(Pig):
     def get_location(self):
         return str(self.location.get_location)
 
+    def prepare_for_double_semenation(self):
+        if self.location.get_workshop.number != 1:
+            raise DjangoValidationError(message='Свиноматка не в Цехе 1.')
+
+        if self.tour or not self.alive:
+            self.tour = None
+            self.change_status_to('Ожидает осеменения')
+
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow_farm_id, piglets):

@@ -50,47 +50,6 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=True)
-    def semination(self, request, pk=None):
-        sow = self.get_object() 
-        serializer = sows_events_serializers.CreateSeminationSerializer(data=request.data)
-        if serializer.is_valid():
-            # semination employee is request user. TODO: need to choose semination employee
-            semination = sows_events_models.Semination.objects.create_semination(
-                sow, serializer.validated_data['week'], request.user, request.user,
-                serializer.validated_data['boar'] )
-            return Response(
-                {
-                    "semination": sows_events_serializers.SeminationSerializer(semination).data,
-                    "sow": sows_serializers.SowSerializer(sow).data, 
-                    "message": f'Свиноматка {sow.farm_id} осеменена.',
-                },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['post'], detail=True)
-    def ultrasound(self, request, pk=None):
-        sow = self.get_object() 
-        serializer = sows_events_serializers.CreateUltrasoundSerializer(data=request.data)
-        if serializer.is_valid():
-            ultrasound = sows_events_models.Ultrasound.objects.create_ultrasound(
-                 sow=sow,
-                 initiator=request.user,
-                 result=serializer.validated_data['result'],
-                 days=serializer.validated_data['days'],
-                 date=timezone.now()
-                 )
-            return Response(
-                {
-                    "ultrasound": sows_events_serializers.UltrasoundSerializer(ultrasound).data,
-                    "sow": sows_serializers.SowSerializer(sow).data, 
-                    "message": f'Свиноматка {sow.farm_id} прошла УЗИ.',
-                },
-                status=status.HTTP_200_OK)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
     @action(methods=['post'], detail=False)
     def mass_semination(self, request):
         serializer = sows_serializers.SowsMassSeminationSerializer(data=request.data)
@@ -132,22 +91,25 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=True)
-    def double_semination(self, request, pk=None):
-        sow = self.get_object() 
-        serializer = serializers.DoubleSeminationSerializer(data=request.data)
+    @action(methods=['post'], detail=False, serializer_class=serializers.CreateDoubleSeminationSerializer)
+    def double_semination(self, request):
+        serializer = serializers.CreateDoubleSeminationSerializer(data=request.data)
         if serializer.is_valid():
+            sow = Sow.objects.get_queryset_with_not_alive().filter(farm_id=data['farm_id']).first()
+            sow.prepare_for_double_semenation()
+
             semination1 = sows_events_models.Semination.objects.create_semination(
                 sow=sow, week=serializer.validated_data['week'],
                 initiator=request.user, 
-                semination_employee=serializer.validated_data['semination_employee'],
+                semination_employee=serializer.validated_data['seminator1'],
                 boar=serializer.validated_data['boar1'])
 
             semination2 = sows_events_models.Semination.objects.create_semination(
                 sow=sow, week=serializer.validated_data['week'],
                 initiator=request.user, 
-                semination_employee=serializer.validated_data['semination_employee'],
+                semination_employee=serializer.validated_data['seminator2'],
                 boar=serializer.validated_data['boar2'])
+
             return Response(
                 {
                     "semination1": sows_events_serializers.SeminationSerializer(semination1).data,
