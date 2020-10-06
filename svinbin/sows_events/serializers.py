@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow,\
      CullingBoar, SemenBoar
-from sows.models import Sow
+from sows.models import Sow, Boar
 
 from sows.serializers import SowSerializer, BoarSerializer
 
@@ -29,10 +29,10 @@ class CreateDoubleSeminationSerializer(serializers.Serializer):
     week = serializers.IntegerField()
     date = serializers.DateTimeField()
 
-    boar1 = serializers.IntegerField()
+    boar1 = serializers.PrimaryKeyRelatedField(queryset=Boar.objects.all())
     seminator1 = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
-    boar2 = serializers.IntegerField()
+    boar2 = serializers.PrimaryKeyRelatedField(queryset=Boar.objects.all())
     seminator2 = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
 
     def validate(self, data):
