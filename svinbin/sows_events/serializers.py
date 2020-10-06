@@ -38,7 +38,7 @@ class CreateDoubleSeminationSerializer(serializers.Serializer):
     def validate(self, data):
         sow = Sow.objects.get_queryset_with_not_alive().filter(farm_id=data['farm_id']).first()
         if not sow:
-            raise serializers.ValidationError(f"Свиноматки с {farm_id} нет.")
+            raise serializers.ValidationError(f"Свиноматки с {data['farm_id']} нет.")
         return data
 
 
