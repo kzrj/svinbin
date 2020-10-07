@@ -91,6 +91,27 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['post'], detail=False, serializer_class=sows_events_serializers.SowsMassCullingSerializer)
+    def mass_culling(self, request):
+        serializer = sows_events_serializers.SowsMassCullingSerializer(data=request.data)
+        if serializer.is_valid():
+            sows_qs = sows_models.Sow.objects.filter(pk__in=serializer.validated_data['sows'])
+            sows_events_models.CullingSow.objects.mass_culling(
+                sows_qs=sows_qs,
+                culling_type=serializer.validated_data['culling_type'],
+                reason=serializer.validated_data['reason'],
+                weight=serializer.validated_data['weight'],
+                initiator=request.user
+                )
+
+            return Response(
+                {
+                    "message": f"{sows_qs.count()} выбыло."
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     @action(methods=['post'], detail=False, serializer_class=sows_events_serializers.CreateDoubleSeminationSerializer)
     def double_semination(self, request):
         serializer = sows_events_serializers.CreateDoubleSeminationSerializer(data=request.data)

@@ -14,7 +14,7 @@ FARM_ID_COUNT = 100000
 def create_boar():
     breed = BoarBreed.objects.all().first()
 
-    return Boar.objects.get_or_create_boar(birth_id=random.randint(1, FARM_ID_COUNT),
+    return Boar.objects.get_or_create_boar(farm_id=random.randint(1, FARM_ID_COUNT),
          breed=breed)
 
 def create_statuses():
@@ -114,5 +114,5 @@ def create_boars():
 
     if Boar.objects.all().count() < 1:
         breed = BoarBreed.objects.all().first()
-        Boar.objects.create_boar(birth_id=random.randint(1, FARM_ID_COUNT), breed=breed)
-        Boar.objects.create_boar(birth_id=random.randint(100, FARM_ID_COUNT), breed=breed)
+        Boar.objects.create_boar(farm_id=random.randint(1, FARM_ID_COUNT), breed=breed)
+        Boar.objects.create_boar(farm_id=random.randint(100, FARM_ID_COUNT), breed=breed)

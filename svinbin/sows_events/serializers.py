@@ -133,3 +133,11 @@ class SemenBoarSerializer(serializers.ModelSerializer):
     class Meta:
         model = SemenBoar
         exclude = ('created_at', 'modified_at', 'id')
+
+
+class SowsMassCullingSerializer(serializers.ModelSerializer):
+    sows = serializers.ListField(child=serializers.IntegerField())
+
+    class Meta:
+        model = CullingSow
+        fields = ('sows', 'culling_type', 'reason' , 'weight')  

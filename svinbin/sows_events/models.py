@@ -243,6 +243,23 @@ class CullingSowManager(CoreModelManager):
         return self.filter(date__date__gte=start_date, date__date__lte=end_date,
             location__in=ws_locs)
 
+    def mass_culling(self, sows_qs, culling_type, weight=None, reason=None, initiator=None, date=None):
+        if not date:
+            date = timezone.now()
+
+        cullings = list()
+
+        for sow in sows_qs:
+            cullings.append(
+                CullingSow(
+                    sow=sow, initiator=initiator, tour=sow.tour, reason=reason, 
+                    date=date, culling_type=culling_type, location=sow.location,
+                    sow_status=sow.status, weight=weight, sow_group=sow.sow_group)
+                )
+        CullingSow.objects.bulk_create(cullings)
+        sows_qs.update_status(title='Брак', date=date)
+        sows_qs.update(alive=False)
+
 
 class CullingSow(SowEvent):
     CULLING_TYPES = [('spec', 'spec uboi'), ('padej', 'padej'), ('prirezka', 'prirezka'),

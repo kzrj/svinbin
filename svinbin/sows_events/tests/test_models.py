@@ -261,6 +261,26 @@ class CullingSowManagerTest(TestCase):
         self.assertEqual(culling.culling_type, 'spec')
         self.assertEqual(culling.reason, 'prichina')
 
+    def test_mass_cullings(self):
+        location = Location.objects.get(workshop__number=1)
+        seminated_sow1 =  sows_testing.create_sow_with_semination(location, 1)
+        seminated_sow2 =  sows_testing.create_sow_with_semination(location, 1)
+        seminated_sow3 =  sows_testing.create_sow_with_semination(location, 1)
+
+        sows_qs = Sow.objects.filter(pk__in=[seminated_sow1.pk, seminated_sow2.pk, seminated_sow3.pk])
+        CullingSow.objects.mass_culling(sows_qs=sows_qs, initiator=None,
+            culling_type='padej')
+
+        seminated_sow2.refresh_from_db()
+        self.assertEqual(seminated_sow2.status.title, 'Брак')
+        self.assertEqual(seminated_sow2.alive, False)
+
+        seminated_sow3.refresh_from_db()
+        self.assertEqual(seminated_sow3.status.title, 'Брак')
+        self.assertEqual(seminated_sow3.alive, False)
+
+        self.assertEqual(CullingSow.objects.all().count(), 3)
+
 
 class WeaningSowTest(TestCase):
     def setUp(self):

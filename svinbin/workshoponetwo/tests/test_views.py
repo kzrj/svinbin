@@ -121,6 +121,31 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.assertEqual(sow3.status.title, 'Супорос 28')
         self.client.logout()
 
+    def test_mass_culling(self):
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testing.create_sow_and_put_in_workshop_one()
+
+        self.client.force_authenticate(user=self.brig1)
+        response = self.client.post('/api/workshoponetwo/sows/mass_culling/',
+            { 
+              'sows': [sow1.pk, sow2.pk, sow3.pk], 'culling_type': 'padej', 
+              'reason': 'test_reason', 'weight': 0
+            })
+
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+        sow3.refresh_from_db()
+
+        self.assertEqual(sow1.alive, False)
+        self.assertEqual(sow2.alive, False)
+        self.assertEqual(sow3.alive, False)
+
+        self.assertEqual(sow1.status.title, 'Брак')
+        self.assertEqual(sow2.status.title, 'Брак')
+        self.assertEqual(sow3.status.title, 'Брак')
+        self.client.logout()
+
     def test_abortion(self):
         self.client.force_authenticate(user=self.brig1)        
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()        
@@ -148,9 +173,10 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
     def test_double_semination(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         self.client.force_authenticate(user=self.brig1)
-        response = self.client.post('/api/workshoponetwo/sows/%s/double_semination/' % sow1.pk, 
-            {'week': 55, 'semination_employee': self.user.pk, 'boar1': self.boar.pk,
-             'boar2': Boar.objects.all()[1].pk})
+        response = self.client.post('/api/workshoponetwo/sows/double_semination/', 
+            {'week': 55, 'seminator1': self.user.pk, 'seminator2': self.user.pk,
+             'boar1': self.boar.pk,
+             'boar2': Boar.objects.all()[1].pk, 'farm_id': sow1.farm_id})
         self.assertEqual(response.data['semination1']['tour'], 'Тур 55 2020г')
         self.assertEqual(response.data['semination2']['tour'], 'Тур 55 2020г')
         self.assertEqual(response.data['semination1']['boar'], self.boar.pk)
