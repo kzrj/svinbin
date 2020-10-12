@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -524,6 +525,32 @@ class WeighingPigletsTest(TestCase):
         self.assertEqual(weighing_record.average_weight, round((670 / piglets.quantity), 2))
         self.assertEqual(weighing_record.piglets_quantity, piglets.quantity)
         self.assertEqual(weighing_record.place, '3/4')
+
+    def test_queryset_get_tour_data_by_place(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws4,
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws4,
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=120,
+            place='3/4', date=datetime.datetime.today())
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=150,
+            place='3/4', date=datetime.datetime(2020,9,25,0,0))
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=360,
+            place='4/8', date=datetime.datetime(2020,9,15,0,0))
+
+        data = WeighingPiglets.objects.all().get_tour_data_by_place(tour=self.tour1, place='3/4')
+        self.assertEqual(data['place'], '3/4')
+        self.assertEqual(data['total']['total_quantity'], 200)
 
 
 class CullingPigletsTest(TestCase):

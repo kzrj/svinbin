@@ -62,6 +62,8 @@ router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsView
 # reports
 router.register(r'reports/tours', reports_views.TourReportViewSet,
  basename='report-tours')
+router.register(r'reports/tours_v2', reports_views.TourReportV2ViewSet,
+ basename='report-tours-v2')
 router.register(r'reports/director', reports_views.ReportDateViewSet,
  basename='report-director')
 router.register(r'reports/recounts', piglets_events_views.RecountViewSet,

@@ -826,3 +826,43 @@ class MetaTourTest(TestCase):
 
         merged_piglets1.metatour.set_week_tour()
         self.assertEqual(merged_piglets1.metatour.week_tour, self.tour51)
+
+
+class TourQuerysetAddWeighingData(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        pigs_testings.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+
+    def test_add_weighing_first_dates(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws4,
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws4,
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=120,
+            place='3/4', date=datetime.datetime.today())
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=360,
+            place='4/8', date=datetime.datetime(2020,9,15,0,0))
+
+        with self.assertNumQueries(1):
+            tours = Tour.objects.all().add_weighing_first_dates()
+            bool(tours)
+            self.assertEqual(tours[0].first_date_3_4, datetime.date(2020,10,12))
+            self.assertEqual(tours[0].first_date_4_8, datetime.date(2020,9,15))
+            # self.assertEqual(tours[0].ws1_count_tour_sow,2)

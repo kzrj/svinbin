@@ -141,6 +141,21 @@ class TourQuerySet(models.QuerySet):
                  output_field=models.FloatField()), 0)
             )
 
+    def add_weighing_first_dates(self):
+        data = dict()
+
+        for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
+            place_formatted = place.replace('/', '_')
+            first_date_weights_subquery = Subquery(piglets_events.models.WeighingPiglets.objects.filter(
+                                        week_tour__pk=OuterRef('pk'),
+                                        place=place) \
+                                    .order_by('date') \
+                                    .values('date__date')[:1], output_field=models.DateTimeField())
+
+            data[f'first_date_{place_formatted}'] = first_date_weights_subquery
+
+        return self.annotate(**data)
+
     def add_culling_data_by_week_tour(self):
         data = dict()
 

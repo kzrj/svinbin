@@ -24,6 +24,7 @@ from piglets.models import Piglets
 
 from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer, \
     StartDateEndDateSerializer
+from piglets_events.serializers import WeighingPigletsSerializer
 from reports.filters import ReportDateFilter
 from core.permissions import ReadOrAdminOnlyPermissions
 
@@ -44,6 +45,24 @@ class TourReportViewSet(viewsets.ModelViewSet):
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
     permission_classes = [ReadOrAdminOnlyPermissions]
+
+
+class TourReportV2ViewSet(viewsets.ModelViewSet):
+    queryset = Tour.objects.all() \
+               .add_weighing_first_dates()
+
+    serializer_class = ReportTourSerializer
+    filter_class = TourFilter
+    permission_classes = [ReadOrAdminOnlyPermissions]
+
+    @action(methods=['get'], detail=True)
+    def weights_data(self, request, pk=None, serializer_class=None):
+        tour = self.get_object()
+        data = dict()
+        for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
+            place_formatted = place.replace('/', '_')
+            data[place] = tour.piglets_weights.all().get_tour_data_by_place(tour=tour, place=place)
+        return Response(data)
 
 
 class ReportDateViewSet(viewsets.ModelViewSet):

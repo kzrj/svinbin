@@ -20,6 +20,9 @@ def create_piglets_statuses():
 
 def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_quantity=0,
      status=None, birthday=None):
+    if not birthday:
+        birthday = timezone.now()
+
     piglets = Piglets.objects.create(location=location, quantity=quantity,
      start_quantity=quantity, gilts_quantity=gilts_quantity, status=status, birthday=birthday)
 
