@@ -258,6 +258,7 @@ class WeighingPiglets(PigletsEvent):
     average_weight = models.FloatField()
     piglets_quantity = models.IntegerField()
     place = models.CharField(max_length=10, choices=WEIGHING_PLACES)
+    piglets_age = models.IntegerField(null=True, blank=True)
 
     week_tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
         related_name="piglets_weights")

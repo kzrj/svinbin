@@ -106,7 +106,7 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
 
             return Response(
                 {
-                    "message": f"{sows_qs.count()} выбыло."
+                    "message": f"Свиноматки выбыли."
                 },
                 status=status.HTTP_200_OK)
         else:
