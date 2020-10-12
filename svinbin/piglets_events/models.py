@@ -242,7 +242,8 @@ class WeighingPigletsManager(CoreModelManager):
             piglets_quantity=piglets_group.quantity,
             initiator=initiator,
             date=date,
-            week_tour=piglets_group.metatour.week_tour
+            week_tour=piglets_group.metatour.week_tour,
+            piglets_age=(date-piglets_group.birthday).days
             )
 
         piglets_group.change_status_to('Взвешены, готовы к заселению')
