@@ -310,7 +310,8 @@ class CullingPigletsManager(CoreModelManager):
         culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
             date=date, initiator=initiator, is_it_gilt=is_it_gilt, quantity=quantity,
             total_weight=total_weight, location=piglets_group.location,
-            week_tour=piglets_group.metatour.week_tour)
+            week_tour=piglets_group.metatour.week_tour,
+            piglets_age=(date-piglets_group.birthday).days)
 
         return culling
 
@@ -328,6 +329,17 @@ class CullingPigletsManager(CoreModelManager):
                         total_weight=Sum('total_weight'),
                         avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())
                     )
+
+    def get_by_tour_and_ws_number(self, tour, ws_number):
+        qs = self.get_queryset().filter(week_tour=tour, 
+            location__pigletsGroupCell__workshop__number=ws_number)
+        total = qs.aggregate(
+            total_quantity=Sum('quantity'),
+            total_total_weight=Sum('total_weight'),
+            total_avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField()),
+            total_avg_age=Avg('piglets_age'),
+            )
+        return qs, total
 
 
 class CullingPiglets(PigletsEvent):
@@ -348,6 +360,8 @@ class CullingPiglets(PigletsEvent):
 
     week_tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
         related_name="piglets_culling")
+
+    piglets_age = models.IntegerField(null=True, blank=True)
 
     objects = CullingPigletsManager()
 

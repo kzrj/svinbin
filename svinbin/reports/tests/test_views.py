@@ -17,7 +17,7 @@ from piglets.models import Piglets
 from locations.models import Location
 from tours.models import Tour, MetaTour
 from reports.models import ReportDate, gen_operations_dict
-from piglets_events.models import WeighingPiglets
+from piglets_events.models import WeighingPiglets, CullingPiglets
 
 from reports.serializers import ReportTourSerializer
 
@@ -78,8 +78,10 @@ class TourReportV2ViewSetTest(APITestCase):
         self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
 
         self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_ws5_cells = Location.objects.filter(pigletsGroupCell__workshop__number=5)
+        self.loc_ws3_cells = Location.objects.filter(sowAndPigletsCell__workshop__number=3)
 
-    def test_detail(self):
+    def test_weights_data(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=self.tour1,
             location=self.loc_ws4,
@@ -101,6 +103,30 @@ class TourReportV2ViewSetTest(APITestCase):
         WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=360,
             place='4/8', date=datetime.datetime(2020,9,15,0,0))
 
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[0],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0))
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[0],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0))
+
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=piglets3, culling_type='padej', reason='xz', quantity=10, 
+            total_weight=100, date='2020-12-09'
+            )
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=piglets4, culling_type='padej', reason='xz', quantity=1, 
+            total_weight=9.5, date='2020-12-09'
+            )
+
+        piglets_testing.create_from_sow_farrow(tour=self.tour1, location=self.loc_ws3_cells[0],
+            quantity=15, date=datetime.datetime(2020,8,5,0,0))
+
         response = self.client.get('/api/reports/tours_v2/%s/weights_data/' % self.tour1.pk)
-        print(response.data)
         self.assertEqual(response.data['3/4']['total']['total_quantity'], 200)
+        self.assertEqual(response.data['farrow_data']['total_alive'], 15)
+        self.assertEqual(response.data['spec_5']['total']['total_quantity'], 11)

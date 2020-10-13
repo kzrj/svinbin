@@ -212,6 +212,13 @@ class SowFarrowManager(CoreModelManager):
 
         return farrow
 
+    def count_piglets(self):
+        return self.aggregate(
+            total_alive=models.Sum('alive_quantity'),
+            total_dead=models.Sum('dead_quantity'),
+            total_mummy=models.Sum('mummy_quantity'),
+            )
+
 
 class SowFarrow(SowEvent):
     piglets_group = models.OneToOneField('piglets.Piglets', on_delete=models.SET_NULL,

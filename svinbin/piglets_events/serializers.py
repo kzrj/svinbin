@@ -13,7 +13,8 @@ class CullingPigletsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CullingPiglets
-        fields = ['culling_type', 'reason', 'is_it_gilt', 'quantity', 'date', 'total_weight']
+        fields = ['culling_type', 'reason', 'is_it_gilt', 'quantity', 'date',
+            'total_weight', 'piglets_age']
 
 
 class WeighingPigletsCreateSerializer(serializers.ModelSerializer):

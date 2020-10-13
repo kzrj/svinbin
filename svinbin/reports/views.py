@@ -24,7 +24,7 @@ from piglets.models import Piglets
 
 from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer, \
     StartDateEndDateSerializer
-from piglets_events.serializers import WeighingPigletsSerializer
+from piglets_events.serializers import WeighingPigletsSerializer, CullingPigletsSerializer
 from reports.filters import ReportDateFilter
 from core.permissions import ReadOrAdminOnlyPermissions
 
@@ -62,6 +62,15 @@ class TourReportV2ViewSet(viewsets.ModelViewSet):
         for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
             place_formatted = place.replace('/', '_')
             data[place] = tour.piglets_weights.all().get_tour_data_by_place(tour=tour, place=place)
+
+        for ws_number in [5, 6, 7]:
+            qs, total = tour.piglets_culling.get_by_tour_and_ws_number(tour=tour, ws_number=ws_number)
+            data[f'spec_{str(ws_number)}'] = dict()
+            data[f'spec_{str(ws_number)}']['list'] = CullingPigletsSerializer(qs, many=True).data
+            data[f'spec_{str(ws_number)}']['total'] = total
+
+        data['farrow_data'] = tour.sowfarrow_set.count_piglets()
+
         return Response(data)
 
 
