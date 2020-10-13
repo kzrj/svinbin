@@ -17,6 +17,15 @@ class CullingPigletsSerializer(serializers.ModelSerializer):
             'total_weight', 'piglets_age']
 
 
+class CullingPigletsReadSerializer(serializers.ModelSerializer):
+    average_weight = serializers.ReadOnlyField()
+
+    class Meta:
+        model = CullingPiglets
+        fields = ['culling_type', 'reason', 'is_it_gilt', 'quantity', 'date',
+            'total_weight', 'piglets_age', 'average_weight']
+
+
 class WeighingPigletsCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = WeighingPiglets
