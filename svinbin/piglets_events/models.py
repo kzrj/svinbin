@@ -337,7 +337,7 @@ class CullingPigletsManager(CoreModelManager):
         total = qs.aggregate(
             total_quantity=Sum('quantity'),
             total_total_weight=Sum('total_weight'),
-            total_avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField()),
+            total_avg=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField()),
             total_avg_age=Avg('piglets_age'),
             )
         return qs, total
