@@ -48,8 +48,8 @@ class WeighingPigletsSerializer(serializers.ModelSerializer):
 
 
 class WeighingPigletsReadSerializer(serializers.ModelSerializer):
-    date = serializers.DateField(source='date__date')
-    
+    date = serializers.DateField()
+
     class Meta:
         model = WeighingPiglets
         fields = ['date', 'total_weight', 'average_weight', 'piglets_quantity', 'piglets_age']
