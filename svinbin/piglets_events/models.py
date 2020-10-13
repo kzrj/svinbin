@@ -231,20 +231,31 @@ class PigletsMerger(PigletsEvent):
 
 
 class WeighingPigletsQuerySet(models.QuerySet):
+    # def get_tour_data_by_place(self, tour, place):
+    #     data = dict()
+    #     qs = self.filter(week_tour=tour, place=place).order_by('date')
+    #     if qs:
+    #         data['place'] = place
+    #         data['list'] = qs.values('date', 'total_weight', 'average_weight', 'piglets_quantity', 'piglets_age')
+    #         data['total'] = qs.aggregate(
+    #             total_quantity=Sum('piglets_quantity'),
+    #             total_avg=Avg('average_weight'),
+    #             total_total_weight=Sum('total_weight'),
+    #             total_avg_age=Avg('piglets_age'),
+    #             )
+    #         return data
+    #     return None
+
     def get_tour_data_by_place(self, tour, place):
-        data = dict()
+        total =list()
         qs = self.filter(week_tour=tour, place=place).order_by('date')
-        if qs:
-            data['place'] = place
-            data['list'] = qs.values('date', 'total_weight', 'average_weight', 'piglets_quantity', 'piglets_age')
-            data['total'] = qs.aggregate(
+        total = qs.aggregate(
                 total_quantity=Sum('piglets_quantity'),
                 total_avg=Avg('average_weight'),
                 total_total_weight=Sum('total_weight'),
                 total_avg_age=Avg('piglets_age'),
                 )
-            return data
-        return None
+        return qs, total
 
 
 class WeighingPigletsManager(CoreModelManager):

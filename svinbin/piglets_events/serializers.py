@@ -47,6 +47,12 @@ class WeighingPigletsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class WeighingPigletsReadSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WeighingPiglets
+        fields = ['date', 'total_weight', 'average_weight', 'piglets_quantity', 'piglets_age']
+
+
 class RecountWeighingPigletsSerializer(serializers.ModelSerializer):
     new_quantity = serializers.IntegerField(required=False)
 
