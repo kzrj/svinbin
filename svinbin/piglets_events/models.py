@@ -330,9 +330,10 @@ class CullingPigletsManager(CoreModelManager):
                         avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())
                     )
 
-    def get_by_tour_and_ws_number(self, tour, ws_number):
+    def get_by_tour_and_ws_number(self, tour, ws_number, culling_type='spec'):
         qs = self.get_queryset().filter(week_tour=tour, 
-            location__pigletsGroupCell__workshop__number=ws_number)
+            location__pigletsGroupCell__workshop__number=ws_number,
+            culling_type=culling_type)
         total = qs.aggregate(
             total_quantity=Sum('quantity'),
             total_total_weight=Sum('total_weight'),
