@@ -115,11 +115,11 @@ class TourReportV2ViewSetTest(APITestCase):
             birthday=datetime.datetime(2020,5,5,0,0))
 
         CullingPiglets.objects.create_culling_piglets(
-            piglets_group=piglets3, culling_type='padej', reason='xz', quantity=10, 
+            piglets_group=piglets3, culling_type='spec', reason='xz', quantity=10, 
             total_weight=100, date='2020-12-09'
             )
         CullingPiglets.objects.create_culling_piglets(
-            piglets_group=piglets4, culling_type='padej', reason='xz', quantity=1, 
+            piglets_group=piglets4, culling_type='spec', reason='xz', quantity=1, 
             total_weight=9.5, date='2020-12-09'
             )
 

@@ -154,6 +154,12 @@ class TourQuerySet(models.QuerySet):
 
             data[f'first_date_{place_formatted}'] = first_date_weights_subquery
 
+        data['first_date_spec'] = Subquery(piglets_events.models.CullingPiglets.objects.filter(
+                                        week_tour__pk=OuterRef('pk'),
+                                        culling_type='spec') \
+                                    .order_by('date') \
+                                    .values('date__date')[:1], output_field=models.DateTimeField())
+
         return self.annotate(**data)
 
     def add_culling_data_by_week_tour(self):
