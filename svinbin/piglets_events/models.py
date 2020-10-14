@@ -3,6 +3,7 @@ import datetime
 
 from django.db import models
 from django.db.models import Q, Sum, Avg, F, OuterRef, Subquery, ExpressionWrapper
+from django.db.models.functions import Round
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
 
@@ -348,7 +349,7 @@ class CullingPigletsManager(CoreModelManager):
         total = qs.aggregate(
             total_quantity=Sum('quantity'),
             total_total_weight=Sum('total_weight'),
-            total_avg=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField()),
+            total_avg=Round(Avg(F('total_weight') / F('quantity'), output_field=models.FloatField()), 2),
             total_avg_age=Avg('piglets_age'),
             )
         return qs, total
