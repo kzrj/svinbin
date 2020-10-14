@@ -23,7 +23,7 @@ from sows.models import Sow
 from piglets.models import Piglets
 
 from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer, \
-    StartDateEndDateSerializer
+    StartDateEndDateSerializer, TotalWeightsSerializer
 from piglets_events.serializers import WeighingPigletsReadSerializer, CullingPigletsReadSerializer
 from reports.filters import ReportDateFilter
 from core.permissions import ReadOrAdminOnlyPermissions
@@ -64,7 +64,7 @@ class TourReportV2ViewSet(viewsets.ModelViewSet):
             data[place] = dict()
             qs, total = tour.piglets_weights.all().get_tour_data_by_place(tour=tour, place=place)
             data[place]['list'] = WeighingPigletsReadSerializer(qs, many=True).data
-            data[place]['total'] = total
+            data[place]['total'] = TotalWeightsSerializer(total).data
 
         for ws_number in [5, 6, 7]:
             qs, total = tour.piglets_culling.get_by_tour_and_ws_number(tour=tour, ws_number=ws_number)

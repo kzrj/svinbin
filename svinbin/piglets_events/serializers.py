@@ -50,6 +50,7 @@ class WeighingPigletsSerializer(serializers.ModelSerializer):
 
 class WeighingPigletsReadSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(format='%d-%m-%Y')
+    average_weight = serializers.FloatField(decimal_places=2)
 
     class Meta:
         model = WeighingPiglets

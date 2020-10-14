@@ -49,4 +49,10 @@ class ReportDateWs3Serializer(AnnotateFieldsModelSerializer, serializers.ModelSe
 class StartDateEndDateSerializer(serializers.Serializer):
     start_date = serializers.DateField(format="%Y-%m-%d")
     end_date = serializers.DateField(format="%Y-%m-%d")
-        
+
+    
+class TotalWeightsSerializer(serializers.Serializer):
+    total_quantity = serializers.IntegerField()
+    total_avg = serializers.FloatField(decimal_places=2)
+    total_total_weight = serializers.IntegerField(decimal_places=2)
+    total_avg_age = serializers.IntegerField(decimal_places=2)
