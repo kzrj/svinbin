@@ -25,6 +25,7 @@ from piglets.models import Piglets
 from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer, \
     StartDateEndDateSerializer, TotalWeightsSerializer
 from piglets_events.serializers import WeighingPigletsReadSerializer, CullingPigletsReadSerializer
+from tours.serializers import TourSerializer
 from reports.filters import ReportDateFilter
 from core.permissions import ReadOrAdminOnlyPermissions
 
@@ -73,6 +74,7 @@ class TourReportV2ViewSet(viewsets.ModelViewSet):
             data[f'spec_{str(ws_number)}']['total'] = TotalWeightsSerializer(total).data
 
         data['farrow_data'] = tour.sowfarrow_set.count_piglets()
+        data['tour'] = TourSerializer(tour).data
 
         return Response(data)
 
