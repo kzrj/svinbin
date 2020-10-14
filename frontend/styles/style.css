@@ -486,7 +486,7 @@ hr {
 	vertical-align: middle !important;
 	font-size: 1.1rem ! important;
 	color: #171619;
-	height: 40px !important;
+	/* height: 40px; */
 }
 
 .op-list-item > td > span {
