@@ -3,7 +3,7 @@ import datetime
 
 from django.db import models
 from django.db.models import Q, Sum, Avg, F, OuterRef, Subquery, ExpressionWrapper
-from django.db.models.functions import Round
+
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
 

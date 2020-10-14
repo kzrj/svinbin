@@ -70,7 +70,7 @@ class TourReportV2ViewSet(viewsets.ModelViewSet):
             qs, total = tour.piglets_culling.get_by_tour_and_ws_number(tour=tour, ws_number=ws_number)
             data[f'spec_{str(ws_number)}'] = dict()
             data[f'spec_{str(ws_number)}']['list'] = CullingPigletsReadSerializer(qs, many=True).data
-            data[f'spec_{str(ws_number)}']['total'] = total
+            data[f'spec_{str(ws_number)}']['total'] = TotalWeightsSerializer(total).data
 
         data['farrow_data'] = tour.sowfarrow_set.count_piglets()
 
