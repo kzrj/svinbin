@@ -111,4 +111,4 @@ class MarksAsGiltListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = sows_events_models.MarkAsGilt.objects.all().select_related('gilt', 'sow', 'tour') \
         .order_by('-date')
     serializer_class = serializers.MarkAsGiltSerializer
-    permission_classes = [IsAuthenticated, WS3Permissions]
+    permission_classes = [IsAuthenticated]
