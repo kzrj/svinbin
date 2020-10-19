@@ -58,6 +58,8 @@ router.register(r'workshoponetwo/sows', workshoponetwo_views.WorkShopOneTwoSowVi
 # workshop three
 router.register(r'workshopthree/sows', workshopthree_views.WorkShopThreeSowsViewSet, \
  basename='workshopthree-sows')
+router.register(r'workshopthree/mark_as_gilts_journal', workshopthree_views.MarksAsGiltListView, \
+ basename='workshopthree-journal-markasgitls')
 
 # reports
 router.register(r'reports/tours', reports_views.TourReportViewSet,

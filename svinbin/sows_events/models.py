@@ -344,7 +344,7 @@ class MarkAsGiltManager(CoreModelManager):
         if not date:
             date = timezone.now()
         return self.create(gilt=gilt, sow=gilt.mother_sow, tour=gilt.tour,
-         location=gilt.mother_sow.location, initiator=initiator, date=date)      
+         location=gilt.mother_sow.location, initiator=initiator, date=date)
 
 
 class MarkAsGilt(SowEvent):

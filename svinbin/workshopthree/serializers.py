@@ -4,6 +4,7 @@ from core.utils import CustomValidation
 
 from tours.models import Tour
 from locations.models import Location
+from sows_events.models import MarkAsGilt
 
 
 class MarkSowAsNurseSerializer(serializers.Serializer):
@@ -29,6 +30,12 @@ class MoveSowAndPigletsSerializer(serializers.Serializer):
         return data
 
 
-class MarkAsGiltSerializer(serializers.Serializer):
+class MarkAsGiltCreateSerializer(serializers.Serializer):
     birth_id = serializers.CharField()
     date = serializers.DateField(format="%Y-%m-%d", required=False, default=None)
+
+
+class MarkAsGiltSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MarkAsGilt
+        fields = '__all__'

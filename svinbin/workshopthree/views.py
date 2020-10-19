@@ -89,7 +89,7 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
     @action(methods=['post'], detail=True)
     def mark_as_gilt(self, request, pk=None):
         mother_sow = self.get_object()
-        serializer = serializers.MarkAsGiltSerializer(data=request.data)
+        serializer = serializers.MarkAsGiltCreateSerializer(data=request.data)
         
         if serializer.is_valid():
             gilt = Gilt.objects.create_gilt(
@@ -105,3 +105,9 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class MarksAsGiltListView(generics.ListAPIView):
+    queryset = MarkAsGilt.objects.all()
+    serializer_class = MarkAsGiltSerializer
+    permission_classes = [IsAuthenticated, WS3Permissions]
