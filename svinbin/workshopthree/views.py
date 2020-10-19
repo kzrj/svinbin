@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.utils import timezone
 
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, generics, mixins
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
@@ -107,7 +107,8 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MarksAsGiltListView(generics.ListAPIView):
-    queryset = MarkAsGilt.objects.all()
-    serializer_class = MarkAsGiltSerializer
+class MarksAsGiltListView(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = sows_events_models.MarkAsGilt.objects.all().select_related('gilt', 'sow', 'tour') \
+        .order_by('-date')
+    serializer_class = serializers.MarkAsGiltSerializer
     permission_classes = [IsAuthenticated, WS3Permissions]

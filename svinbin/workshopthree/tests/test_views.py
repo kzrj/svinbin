@@ -287,3 +287,50 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         self.assertEqual(event.date.day, 10)
 
         self.client.logout()
+
+
+class MarksAsGiltListViewTest(APITestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+        staff_testing.create_svinbin_users()
+        self.client = APIClient()
+        self.user = staff_testing.create_employee()
+        self.brig1 = User.objects.get(username='brigadir1')
+        self.brig2 = User.objects.get(username='brigadir2')
+        self.brig3 = User.objects.get(username='brigadir3')
+        self.brig4 = User.objects.get(username='brigadir4')
+        self.brig5 = User.objects.get(username='brigadir5')
+
+        self.loc_ws1 = Location.objects.get(workshop__number=1)
+        self.loc_ws2 = Location.objects.get(workshop__number=2)
+
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.loc_ws3_sec1 = Location.objects.get(section__workshop__number=3, section__number=1)
+        self.loc_ws3_sec2 = Location.objects.get(section__workshop__number=3, section__number=2)
+
+    def test_mark_as_gilt_list(self):
+        self.client.force_authenticate(user=self.brig3)
+        sow = sows_testing.create_sow_seminated_usouded_ws3_section(section_number=1,
+            week=7)
+        location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
+        sow.change_sow_current_location(location)
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+
+        response = self.client.post('/api/workshopthree/sows/%s/mark_as_gilt/' % sow.pk,
+         {'birth_id': 'A123'})
+        
+        sow.alive = False
+        sow.save()
+        response = self.client.post('/api/workshopthree/sows/%s/mark_as_gilt/' % sow.pk,
+         {'birth_id': 'A124', 'date': '2020-09-21'})
+              
+        response = self.client.post('/api/workshopthree/sows/%s/mark_as_gilt/' % sow.pk,
+         {'birth_id': 'A125', 'date': '2020-09-10'})
+
+        response = self.client.get('/api/workshopthree/reports/mark_as_gilts_journal/')
+        self.assertEqual(response.data['results'][0]['birth_id'], 'A123')              
+
+        self.client.logout()

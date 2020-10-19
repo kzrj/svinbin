@@ -36,6 +36,10 @@ class MarkAsGiltCreateSerializer(serializers.Serializer):
 
 
 class MarkAsGiltSerializer(serializers.ModelSerializer):
+    birth_id = serializers.ReadOnlyField(source='gilt.birth_id')
+    week = serializers.ReadOnlyField(source='tour.week_number')
+    sow_farm_id = serializers.ReadOnlyField(source='sow.farm_id')
+
     class Meta:
         model = MarkAsGilt
-        fields = '__all__'
+        fields = ['date', 'sow_farm_id', 'week', 'birth_id']
