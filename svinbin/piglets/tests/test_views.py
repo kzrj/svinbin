@@ -114,6 +114,31 @@ class PigletsViewSetTest(APITestCase):
         self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
         self.client.logout()
 
+    def test_create_from_merging_list_v3(self):
+        # with gilts quantity
+        self.client.force_authenticate(user=self.brig3)
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets1.add_gilts_without_increase_quantity(2)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets2.add_gilts_without_increase_quantity(2)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1, 10)
+        piglets3.add_gilts_without_increase_quantity(2)
+
+        response = self.client.post('/api/piglets/create_from_merging_list_and_move_to_ws4/', \
+            {'records': [
+                {'piglets_id': piglets1.pk, 'quantity': 8, 'changed': True, 
+                    'gilts_contains': True, 'gilts_quantity': 8},
+                {'piglets_id': piglets2.pk, 'quantity': piglets2.quantity, 'changed': False, 
+                    'gilts_contains': False, 'gilts_quantity': 8}
+                ],
+            },
+            format='json')
+        self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
+        self.client.logout()
+
     def test_create_from_merging_list_permissions(self):
         self.client.force_authenticate(user=self.brig1)
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -366,7 +391,7 @@ class PigletsViewSetTest(APITestCase):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
         piglets = Piglets.objects.create(location=self.loc_ws4_cell1, quantity=100, start_quantity=100,
-            gilts_quantity=0, status=None)
+            gilts_quantity=0, status=None, birthday=datetime.datetime.now())
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
         record1 = meta_tour.records.create_record(meta_tour, tour, 60, piglets.quantity)
@@ -390,7 +415,7 @@ class PigletsViewSetTest(APITestCase):
         tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
         location = Location.objects.get(section__number=1, section__workshop__number=3)
         piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100,
-            gilts_quantity=0, status=None)
+            gilts_quantity=0, status=None, birthday=datetime.datetime.now())
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
         record1 = meta_tour.records.create_record(meta_tour, tour, 60, piglets.quantity)
@@ -411,7 +436,7 @@ class PigletsViewSetTest(APITestCase):
         tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
         location = Location.objects.get(section__number=1, section__workshop__number=3)
         piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100,
-            gilts_quantity=0, status=None)
+            gilts_quantity=0, status=None, birthday=datetime.datetime.now())
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
         record1 = meta_tour.records.create_record(meta_tour, tour, 60, piglets.quantity)
@@ -472,6 +497,7 @@ class PigletsViewSetTest(APITestCase):
             {})
         self.assertEqual(response.status_code, 403)
         self.client.logout()
+
 
 class PigletsFilterTest(APITestCase):
     def setUp(self):

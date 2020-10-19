@@ -185,27 +185,25 @@ class PigletsMergerManager(CoreModelManager):
     def create_from_merging_list(self, merging_list, new_location, initiator=None, date=None):
         if not date:
             date=timezone.now()
-        # parse and parentpiglets
+            
         parent_piglets_ids = list()
         for merging_record in merging_list:
-            piglets = Piglets.objects.get(id=merging_record['piglets_id'])
-            weaning_piglets = piglets
-
             weaning_piglets = Piglets.objects.get(id=merging_record['piglets_id'])            
 
-            if not merging_record['changed']:
-                parent_piglets_ids.append(merging_record['piglets_id'])
-
-            else:
-                # split piglets return group id with quantity
+            if merging_record['changed']:
                 not_merging_piglets, merging_piglets = \
-                    PigletsSplit.objects.split_return_groups(parent_piglets=piglets,
+                    PigletsSplit.objects.split_return_groups(parent_piglets=weaning_piglets,
                     new_amount=merging_record['quantity'],
                     gilts_to_new=merging_record['gilts_contains'],
                     initiator=initiator,
                     date=date)
                 weaning_piglets = merging_piglets
-                parent_piglets_ids.append(merging_piglets.id)
+            
+            if merging_record.get('gilts_quantity'):
+                weaning_piglets.gilts_quantity = merging_record.get('gilts_quantity')
+                weaning_piglets.save()
+
+            parent_piglets_ids.append(weaning_piglets.id)
 
             sow_in_cell = weaning_piglets.location.sow_set.all().first()
             if sow_in_cell:

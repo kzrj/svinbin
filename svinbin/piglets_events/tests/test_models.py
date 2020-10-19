@@ -343,6 +343,30 @@ class PigletsMergerModelTest(TransactionTestCase):
 
         self.assertEqual(merged_piglets.quantity, 100)
 
+    def test_create_from_merging_list_v5_with_gilts_quantity(self):
+        # without gilts
+        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1,
+         self.loc_ws3_sec1_cell1, 10)
+        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2,
+         self.loc_ws3_sec1_cell2, 10)
+        
+        piglets1.add_gilts_without_increase_quantity(3)
+        piglets2.add_gilts_without_increase_quantity(2)
+
+        merging_list = [
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True,
+             'gilts_contains': False, 'gilts_quantity': 7},
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False,
+             'gilts_contains': True, 'gilts_quantity': 5}
+        ]
+
+        nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list,
+         self.loc_ws3)
+
+        self.assertEqual(nomad_piglets.location, self.loc_ws3)
+        self.assertEqual(nomad_piglets.quantity, 17)
+        self.assertEqual(nomad_piglets.gilts_quantity, 12)
+
 
 class PigletsSplitModelTest(TestCase):
     def setUp(self):
