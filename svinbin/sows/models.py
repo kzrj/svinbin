@@ -365,8 +365,8 @@ class Sow(Pig):
 
 
 class GiltManager(CoreModelManager):
-    def create_gilt(self, birth_id, mother_sow_farm_id, piglets):
-        mother_sow = Sow.objects.filter(farm_id=mother_sow_farm_id).first()
+    def create_gilt(self, birth_id, mother_sow_farm_id, piglets=None):
+        mother_sow = Sow.objects.get_queryset_with_not_alive().filter(farm_id=mother_sow_farm_id).first()
 
         if not mother_sow:
             raise DjangoValidationError(message=f'Нет свиноматки с {mother_sow_farm_id}.')
@@ -381,7 +381,8 @@ class GiltManager(CoreModelManager):
             farrow=mother_sow.get_last_farrow
          )
 
-        piglets.add_gilts_without_increase_quantity(1)
+        if piglets:
+            piglets.add_gilts_without_increase_quantity(1)
 
         return gilt
 

@@ -10,7 +10,7 @@ from workshopthree import serializers
 from sows import serializers as sows_serializers
 from sows_events import serializers as sows_events_serializers
 
-from sows.models import Sow
+from sows.models import Sow, Gilt
 from sows_events import models as sows_events_models
 from transactions.models import SowTransaction, PigletsTransaction
 
@@ -81,6 +81,26 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
             return Response(
                 {
                  "message": f"Свиноматка {sow.farm_id} и поросята №{piglets.id} перемещены.",
+                },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=True)
+    def mark_as_gilt(self, request, pk=None):
+        mother_sow = self.get_object()
+        serializer = serializers.MarkAsGiltSerializer(data=request.data)
+        
+        if serializer.is_valid():
+            gilt = Gilt.objects.create_gilt(
+                birth_id=serializer.validated_data['birth_id'],
+                mother_sow_farm_id=mother_sow.farm_id
+                )
+            sows_events_models.MarkAsGilt.objects.create_init_gilt_event(
+                gilt=gilt, initiator=request.user, date=serializer.validated_data['date'])
+            return Response(
+                {
+                    'message': f'Ремонтная свинка {gilt.birth_id} создана.'
                 },
                 status=status.HTTP_200_OK)
         else:

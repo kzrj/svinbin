@@ -11,7 +11,7 @@ import piglets.testing_utils as piglets_testing
 import staff.testing_utils as staff_testing
 
 from sows.models import Gilt
-from sows_events.models import SowFarrow
+from sows_events.models import SowFarrow, MarkAsGilt
 from locations.models import WorkShop, SowAndPigletsCell, Location
 from transactions.models import PigletsTransaction, SowTransaction
 from tours.models import Tour
@@ -259,4 +259,31 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         response = self.client.post('/api/workshopthree/sows/%s/culling/' % sow1.pk,
          {'culling_type': 'padej', 'reason': 'test', 'weight': 150})
         self.assertEqual(response.status_code, 403)
+        self.client.logout()
+
+    def test_mark_as_gilt(self):
+        self.client.force_authenticate(user=self.brig3)
+        sow = sows_testing.create_sow_seminated_usouded_ws3_section(section_number=1,
+            week=7)
+        location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
+        sow.change_sow_current_location(location)
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+
+        response = self.client.post('/api/workshopthree/sows/%s/mark_as_gilt/' % sow.pk,
+         {'birth_id': 'A123'})
+        self.assertEqual(response.status_code, 200)
+
+        sow.alive = False
+        sow.save()
+        response = self.client.post('/api/workshopthree/sows/%s/mark_as_gilt/' % sow.pk,
+         {'birth_id': 'A124'})
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.client.post('/api/workshopthree/sows/%s/mark_as_gilt/' % sow.pk,
+         {'birth_id': 'A125', 'date': '2020-09-10'})
+        self.assertEqual(response.status_code, 200)
+        
+        event = MarkAsGilt.objects.filter(gilt__birth_id='A125').first()
+        self.assertEqual(event.date.day, 10)
+
         self.client.logout()

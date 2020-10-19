@@ -191,6 +191,8 @@ class PigletsMergerManager(CoreModelManager):
             piglets = Piglets.objects.get(id=merging_record['piglets_id'])
             weaning_piglets = piglets
 
+            weaning_piglets = Piglets.objects.get(id=merging_record['piglets_id'])            
+
             if not merging_record['changed']:
                 parent_piglets_ids.append(merging_record['piglets_id'])
 

@@ -27,3 +27,8 @@ class MoveSowAndPigletsSerializer(serializers.Serializer):
                 'to_location', status_code=status.HTTP_400_BAD_REQUEST)
 
         return data
+
+
+class MarkAsGiltSerializer(serializers.Serializer):
+    birth_id = serializers.CharField()
+    date = serializers.DateField(format="%Y-%m-%d", required=False, default=None)
