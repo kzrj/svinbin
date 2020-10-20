@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import datetime
 from django.utils import timezone
 
 from rest_framework import viewsets, status, generics, mixins
@@ -110,5 +111,22 @@ class WorkShopThreeSowsViewSet(WorkShopSowViewSet):
 class MarksAsGiltListView(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = sows_events_models.MarkAsGilt.objects.all().select_related('gilt', 'sow', 'tour') \
         .order_by('-date')
-    serializer_class = serializers.MarkAsGiltSerializer
+    serializer_class = serializers.SowMarkAsGiltSerializer
     permission_classes = [IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        sows_pk_list = self.filter_queryset(self.get_queryset()) \
+            .values_list('sow__pk', flat=True)
+
+        sows_qs = Sow.objects.get_queryset_with_not_alive() \
+            .filter(pk__in=sows_pk_list) \
+            .add_mark_as_gilt_last_date_and_last_tour() \
+            .order_by('-last_date_mark')
+
+        page = self.paginate_queryset(sows_qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(sows_qs, many=True)
+        return Response(serializer.data)

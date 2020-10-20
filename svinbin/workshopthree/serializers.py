@@ -5,6 +5,7 @@ from core.utils import CustomValidation
 from tours.models import Tour
 from locations.models import Location
 from sows_events.models import MarkAsGilt
+from sows.models import Sow
 
 
 class MarkSowAsNurseSerializer(serializers.Serializer):
@@ -43,3 +44,13 @@ class MarkAsGiltSerializer(serializers.ModelSerializer):
     class Meta:
         model = MarkAsGilt
         fields = ['date', 'sow_farm_id', 'week', 'birth_id']
+
+
+class SowMarkAsGiltSerializer(serializers.ModelSerializer):
+    gilt_list = serializers.ReadOnlyField(source='gilt_list_by_last_tour')
+    last_date_mark = serializers.DateTimeField()
+    last_week_mark = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Sow
+        fields = ['farm_id', 'last_date_mark', 'last_week_mark', 'gilt_list']

@@ -7,7 +7,8 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location
-from sows_events.models import Semination, AssingFarmIdEvent, PigletsToSowsEvent, CullingSow, SowFarrow
+from sows_events.models import Semination, AssingFarmIdEvent, PigletsToSowsEvent, CullingSow, SowFarrow, \
+    MarkAsGilt
 from tours.models import Tour
 
 
@@ -174,6 +175,27 @@ class SowsQuerySet(models.QuerySet):
                     Q(location__sowAndPigletsCell__isnull=False) 
                     | Q(location__workshop__number=workshop_number))\
                     .values_list('tour__pk', flat=True).distinct()
+
+    def add_mark_as_gilt_last_date_and_last_tour(self):
+        last_date = MarkAsGilt.objects.filter(sow__pk=OuterRef('pk')) \
+            .order_by('-date').values('date')[:1]
+        last_tour_week = MarkAsGilt.objects.filter(sow__pk=OuterRef('pk')) \
+            .order_by('-date').values('tour__week_number')[:1]
+
+        return self.annotate(last_date_mark=Subquery(last_date), last_week_mark=Subquery(last_tour_week))
+
+    # def add_last_mark_gilts(self):
+    #     # MarkAsGilt.objects \
+    #     #     .filter(sow__pk=OuterRef('pk'), tour__week_number=OuterRef('last_week_mark')) \
+
+    #     return self.prefetch_related(
+    #         Prefetch(
+    #             'gilts',
+    #             queryset=Subquery(Gilt.objects.filter(tour__week_number=OuterRef('last_week_mark'))),
+    #             to_attr='gilts_last_mark'
+    #         )
+    #     )
+            
 
 
 class SowManager(CoreModelManager):
@@ -363,6 +385,10 @@ class Sow(Pig):
             self.tour = None
             self.change_status_to('Ожидает осеменения')
 
+    @property
+    def gilt_list_by_last_tour(self):
+        return self.gilts.filter(tour__week_number=self.last_week_mark).values_list('birth_id', flat=True)
+
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow_farm_id, piglets=None):
@@ -388,7 +414,7 @@ class GiltManager(CoreModelManager):
 
 
 class Gilt(Pig):
-    mother_sow = models.ForeignKey(Sow, on_delete=models.SET_NULL, null=True)
+    mother_sow = models.ForeignKey(Sow, on_delete=models.SET_NULL, null=True, related_name='gilts')
     tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True)
     farrow = models.ForeignKey('sows_events.SowFarrow', on_delete=models.SET_NULL, null=True)
 

@@ -16,7 +16,7 @@ import piglets.testing_utils as piglets_testing
 from locations.models import Location, Section
 from sows.models import Sow, Gilt, Boar, SowStatus, SowStatusRecord
 from sows_events.models import SowFarrow, Ultrasound, Semination, AssingFarmIdEvent, \
-    PigletsToSowsEvent, CullingSow
+    PigletsToSowsEvent, CullingSow, MarkAsGilt
 from tours.models import Tour
 
 from sows.serializers import SowManySerializer
@@ -305,7 +305,6 @@ class SowModelTest(TransactionTestCase):
         self.assertEqual(assing_event.sow, assigned_sow)
         self.assertEqual(assing_event.assing_type, 'nowhere')
 
-
 class SowQueryTest(TransactionTestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
@@ -378,6 +377,47 @@ class SowQueryTest(TransactionTestCase):
         ws3_tours = Sow.objects.all().get_tours_pks(workshop_number=3)        
         # self.assertEqual(ws3_tours[0], 4)
         # self.assertEqual(ws3_tours[1], 5)
+
+    def test_mark_as_gilt_qs(self):
+        cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
+        sow = sows_testings.create_sow_with_semination_usound(cells[0], 1)
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+        piglets = farrow.piglets_group
+        gilt1 = Gilt.objects.create_gilt(birth_id='1a', mother_sow_farm_id=sow.farm_id,
+             piglets=piglets)
+        mg1 = MarkAsGilt.objects.create_init_gilt_event(gilt=gilt1)
+        gilt2 = Gilt.objects.create_gilt(birth_id='2a', mother_sow_farm_id=sow.farm_id,
+             piglets=piglets)
+        mg2 = MarkAsGilt.objects.create_init_gilt_event(gilt=gilt2)
+
+        sow2 = sows_testings.create_sow_with_semination_usound(cells[1], 1)
+        farrow2 = SowFarrow.objects.create_sow_farrow(sow=sow2, alive_quantity=10)
+        piglets2 = farrow2.piglets_group
+        gilt3 = Gilt.objects.create_gilt(birth_id='3a', mother_sow_farm_id=sow2.farm_id,
+             piglets=piglets2)
+        mg3 = MarkAsGilt.objects.create_init_gilt_event(gilt=gilt3)
+        gilt4 = Gilt.objects.create_gilt(birth_id='4a', mother_sow_farm_id=sow2.farm_id,
+             piglets=piglets2)
+        mg4 = MarkAsGilt.objects.create_init_gilt_event(gilt=gilt4)
+
+        sow3 = sows_testings.create_sow_with_semination_usound(cells[2], 1)
+        farrow3 = SowFarrow.objects.create_sow_farrow(sow=sow3, alive_quantity=10)
+        piglets3 = farrow3.piglets_group
+        gilt5 = Gilt.objects.create_gilt(birth_id='5a', mother_sow_farm_id=sow3.farm_id,
+             piglets=piglets3)
+        mg5 = MarkAsGilt.objects.create_init_gilt_event(gilt=gilt5)
+        gilt6 = Gilt.objects.create_gilt(birth_id='6a', mother_sow_farm_id=sow3.farm_id,
+             piglets=piglets3)
+        mg6 = MarkAsGilt.objects.create_init_gilt_event(gilt=gilt6)
+
+        sows_qs = Sow.objects.get_queryset_with_not_alive()\
+                             .add_mark_as_gilt_last_date_and_last_tour() \
+                             .order_by('-last_date_mark')
+        self.assertEqual(sows_qs.first().last_date_mark, mg6.date)
+        self.assertEqual(sows_qs.first().last_week_mark, mg6.tour.week_number)
+
+        # sows_qs = sows_qs.add_last_mark_gilts()
+        # print(sows_qs.first().gilt_list_by_last_tour)
 
 
 class GiltModelManagerTest(TransactionTestCase):

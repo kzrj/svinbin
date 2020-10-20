@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+import time
 from django.contrib.auth.models import User
 
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
+from django.test import TransactionTestCase
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
@@ -10,11 +12,13 @@ import sows_events.utils as sows_events_testings
 import piglets.testing_utils as piglets_testing
 import staff.testing_utils as staff_testing
 
-from sows.models import Gilt
+from sows.models import Gilt, Sow
 from sows_events.models import SowFarrow, MarkAsGilt
 from locations.models import WorkShop, SowAndPigletsCell, Location
 from transactions.models import PigletsTransaction, SowTransaction
 from tours.models import Tour
+
+from workshopthree.serializers import SowMarkAsGiltSerializer
 
 
 class WorkshopThreeSowsViewSetTest(APITestCase):
@@ -320,7 +324,7 @@ class MarksAsGiltListViewTest(APITestCase):
         farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
 
         response = self.client.post('/api/workshopthree/sows/%s/mark_as_gilt/' % sow.pk,
-         {'birth_id': 'A123'})
+         {'birth_id': 'A123', 'date': '2020-09-11'})
         
         sow.alive = False
         sow.save()
@@ -330,7 +334,71 @@ class MarksAsGiltListViewTest(APITestCase):
         response = self.client.post('/api/workshopthree/sows/%s/mark_as_gilt/' % sow.pk,
          {'birth_id': 'A125', 'date': '2020-09-10'})
 
+        sow2 = sows_testing.create_sow_seminated_usouded_ws3_section(section_number=1,
+            week=7)
+        location2 = Location.objects.filter(sowAndPigletsCell__isnull=False)[1]
+        sow2.change_sow_current_location(location2)
+        farrow2 = SowFarrow.objects.create_sow_farrow(sow=sow2, alive_quantity=10)
+        response = self.client.post('/api/workshopthree/sows/%s/mark_as_gilt/' % sow2.pk,
+         {'birth_id': 'A126', 'date': '2020-10-10'})
+
         response = self.client.get('/api/workshopthree/reports/mark_as_gilts_journal/')
-        self.assertEqual(response.data['results'][0]['birth_id'], 'A123')              
+        self.assertEqual(response.data['results'][0]['farm_id'], sow2.farm_id)
+        self.assertEqual(response.data['results'][0]['gilt_list'][0], 'A126')
 
         self.client.logout()
+
+
+class SowMarksAsGiltSerializerTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+        staff_testing.create_svinbin_users()
+        
+    def test_serializer_queries(self):
+        cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
+        sow = sows_testing.create_sow_with_semination_usound(cells[0], 1)
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10)
+        piglets = farrow.piglets_group
+        gilt1 = Gilt.objects.create_gilt(birth_id='1a', mother_sow_farm_id=sow.farm_id,
+             piglets=piglets)
+        MarkAsGilt.objects.create_init_gilt_event(gilt=gilt1)
+        gilt2 = Gilt.objects.create_gilt(birth_id='2a', mother_sow_farm_id=sow.farm_id,
+             piglets=piglets)
+        MarkAsGilt.objects.create_init_gilt_event(gilt=gilt2)
+
+        sow2 = sows_testing.create_sow_with_semination_usound(cells[1], 1)
+        farrow2 = SowFarrow.objects.create_sow_farrow(sow=sow2, alive_quantity=10)
+        piglets2 = farrow2.piglets_group
+        gilt3 = Gilt.objects.create_gilt(birth_id='3a', mother_sow_farm_id=sow2.farm_id,
+             piglets=piglets2)
+        MarkAsGilt.objects.create_init_gilt_event(gilt=gilt3)
+        gilt4 = Gilt.objects.create_gilt(birth_id='4a', mother_sow_farm_id=sow2.farm_id,
+             piglets=piglets2)
+        MarkAsGilt.objects.create_init_gilt_event(gilt=gilt4)
+
+        sow3 = sows_testing.create_sow_with_semination_usound(cells[2], 1)
+        farrow3 = SowFarrow.objects.create_sow_farrow(sow=sow3, alive_quantity=10)
+        piglets3 = farrow3.piglets_group
+        gilt5 = Gilt.objects.create_gilt(birth_id='5a', mother_sow_farm_id=sow3.farm_id,
+             piglets=piglets3)
+        MarkAsGilt.objects.create_init_gilt_event(gilt=gilt5)
+        gilt6 = Gilt.objects.create_gilt(birth_id='6a', mother_sow_farm_id=sow3.farm_id,
+             piglets=piglets3)
+        MarkAsGilt.objects.create_init_gilt_event(gilt=gilt6)
+
+        mag_qs = MarkAsGilt.objects.all().select_related('gilt', 'sow', 'tour') \
+            .order_by('-date')
+
+        sows_pk_list = mag_qs.values_list('sow__pk', flat=True)
+
+        sows_qs = Sow.objects.get_queryset_with_not_alive() \
+            .filter(pk__in=sows_pk_list) \
+            .add_mark_as_gilt_last_date_and_last_tour() \
+            .order_by('-last_date_mark')
+
+        with self.assertNumQueries(1):
+            serializer = SowMarkAsGiltSerializer(sows_qs, many=True)
+            serializer.data
