@@ -397,13 +397,15 @@ class GiltManager(CoreModelManager):
         if not mother_sow:
             raise DjangoValidationError(message=f'Нет свиноматки с {mother_sow_farm_id}.')
         
-        if not mother_sow.tour:
-            raise DjangoValidationError(message=f'У свиноматки {mother_sow.farm_id} не текущего тура.')
+        tour = mother_sow.tour
+        if not tour:
+            tour = sow.get_last_farrow.tour
+            # raise DjangoValidationError(message=f'У свиноматки {mother_sow.farm_id} не текущего тура.')
 
         gilt = self.create(
             birth_id=birth_id,
             mother_sow=mother_sow,
-            tour=mother_sow.tour,
+            tour=tour,
             farrow=mother_sow.get_last_farrow
          )
 
