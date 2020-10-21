@@ -73,6 +73,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                   "message": 'Партия создана и перемещена в Цех4.',
+                  "piglets": piglets_serializers.PigletsSimpleSerializer(merged_piglets).data
                  },
                  
                 status=status.HTTP_200_OK)

@@ -132,11 +132,14 @@ class PigletsViewSetTest(APITestCase):
                 {'piglets_id': piglets1.pk, 'quantity': 8, 'changed': True, 
                     'gilts_contains': True, 'gilts_quantity': 8},
                 {'piglets_id': piglets2.pk, 'quantity': piglets2.quantity, 'changed': False, 
-                    'gilts_contains': False, 'gilts_quantity': 8}
+                    'gilts_contains': False,}
                 ],
             },
             format='json')
+        
         self.assertEqual(response.data['message'], 'Партия создана и перемещена в Цех4.')
+        self.assertEqual(response.data['piglets']['quantity'], 18)
+        self.assertEqual(response.data['piglets']['gilts_quantity'], 10)
         self.client.logout()
 
     def test_create_from_merging_list_permissions(self):
