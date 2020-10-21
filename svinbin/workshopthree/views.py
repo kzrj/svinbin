@@ -121,7 +121,7 @@ class MarksAsGiltListView(mixins.ListModelMixin, viewsets.GenericViewSet):
         sows_qs = Sow.objects.get_queryset_with_not_alive() \
             .filter(pk__in=sows_pk_list) \
             .add_mark_as_gilt_last_date_and_last_tour() \
-            .order_by('-last_date_mark')
+            .order_by('-last_date_mark')[:10]
 
         page = self.paginate_queryset(sows_qs)
         if page is not None:
