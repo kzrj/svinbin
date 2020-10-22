@@ -18,8 +18,9 @@ from sows.models import Sow, Gilt, Boar, SowStatus, SowStatusRecord
 from sows_events.models import SowFarrow, Ultrasound, Semination, AssingFarmIdEvent, \
     PigletsToSowsEvent, CullingSow, MarkAsGilt
 from tours.models import Tour
+from transactions.models import SowTransaction
 
-from sows.serializers import SowManySerializer
+from sows.serializers import SowManySerializer, SowOperationSerializer
 
 
 class SowModelTest(TransactionTestCase):
@@ -726,3 +727,29 @@ class SowGroupTest(TransactionTestCase):
         self.assertEqual(sow.count_group_rem, 0)
         self.assertEqual(sow.count_group_check, 0)
         self.assertEqual(sow.count_group_oporos, 3)
+
+
+class SowModelOperationsTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_operations(self):
+        loc = Location.objects.get(workshop__number=1)
+        sow = sows_testings.create_sow_with_location(location=loc)
+
+        Semination.objects.create_semination(sow=sow, week=10, date=date(2020, 6, 1))
+        Ultrasound.objects.create_ultrasound(sow=sow, result=True, 
+            days=30, date=date(2020, 6, 30))
+        Ultrasound.objects.create_ultrasound(sow=sow, result=True, 
+            days=60, date=date(2020, 7, 15))
+
+        loc2 = Location.objects.get(workshop__number=2)
+        SowTransaction.objects.create_transaction(sow=sow, to_location=loc2,
+            date=date(2020, 7, 17))
+
+        print(sow.last_operations())
+        # with self.assertNumQueries(1):
+        print(SowOperationSerializer(sow.last_operations(), many=True).data)

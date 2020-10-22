@@ -195,7 +195,6 @@ class SowsQuerySet(models.QuerySet):
     #             to_attr='gilts_last_mark'
     #         )
     #     )
-            
 
 
 class SowManager(CoreModelManager):
@@ -388,6 +387,31 @@ class Sow(Pig):
     @property
     def gilt_list_by_last_tour(self):
         return self.gilts.filter(tour__week_number=self.last_week_mark).values_list('birth_id', flat=True)
+
+    def last_operations(self):
+        return self.semination_set.all() \
+                .prepare_and_return_union_values(fields=['result', 'from_location', 'to_location'],
+                                                 label='осеменение') \
+            .union(self.ultrasound_set.all() \
+                .prepare_and_return_union_values(fields=['from_location', 'to_location'], label='узи')) \
+            .union(self.cullingsow_set.all() \
+                .prepare_and_return_union_values(fields=['result','from_location', 'to_location'],
+                                                 label='выбытие')) \
+            .union(self.abortionsow_set.all() \
+                .prepare_and_return_union_values(fields=['result','from_location', 'to_location'],
+                                                 label='аборт')) \
+            .union(self.sowfarrow_set.all() \
+                .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
+                                                label='опорос')) \
+            .union(self.weaningsow_set.all() \
+                .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
+                                                label='отъем')) \
+            .union(self.markasnurse_set.all() \
+                .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
+                                                label='кормилица')) \
+            # .union(self.transactions.all() \
+            #     .values('date', 'tour__week_number', 'initiator__username', 'from_location', 'to_location', result=models.Value(False, output_field=models.BooleanField()), label=Value('перемещение', output_field=models.CharField()))) \
+            # .order_by('-date')[:10]
 
 
 class GiltManager(CoreModelManager):

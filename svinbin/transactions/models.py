@@ -17,13 +17,16 @@ class Transaction(Event):
 
 
 class SowTransactionManager(CoreModelManager):
-    def create_transaction(self, sow, to_location,  initiator=None,):
+    def create_transaction(self, sow, to_location,  initiator=None, date=None):
         if isinstance(to_location.get_location, SowAndPigletsCell) and not to_location.is_sow_empty:
             raise DjangoValidationError(message='Клетка №{} не пустая'. \
                 format(to_location.sowAndPigletsCell.number))
 
+        if not date:
+            date = timezone.now()
+
         transaction = self.create(
-                date=timezone.now(),
+                date=date,
                 initiator=initiator,
                 from_location=sow.location,
                 to_location=to_location,

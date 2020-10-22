@@ -94,3 +94,20 @@ class BoarBreedSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoarBreed
         fields = ['id', 'title']
+
+
+class LocationPkField(serializers.RelatedField):
+    def to_representation(self, value):
+        if value == 0:
+            return None
+        return Location.objects.get(pk=value).get_full_loc
+
+
+class SowOperationSerializer(serializers.Serializer):
+    date = serializers.DateTimeField()
+    week = serializers.IntegerField(source='tour__week_number')
+    initiator = serializers.CharField(source='initiator__username')
+    label = serializers.CharField()
+    from_location = LocationPkField(read_only=True)
+    to_location = LocationPkField(read_only=True)
+    # result = serializers.BooleanField()

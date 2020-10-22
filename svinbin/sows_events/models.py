@@ -20,8 +20,40 @@ class SowEvent(Event):
     class Meta:
         abstract = True
 
+
+class SowEventManager(CoreModelManager):
+    pass
+
+
+class SowEventQuerySet(models.QuerySet):
+    def add_missing_fields_for_union(self, fields=[]):
+        data = dict()
+        for field in fields:
+            if field == 'result':
+                data[field] = models.Value(False, output_field=models.BooleanField())
+            else:
+                data[field] = models.Value(0, output_field=models.IntegerField())
+
+        return self.annotate(**data)
+
+    def values_for_union(self, label):
+        return self.values('date', 'tour__week_number', 'initiator__username', 'result',
+         'from_location', 'to_location', label=models.Value(label, output_field=models.CharField()))
+
+    def prepare_and_return_union_values(self, label, fields=[]):
+        return self.add_missing_fields_for_union(fields=fields) \
+                .values_for_union(label=label)
+
+
+
+class SeminationQuerySet(SowEventQuerySet):
+    pass
+
     
-class SeminationManager(CoreModelManager):
+class SeminationManager(SowEventManager):
+    def get_queryset(self):
+        return SeminationQuerySet(self.model, using=self._db)
+
     def create_semination_tour(self, sow, tour, initiator=None, semination_employee=None, boar=None,
          date=None):
 
@@ -105,7 +137,14 @@ class UltrasoundType(CoreModel):
         return 'UZI %d' % self.days
 
 
-class UltrasoundManager(CoreModelManager):
+class UltrasoundQuerySet(SowEventQuerySet):
+    pass
+
+
+class UltrasoundManager(SowEventManager):
+    def get_queryset(self):
+        return UltrasoundQuerySet(self.model, using=self._db)
+
     def create_ultrasound(self, sow, initiator=None, result=False, days=30, date=timezone.now()):
         if not date:
             date=timezone.now()
@@ -154,11 +193,11 @@ class Ultrasound(SowEvent):
     objects = UltrasoundManager()
 
 
-class SowFarrowQuerySet(models.QuerySet):
+class SowFarrowQuerySet(SowEventQuerySet):
     pass
 
 
-class SowFarrowManager(CoreModelManager):
+class SowFarrowManager(SowEventManager):
     def get_queryset(self):
         return SowFarrowQuerySet(self.model, using=self._db)
 
@@ -236,7 +275,15 @@ class SowFarrow(SowEvent):
         ordering = ['date']
 
 
-class CullingSowManager(CoreModelManager):
+
+class CullingSowQuerySet(SowEventQuerySet):
+    pass
+
+
+class CullingSowManager(SowEventManager):
+    def get_queryset(self):
+        return CullingSowQuerySet(self.model, using=self._db)
+
     def create_culling(self, sow, culling_type, weight=None, reason=None, initiator=None, date=None):
         if not date:
             date = timezone.now()
@@ -283,7 +330,14 @@ class CullingSow(SowEvent):
     objects = CullingSowManager()
 
 
-class WeaningSowManager(CoreModelManager):
+class WeaningSowQuerySet(SowEventQuerySet):
+    pass
+
+
+class WeaningSowManager(SowEventManager):
+    def get_queryset(self):
+        return WeaningSowQuerySet(self.model, using=self._db)
+
     def create_weaning(self, sow, piglets, tour=None, initiator=None, date=None):
         if not date:
             date = timezone.now()
@@ -303,7 +357,14 @@ class WeaningSow(SowEvent):
     objects = WeaningSowManager()
 
 
-class AbortionSowManager(CoreModelManager):
+class AbortionSowQuerySet(SowEventQuerySet):
+    pass
+
+
+class AbortionSowManager(SowEventManager):
+    def get_queryset(self):
+        return AbortionSowQuerySet(self.model, using=self._db)
+
     def create_abortion(self, sow, initiator=None, date=None):
         if not date:
             date = timezone.now()
@@ -320,7 +381,15 @@ class AbortionSow(SowEvent):
     objects = AbortionSowManager()
 
 
-class MarkAsNurseManager(CoreModelManager):
+class MarkAsNurseQuerySet(SowEventQuerySet):
+    pass
+
+
+class MarkAsNurseManager(SowEventManager):
+    def get_queryset(self):
+        return MarkAsNurseQuerySet(self.model, using=self._db)
+
+
     def create_nurse_event(self, sow, initiator=None, date=timezone.now()):
         if sow.status.title != 'Опоросилась':
             raise DjangoValidationError(message='Кормилицей свинья может стать только после опороса.')
@@ -339,7 +408,7 @@ class MarkAsNurse(SowEvent):
         ordering = ['date']
 
 
-class MarkAsGiltManager(CoreModelManager):
+class MarkAsGiltManager(SowEventManager):
     def create_init_gilt_event(self, gilt, initiator=None, date=None):
         if not date:
             date = timezone.now()
