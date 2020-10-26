@@ -5,7 +5,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
 
-from core.models import CoreModel, CoreModelManager, Event
+from core.models import CoreModel, CoreModelManager, Event, CoreQuerySet
 from locations.models import SowAndPigletsCell, Location
 from piglets.models import Piglets
 from piglets_events.models import PigletsMerger, PigletsSplit
@@ -16,7 +16,14 @@ class Transaction(Event):
         abstract = True
 
 
+class SowTransactionQuerySet(CoreQuerySet):
+    pass
+
+
 class SowTransactionManager(CoreModelManager):
+    def get_queryset(self):
+        return SowTransactionQuerySet(self.model, using=self._db)
+        
     def create_transaction(self, sow, to_location,  initiator=None, date=None):
         if isinstance(to_location.get_location, SowAndPigletsCell) and not to_location.is_sow_empty:
             raise DjangoValidationError(message='Клетка №{} не пустая'. \

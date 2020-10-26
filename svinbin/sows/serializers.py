@@ -104,10 +104,10 @@ class LocationPkField(serializers.RelatedField):
 
 
 class SowOperationSerializer(serializers.Serializer):
-    date = serializers.DateTimeField()
-    week = serializers.IntegerField(source='tour__week_number')
-    initiator = serializers.CharField(source='initiator__username')
-    label = serializers.CharField()
-    from_location = LocationPkField(read_only=True)
-    to_location = LocationPkField(read_only=True)
-    # result = serializers.BooleanField()
+    op_date = serializers.DateTimeField()
+    op_week = serializers.IntegerField()
+    op_initiator = serializers.CharField()
+    op_label = serializers.CharField()
+    op_from_location = LocationPkField(read_only=True)
+    op_to_location = LocationPkField(read_only=True)
+    op_uzi_result = serializers.BooleanField()

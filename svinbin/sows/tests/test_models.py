@@ -750,6 +750,6 @@ class SowModelOperationsTest(TransactionTestCase):
         SowTransaction.objects.create_transaction(sow=sow, to_location=loc2,
             date=date(2020, 7, 17))
 
-        print(sow.last_operations())
-        # with self.assertNumQueries(1):
-        print(SowOperationSerializer(sow.last_operations(), many=True).data)
+        with self.assertNumQueries(5):
+            ops = SowOperationSerializer(sow.last_operations(), many=True).data
+            self.assertEqual(ops[0]['op_label'], 'перемещение')

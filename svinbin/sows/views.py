@@ -32,24 +32,10 @@ class SowViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None):
         sow = self.get_object()
-        tours_info = list()
-        for tour in tours_models.Tour.objects.filter(pk__in=sow.get_tours_pk()):
-            tours_info.append(
-                {
-                    'tour_title': str(tour),
-                    'seminations': sows_events_serializers.SimpleSeminationSerializer(
-                        sow.get_seminations_by_tour(tour), many=True).data,
-                    'ultrasounds': sows_events_serializers.SimpleUltrasoundSerializer(
-                        sow.get_ultrasounds1_by_tour(tour), many=True).data,
-                    'farrows': sows_events_serializers.SimpleSowFarrowSerializer(
-                        sow.get_farrows_by_tour(tour), many=True).data,
-                }
-            )
-
         return Response(
             { 
                 'sow': sows_serializers.SowSerializer(sow).data,
-                'tours_info': tours_info
+                'ops': sows_serializers.SowOperationSerializer(sow.last_operations()),
             },
             status=status.HTTP_200_OK
         )

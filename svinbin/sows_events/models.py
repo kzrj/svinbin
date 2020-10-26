@@ -6,7 +6,7 @@ from django.db import models
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
 
-from core.models import Event, CoreModel, CoreModelManager
+from core.models import Event, CoreModel, CoreModelManager, CoreQuerySet
 from piglets.models import Piglets, PigletsStatus
 from tours.models import Tour, MetaTour, MetaTourRecord
 from piglets_events.models import PigletsMerger
@@ -25,25 +25,8 @@ class SowEventManager(CoreModelManager):
     pass
 
 
-class SowEventQuerySet(models.QuerySet):
-    def add_missing_fields_for_union(self, fields=[]):
-        data = dict()
-        for field in fields:
-            if field == 'result':
-                data[field] = models.Value(False, output_field=models.BooleanField())
-            else:
-                data[field] = models.Value(0, output_field=models.IntegerField())
-
-        return self.annotate(**data)
-
-    def values_for_union(self, label):
-        return self.values('date', 'tour__week_number', 'initiator__username', 'result',
-         'from_location', 'to_location', label=models.Value(label, output_field=models.CharField()))
-
-    def prepare_and_return_union_values(self, label, fields=[]):
-        return self.add_missing_fields_for_union(fields=fields) \
-                .values_for_union(label=label)
-
+class SowEventQuerySet(CoreQuerySet):
+    pass
 
 
 class SeminationQuerySet(SowEventQuerySet):

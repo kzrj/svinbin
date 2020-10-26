@@ -389,30 +389,29 @@ class Sow(Pig):
         return self.gilts.filter(tour__week_number=self.last_week_mark).values_list('birth_id', flat=True)
 
     def last_operations(self):
-        return self.semination_set.all() \
+        return self.transactions.all() \
+                .prepare_and_return_union_values(fields=['result',], label='перемещение') \
+        .union(self.semination_set.all() \
                 .prepare_and_return_union_values(fields=['result', 'from_location', 'to_location'],
-                                                 label='осеменение') \
-            .union(self.ultrasound_set.all() \
+                                                 label='осеменение')) \
+        .union(self.ultrasound_set.all() \
                 .prepare_and_return_union_values(fields=['from_location', 'to_location'], label='узи')) \
-            .union(self.cullingsow_set.all() \
+        .union(self.cullingsow_set.all() \
                 .prepare_and_return_union_values(fields=['result','from_location', 'to_location'],
                                                  label='выбытие')) \
-            .union(self.abortionsow_set.all() \
-                .prepare_and_return_union_values(fields=['result','from_location', 'to_location'],
-                                                 label='аборт')) \
-            .union(self.sowfarrow_set.all() \
-                .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
-                                                label='опорос')) \
-            .union(self.weaningsow_set.all() \
-                .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
-                                                label='отъем')) \
-            .union(self.markasnurse_set.all() \
-                .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
-                                                label='кормилица')) \
-            # .union(self.transactions.all() \
-            #     .values('date', 'tour__week_number', 'initiator__username', 'from_location', 'to_location', result=models.Value(False, output_field=models.BooleanField()), label=Value('перемещение', output_field=models.CharField()))) \
-            # .order_by('-date')[:10]
-
+        .union(self.abortionsow_set.all() \
+            .prepare_and_return_union_values(fields=['result','from_location', 'to_location'],
+                                             label='аборт')) \
+        .union(self.sowfarrow_set.all() \
+            .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
+                                            label='опорос')) \
+        .union(self.weaningsow_set.all() \
+            .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
+                                            label='отъем')) \
+        .union(self.markasnurse_set.all() \
+            .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
+                                            label='кормилица')) \
+        .order_by('-op_date')[:10]
 
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow_farm_id, piglets=None):
