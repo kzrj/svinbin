@@ -39,7 +39,7 @@ class SowViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def retrieve_by_farm_id(self, request):
         farm_id = request.GET.get('farm_id')
-        sow = sows_models.Sow.objects.get_queryset_with_not_alive().filter(farm_id=farm_id)
+        sow = sows_models.Sow.objects.get_queryset_with_not_alive().filter(farm_id=farm_id).first()
         if sow:
             return Response(sows_serializers.SowWithOpsSerializer(sow).data,
                 status=status.HTTP_200_OK
