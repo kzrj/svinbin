@@ -33,7 +33,7 @@ class SowViewSet(viewsets.ModelViewSet):
     def retrieve(self, request, pk=None):
         sow = self.get_object()
         return Response(
-            {sows_serializers.SowWithOpsSerializer(sow).data},
+            sows_serializers.SowWithOpsSerializer(sow).data,
             status=status.HTTP_200_OK
         )
 
