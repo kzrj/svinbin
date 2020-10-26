@@ -36,6 +36,20 @@ class SowViewSet(viewsets.ModelViewSet):
             status=status.HTTP_200_OK
         )
 
+    @action(methods=['get'], detail=False)
+    def retrieve_by_farm_id(self, request):
+        farm_id = request.GET.get('farm_id')
+        sow = sows_models.Sow.objects.get_queryset_with_not_alive().filter(farm_id=farm_id)
+        if sow:
+            return Response(sows_serializers.SowWithOpsSerializer(sow).data,
+                status=status.HTTP_200_OK
+            )
+        else:
+            return Response(f'Свиноматки с номером {farm_id} нет',
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+
     def list(self, request):
         queryset = self.filter_queryset(
             self.get_queryset() \
