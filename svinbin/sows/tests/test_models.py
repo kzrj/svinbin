@@ -20,7 +20,7 @@ from sows_events.models import SowFarrow, Ultrasound, Semination, AssingFarmIdEv
 from tours.models import Tour
 from transactions.models import SowTransaction
 
-from sows.serializers import SowManySerializer, SowOperationSerializer
+from sows.serializers import SowManySerializer, SowOperationSerializer, SowWithOpsSerializer
 
 
 class SowModelTest(TransactionTestCase):
@@ -751,5 +751,5 @@ class SowModelOperationsTest(TransactionTestCase):
             date=date(2020, 7, 17))
 
         with self.assertNumQueries(5):
-            ops = SowOperationSerializer(sow.last_operations(), many=True).data
+            ops = SowOperationSerializer(sow.last_operations, many=True).data
             self.assertEqual(ops[0]['op_label'], 'перемещение')
