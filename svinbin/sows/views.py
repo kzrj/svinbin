@@ -35,7 +35,7 @@ class SowViewSet(viewsets.ModelViewSet):
         return Response(
             { 
                 'sow': sows_serializers.SowWithOpsSerializer(sow).data,
-                'ops': sows_serializers.SowOperationSerializer(sow.last_operations()),
+                'ops': sows_serializers.SowOperationSerializer(sow.last_operations),
             },
             status=status.HTTP_200_OK
         )
