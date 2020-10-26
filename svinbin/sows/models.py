@@ -388,6 +388,7 @@ class Sow(Pig):
     def gilt_list_by_last_tour(self):
         return self.gilts.filter(tour__week_number=self.last_week_mark).values_list('birth_id', flat=True)
 
+    @property
     def last_operations(self):
         return self.transactions.all() \
                 .prepare_and_return_union_values(fields=['result',], label='перемещение') \

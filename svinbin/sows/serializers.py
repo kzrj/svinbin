@@ -111,3 +111,7 @@ class SowOperationSerializer(serializers.Serializer):
     op_from_location = LocationPkField(read_only=True)
     op_to_location = LocationPkField(read_only=True)
     op_uzi_result = serializers.BooleanField()
+
+
+class SowWithOpsSerializer(SowSerializer):
+    last_operations = SowOperationSerializer(many=True)

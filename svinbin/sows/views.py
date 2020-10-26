@@ -34,7 +34,7 @@ class SowViewSet(viewsets.ModelViewSet):
         sow = self.get_object()
         return Response(
             { 
-                'sow': sows_serializers.SowSerializer(sow).data,
+                'sow': sows_serializers.SowWithOpsSerializer(sow).data,
                 'ops': sows_serializers.SowOperationSerializer(sow.last_operations()),
             },
             status=status.HTTP_200_OK
