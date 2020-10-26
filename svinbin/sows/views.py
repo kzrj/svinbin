@@ -45,7 +45,7 @@ class SowViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK
             )
         else:
-            return Response(f'Свиноматки с номером {farm_id} нет',
+            return Response({'message': f'Свиноматки с номером {farm_id} нет'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
