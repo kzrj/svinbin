@@ -481,3 +481,6 @@ class Boar(Pig):
     breed = models.ForeignKey(BoarBreed, on_delete=models.SET_NULL, null=True)
     active = models.BooleanField(default=True)
     objects = BoarManager()
+
+    def __str__(self):
+        return self.farm_id

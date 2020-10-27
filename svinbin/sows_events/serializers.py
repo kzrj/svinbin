@@ -19,6 +19,10 @@ class SeminationSerializer(serializers.ModelSerializer):
 
 
 class SimpleSeminationSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%d-%m-%Y")
+    boar = serializers.StringRelatedField()
+    semination_employee = serializers.ReadOnlyField(source='semination_employee.farm_name')
+
     class Meta:
         model = Semination
         fields = ['date', 'semination_employee', 'boar']
@@ -52,6 +56,7 @@ class UltrasoundSerializer(serializers.ModelSerializer):
 
 
 class SimpleUltrasoundSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%d-%m-%Y")
     class Meta:
         model = Ultrasound
         fields = ['date', 'result', 'u_type']
@@ -100,6 +105,8 @@ class SowFarrowSerializer(serializers.ModelSerializer):
 
 
 class SimpleSowFarrowSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%d-%m-%Y")
+
     class Meta:
         model = SowFarrow
         fields = ['date', 'alive_quantity', 'dead_quantity', 'mummy_quantity']
@@ -144,6 +151,8 @@ class SowsMassCullingSerializer(serializers.ModelSerializer):
 
 
 class SimpleWeaningSowSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%d-%m-%Y")
+
     class Meta:
         model = WeaningSow
         fields = ('date', 'quantity')
