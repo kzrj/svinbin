@@ -47,7 +47,8 @@ $(document).ready(function(){
             ["dark1","#656D78","#434A54","#242b34"],
             ["dark2","#3C3B3D","#323133","#1c191f"],
             ["mainDark", "#313131", "#313131", "#313131"],
-            ["mainGrey", "#6c6c6c ", "#6c6c6c ", "#6c6c6c "],
+            ["mainGrey", "#6c6c6c", "#6c6c6c", "#6c6c6c"],
+            ["white", "#FFFFFF", "#FFFFFF", "#FFFFFF"],
 
         ];
         var socialColorArray = [

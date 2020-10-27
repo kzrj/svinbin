@@ -352,9 +352,7 @@ hr {
 	font-weight: bold;
 }
 
-.table-piglets-weaning table, td {
-	border: 1px solid !important;
-}
+
 
 .weaning-cell {
 	border: 1px solid !important;
@@ -397,14 +395,6 @@ hr {
 }
 
 /* REPORTS */
-.report-block table, th, td{
-	border: 1px solid #c9c5de !important;
-}
-
-.report-table table{
-	/* table-layout:fixed; */
-	/* border: 1px solid blue ! important; */
-}
 
 /* .report-cell-td{ */
 	/* text-align: center; */
@@ -479,12 +469,22 @@ hr {
 }
 
 /* Report operations */
-.op-list-item td, th{
+.op-list-item td{
 	/* border: none !important; */
 	margin-right: 5px;
 	text-align: center !important;
 	vertical-align: middle !important;
 	font-size: 1.1rem ! important;
+	color: #171619;
+	/* height: 40px; */
+}
+
+.op-list-item th{
+	/* border: none !important; */
+	margin-right: 5px;
+	text-align: center !important;
+	vertical-align: middle !important;
+	/* font-size: 1.1rem ! important; */
 	color: #171619;
 	/* height: 40px; */
 }
