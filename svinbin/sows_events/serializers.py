@@ -21,7 +21,7 @@ class SeminationSerializer(serializers.ModelSerializer):
 class SimpleSeminationSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(format="%d-%m-%Y")
     boar = serializers.StringRelatedField()
-    semination_employee = serializers.ReadOnlyField(source='semination_employee.farm_name')
+    semination_employee = serializers.StringRelatedField()
 
     class Meta:
         model = Semination

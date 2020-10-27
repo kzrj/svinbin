@@ -26,4 +26,4 @@ class WorkShopEmployee(CoreModel):
     objects = WorkShopEmployeeModelManager()
 
     def __str__(self):
-        return 'Employee {} '.format(self.user.username)
+        return self.farm_name
