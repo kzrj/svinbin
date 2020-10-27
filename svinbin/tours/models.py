@@ -1,7 +1,7 @@
 import datetime
 from django.db import models
 from django.db.models import Subquery, OuterRef, F, ExpressionWrapper, Q, Sum, Avg, Count, Value, Func, \
-    Case, When
+    Case, When, Prefetch
 from django.db.models.functions import Coalesce, Greatest
 from django.utils import timezone
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -280,6 +280,30 @@ class TourQuerySet(models.QuerySet):
                     )
 
         return self.annotate(**data)
+
+    def add_sow_events(self, sow):
+        return self.prefetch_related(
+            Prefetch(
+                'semination_set',
+                queryset=events_models.Semination.objects.filter(sow=sow),
+                to_attr='sow_semination'
+                ),
+            Prefetch(
+                'ultrasound_set',
+                queryset=events_models.Ultrasound.objects.filter(sow=sow),
+                to_attr='sow_ultrasound'
+                ),
+            Prefetch(
+                'sowfarrow_set',
+                queryset=events_models.SowFarrow.objects.filter(sow=sow),
+                to_attr='sow_farrow'
+                ),
+            Prefetch(
+                'weaningsow_set',
+                queryset=events_models.WeaningSow.objects.filter(sow=sow),
+                to_attr='sow_weaning'
+                ),
+            )
 
 
 class TourManager(CoreModelManager):

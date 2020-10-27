@@ -414,6 +414,7 @@ class Sow(Pig):
                                             label='кормилица')) \
         .order_by('-op_date')[:10]
 
+
 class GiltManager(CoreModelManager):
     def create_gilt(self, birth_id, mother_sow_farm_id, piglets=None):
         mother_sow = Sow.objects.get_queryset_with_not_alive().filter(farm_id=mother_sow_farm_id).first()

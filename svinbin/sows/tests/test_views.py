@@ -18,7 +18,7 @@ import piglets.testing_utils as piglets_testing
 from locations.models import Location
 from tours.models import Tour
 from transactions.models import SowTransaction
-from sows_events.models import Ultrasound, Semination, SowFarrow, UltrasoundType
+from sows_events.models import Ultrasound, Semination, SowFarrow, UltrasoundType, WeaningSow
 from sows.models import Boar, Sow, BoarBreed
 
 
@@ -215,6 +215,39 @@ class SowViewSetTest(APITestCase):
                 result_sow['id'] in [sow1.pk, seminated_sow5.pk],
                 True)
         self.client.logout()
+
+    def test_retrieve_by_farm_id_cycles(self):
+        self.client.force_authenticate(user=self.brig1)
+        sow1 = sows_testing.create_sow_with_semination(self.loc_ws1)
+        Semination.objects.create_semination(sow=sow1, week=1, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow=sow1,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow1,
+         initiator=None, result=True, days=60)
+
+        Semination.objects.create_semination(sow=sow1, week=2, initiator=None,
+         semination_employee=None)
+        Ultrasound.objects.create_ultrasound(sow=sow1,
+         initiator=None, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow1,
+         initiator=None, result=True, days=60)
+        sow1.change_sow_current_location(
+            Location.objects.filter(sowAndPigletsCell__isnull=False).first())
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow1, alive_quantity=7, mummy_quantity=1)
+        WeaningSow.objects.create_weaning(sow=sow1, piglets=farrow.piglets_group)
+
+        response = self.client.get(f'/api/sows/retrieve_by_farm_id/?farm_id={sow1.farm_id}')
+        self.assertEqual(response.data['sow']['farm_id'], sow1.farm_id)
+        self.assertEqual(response.data['cycles'][0]['week_number'], 2)
+        self.assertEqual(len(response.data['cycles'][0]['sow_semination']), 1)
+        self.assertEqual(len(response.data['cycles'][0]['sow_ultrasound']), 2)
+        self.assertEqual(response.data['cycles'][0]['sow_farrow'][0]['alive_quantity'], 7)
+
+        self.client.logout()
+
+    # def test_retrieve_by_farm_id_ops(self):
+    #     pass
 
 
 class BoarViewSetTest(APITestCase):

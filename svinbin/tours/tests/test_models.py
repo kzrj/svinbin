@@ -703,6 +703,34 @@ class TourQuerysetAddSowsDataTest(TestCase):
             self.assertEqual(tours[0].ws1_count_tour_sow,2)
             self.assertEqual(tours[0].ws3_count_tour_sow,1)
 
+    def test_add_sow_events(self):
+        loc_ws1 = Location.objects.get(workshop__number=1)
+        sow1 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow1, week=2)
+        Semination.objects.create_semination(sow=sow1, week=2)
+        Ultrasound.objects.create_ultrasound(sow=sow1, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow1, result=False, days=60)
+
+        Semination.objects.create_semination(sow=sow1, week=3)
+        Semination.objects.create_semination(sow=sow1, week=3)
+        Ultrasound.objects.create_ultrasound(sow=sow1, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow1, result=True, days=60)
+
+        sow3 = pigs_testings.create_sow_with_location(loc_ws1)
+        Semination.objects.create_semination(sow=sow3, week=3)
+        Semination.objects.create_semination(sow=sow3, week=3)
+        Ultrasound.objects.create_ultrasound(sow=sow3, result=True, days=30)
+        Ultrasound.objects.create_ultrasound(sow=sow3, result=False, days=60)
+
+        sow1_tours = Tour.objects.filter(pk__in=sow1.get_tours_pk()).add_sow_events(sow=sow1)
+
+        self.assertEqual(len(sow1_tours), 2)
+        self.assertEqual(sow1_tours[0].sow_semination[0].sow, sow1)
+        self.assertEqual(sow1_tours[0].sow_semination[1].tour.week_number, 2)
+        self.assertEqual(sow1_tours[0].sow_ultrasound[0].tour.week_number, 2)
+        self.assertEqual(sow1_tours[1].sow_semination[0].sow, sow1)
+        self.assertEqual(sow1_tours[1].sow_semination[1].tour.week_number, 3)
+
 
 class MetaTourTest(TestCase):
     def setUp(self):

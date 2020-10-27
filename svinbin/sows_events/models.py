@@ -324,7 +324,7 @@ class WeaningSowManager(SowEventManager):
     def create_weaning(self, sow, piglets, tour=None, initiator=None, date=None):
         if not date:
             date = timezone.now()
-        weaning = self.create(sow=sow, tour=tour, piglets=piglets, quantity=piglets.quantity,
+        weaning = self.create(sow=sow, tour=sow.tour, piglets=piglets, quantity=piglets.quantity,
          initiator=initiator, date=date, sow_group=sow.sow_group)
 
         # when set tour to None

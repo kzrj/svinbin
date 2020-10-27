@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow,\
-     CullingBoar, SemenBoar
+     CullingBoar, SemenBoar, WeaningSow
 from sows.models import Sow, Boar
 
 from sows.serializers import SowSerializer, BoarSerializer
@@ -140,4 +140,10 @@ class SowsMassCullingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CullingSow
-        fields = ('sows', 'culling_type', 'reason' , 'weight')  
+        fields = ('sows', 'culling_type', 'reason' , 'weight')
+
+
+class SimpleWeaningSowSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = WeaningSow
+        fields = ('date', 'quantity')

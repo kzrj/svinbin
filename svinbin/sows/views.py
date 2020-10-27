@@ -11,6 +11,7 @@ import sows.serializers as sows_serializers
 import sows_events.serializers as sows_events_serializers
 import transactions.serializers as transactions_serializers
 import locations.serializers as locations_serializers
+import tours.serializers as tours_serializers
 
 import sows.models as sows_models
 import sows_events.models as sows_events_models
@@ -41,7 +42,14 @@ class SowViewSet(viewsets.ModelViewSet):
         farm_id = request.GET.get('farm_id')
         sow = sows_models.Sow.objects.get_queryset_with_not_alive().filter(farm_id=farm_id).first()
         if sow:
-            return Response(sows_serializers.SowWithOpsSerializer(sow).data,
+            tour_cylces = tours_models.Tour.objects.filter(pk__in=sow.get_tours_pk()) \
+                .add_sow_events(sow=sow).order_by('-start_date')
+
+            return Response(
+                {
+                    'sow': sows_serializers.SowWithOpsSerializer(sow).data,
+                    'cycles': tours_serializers.SowCycleSerializer(tour_cylces, many=True).data
+                },
                 status=status.HTTP_200_OK
             )
         else:
