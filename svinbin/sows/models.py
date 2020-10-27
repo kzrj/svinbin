@@ -483,4 +483,4 @@ class Boar(Pig):
     objects = BoarManager()
 
     def __str__(self):
-        return self.farm_id
+        return str(self.farm_id)
