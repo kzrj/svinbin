@@ -78,7 +78,7 @@ class CullingSowSerializer(serializers.ModelSerializer):
 
 class CullingSowReadListSerializer(serializers.ModelSerializer):
     farm_id = serializers.ReadOnlyField(source='sow.farm_id')
-    initiator = serializers.ReadOnlyField(source='initiator.user.username')
+    initiator = serializers.ReadOnlyField(source='initiator.username')
 
     class Meta:
         model = CullingSow

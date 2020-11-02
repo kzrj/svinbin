@@ -86,7 +86,7 @@ class SowViewSet(viewsets.ModelViewSet):
         ws_locs = locations_models.Location.objects.all() \
             .get_workshop_location_by_number(workshop_number=ws_number)
         cullings = sows_events_models.CullingSow.objects.in_ws(ws_locs=ws_locs) \
-            .select_related('sow', 'initiator__user').order_by('-date')[:10]
+            .select_related('sow', 'initiator__username').order_by('-date')[:10]
         return Response(
             sows_events_serializers.CullingSowReadListSerializer(cullings, many=True).data
         )
