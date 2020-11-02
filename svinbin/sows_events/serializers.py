@@ -76,6 +76,14 @@ class CullingSowSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CullingSowReadListSerializer(serializers.ModelSerializer):
+    farm_id = serializers.ReadOnlyField(source='sow.farm_id')
+
+    class Meta:
+        model = CullingSow
+        fields = ('date', 'farm_id', 'culling_type', 'reason', 'initiator', 'weight')
+
+
 class CreateCullingSowSerializer(serializers.ModelSerializer):
     farm_id = serializers.IntegerField()
 
@@ -106,10 +114,11 @@ class SowFarrowSerializer(serializers.ModelSerializer):
 
 class SimpleSowFarrowSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(format="%d-%m-%Y")
+    tour = serializers.StringRelatedField()
 
     class Meta:
         model = SowFarrow
-        fields = ['date', 'alive_quantity', 'dead_quantity', 'mummy_quantity']
+        fields = ['date', 'alive_quantity', 'dead_quantity', 'mummy_quantity', 'tour']
 
 
 class AbortionSowSerializer(serializers.ModelSerializer):

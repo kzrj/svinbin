@@ -80,6 +80,24 @@ class SowViewSet(viewsets.ModelViewSet):
         serializer = sows_serializers.SowManySerializer(queryset, many=True)
         return Response(serializer.data)
 
+    @action(methods=['get'], detail=False)
+    def cullings(self, request):
+        ws_number = request.GET.get('ws_number')
+        ws_locs = locations_models.Location.objects.all() \
+            .get_workshop_location_by_number(workshop_number=ws_number)
+        cullings = sows_events_models.CullingSow.objects.in_ws(ws_locs=ws_locs) \
+            .select_related('sow').order_by('-date')[:10]
+        return Response(
+            sows_events_serializers.CullingSowReadListSerializer(cullings, many=True).data
+        )
+
+    @action(methods=['get'], detail=False)
+    def farrows(self, request):
+        farrows = sows_events_models.SowFarrow.objects.all().order_by('-date')[:10]
+        return Response(
+            sows_events_serializers.SimpleSowFarrowSerializer(farrows, many=True).data
+        )
+
 
 class WorkShopSowViewSet(SowViewSet):
     @action(methods=['post'], detail=True)

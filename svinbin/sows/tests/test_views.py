@@ -18,7 +18,8 @@ import piglets.testing_utils as piglets_testing
 from locations.models import Location
 from tours.models import Tour
 from transactions.models import SowTransaction
-from sows_events.models import Ultrasound, Semination, SowFarrow, UltrasoundType, WeaningSow
+from sows_events.models import Ultrasound, Semination, SowFarrow, UltrasoundType, WeaningSow,\
+ CullingSow
 from sows.models import Boar, Sow, BoarBreed
 
 
@@ -246,8 +247,48 @@ class SowViewSetTest(APITestCase):
 
         self.client.logout()
 
-    # def test_retrieve_by_farm_id_ops(self):
-    #     pass
+    def test_sow_farrows(self):
+        sow1 = sows_testing.create_sow_with_semination_usound(
+            Location.objects.filter(sowAndPigletsCell__isnull=False).first())
+        farrow = SowFarrow.objects.create_sow_farrow(sow=sow1, alive_quantity=7, mummy_quantity=1)
+
+        sow2 = sows_testing.create_sow_with_semination_usound(
+            Location.objects.filter(sowAndPigletsCell__isnull=False)[1])
+        farrow2 = SowFarrow.objects.create_sow_farrow(sow=sow2, alive_quantity=9, mummy_quantity=1)
+
+        sow3 = sows_testing.create_sow_with_semination_usound(
+            Location.objects.filter(sowAndPigletsCell__isnull=False)[2])
+        farrow3 = SowFarrow.objects.create_sow_farrow(sow=sow3, alive_quantity=17, mummy_quantity=1)
+        
+        sow4 = sows_testing.create_sow_and_put_in_workshop_one()
+
+        self.client.force_authenticate(user=self.brig3)
+        response = self.client.get(f'/api/sows/farrows/')
+        self.assertEqual(len(response.data), 3)
+        self.client.logout()
+
+    def test_sow_cullings(self):
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow1.change_sow_current_location(
+            Location.objects.filter(sowAndPigletsCell__isnull=False).first())
+
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow2.change_sow_current_location(
+            Location.objects.filter(sowAndPigletsCell__isnull=False)[1])
+
+        sow3 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow3.change_sow_current_location(
+            Location.objects.filter(sowAndPigletsCell__isnull=False)[2])
+        
+        sow4 = sows_testing.create_sow_and_put_in_workshop_one()
+
+        CullingSow.objects.mass_culling(sows_qs=Sow.objects.filter(pk__in=[sow1.pk, sow2.pk]),
+             culling_type='padej')
+
+        self.client.force_authenticate(user=self.brig3)
+        response = self.client.get(f'/api/sows/cullings/?ws_number=3')
+        self.assertEqual(len(response.data), 2)
+        self.client.logout()
 
 
 class BoarViewSetTest(APITestCase):
