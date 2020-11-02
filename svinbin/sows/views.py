@@ -93,7 +93,9 @@ class SowViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=False)
     def farrows(self, request):
-        farrows = sows_events_models.SowFarrow.objects.all().order_by('-date')[:10]
+        farrows = sows_events_models.SowFarrow.objects.all() \
+            .select_related('sow', 'tour', 'initiator') \
+            .order_by('-date')[:10]
         return Response(
             sows_events_serializers.SimpleSowFarrowSerializer(farrows, many=True).data
         )

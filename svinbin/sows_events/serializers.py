@@ -116,10 +116,13 @@ class SowFarrowSerializer(serializers.ModelSerializer):
 class SimpleSowFarrowSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(format="%d-%m-%Y")
     tour = serializers.StringRelatedField()
+    initiator = serializers.ReadOnlyField(source='initiator.username')
+    farm_id = serializers.ReadOnlyField(source='sow.farm_id')
 
     class Meta:
         model = SowFarrow
-        fields = ['date', 'alive_quantity', 'dead_quantity', 'mummy_quantity', 'tour']
+        fields = ['date', 'alive_quantity', 'dead_quantity', 'mummy_quantity', 'tour', 
+        'initiator', 'farm_id']
 
 
 class AbortionSowSerializer(serializers.ModelSerializer):
