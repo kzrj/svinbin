@@ -40,7 +40,7 @@ class SowViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def retrieve_by_farm_id(self, request):
         farm_id = request.GET.get('farm_id')
-        sow = sows_models.Sow.objects.get_queryset_with_not_alive().filter(farm_id=farm_id).first()
+        sow = self.filter_queryset(self.get_queryset()).filter(farm_id=farm_id).first()
         if sow:
             tour_cylces = tours_models.Tour.objects.filter(pk__in=sow.get_tours_pk()) \
                 .add_sow_events(sow=sow).order_by('-start_date')
