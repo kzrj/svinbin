@@ -44,6 +44,16 @@ class SowSimpleSerializer(serializers.ModelSerializer):
         fields = ['status', 'tour', 'farm_id', 'id']
 
 
+class SowSimpleV2Serializer(serializers.ModelSerializer):
+    status = serializers.StringRelatedField()
+    tour = serializers.StringRelatedField()
+    location = serializers.ReadOnlyField(source='get_location')
+
+    class Meta:
+        model = Sow
+        fields = ['status', 'tour', 'farm_id', 'id', 'location']
+
+
 class SowsToMoveSerializer(serializers.Serializer):
     # mb alive
     sows = serializers.PrimaryKeyRelatedField(queryset=Sow.objects.all(), many=True)

@@ -41,7 +41,16 @@ class SowViewSet(viewsets.ModelViewSet):
     def retrieve_by_farm_id(self, request):
         farm_id = request.GET.get('farm_id')
         sow = self.filter_queryset(self.get_queryset()).filter(farm_id=farm_id).first()
+
         if sow:
+            if request.GET.get('simple'):
+                return Response(
+                    {
+                        'sow': sows_serializers.SowSimpleV2Serializer(sow).data,
+                    },
+                    status=status.HTTP_200_OK
+                )
+
             tour_cylces = tours_models.Tour.objects.filter(pk__in=sow.get_tours_pk()) \
                 .add_sow_events(sow=sow).order_by('-start_date')
 
