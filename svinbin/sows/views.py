@@ -47,6 +47,8 @@ class SowViewSet(viewsets.ModelViewSet):
                 return Response(
                     {
                         'sow': sows_serializers.SowSimpleV2Serializer(sow).data,
+                        'filter_count': self.filter_queryset(self.get_queryset()).count(),
+                        'cycles': []
                     },
                     status=status.HTTP_200_OK
                 )
@@ -57,7 +59,8 @@ class SowViewSet(viewsets.ModelViewSet):
             return Response(
                 {
                     'sow': sows_serializers.SowWithOpsSerializer(sow).data,
-                    'cycles': tours_serializers.SowCycleSerializer(tour_cylces, many=True).data
+                    'cycles': tours_serializers.SowCycleSerializer(tour_cylces, many=True).data,
+                    'filter_count': 0
                 },
                 status=status.HTTP_200_OK
             )
@@ -103,10 +106,19 @@ class SowViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def farrows(self, request):
         farrows = sows_events_models.SowFarrow.objects.all() \
-            .select_related('sow', 'tour', 'initiator') \
+            .select_related('sow', 'tour', 'initiator', 'location__sowAndPigletsCell__section') \
             .order_by('-date')[:10]
         return Response(
             sows_events_serializers.SimpleSowFarrowSerializer(farrows, many=True).data
+        )
+
+    @action(methods=['get'], detail=False)
+    def nurses(self, request):
+        nurses = sows_events_models.MarkAsNurse.objects.all() \
+            .select_related('sow', 'tour', 'initiator', 'location__sowAndPigletsCell__section') \
+            .order_by('-date')[:10]
+        return Response(
+            sows_events_serializers.SimpleNurseSerializer(nurses, many=True).data
         )
 
 

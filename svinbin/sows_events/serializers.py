@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from sows_events.models import Semination, Ultrasound, CullingSow, SowFarrow, AbortionSow,\
-     CullingBoar, SemenBoar, WeaningSow
+     CullingBoar, SemenBoar, WeaningSow, MarkAsNurse
 from sows.models import Sow, Boar
 
 from sows.serializers import SowSerializer, BoarSerializer
@@ -118,11 +118,12 @@ class SimpleSowFarrowSerializer(serializers.ModelSerializer):
     tour = serializers.StringRelatedField()
     initiator = serializers.ReadOnlyField(source='initiator.username')
     farm_id = serializers.ReadOnlyField(source='sow.farm_id')
+    location = serializers.ReadOnlyField(source='get_location')
 
     class Meta:
         model = SowFarrow
         fields = ['date', 'alive_quantity', 'dead_quantity', 'mummy_quantity', 'tour', 
-        'initiator', 'farm_id']
+        'initiator', 'farm_id', 'location']
 
 
 class AbortionSowSerializer(serializers.ModelSerializer):
@@ -169,3 +170,15 @@ class SimpleWeaningSowSerializer(serializers.ModelSerializer):
     class Meta:
         model = WeaningSow
         fields = ('date', 'quantity')
+
+
+class SimpleNurseSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%d-%m-%Y")
+    tour = serializers.StringRelatedField()
+    initiator = serializers.ReadOnlyField(source='initiator.username')
+    farm_id = serializers.ReadOnlyField(source='sow.farm_id')
+    location = serializers.ReadOnlyField(source='get_location')
+
+    class Meta:
+        model = MarkAsNurse
+        fields = ['date', 'tour', 'initiator', 'farm_id', 'location']
