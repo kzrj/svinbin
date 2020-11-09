@@ -372,7 +372,6 @@ class MarkAsNurseManager(SowEventManager):
     def get_queryset(self):
         return MarkAsNurseQuerySet(self.model, using=self._db)
 
-
     def create_nurse_event(self, sow, initiator=None, date=timezone.now()):
         if sow.status.title != 'Опоросилась':
             raise DjangoValidationError(message='Кормилицей свинья может стать только после опороса.')

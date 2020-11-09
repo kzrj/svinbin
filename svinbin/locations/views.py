@@ -54,7 +54,7 @@ class LocationViewSet(viewsets.ModelViewSet):
                     .prefetch_related(
                         'sow_set__tour',
                         'sow_set__status',
-                        'piglets__metatour__records__tour',)
+                        'piglets__metatour__week_tour',)
             )
 
         if request.GET.get('sections'):
