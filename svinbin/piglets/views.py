@@ -138,7 +138,8 @@ class PigletsViewSet(viewsets.ModelViewSet):
             message = "Взвешивание прошло успешно"
             
             # mb to model
-            if serializer.validated_data.get('new_amount', None) or serializer.validated_data.get('new_amount', 0):
+            new_amount = serializer.validated_data.get('new_amount', None)
+            if new_amount and new_amount > 0 and new_amount < piglets_group.quantity:
                 transaction, moved_piglets, piglets_to_weight, split_event, merge_event = \
                     transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
                         piglets=piglets_group,
