@@ -15,7 +15,8 @@ from piglets.models import Piglets
 from tours.models import Tour
 
 from locations.serializers import (
-    LocationCellSerializer, LocationSectionSerializer, SectionSerializer
+    LocationCellSerializer, LocationSectionSerializer, SectionSerializer,
+    LocationPigletsCellSerializer, LocationSowCellSerializer
     )
 
 
@@ -78,6 +79,33 @@ class LocationsTest(TransactionTestCase):
                     'piglets__metatour__week_tour',
                     )
             serializer = LocationCellSerializer(data, many=True)
+            serializer.data
+
+    def test_location_piglets_cell_serializer_queries(self):
+        with self.assertNumQueries(3):
+            data = Location.objects.all() \
+                .select_related(
+                    'pigletsGroupCell__section',
+                    'sowAndPigletsCell__section',
+                    ) \
+                .prefetch_related(
+                    'piglets__metatour__week_tour',
+                    )
+            serializer = LocationPigletsCellSerializer(data, many=True)
+            serializer.data
+
+    def test_location_sow_cell_serializer_queries(self):
+        with self.assertNumQueries(4):
+            data = Location.objects.all() \
+                .filter(sowAndPigletsCell__isnull=False) \
+                .select_related(
+                    'sowAndPigletsCell__section',
+                    ) \
+                .prefetch_related(
+                    'sow_set__tour',
+                    'sow_set__status'
+                    )
+            serializer = LocationSowCellSerializer(data, many=True)
             serializer.data
 
     def test_location_section_serializer_queries(self):

@@ -40,6 +40,35 @@ class LocationCellSerializer(serializers.ModelSerializer):
             'is_piglets_empty']
 
 
+class LocationPigletsCellSerializer(serializers.ModelSerializer):
+    cell = serializers.ReadOnlyField(source='get_cell_number')
+    piglets = piglets_serializers.PigletsSimpleSerializer(many=True, read_only=True)
+    is_piglets_empty = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Location
+        fields = [
+            'id',
+            'cell',
+            'piglets',
+            'is_piglets_empty']
+
+
+class LocationSowCellSerializer(serializers.ModelSerializer):
+    cell = serializers.ReadOnlyField(source='get_cell_number')
+    sow_set = sows_serializers.SowSimpleSerializer(many=True, read_only=True)
+    is_sow_empty = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Location
+        fields = [
+            'id',
+            'cell',
+            'sow_set',
+            'is_sow_empty',
+            ]
+
+
 class LocationSectionSerializer(serializers.ModelSerializer):
     section_number = serializers.ReadOnlyField(source='section.number')
     section_id = serializers.ReadOnlyField(source='section.id')

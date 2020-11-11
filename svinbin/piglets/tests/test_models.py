@@ -9,7 +9,7 @@ from piglets_events.models import PigletsMerger
 from tours.models import Tour
 from locations.models import Location
 
-from piglets.serializers import PigletsSerializer
+from piglets.serializers import PigletsSerializer, PigletsSimpleSerializer
 
 import locations.testing_utils as locations_testing
 import piglets.testing_utils as piglets_testing
@@ -170,10 +170,10 @@ class PigletsQueryTest(TransactionTestCase):
             parent_piglets=[piglets15, piglets16], new_location=loc_cell_ws5_2)
 
     def test_queryset_serializer(self):
-        with self.assertNumQueries(4):
+        with self.assertNumQueries(2):
             data = Piglets.objects.all() \
-                .prefetch_related('metatour__records__tour__sowfarrow_set') 
-            serializer = PigletsSerializer(data, many=True)
+                .prefetch_related('metatour__week_tour') 
+            serializer = PigletsSimpleSerializer(data, many=True)
             serializer.data
 
     def test_all_in_workshop(self):

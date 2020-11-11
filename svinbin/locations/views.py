@@ -57,6 +57,31 @@ class LocationViewSet(viewsets.ModelViewSet):
                         'piglets__metatour__week_tour',)
             )
 
+        if request.GET.get('cells_piglets'):
+            serializer = serializers.LocationPigletsCellSerializer
+            queryset = self.filter_queryset(
+                self.get_queryset() \
+                    .select_related(
+                        'pigletsGroupCell__section',
+                        'sowAndPigletsCell__section',
+                        ) \
+                    .prefetch_related(
+                        'piglets__metatour__week_tour',)
+            )
+
+        if request.GET.get('cells_sows'):
+            serializer = serializers.LocationSowCellSerializer
+            queryset = self.filter_queryset(
+                self.get_queryset() \
+                    .filter(sowAndPigletsCell__isnull=False) \
+                    .select_related(
+                        'sowAndPigletsCell__section',
+                        ) \
+                    .prefetch_related(
+                        'sow_set__tour',
+                        'sow_set__status')
+                )
+
         if request.GET.get('sections'):
             serializer = serializers.LocationSectionSerializer
             queryset = self.filter_queryset(
