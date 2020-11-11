@@ -88,6 +88,6 @@ class SowFarrowViewSet(viewsets.ModelViewSet):
 
 
 class SemenBoarViewSet(viewsets.ModelViewSet):
-    queryset = SemenBoar.objects.all()
+    queryset = SemenBoar.objects.all().order_by('-date')
     serializer_class = serializers.SemenBoarSerializer
     filter_class = SemenBoarFilter
