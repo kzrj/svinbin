@@ -477,7 +477,7 @@ class CullingBoar(Event):
 
 
 class SemenBoarManager(CoreModelManager):
-    def create_semen_boar(self, boar, a, b, d, f_denom=2.0, final_motility_score=0,
+    def create_semen_boar(self, boar, tour, a, b, d, f_denom=2.0, final_motility_score=0,
          initiator=None, date=None):
         if not date:
             date = timezone.now()
@@ -486,13 +486,14 @@ class SemenBoarManager(CoreModelManager):
         f = e / f_denom
         g = f * 90
         h = g - a
-        return self.create(boar=boar, a=a, b=b, c=c, d=d, e=e, f=f, g=g, h=h,
+        return self.create(boar=boar, tour=tour, a=a, b=b, c=c, d=d, e=e, f=f, g=g, h=h,
          final_motility_score=final_motility_score,
          initiator=initiator, date=date)
 
 
 class SemenBoar(Event):
     boar = models.ForeignKey('sows.Boar', on_delete=models.CASCADE)
+    tour = models.ForeignKey('tours.Tour', null=True, blank=True, on_delete=models.CASCADE)
 
     a = models.FloatField(verbose_name='Ejaculate volume (ml)')
     b = models.FloatField(verbose_name='Sperm Concentration (million / ml)')

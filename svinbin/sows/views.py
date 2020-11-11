@@ -247,6 +247,7 @@ class BoarViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             sows_events_models.SemenBoar.objects.create_semen_boar(
                 boar=boar, 
+                tour=serializer.validated_data['tour'],
                 a=serializer.validated_data['a'],
                 b=serializer.validated_data['b'],
                 d=serializer.validated_data['d'],
