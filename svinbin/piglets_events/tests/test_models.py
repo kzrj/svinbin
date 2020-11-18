@@ -606,6 +606,7 @@ class CullingPigletsTest(TestCase):
         self.assertEqual(culling.culling_type, 'padej')
         self.assertEqual(culling.reason, 'xz')
         self.assertEqual(culling.total_weight, 100)
+        self.assertEqual(culling.avg_weight, 10)
         self.assertEqual(culling.date.day, 9)
         self.assertEqual(culling.location, self.loc_ws3)
 

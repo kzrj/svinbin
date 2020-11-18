@@ -481,36 +481,6 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             self.assertEqual(tours[0].ws5_padej_quantity, 26)
             self.assertEqual(tours[1].ws5_spec_avg_weight, 14.5)
 
-    def test_add_count_transfer_to_7_5(self):
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws5, 100)
-        PigletsTransaction.objects.transaction_gilts_to_7_5(piglets1)
-
-        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws5, 100)
-        PigletsTransaction.objects.transaction_gilts_to_7_5(piglets2)
-        piglets2.deactivate()
-
-        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws5, 100)
-        PigletsTransaction.objects.transaction_gilts_to_7_5(piglets3)
-        
-        trs = PigletsTransaction.objects \
-            .filter(to_location__workshop__number=11, week_tour=self.tour1 ) \
-            .filter(Q(
-                    Q(from_location__workshop__number=5) |
-                    Q(from_location__section__workshop__number=5) |
-                    Q(from_location__pigletsGroupCell__workshop__number=5) |
-                    Q(from_location__sowAndPigletsCell__workshop__number=5)
-                )) \
-            .values('piglets_group__metatour__week_tour') \
-            .aggregate(qnty=models.Sum('piglets_group__quantity'))
-
-        with self.assertNumQueries(1):
-            tours = Tour.objects.all().add_count_transfer_to_7_5()
-            bool(tours)
-            self.assertEqual(tours[0].ws5_qnty_to_7_5, 200)
-
 
 class TourQuerysetAddPigletsData2Test(TestCase):
     def setUp(self):
@@ -894,3 +864,85 @@ class TourQuerysetAddWeighingData(TestCase):
             self.assertEqual(tours[0].first_date_3_4, datetime.date(2020,10,12))
             self.assertEqual(tours[0].first_date_4_8, datetime.date(2020,9,15))
             # self.assertEqual(tours[0].ws1_count_tour_sow,2)
+
+
+class TourQuerysetAddDataByWs(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        pigs_testings.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_ws5_cells = Location.objects.filter(pigletsGroupCell__workshop__number=5)
+        self.loc_ws6_cells = Location.objects.filter(pigletsGroupCell__workshop__number=6)
+
+    def test_add_weight_data_by_place(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws4,
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws4,
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=120,
+            place='8/5', date=datetime.datetime.today())
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=360,
+            place='8/5', date=datetime.datetime(2020,9,15,0,0))
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=360,
+            place='8/6', date=datetime.datetime(2020,9,15,0,0))
+        
+        tours = Tour.objects.all().add_weight_data_by_place(place='8/5')
+        self.assertEqual(tours[0].weight_quantity, 200)
+        self.assertEqual(tours[0].weight_avg, 2.4)
+        self.assertEqual(tours[0].weight_total, 480)
+        self.assertEqual(tours[1].weight_quantity, None)
+
+    def test_add_culling_data_by_ws(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[0],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour2,
+            location=self.loc_ws5_cells[1],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1,
+         culling_type='spec', quantity=20, total_weight=400)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1,
+         culling_type='spec', quantity=12, total_weight=250)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2,
+         culling_type='spec', quantity=10, total_weight=230)
+        
+        tours = Tour.objects.all().add_culling_data_by_ws(ws_number=5, culling_type='spec')
+        self.assertEqual(tours[0].spec_quantity, 32)
+        self.assertEqual(tours[0].spec_total, 650)
+        self.assertEqual(round(tours[0].spec_avg, 2), 20.42)
+        self.assertEqual(tours[1].spec_quantity, 10)
+        self.assertEqual(tours[1].spec_total, 230)
+
+        tours = Tour.objects.all().add_culling_data_by_ws(ws_number=5, culling_type='padej')
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2,
+         culling_type='padej', quantity=5, total_weight=120)
+        self.assertEqual(tours[0].padej_quantity, None)
+        self.assertEqual(tours[1].padej_quantity, 5)
+        self.assertEqual(tours[1].padej_total, 120)
+        self.assertEqual(tours[1].padej_avg, 24)

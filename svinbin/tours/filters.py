@@ -7,12 +7,14 @@ from django_filters import rest_framework as filters
 
 from tours.models import Tour
 from sows.models import Sow
+from piglets_events.models import WeighingPiglets
 
 
 class TourFilter(filters.FilterSet):
     by_workshop_number = filters.NumberFilter(method='filter_by_workshop_number')
     has_weights = filters.BooleanFilter(method='filter_has_weights')
     has_weights_in_range = filters.DateFromToRangeFilter(method='filter_has_weights_in_range')
+    has_weights_in_ws = filters.CharFilter(method='filter_has_weights_in_ws')
     year = filters.NumberFilter(field_name="year", lookup_expr='exact')
 
     def filter_by_workshop_number(self, queryset, name, value):
@@ -41,6 +43,9 @@ class TourFilter(filters.FilterSet):
                     Q(first_date_8_7__range=date_range) |
                     Q(first_date_spec__range=date_range)
                 ))
+
+    def filter_has_weights_in_ws(self, queryset, name, value):
+        return queryset.filter(piglets_weights__place=value)
 
     class Meta:
         model = Tour

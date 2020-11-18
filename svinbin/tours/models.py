@@ -204,26 +204,6 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def add_count_transfer_to_7_5(self):
-        data = dict()
-
-        for ws_number in [5, 6, 7]:
-            trs_subquery = transactions.models.PigletsTransaction.objects \
-                .filter(to_location__workshop__number=11, week_tour=OuterRef('pk')) \
-                .filter(Q(
-                        Q(from_location__workshop__number=ws_number) |
-                        Q(from_location__section__workshop__number=ws_number) |
-                        Q(from_location__pigletsGroupCell__workshop__number=ws_number) |
-                        Q(from_location__sowAndPigletsCell__workshop__number=ws_number)
-                    )) \
-                .values('week_tour') \
-                .annotate(qnty=models.Sum('quantity')) \
-                .values('qnty')
-
-            data[f'ws{ws_number}_qnty_to_7_5'] = Subquery(trs_subquery, output_field=models.IntegerField())
-
-        return self.annotate(**data)
-
     def add_culling_percentage(self):
         data = dict()
 
@@ -305,6 +285,66 @@ class TourQuerySet(models.QuerySet):
                 ),
             )
 
+    def add_weight_data_by_place(self, place):
+        data = dict()
+        subquery_weight_quantity = self.filter(
+                                    piglets_weights__week_tour__pk=OuterRef('pk'),
+                                    piglets_weights__place=place) \
+                            .values('piglets_weights__place') \
+                            .annotate(weight_quantity=Sum('piglets_weights__piglets_quantity'))\
+                            .values('weight_quantity')
+        data['weight_quantity'] = Subquery(subquery_weight_quantity)
+
+        subquery_weight_avg = self.filter(
+                                    piglets_weights__week_tour__pk=OuterRef('pk'),
+                                    piglets_weights__place=place) \
+                            .values('piglets_weights__place') \
+                            .annotate(weight_avg=Avg('piglets_weights__average_weight'))\
+                            .values('weight_avg')
+        data['weight_avg'] = Subquery(subquery_weight_avg)
+
+        subquery_weight_total = self.filter(
+                                    piglets_weights__week_tour__pk=OuterRef('pk'),
+                                    piglets_weights__place=place) \
+                            .values('piglets_weights__place') \
+                            .annotate(weight_total=Sum('piglets_weights__total_weight'))\
+                            .values('weight_total')
+        data['weight_total'] = Subquery(subquery_weight_total)
+
+        return self.annotate(**data)
+
+    def add_culling_data_by_ws(self, ws_number, culling_type):
+        data = dict()
+        subquery_quantity = self.filter(
+                                piglets_culling__week_tour__pk=OuterRef('pk'),
+                                piglets_culling__culling_type=culling_type,
+                                piglets_culling__location__pigletsGroupCell__workshop__number=ws_number,
+                                    ) \
+                            .values('piglets_culling__culling_type') \
+                            .annotate(qnty=Sum('piglets_culling__quantity'))\
+                            .values('qnty')
+        data[f'{culling_type}_quantity'] = Subquery(subquery_quantity)
+
+        subquery_avg = self.filter(
+                                piglets_culling__week_tour__pk=OuterRef('pk'),
+                                piglets_culling__culling_type=culling_type,
+                                piglets_culling__location__pigletsGroupCell__workshop__number=ws_number,
+                                    ) \
+                            .values('piglets_culling__culling_type') \
+                            .annotate(avg=Avg('piglets_culling__avg_weight'))\
+                            .values('avg')
+        data[f'{culling_type}_avg'] = Subquery(subquery_avg)
+
+        subquery_total = self.filter(
+                                piglets_culling__week_tour__pk=OuterRef('pk'),
+                                piglets_culling__culling_type=culling_type,
+                                piglets_culling__location__pigletsGroupCell__workshop__number=ws_number)\
+                            .values('piglets_culling__culling_type') \
+                            .annotate(total=Sum('piglets_culling__total_weight'))\
+                            .values('total')
+        data[f'{culling_type}_total'] = Subquery(subquery_total)
+
+        return self.annotate(**data)
 
 class TourManager(CoreModelManager):
     def get_queryset(self):

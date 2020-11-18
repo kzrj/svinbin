@@ -73,7 +73,7 @@ class TourFiltersTest(TestCase):
             )
 
         qs = Tour.objects.all().add_weighing_first_dates()
-        print(qs[0].first_date_3_4)
+        # print(qs[0].first_date_3_4)
 
         f = filters.TourFilter({
             'has_weights_in_range_after': '2020-09-01',
@@ -89,3 +89,36 @@ class TourFiltersTest(TestCase):
         self.assertEqual(f.qs.count(), 1)
         self.assertEqual(f.qs.first().week_number, 3)
    
+    def test_filter_has_weights_in_ws(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws4,
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour2,
+            location=self.loc_ws4,
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour3,
+            location=self.loc_ws4,
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=120,
+            place='8/5', date=datetime.datetime.today())
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=150,
+            place='8/6', date=datetime.datetime(2020,9,25,0,0))
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=120,
+            place='8/5', date=datetime.datetime.today())
+
+        qs = Tour.objects.all()
+
+        f = filters.TourFilter({'has_weights_in_ws': '8/5'}, queryset=qs)
+        self.assertEqual(f.qs.count(), 2)
+        self.assertTrue(f.qs[0].week_number in [1,3])
+        self.assertTrue(f.qs[1].week_number in [1,3])

@@ -318,10 +318,16 @@ class CullingPigletsManager(CoreModelManager):
             piglets_group.remove_gilts(quantity)
         else:
             piglets_group.remove_piglets(quantity)
-            
-        culling = self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
+        
+        avg_weight = 0
+        if total_weight > 0:
+            avg_weight = total_weight / quantity
+
+        culling = self.create(piglets_group=piglets_group, culling_type=culling_type, 
+            reason=reason,
             date=date, initiator=initiator, is_it_gilt=is_it_gilt, quantity=quantity,
-            total_weight=total_weight, location=piglets_group.location,
+            total_weight=total_weight, avg_weight=avg_weight,
+            location=piglets_group.location,
             week_tour=piglets_group.metatour.week_tour,
             piglets_age=(date-piglets_group.birthday).days)
 
@@ -368,6 +374,9 @@ class CullingPiglets(PigletsEvent):
     is_it_gilt = models.BooleanField(default=False)
 
     total_weight = models.FloatField(null=True)
+
+    avg_weight = models.FloatField(null=True)    
+
     location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL, null=True, blank=True, 
         related_name="cullings")
 
