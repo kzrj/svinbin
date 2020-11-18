@@ -144,13 +144,12 @@ class SemenBoarCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = SemenBoar
-        fields = ('a', 'b', 'd', 'f_denom', 'final_motility_score', 'date', 'tour')
+        fields = ('a', 'b', 'd', 'f_denom', 'final_motility_score', 'date',)
 
 
 class SemenBoarSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(format="%Y-%m-%d")
     boar = BoarSerializer()
-    tour = serializers.StringRelatedField()
 
     class Meta:
         model = SemenBoar
