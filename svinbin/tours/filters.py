@@ -16,6 +16,7 @@ class TourFilter(filters.FilterSet):
     has_weights_in_range = filters.DateFromToRangeFilter(method='filter_has_weights_in_range')
     has_weights_in_ws = filters.CharFilter(method='filter_has_weights_in_ws')
     year = filters.NumberFilter(field_name="year", lookup_expr='exact')
+    last_5 = filters.BooleanFilter(method='filter_last_5')
 
     def filter_by_workshop_number(self, queryset, name, value):
         pks = Sow.objects.all().get_tours_pks(workshop_number=value)
@@ -46,6 +47,11 @@ class TourFilter(filters.FilterSet):
 
     def filter_has_weights_in_ws(self, queryset, name, value):
         return queryset.filter(piglets_weights__place=value)
+
+    def filter_last_5(self, queryset, name, value):
+        if value:
+            return queryset[:5]
+        return queryset
 
     class Meta:
         model = Tour
