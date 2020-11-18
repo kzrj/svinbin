@@ -50,7 +50,7 @@ class TourFilter(filters.FilterSet):
 
     def filter_last_n(self, queryset, name, value):
         if value:
-            pks = queryset.values_list('pk', flat=True)[:value]
+            pks = queryset.values_list('pk', flat=True)[:int(value)]
             return queryset.filter(pk__in=pks)
         return queryset
 
