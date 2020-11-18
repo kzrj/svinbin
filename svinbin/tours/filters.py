@@ -50,7 +50,8 @@ class TourFilter(filters.FilterSet):
 
     def filter_last_5(self, queryset, name, value):
         if value:
-            return queryset[:5]
+            pks = queryset.values_list('pk', flat=True)[:5]
+            return queryset.filter(pk__in=pks)
         return queryset
 
     class Meta:
