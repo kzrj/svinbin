@@ -26,11 +26,13 @@ $(document).ready(function(){
             ["none","","",""], 
             ["red1","#D8334A","#BF263C","#9d0f23"], 
             ["red2","#ED5565","#DA4453","#a71222"], 
+            ["red3","#e43e3e","#e43e3e","#e43e3e"], 
             ["orange","#FC6E51","#E9573F","#ce3319"], 
             ["yellow1","#FFCE54","#F6BB42","#e6a00f"], 
             ["yellow2","#E8CE4D","#E0C341","#dbb50c"],
             ["green1","#A0D468","#8CC152","#5ba30b"], 
             ["green2","#2ECC71","#2ABA66","#0da24b"], 
+            ["green3","#138a27","#138a27","#138a27"], 
             ["mint","#48CFAD","#37BC9B","#0fa781"], 
             ["teal","#A0CECB","#7DB1B1","#158383"], 
             ["aqua","#4FC1E9","#3BAFDA","#0a8ab9"], 
@@ -48,6 +50,7 @@ $(document).ready(function(){
             ["dark2","#3C3B3D","#323133","#1c191f"],
             ["mainDark", "#313131", "#313131", "#313131"],
             ["mainGrey", "#6c6c6c", "#6c6c6c", "#6c6c6c"],
+            ["tourTT", "#f5e9ff", "#f5e9ff", "#f5e9ff"],
             ["white", "#FFFFFF", "#FFFFFF", "#FFFFFF"],
 
         ];
