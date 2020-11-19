@@ -130,3 +130,24 @@ class TourReportV2ViewSetTest(APITestCase):
         self.assertEqual(response.data['3/4']['total']['total_quantity'], 200)
         self.assertEqual(response.data['farrow_data']['total_alive'], 15)
         self.assertEqual(response.data['spec_5']['total']['total_quantity'], 11)
+
+
+class TourReportFilterViewSetTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+        sows_events_testings.create_types()
+
+        self.user = staff_testing.create_employee()
+        self.client.force_authenticate(user=self.user)
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.tour3 = Tour.objects.get_or_create_by_week_in_current_year(week_number=3)
+
+    def test_tour_filter_ids(self):
+        response = self.client.get('/api/reports/tours/?ids=1,2')
+        print(response.data)
+

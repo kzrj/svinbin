@@ -122,3 +122,10 @@ class TourFiltersTest(TestCase):
         self.assertEqual(f.qs.count(), 2)
         self.assertTrue(f.qs[0].week_number in [1,3])
         self.assertTrue(f.qs[1].week_number in [1,3])
+
+    def test_tour_ids_filter(self):
+        qs = Tour.objects.all()
+        f = filters.TourFilter({
+            'ids': [1, 2],
+            }, queryset=qs)
+        print(f.qs)

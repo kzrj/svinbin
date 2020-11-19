@@ -10,6 +10,11 @@ from sows.models import Sow
 from piglets_events.models import WeighingPiglets
 
 
+# tours_pks = [(str(t), str(t)) for t in Tour.objects.all().values_list('pk', flat=True)]
+class NumberInFilter(filters.BaseInFilter, filters.NumberFilter):
+    pass
+
+
 class TourFilter(filters.FilterSet):
     by_workshop_number = filters.NumberFilter(method='filter_by_workshop_number')
     has_weights = filters.BooleanFilter(method='filter_has_weights')
@@ -17,9 +22,12 @@ class TourFilter(filters.FilterSet):
     has_weights_in_ws = filters.CharFilter(method='filter_has_weights_in_ws')
     year = filters.NumberFilter(field_name="year", lookup_expr='exact')
     last_n = filters.NumberFilter(method='filter_last_n')
-    ids = filters.ModelMultipleChoiceFilter(
-        field_name='id',
-        queryset=Tour.objects.all())
+    ids = NumberInFilter(field_name='id', lookup_expr='in')
+
+    # def filter_ids(self, queryset, name, value):
+    #     print(name)
+    #     print(value)
+    #     return queryset
 
     def filter_by_workshop_number(self, queryset, name, value):
         pks = Sow.objects.all().get_tours_pks(workshop_number=value)
