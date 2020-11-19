@@ -13,3 +13,14 @@ class TourViewSet(viewsets.ModelViewSet):
     serializer_class = TourSerializer
     filter_class = TourFilter
     permission_classes = [ReadOrAdminOnlyPermissions]
+
+
+    # @action(methods=['get'], detail=False)
+    # def tours_for_filter(self, request):
+    # 	data = list()
+    # 	years = self.queryset.values_list('year', flat=True).distinct()
+
+    # 	for year in years:
+    # 		data.append(
+    # 			{'year': year,self.queryset.filter(year=year).order_by('-week_number')
+    # 		)

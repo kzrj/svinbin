@@ -17,6 +17,11 @@ class TourFilter(filters.FilterSet):
     has_weights_in_ws = filters.CharFilter(method='filter_has_weights_in_ws')
     year = filters.NumberFilter(field_name="year", lookup_expr='exact')
     last_n = filters.NumberFilter(method='filter_last_n')
+    ids = filters.MultipleChoiceFilter(
+        name='pk',
+        to_field_name='pk',
+        lookup_type='in',
+        queryset=Tour.objects.all())
 
     def filter_by_workshop_number(self, queryset, name, value):
         pks = Sow.objects.all().get_tours_pks(workshop_number=value)
