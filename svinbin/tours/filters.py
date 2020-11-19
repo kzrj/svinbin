@@ -18,8 +18,7 @@ class TourFilter(filters.FilterSet):
     year = filters.NumberFilter(field_name="year", lookup_expr='exact')
     last_n = filters.NumberFilter(method='filter_last_n')
     ids = filters.MultipleChoiceFilter(
-        name='pk',
-        to_field_name='pk',
+        to_field_name='id',
         lookup_type='in',
         queryset=Tour.objects.all())
 
