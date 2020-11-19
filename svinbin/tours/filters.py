@@ -19,6 +19,7 @@ class TourFilter(filters.FilterSet):
     last_n = filters.NumberFilter(method='filter_last_n')
     ids = filters.ModelMultipleChoiceFilter(
         field_name='id',
+        to_field_name='id',
         queryset=Tour.objects.all())
 
     def filter_by_workshop_number(self, queryset, name, value):
