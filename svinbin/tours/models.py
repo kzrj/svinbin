@@ -63,11 +63,18 @@ class TourQuerySet(models.QuerySet):
     def add_farrow_data(self):
         data = dict()
         for born_type in ['alive', 'dead', 'mummy']:
+            # data[f'total_born_{born_type}'] = Subquery(
+            #     events_models.SowFarrow.objects.filter(tour__pk=OuterRef('pk')) \
+            #                 .values('tour') \
+            #                 .annotate(total=models.Sum(f'{born_type}_quantity')) \
+            #                 .values('total')
+            #     ,output_field=models.IntegerField())
+
             data[f'total_born_{born_type}'] = Subquery(
-                events_models.SowFarrow.objects.filter(tour__pk=OuterRef('pk')) \
-                            .values('tour') \
-                            .annotate(total=models.Sum(f'{born_type}_quantity')) \
-                            .values('total')
+                self.filter() \
+                    .values('sowfarrowset__tour') \
+                    .annotate(total=models.Sum(f'sowfarrowset__{born_type}_quantity')) \
+                    .values('total')
                 ,output_field=models.IntegerField())
 
         data['gilt_count'] = Subquery(sows_models.Gilt.objects.filter(tour__pk=OuterRef('pk')) \

@@ -34,13 +34,12 @@ class TourReportViewSet(viewsets.ModelViewSet):
     queryset = Tour.objects.all() \
                 .add_sow_data() \
                 .add_farrow_data() \
-                .add_count_tour_sow() \
                 .add_week_weight() \
                 .add_week_weight_ws8_v2() \
                 .add_culling_data_by_week_tour() \
                 .add_culling_percentage() \
                 .order_by('-year','-week_number', ) \
-                # .filter(year__gte=2020)
+                # .add_count_tour_sow() \
 
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
