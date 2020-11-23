@@ -270,6 +270,10 @@ class CullingSowManager(SowEventManager):
     def create_culling(self, sow, culling_type, weight=None, reason=None, initiator=None, date=None):
         if not date:
             date = timezone.now()
+
+        if self.filter(sow=sow):
+            raise DjangoValidationError(message=f'Свиноматка {sow.farm_id} уже выбыла.')
+
         culling = self.create(sow=sow, initiator=initiator, tour=sow.tour, reason=reason, date=date,
          culling_type=culling_type, location=sow.location, sow_status=sow.status, weight=weight,
          sow_group=sow.sow_group)
