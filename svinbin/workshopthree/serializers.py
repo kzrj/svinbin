@@ -48,7 +48,7 @@ class MarkAsGiltSerializer(serializers.ModelSerializer):
 
 class SowMarkAsGiltSerializer(serializers.ModelSerializer):
     gilt_list = serializers.ReadOnlyField(source='gilt_list_by_last_tour')
-    last_date_mark = serializers.DateTimeField()
+    last_date_mark = serializers.DateField()
     last_week_mark = serializers.ReadOnlyField()
 
     class Meta:
