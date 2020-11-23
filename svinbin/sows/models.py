@@ -421,6 +421,9 @@ class GiltManager(CoreModelManager):
 
         if not mother_sow:
             raise DjangoValidationError(message=f'Нет свиноматки с {mother_sow_farm_id}.')
+
+        if self.filter(birth_id=birth_id):
+            raise DjangoValidationError(message=f'{birth_id} такая бирка уже есть.')
         
         tour = mother_sow.tour
         if not tour:
