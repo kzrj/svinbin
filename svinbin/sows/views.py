@@ -67,10 +67,14 @@ class SowViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK
             )
         else:
-            return Response({'message': f'Свиноматки с номером {farm_id} нет'},
-                status=status.HTTP_404_NOT_FOUND
-            )
-
+            if farm_id:
+                return Response({'message': f'Свиноматки с номером {farm_id} нет'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            else:
+                return Response({'message': f'Введите номер свиноматки.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
 
     def list(self, request):
         queryset = self.filter_queryset(
