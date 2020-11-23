@@ -40,7 +40,9 @@ class SowViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def retrieve_by_farm_id(self, request):
         farm_id = request.GET.get('farm_id')
-        sow = self.filter_queryset(self.get_queryset()).filter(farm_id=farm_id).first()
+        sow = None
+        if farm_id:
+            sow = self.filter_queryset(self.get_queryset()).filter(farm_id=farm_id).first()
 
         if sow:
             if request.GET.get('simple'):
