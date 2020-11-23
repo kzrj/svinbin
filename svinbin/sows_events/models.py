@@ -356,7 +356,7 @@ class AbortionSowManager(SowEventManager):
         if not date:
             date = timezone.now()
         if self.filter(sow=sow, tour=sow.tour):
-        	raise DjangoValidationError(message=f'У свиноматки №{sow.farm_id} уже был аборт в жтом туре.')
+        	raise DjangoValidationError(message=f'У свиноматки №{sow.farm_id} уже был аборт в этом туре.')
 
         abortion = self.create(sow=sow, tour=sow.tour, initiator=initiator, date=date,
              location=sow.location, sow_group=sow.sow_group)
