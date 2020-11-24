@@ -334,19 +334,23 @@ class TourQuerysetAddPigletsDataTest(TestCase):
         merged_piglets2 = PigletsMerger.objects.create_merger_return_group(
             parent_piglets=[piglets15, piglets16], new_location=loc_cell_ws5_2)
 
-    def test_add_farrow_data(self):        
+    def test_add_farrow_data(self):     
         with self.assertNumQueries(1):
-            tours = Tour.objects.all().add_farrow_data()
+            tours = Tour.objects.all().add_farrow_data().add_sow_data().add_farrow_percentage()
+            # tours = Tour.objects.all().add_farrow_data().add_sow_data()
             bool(tours)
+            self.assertEqual(tours[0].farrow_percentage, 100)
+            self.assertEqual(tours[0].count_farrows, 3)
             self.assertEqual(tours[0].total_born_alive, 35)
             self.assertEqual(tours[0].total_born_dead, 8)
             self.assertEqual(tours[0].total_born_mummy, 3)
             self.assertEqual(tours[0].gilt_count, 2)
 
+            self.assertEqual(tours[1].farrow_percentage, 100)
+            self.assertEqual(tours[1].count_farrows, 2)
             self.assertEqual(tours[1].total_born_alive, 33)
             self.assertEqual(tours[1].total_born_dead, 3)
             self.assertEqual(tours[1].total_born_mummy, 2)
-
 
     def test_add_week_weight(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,

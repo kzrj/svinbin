@@ -16,38 +16,42 @@ import transactions
 
 class TourQuerySet(models.QuerySet):
     def add_sow_data(self):
-        subquery_seminated = events_models.Semination.objects.filter(tour__pk=OuterRef('pk')) \
-                            .values('tour') \
-                            .annotate(cnt=Count('sow', distinct=True)) \
+        subquery_seminated = self.filter(semination__tour__pk=OuterRef('pk')) \
+                            .values('semination__tour') \
+                            .annotate(cnt=Count('semination__sow', distinct=True)) \
                             .values('cnt')
 
-        subquery_usound28_suporos = events_models.Ultrasound.objects.filter(
-                                            tour__pk=OuterRef('pk'), u_type__days=30, result=True) \
-                            .values('tour') \
-                            .annotate(cnt=Count('sow', distinct=True)) \
+        subquery_usound28_suporos = self.filter(
+                                ultrasound__tour__pk=OuterRef('pk'), ultrasound__u_type__days=30,
+                                ultrasound__result=True) \
+                            .values('ultrasound__tour') \
+                            .annotate(cnt=Count('ultrasound__sow', distinct=True)) \
                             .values('cnt')
 
-        subquery_usound28_proholost = events_models.Ultrasound.objects.filter(
-                                            tour__pk=OuterRef('pk'), u_type__days=30, result=False) \
-                            .values('tour') \
-                            .annotate(cnt=Count('sow', distinct=True)) \
+        subquery_usound28_proholost = self.filter(
+                                ultrasound__tour__pk=OuterRef('pk'), ultrasound__u_type__days=30,
+                                ultrasound__result=False) \
+                            .values('ultrasound__tour') \
+                            .annotate(cnt=Count('ultrasound__sow', distinct=True)) \
                             .values('cnt')
 
-        subquery_usound35_suporos = events_models.Ultrasound.objects.filter(
-                                            tour__pk=OuterRef('pk'), u_type__days=60, result=True) \
-                            .values('tour') \
-                            .annotate(cnt=Count('sow', distinct=True)) \
+        subquery_usound35_suporos = self.filter(
+                                ultrasound__tour__pk=OuterRef('pk'), ultrasound__u_type__days=60,
+                                ultrasound__result=True) \
+                            .values('ultrasound__tour') \
+                            .annotate(cnt=Count('ultrasound__sow', distinct=True)) \
                             .values('cnt')
 
-        subquery_usound35_proholost = events_models.Ultrasound.objects.filter(
-                                            tour__pk=OuterRef('pk'), u_type__days=60, result=False) \
-                            .values('tour') \
-                            .annotate(cnt=Count('sow', distinct=True)) \
+        subquery_usound35_proholost = self.filter(
+                                ultrasound__tour__pk=OuterRef('pk'), ultrasound__u_type__days=60,
+                                ultrasound__result=False) \
+                            .values('ultrasound__tour') \
+                            .annotate(cnt=Count('ultrasound__sow', distinct=True)) \
                             .values('cnt')
 
-        subquery_abort = events_models.AbortionSow.objects.filter(tour__pk=OuterRef('pk')) \
-                            .values('tour') \
-                            .annotate(cnt=Count('sow', distinct=True)) \
+        subquery_abort = self.filter(abortionsow__tour__pk=OuterRef('pk')) \
+                            .values('abortionsow__tour') \
+                            .annotate(cnt=Count('abortionsow__sow', distinct=True)) \
                             .values('cnt')
 
         return self.annotate(
@@ -64,26 +68,28 @@ class TourQuerySet(models.QuerySet):
         data = dict()
         for born_type in ['alive', 'dead', 'mummy']:
             data[f'total_born_{born_type}'] = Subquery(
-                events_models.SowFarrow.objects.filter(tour__pk=OuterRef('pk')) \
-                            .values('tour') \
-                            .annotate(total=models.Sum(f'{born_type}_quantity')) \
-                            .values('total')
+                self.filter(sowfarrow__tour__pk=OuterRef('pk')) \
+                    .values('sowfarrow__tour') \
+                    .annotate(total=models.Sum(f'sowfarrow__{born_type}_quantity')) \
+                    .values('total')
                 ,output_field=models.IntegerField())
 
-            # data[f'total_born_{born_type}'] = Subquery(
-            #     self.filter() \
-            #         .values('sowfarrow__tour') \
-            #         .annotate(total=models.Sum(f'sowfarrowset__{born_type}_quantity')) \
-            #         .values('total')
-            #     ,output_field=models.IntegerField())
-
-        data['gilt_count'] = Subquery(sows_models.Gilt.objects.filter(tour__pk=OuterRef('pk')) \
-                                .values('tour') \
+        data['gilt_count'] = Subquery(self.filter(gilt__tour__pk=OuterRef('pk')) \
+                                .values('gilt__tour') \
                                 .annotate(cnt=Count('*')) \
                                 .values('cnt'),
                 output_field=models.IntegerField())
 
+        data['count_farrows'] = Subquery(
+                self.filter(sowfarrow__tour__pk=OuterRef('pk'))
+                .values('sowfarrow__tour') \
+                .annotate(farrow_cnt=models.Count('sowfarrow__sow')) \
+                .values('farrow_cnt'))
+
         return self.annotate(**data)
+
+    def add_farrow_percentage(self):
+        return self.annotate(farrow_percentage=((F('count_farrows') * 100 ) / F('count_seminated')))
 
     def add_count_tour_sow(self):
         data = dict()

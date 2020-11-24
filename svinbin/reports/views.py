@@ -34,6 +34,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
     queryset = Tour.objects.all() \
                 .add_sow_data() \
                 .add_farrow_data() \
+                .add_farrow_percentage() \
                 .add_week_weight() \
                 .add_week_weight_ws8_v2() \
                 .add_culling_data_by_week_tour() \
