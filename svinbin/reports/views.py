@@ -32,8 +32,8 @@ from core.permissions import ReadOrAdminOnlyPermissions
 
 class TourReportViewSet(viewsets.ModelViewSet):
     queryset = Tour.objects.all() \
-                .add_sow_data() \
                 .add_farrow_data() \
+                .add_sow_data() \
                 .add_farrow_percentage() \
                 .add_week_weight() \
                 .add_week_weight_ws8_v2() \

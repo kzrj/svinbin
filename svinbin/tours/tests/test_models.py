@@ -336,8 +336,14 @@ class TourQuerysetAddPigletsDataTest(TestCase):
 
     def test_add_farrow_data(self):     
         with self.assertNumQueries(1):
-            tours = Tour.objects.all().add_farrow_data().add_sow_data().add_farrow_percentage()
-            # tours = Tour.objects.all().add_farrow_data().add_sow_data()
+            tours = Tour.objects.all() \
+                .add_farrow_data() \
+                .add_sow_data() \
+                .add_farrow_percentage() \
+                .add_week_weight() \
+                .add_week_weight_ws8_v2() \
+                .add_culling_data_by_week_tour() \
+                .add_culling_percentage()
             bool(tours)
             self.assertEqual(tours[0].farrow_percentage, 100)
             self.assertEqual(tours[0].count_farrows, 3)
@@ -572,7 +578,7 @@ class TourQuerysetAddSowsDataTest(TestCase):
         bool(count_seminated)
 
         with self.assertNumQueries(1):
-            tours = Tour.objects.all().add_sow_data()
+            tours = Tour.objects.all().add_farrow_data().add_sow_data()
             bool(tours)
             self.assertEqual(tours[0].count_seminated, count_seminated)
             
@@ -865,7 +871,7 @@ class TourQuerysetAddWeighingData(TestCase):
         with self.assertNumQueries(1):
             tours = Tour.objects.all().add_weighing_first_dates()
             bool(tours)
-            self.assertEqual(tours[0].first_date_3_4, datetime.date(2020,10,12))
+            self.assertEqual(tours[0].first_date_3_4, datetime.datetime.today().date)
             self.assertEqual(tours[0].first_date_4_8, datetime.date(2020,9,15))
             # self.assertEqual(tours[0].ws1_count_tour_sow,2)
 
