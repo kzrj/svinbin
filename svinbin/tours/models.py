@@ -365,7 +365,7 @@ class TourQuerySet(models.QuerySet):
         for ws_number in [5, 6, 7]:
             data[f'ws{ws_number}_remont'] = Subquery(
                     self.filter(
-                        piglets_transactions__week_tour=OuterRef('pk'),
+                        piglets_transactions__week_tour__pk=OuterRef('pk'),
                         piglets_transactions__to_location__workshop__number=2,
                         piglets_transactions__from_location__pigletsGroupCell__workshop__number=ws_number,
                         ) \
@@ -374,7 +374,7 @@ class TourQuerySet(models.QuerySet):
                     .values('total'))
 
         data['count_remont_total'] = Subquery(
-                self.filter(piglets_transactions__week_tour=OuterRef('pk'),
+                self.filter(piglets_transactions__week_tour__pk=OuterRef('pk'),
                     piglets_transactions__to_location__workshop__number=2) \
                 .values('piglets_transactions__week_tour') \
                 .annotate(total=Sum('piglets_transactions__quantity'))
