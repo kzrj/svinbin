@@ -956,3 +956,69 @@ class TourQuerysetAddDataByWs(TestCase):
         self.assertEqual(tours[1].padej_quantity, 5)
         self.assertEqual(tours[1].padej_total, 120)
         self.assertEqual(tours[1].padej_avg, 24)
+
+
+class TourQuerysetAddRemont(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        pigs_testings.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_ws2 = Location.objects.get(workshop__number=2)
+        self.loc_ws5_cells = Location.objects.filter(pigletsGroupCell__workshop__number=5)
+        self.loc_ws6_cells = Location.objects.filter(pigletsGroupCell__workshop__number=6)
+
+    def test_add_remont_trs_out(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[0],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws6_cells[1],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        PigletsTransaction.objects.transaction_with_split_and_merge(
+            piglets=piglets1,
+            to_location=self.loc_ws2,
+            new_amount=65
+            )
+
+        PigletsTransaction.objects.transaction_with_split_and_merge(
+            piglets=piglets2,
+            to_location=self.loc_ws2,
+            new_amount=43
+            )
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour2,
+            location=self.loc_ws6_cells[1],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        PigletsTransaction.objects.transaction_with_split_and_merge(
+            piglets=piglets3,
+            to_location=self.loc_ws2,
+            new_amount=29
+            )
+
+        tours = Tour.objects.all().add_remont_trs_out()
+        self.assertEqual(tours[0].count_remont_total, 108)
+        self.assertEqual(tours[0].ws5_remont, 65)
+        self.assertEqual(tours[0].ws6_remont, 43)
+        self.assertEqual(tours[0].ws7_remont, None)
+
+        self.assertEqual(tours[1].count_remont_total, 29)
+        self.assertEqual(tours[1].ws5_remont, None)
+        self.assertEqual(tours[1].ws6_remont, 29)
+        self.assertEqual(tours[1].ws7_remont, None)
