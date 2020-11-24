@@ -89,7 +89,8 @@ class TourQuerySet(models.QuerySet):
         return self.annotate(**data)
 
     def add_farrow_percentage(self):
-        return self.annotate(farrow_percentage=((F('count_farrows') * 100 ) / F('count_seminated')))
+        return self.annotate(farrow_percentage=ExpressionWrapper(
+            (F('count_farrows') * 100 ) / F('count_seminated')), output_field=models.FloatField())
 
     def add_count_tour_sow(self):
         data = dict()
