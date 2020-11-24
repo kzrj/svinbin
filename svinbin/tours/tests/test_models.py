@@ -1012,7 +1012,16 @@ class TourQuerysetAddRemont(TestCase):
             new_amount=29
             )
 
-        tours = Tour.objects.all().add_remont_trs_out()
+        tours = Tour.objects.all() \
+                .add_farrow_data() \
+                .add_sow_data() \
+                .add_farrow_percentage() \
+                .add_week_weight() \
+                .add_week_weight_ws8_v2() \
+                .add_culling_data_by_week_tour() \
+                .add_culling_percentage() \
+                .add_remont_trs_out() \
+                
         self.assertEqual(tours[0].count_remont_total, 108)
         self.assertEqual(tours[0].ws5_remont, 65)
         self.assertEqual(tours[0].ws6_remont, 43)

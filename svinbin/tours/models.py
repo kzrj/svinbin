@@ -370,8 +370,8 @@ class TourQuerySet(models.QuerySet):
                         piglets_transactions__from_location__pigletsGroupCell__workshop__number=ws_number,
                         ) \
                     .values('piglets_transactions__week_tour') \
-                    .annotate(f'total_{ws_number}_remont'=Sum('piglets_transactions__quantity'))
-                    .values(f'total_{ws_number}_remont'))
+                    .annotate(total=Sum('piglets_transactions__quantity'))
+                    .values('total'))
 
         data['count_remont_total'] = Subquery(
                 self.filter(piglets_transactions__week_tour__pk=OuterRef('pk'),
