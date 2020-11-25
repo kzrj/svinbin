@@ -382,6 +382,41 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def add_weight_avg_age(self):
+        subquery = self.filter(
+                piglets_weights__week_tour__pk=OuterRef('pk'),
+                piglets_weights__place='3/4',
+                ) \
+            .values('piglets_weights__week_tour') \
+            .annotate(weight_3_4_avg_age=ExpressionWrapper(
+                Sum(
+                    ExpressionWrapper(F('piglets_weights__piglets_age') * F('piglets_weights__piglets_quantity'),
+                     output_field=models.FloatField())
+                    )
+                 / Sum('piglets_weights__piglets_quantity', output_field=models.FloatField()),
+                output_field=models.FloatField()
+                )) \
+            .values('weight_3_4_avg_age')
+
+        subquery2 = self.filter(
+                piglets_weights__week_tour__pk=OuterRef('pk'),
+                piglets_weights__place='3/4',
+                ) \
+            .values('piglets_weights__week_tour') \
+            .annotate(weight_3_4_avg_age_sum=
+                Sum(
+                    ExpressionWrapper(
+                        F('piglets_weights__piglets_age') * F('piglets_weights__piglets_quantity'),
+                         output_field=models.FloatField()
+                        )
+                )) \
+            .values('weight_3_4_avg_age_sum')
+
+        return self.annotate(
+            weight_3_4_avg_age=Subquery(subquery),
+            weight_3_4_avg_age_sum=Subquery(subquery2),
+            )
+
 
 class TourManager(CoreModelManager):
     def get_queryset(self):

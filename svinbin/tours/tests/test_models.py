@@ -1031,3 +1031,116 @@ class TourQuerysetAddRemont(TestCase):
         self.assertEqual(tours[1].ws5_remont, None)
         self.assertEqual(tours[1].ws6_remont, 29)
         self.assertEqual(tours[1].ws7_remont, None)
+
+
+class TourPrivesTest(TestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        pigs_testings.create_statuses()
+        sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_ws2 = Location.objects.get(workshop__number=2)
+        self.loc_ws5_cells = Location.objects.filter(pigletsGroupCell__workshop__number=5)
+        self.loc_ws6_cells = Location.objects.filter(pigletsGroupCell__workshop__number=6)
+
+        self.piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[0],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,1,0,0)
+            )
+
+        self.piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[1],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+
+        self.piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[2],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+
+        self.piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[3],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+
+        self.piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[4],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+
+        self.piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[5],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+
+        # 3/4 взвешивания
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets1, total_weight=2400,
+            place='3/4', date=self.piglets1.birthday + datetime.timedelta(days=60))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets2, total_weight=2500,
+            place='3/4', date=self.piglets2.birthday + datetime.timedelta(days=60))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets3, total_weight=2700,
+            place='3/4', date=self.piglets3.birthday + datetime.timedelta(days=64))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets4, total_weight=2600,
+            place='3/4', date=self.piglets4.birthday + datetime.timedelta(days=64))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets5, total_weight=3000,
+            place='3/4', date=self.piglets5.birthday + datetime.timedelta(days=70))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets6, total_weight=3200,
+            place='3/4', date=self.piglets6.birthday + datetime.timedelta(days=70))
+
+        # 4/8 взвешивания
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets1, total_weight=5100,
+            place='4/8', date=self.piglets2.birthday + datetime.timedelta(days=110))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets2, total_weight=4900,
+            place='4/8', date=self.piglets2.birthday + datetime.timedelta(days=110))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets3, total_weight=5400,
+            place='4/8', date=self.piglets3.birthday + datetime.timedelta(days=110))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets4, total_weight=5200,
+            place='4/8', date=self.piglets4.birthday + datetime.timedelta(days=110))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets5, total_weight=5800,
+            place='4/8', date=self.piglets5.birthday + datetime.timedelta(days=110))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets6, total_weight=5700,
+            place='4/8', date=self.piglets6.birthday + datetime.timedelta(days=110))
+
+    def test_add_weight_avg_age(self):
+        tours = Tour.objects.all().add_weight_avg_age()
+        print(tours[0].weight_3_4_avg_age)
+        print(tours[0].weight_3_4_avg_age_sum)
+
+        w1 = WeighingPiglets.objects.filter(piglets_group=self.piglets1, place='3/4').first()
+        print(w1.piglets_age)
+        # print(Tour.objects.all().add_weight_avg_age())
+
+        # print(Tour.objects.all() \
+        #         .filter(piglets_weights__week_tour__pk=self.tour1.pk) \
+        #         .values('piglets_weights') \
+        #         .annotate('piglets_weights') \
+        #     )
