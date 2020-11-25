@@ -70,8 +70,8 @@ class TourQuerySet(models.QuerySet):
             data[f'total_born_{born_type}'] = Subquery(
                 self.filter(sowfarrow__tour__pk=OuterRef('pk')) \
                     .values('sowfarrow__tour') \
-                    .annotate(total=Sum(f'sowfarrow__{born_type}_quantity')) \
-                    .values('total')
+                    .annotate(total_born=Sum(f'sowfarrow__{born_type}_quantity')) \
+                    .values('total_born')
                 ,output_field=models.IntegerField())
 
         data['gilt_count'] = Subquery(self.filter(gilt__tour__pk=OuterRef('pk')) \
@@ -103,8 +103,8 @@ class TourQuerySet(models.QuerySet):
                             Q(location__sowAndPigletsCell__workshop__number=ws_number)
                         )) \
                         .values('tour') \
-                        .annotate(cnt=Count('*')) \
-                        .values('cnt'),
+                        .annotate(cnt_tour_sow=Count('*')) \
+                        .values('cnt_tour_sow'),
                  output_field=models.IntegerField())
 
         return self.annotate(**data)        
@@ -197,8 +197,8 @@ class TourQuerySet(models.QuerySet):
                         
                 culling_subquery_qnty = culling_subquery \
                     .values('culling_type') \
-                    .annotate(qnty=Sum('quantity')) \
-                    .values('qnty')
+                    .annotate(culling_qnty=Sum('quantity')) \
+                    .values('culling_qnty')
 
                 data[f'ws{ws_number}_{c_type}_quantity'] = Subquery(culling_subquery_qnty,
                      output_field=models.IntegerField())
@@ -210,8 +210,8 @@ class TourQuerySet(models.QuerySet):
                     if c_type == 'spec':
                         culling_subquery_avg_weight = culling_subquery \
                             .values('culling_type') \
-                            .annotate(avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())) \
-                            .values('avg_weight')
+                            .annotate(culling_avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())) \
+                            .values('culling_avg_weight')
 
                         data[f'ws{ws_number}_{c_type}_avg_weight'] = Subquery(culling_subquery_avg_weight,
                          output_field=models.FloatField())
@@ -335,8 +335,8 @@ class TourQuerySet(models.QuerySet):
                                 piglets_culling__location__pigletsGroupCell__workshop__number=ws_number,
                                     ) \
                             .values('piglets_culling__culling_type') \
-                            .annotate(qnty=Sum('piglets_culling__quantity'))\
-                            .values('qnty')
+                            .annotate(culling_by_ws_qnty=Sum('piglets_culling__quantity'))\
+                            .values('culling_by_ws_qnty')
         data[f'{culling_type}_quantity'] = Subquery(subquery_quantity)
 
         subquery_avg = self.filter(
@@ -345,8 +345,8 @@ class TourQuerySet(models.QuerySet):
                                 piglets_culling__location__pigletsGroupCell__workshop__number=ws_number,
                                     ) \
                             .values('piglets_culling__culling_type') \
-                            .annotate(avg=Avg('piglets_culling__avg_weight'))\
-                            .values('avg')
+                            .annotate(culling_by_ws_avg=Avg('piglets_culling__avg_weight'))\
+                            .values('culling_by_ws_avg')
         data[f'{culling_type}_avg'] = Subquery(subquery_avg)
 
         subquery_total = self.filter(
@@ -354,8 +354,8 @@ class TourQuerySet(models.QuerySet):
                                 piglets_culling__culling_type=culling_type,
                                 piglets_culling__location__pigletsGroupCell__workshop__number=ws_number)\
                             .values('piglets_culling__culling_type') \
-                            .annotate(total=Sum('piglets_culling__total_weight'))\
-                            .values('total')
+                            .annotate(culling_by_ws_total=Sum('piglets_culling__total_weight'))\
+                            .values('culling_by_ws_total')
         data[f'{culling_type}_total'] = Subquery(subquery_total)
 
         return self.annotate(**data)
@@ -370,15 +370,15 @@ class TourQuerySet(models.QuerySet):
                         piglets_transactions__from_location__pigletsGroupCell__workshop__number=ws_number,
                         ) \
                     .values('piglets_transactions__week_tour') \
-                    .annotate(total=Sum('piglets_transactions__quantity'))
-                    .values('total'))
+                    .annotate(ws_remont_total=Sum('piglets_transactions__quantity'))
+                    .values('ws_remont_total'))
 
         data['count_remont_total'] = Subquery(
                 self.filter(piglets_transactions__week_tour__pk=OuterRef('pk'),
                     piglets_transactions__to_location__workshop__number=2) \
                 .values('piglets_transactions__week_tour') \
-                .annotate(total=Sum('piglets_transactions__quantity'))
-                .values('total'))
+                .annotate(remont_total=Sum('piglets_transactions__quantity'))
+                .values('remont_total'))
 
         return self.annotate(**data)
 
