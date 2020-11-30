@@ -33,6 +33,7 @@ from core.permissions import ReadOrAdminOnlyPermissions
 class TourReportViewSet(viewsets.ModelViewSet):
     queryset = Tour.objects.all() \
                 .add_remont_trs_out() \
+                .add_prives() \
                 .add_farrow_data() \
                 .add_sow_data() \
                 .add_farrow_percentage() \
