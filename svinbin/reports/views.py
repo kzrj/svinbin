@@ -40,6 +40,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
                 .add_week_weight_ws8_v2() \
                 .add_culling_data_by_week_tour() \
                 .add_culling_percentage() \
+                .add_prives() \
                 .order_by('-year','-week_number', ) \
                 # .add_count_tour_sow() \
 
