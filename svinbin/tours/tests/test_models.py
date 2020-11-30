@@ -1130,17 +1130,79 @@ class TourPrivesTest(TestCase):
             piglets_group=self.piglets6, total_weight=5700,
             place='4/8', date=self.piglets6.birthday + datetime.timedelta(days=110))
 
-    def test_add_weight_avg_age(self):
-        tours = Tour.objects.all().add_weight_avg_age()
-        print(tours[0].weight_3_4_avg_age)
-        print(tours[0].weight_3_4_avg_age_sum)
+        # 8/5 взвешивания
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets1, total_weight=15100,
+            place='8/5', date=self.piglets2.birthday + datetime.timedelta(days=150))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets2, total_weight=14900,
+            place='8/5', date=self.piglets2.birthday + datetime.timedelta(days=150))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets3, total_weight=15400,
+            place='8/5', date=self.piglets3.birthday + datetime.timedelta(days=150))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets4, total_weight=15200,
+            place='8/6', date=self.piglets4.birthday + datetime.timedelta(days=150))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets5, total_weight=15800,
+            place='8/6', date=self.piglets5.birthday + datetime.timedelta(days=150))
+        WeighingPiglets.objects.create_weighing(
+            piglets_group=self.piglets6, total_weight=15700,
+            place='8/7', date=self.piglets6.birthday + datetime.timedelta(days=150))
 
-        w1 = WeighingPiglets.objects.filter(piglets_group=self.piglets1, place='3/4').first()
-        print(w1.piglets_age)
-        # print(Tour.objects.all().add_weight_avg_age())
+        
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=self.piglets1, culling_type='spec', quantity=50, total_weight=20000,
+            date=self.piglets1.birthday + datetime.timedelta(days=200))
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=self.piglets2, culling_type='spec', quantity=50, total_weight=20000,
+            date=self.piglets2.birthday + datetime.timedelta(days=200))
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=self.piglets3, culling_type='spec', quantity=50, total_weight=20000,
+            date=self.piglets3.birthday + datetime.timedelta(days=200))
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=self.piglets4, culling_type='spec', quantity=50, total_weight=20000,
+            date=self.piglets4.birthday + datetime.timedelta(days=200))
+        CullingPiglets.objects.create_culling_piglets(
+            piglets_group=self.piglets5, culling_type='spec', quantity=50, total_weight=20000,
+            date=self.piglets5.birthday + datetime.timedelta(days=200))
 
-        # print(Tour.objects.all() \
-        #         .filter(piglets_weights__week_tour__pk=self.tour1.pk) \
-        #         .values('piglets_weights') \
-        #         .annotate('piglets_weights') \
-        #     )
+    def test_add_prives_prepare(self):
+        tours = Tour.objects.all().add_prives_prepare()
+        self.assertEqual(round(tours[0].sv_age_3_4, 2), 64.67)
+        self.assertEqual(tours[0].total1_3_4, 16400)
+        self.assertEqual(tours[0].total2_3_4, 16400)
+        
+        self.assertEqual(round(tours[0].sv_age_4_8, 2), 110.67)
+        self.assertEqual(tours[0].total1_4_8, 32100)
+        self.assertEqual(tours[0].total2_4_8, 32100)
+
+        self.assertEqual(round(tours[0].sv_age_ws8, 2), 150.67)
+        self.assertEqual(tours[0].total1_ws8, 92100)
+        self.assertEqual(tours[0].total2_ws8, 92100)
+
+    def test_add_prives_prepare(self):
+        tours = Tour.objects.all().add_prives_prepare_spec()
+
+        self.assertEqual(tours[0].spec_weight_total_ws5, 100000)
+        self.assertEqual(tours[0].spec_sv_avg_age_ws5, 200)
+
+    def test_add_prives(self):
+        tours = Tour.objects.all().add_prives()
+
+        self.assertEqual(round(tours[0].prives_4, 2),
+            round(((tours[0].total2_4_8 - tours[0].total2_3_4) / 
+                (tours[0].sv_age_4_8 - tours[0].sv_age_3_4)), 2))
+
+        self.assertEqual(round(tours[0].prives_8, 2),
+            round(((tours[0].total2_ws8 - tours[0].total2_4_8) / 
+                (tours[0].sv_age_ws8 - tours[0].sv_age_4_8)), 2))
+
+        self.assertEqual(round(tours[0].prives_5, 2),
+            round(((tours[0].spec_weight_total_ws5 - tours[0].total2_8_5) / 
+                (tours[0].spec_sv_avg_age_ws5 - tours[0].sv_age_8_5)), 2))       
+
+    # def test_sum_avgs_in_total(self):
+    #     tours = Tour.objects.all().add_weight_avg_age()
+    #     print(tours[0].sum_avgs_in_total_3_4)
+    #     print(tours[0].sum_avgs_in_total2_3_4)
