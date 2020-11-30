@@ -382,6 +382,33 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def gen_subquery_sv_age_at_place(self, places):
+        return Subquery(self.filter(
+                    piglets_weights__week_tour__pk=OuterRef('pk'),
+                    piglets_weights__place__in=places,
+                    ) \
+                .values('piglets_weights__week_tour') \
+                .annotate(weight_sv_avg_age=ExpressionWrapper(
+                    Sum(
+                        ExpressionWrapper(
+                            F('piglets_weights__piglets_age') 
+                            * F('piglets_weights__piglets_quantity'),
+                            output_field=models.FloatField())
+                        )
+                     / Sum('piglets_weights__piglets_quantity'),
+                    output_field=models.FloatField()
+                    )) \
+                .values('weight_sv_avg_age'))
+
+    def gen_subquery_total2_place(self, places):
+        return Subquery(self.filter(
+                    piglets_weights__week_tour__pk=OuterRef('pk'),
+                    piglets_weights__place__in=places,
+                    ) \
+                .values('piglets_weights__week_tour') \
+                .annotate(total2=Sum('piglets_weights__total_weight')) \
+                .values('total2'))
+
     def add_prives_prepare(self):
         data = dict()
 
@@ -430,12 +457,18 @@ class TourQuerySet(models.QuerySet):
 
         for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
             place_formatted = place.replace('/', '_')
+            # data[f'sv_age_{place_formatted}']  = self.gen_subquery_sv_age_at_place(places=[place])
             data[f'sv_age_{place_formatted}']  = subquery_sv_age_at_place(self, [place])
-            data[f'total1_{place_formatted}']  = subquery_total1_place(self, [place])
+            # data[f'total1_{place_formatted}']  = subquery_total1_place(self, [place])
             data[f'total2_{place_formatted}']  = subquery_total2_place(self, [place])
+            # data[f'total2_{place_formatted}']  = self.gen_subquery_total2_place(places=[place])
+
+        # data['sv_age_ws8'] = self.gen_subquery_sv_age_at_place(places=['8/5', '8/6', '8/7'])
+        # data['total1_ws8'] = subquery_total1_place(self, ['8/5', '8/6', '8/7'])
+        # data['total2_ws8'] = self.gen_subquery_total2_place(places=['8/5', '8/6', '8/7'])
 
         data['sv_age_ws8'] = subquery_sv_age_at_place(self, ['8/5', '8/6', '8/7'])
-        data['total1_ws8'] = subquery_total1_place(self, ['8/5', '8/6', '8/7'])
+        # data['total1_ws8'] = subquery_total1_place(self, ['8/5', '8/6', '8/7'])
         data['total2_ws8'] = subquery_total2_place(self, ['8/5', '8/6', '8/7'])
 
         return self.annotate(**data)
@@ -488,6 +521,7 @@ class TourQuerySet(models.QuerySet):
                              (F('spec_sv_avg_age_ws7') - F('sv_age_8_7'))
 
         return self.add_prives_prepare().add_prives_prepare_spec().annotate(**data)
+        # return self.annotate(**data)
 
 
 

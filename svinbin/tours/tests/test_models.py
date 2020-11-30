@@ -1202,6 +1202,21 @@ class TourPrivesTest(TestCase):
             round(((tours[0].spec_weight_total_ws5 - tours[0].total2_8_5) / 
                 (tours[0].spec_sv_avg_age_ws5 - tours[0].sv_age_8_5)), 2))       
 
+    def test_xz(self):
+        tours = Tour.objects.all() \
+                .add_remont_trs_out() \
+                .add_farrow_data() \
+                .add_sow_data() \
+                .add_farrow_percentage() \
+                .add_week_weight() \
+                .add_week_weight_ws8_v2() \
+                .add_culling_data_by_week_tour() \
+                .add_culling_percentage() \
+                .add_prives()
+
+        print(tours)
+
+
     # def test_sum_avgs_in_total(self):
     #     tours = Tour.objects.all().add_weight_avg_age()
     #     print(tours[0].sum_avgs_in_total_3_4)
