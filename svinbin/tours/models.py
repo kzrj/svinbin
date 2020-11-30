@@ -515,10 +515,10 @@ class TourQuerySet(models.QuerySet):
         data['prives_8'] = (F('total2_ws8') - F('total2_4_8'))  / (F('sv_age_ws8') - F('sv_age_4_8'))
         data['prives_5'] = (F('spec_weight_total_ws5') - F('total2_8_5')) / \
                              (F('spec_sv_avg_age_ws5') - F('sv_age_8_5'))
-        data['prives_6'] = (F('spec_weight_total_ws6') - F('total2_8_6')) / \
-                             (F('spec_sv_avg_age_ws6') - F('sv_age_8_6'))
-        data['prives_7'] = (F('spec_weight_total_ws7') - F('total2_8_7')) / \
-                             (F('spec_sv_avg_age_ws7') - F('sv_age_8_7'))
+        # data['prives_6'] = (F('spec_weight_total_ws6') - F('total2_8_6')) / \
+        #                      (F('spec_sv_avg_age_ws6') - F('sv_age_8_6'))
+        # data['prives_7'] = (F('spec_weight_total_ws7') - F('total2_8_7')) / \
+        #                      (F('spec_sv_avg_age_ws7') - F('sv_age_8_7'))
 
         return self.add_prives_prepare().add_prives_prepare_spec().annotate(**data)
         # return self.annotate(**data)
