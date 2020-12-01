@@ -573,8 +573,6 @@ class TourQuerySet(models.QuerySet):
                              (F('spec_sv_avg_age_ws7') - F('sv_age_8_7'))
 
         return self.add_prives_prepare().add_prives_prepare_spec().annotate(**data)
-        # return self.annotate(**data)
-
 
 
 class TourManager(CoreModelManager):
