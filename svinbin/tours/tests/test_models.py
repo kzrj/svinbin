@@ -1215,6 +1215,17 @@ class TourPrivesTest(TestCase):
                 .add_prives()
 
         print(tours)
+        # self.assertEqual(round(tours[0].sv_age_3_4, 2), 64.67)
+        # self.assertEqual(tours[0].total1_3_4, 16400)
+        # self.assertEqual(tours[0].total2_3_4, 16400)
+        
+        # self.assertEqual(round(tours[0].sv_age_4_8, 2), 110.67)
+        # self.assertEqual(tours[0].total1_4_8, 32100)
+        # self.assertEqual(tours[0].total2_4_8, 32100)
+
+        # self.assertEqual(round(tours[0].sv_age_ws8, 2), 150.67)
+        # self.assertEqual(tours[0].total1_ws8, 92100)
+        # self.assertEqual(tours[0].total2_ws8, 92100)
 
 
     # def test_sum_avgs_in_total(self):

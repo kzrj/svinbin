@@ -468,7 +468,7 @@ class TourQuerySet(models.QuerySet):
         # data['total2_ws8'] = self.gen_subquery_total2_place(places=['8/5', '8/6', '8/7'])
 
         data['sv_age_ws8'] = subquery_sv_age_at_place(self, ['8/5', '8/6', '8/7'])
-        # data['total1_ws8'] = subquery_total1_place(self, ['8/5', '8/6', '8/7'])
+        data['total1_ws8'] = subquery_total1_place(self, ['8/5', '8/6', '8/7'])
         data['total2_ws8'] = subquery_total2_place(self, ['8/5', '8/6', '8/7'])
 
         return self.annotate(**data)

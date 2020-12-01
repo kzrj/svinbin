@@ -368,7 +368,7 @@ class CullingPiglets(PigletsEvent):
     week_tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
         related_name="piglets_culling")
 
-    piglets_age = models.IntegerField(null=True, blank=True)
+    piglets_age = models.FloatField(null=True, blank=True)
 
     objects = CullingPigletsManager()
 
