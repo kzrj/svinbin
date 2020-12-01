@@ -1181,7 +1181,7 @@ class TourPrivesTest(TestCase):
         self.assertEqual(tours[0].total1_ws8, 92100)
         self.assertEqual(tours[0].total2_ws8, 92100)
 
-    def test_add_prives_prepare(self):
+    def test_add_prives_prepare_spec(self):
         tours = Tour.objects.all().add_prives_prepare_spec()
 
         self.assertEqual(tours[0].spec_weight_total_ws5, 100000)

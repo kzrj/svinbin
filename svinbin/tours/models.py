@@ -412,13 +412,15 @@ class TourQuerySet(models.QuerySet):
     def add_prives_prepare(self):
         data = dict()
 
+        def get_place_formatted(places):
+            if len(places) == 1:
+                return places[0].replace('/', '_')
+            else:
+                return 'ws8'
+                
         def subquery_sv_age_at_place(self, places):
-            return Subquery(self.filter(
-                    piglets_weights__week_tour__pk=OuterRef('pk'),
-                    piglets_weights__place__in=places,
-                    ) \
-                .values('piglets_weights__week_tour') \
-                .annotate(weight_sv_avg_age=ExpressionWrapper(
+            place_formatted = get_place_formatted(places=places)
+            ann_data = {f'weight_sv_avg_age_{place_formatted}':ExpressionWrapper(
                     Sum(
                         ExpressionWrapper(
                             F('piglets_weights__piglets_age') 
@@ -427,39 +429,53 @@ class TourQuerySet(models.QuerySet):
                         )
                      / Sum('piglets_weights__piglets_quantity'),
                     output_field=models.FloatField()
-                    )) \
-                .values('weight_sv_avg_age'))
+                    ) }
 
-        def subquery_total1_place(self, places):
             return Subquery(self.filter(
                     piglets_weights__week_tour__pk=OuterRef('pk'),
                     piglets_weights__place__in=places,
                     ) \
                 .values('piglets_weights__week_tour') \
-                .annotate(total1=
-                    Sum(
+                .annotate(**ann_data) \
+                .values(f'weight_sv_avg_age_{place_formatted}'))
+
+        def subquery_total1_place(self, places):
+            place_formatted = get_place_formatted(places=places)
+
+            ann_data = {f'total1_{place_formatted}': Sum(
                         ExpressionWrapper(
                             F('piglets_weights__piglets_quantity') 
                             * F('piglets_weights__average_weight'),
                             output_field=models.FloatField())
                         )
-                    ) \
-                .values('total1'))
+                        }
 
-        def subquery_total2_place(self, places):
             return Subquery(self.filter(
                     piglets_weights__week_tour__pk=OuterRef('pk'),
                     piglets_weights__place__in=places,
                     ) \
                 .values('piglets_weights__week_tour') \
-                .annotate(total2=Sum('piglets_weights__total_weight')) \
-                .values('total2'))
+                .annotate(**ann_data) \
+                .values(f'total1_{place_formatted}'))
+
+        def subquery_total2_place(self, places):
+            place_formatted = get_place_formatted(places=places)
+
+            ann_data = {f'total2_{place_formatted}': Sum('piglets_weights__total_weight')}
+
+            return Subquery(self.filter(
+                    piglets_weights__week_tour__pk=OuterRef('pk'),
+                    piglets_weights__place__in=places,
+                    ) \
+                .values('piglets_weights__week_tour') \
+                .annotate(**ann_data) \
+                .values(f'total2_{place_formatted}'))
 
         for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
             place_formatted = place.replace('/', '_')
             # data[f'sv_age_{place_formatted}']  = self.gen_subquery_sv_age_at_place(places=[place])
             data[f'sv_age_{place_formatted}']  = subquery_sv_age_at_place(self, [place])
-            # data[f'total1_{place_formatted}']  = subquery_total1_place(self, [place])
+            data[f'total1_{place_formatted}']  = subquery_total1_place(self, [place])
             data[f'total2_{place_formatted}']  = subquery_total2_place(self, [place])
             # data[f'total2_{place_formatted}']  = self.gen_subquery_total2_place(places=[place])
 

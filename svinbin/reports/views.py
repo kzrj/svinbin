@@ -31,21 +31,33 @@ from core.permissions import ReadOrAdminOnlyPermissions
 
 
 class TourReportViewSet(viewsets.ModelViewSet):
-    queryset = Tour.objects.all() \
-                .add_remont_trs_out() \
-                .add_farrow_data() \
-                .add_sow_data() \
-                .add_farrow_percentage() \
-                .add_week_weight() \
-                .add_week_weight_ws8_v2() \
-                .add_culling_data_by_week_tour() \
-                .add_culling_percentage() \
-                .add_prives() \
-                .order_by('-year','-week_number', ) \
-
+    queryset = Tour.objects.all() 
     serializer_class = ReportTourSerializer
     filter_class = TourFilter
     permission_classes = [ReadOrAdminOnlyPermissions]
+
+    def list(self, request):
+        queryset = self.filter_queryset(
+            self.queryset \
+            .add_remont_trs_out() \
+            .add_farrow_data() \
+            .add_sow_data() \
+            .add_farrow_percentage() \
+            .add_week_weight() \
+            .add_week_weight_ws8_v2() \
+            .add_culling_data_by_week_tour() \
+            .add_culling_percentage() \
+            .add_prives() \
+            .order_by('-year','-week_number', ) \
+            )
+        serializer = ReportTourSerializer(queryset, many=True)
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = ReportTourSerializer(queryset, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        return super().list(request)
 
 
 class TourReportV2ViewSet(viewsets.ModelViewSet):
