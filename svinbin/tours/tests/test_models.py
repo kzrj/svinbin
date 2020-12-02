@@ -1188,7 +1188,8 @@ class TourPrivesTest(TestCase):
         self.assertEqual(tours[0].spec_sv_avg_age_ws5, 200)
 
     def test_add_prives(self):
-        tours = Tour.objects.all().add_prives()
+        tours = Tour.objects.all().add_culling_data_by_week_tour().add_prives()
+        bool(tours)
 
         self.assertEqual(round(tours[0].prives_4, 2),
             round(((tours[0].total2_4_8 - tours[0].total2_3_4) / 
@@ -1200,7 +1201,11 @@ class TourPrivesTest(TestCase):
 
         self.assertEqual(round(tours[0].prives_5, 2),
             round(((tours[0].spec_weight_total_ws5 - tours[0].total2_8_5) / 
-                (tours[0].spec_sv_avg_age_ws5 - tours[0].sv_age_8_5)), 2))       
+                (tours[0].spec_sv_avg_age_ws5 - tours[0].sv_age_8_5)), 2))      
+
+        print(tours[0].prives_5)
+        print(tours[0].prives_1g_5)
+        print(tours[0].ws5_spec_quantity)
 
     def test_xz(self):
         tours = Tour.objects.all() \
