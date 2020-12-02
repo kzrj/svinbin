@@ -499,8 +499,18 @@ class TourQuerySet(models.QuerySet):
                              (F('spec_sv_avg_age_ws7') - F('sv_age_8_7'))
 
         # should annotate self.add_culling_data_by_week_tour
-        data['prives_1g_5'] = ExpressionWrapper(
-            data['prives_5'] * 1000 / F('ws5_spec_quantity'), output_field=models.FloatField())
+        for o in [5, 6, 7]:
+            data[f'prives_1g_{o}'] = ExpressionWrapper(
+                data[f'prives_{o}'] * 1000 / F(f'ws{o}_spec_quantity'),
+                 output_field=models.FloatField())
+
+        data[f'prives_1g_4'] = ExpressionWrapper(
+                data[f'prives_4'] * 1000 / F('week_weight_qnty_4_8'),
+                 output_field=models.FloatField())
+
+        data[f'prives_1g_8'] = ExpressionWrapper(
+                data[f'prives_8'] * 1000 / F('week_weight_qnty_ws8'),
+                 output_field=models.FloatField())
 
         return self.add_prives_prepare().add_prives_prepare_spec().annotate(**data)
 
