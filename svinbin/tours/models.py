@@ -517,6 +517,10 @@ class TourQuerySet(models.QuerySet):
                 F(f'prives_without_remont_{ws_number}') * 1000 / F(f'ws{ws_number}_spec_quantity'),
                  output_field=models.FloatField())
 
+        data[f'prives_1g_3'] = ExpressionWrapper(
+                F(f'prives_3') * 1000 / F('week_weight_qnty_3_4'),
+                 output_field=models.FloatField())
+
         data[f'prives_1g_4'] = ExpressionWrapper(
                 F(f'prives_4') * 1000 / F('week_weight_qnty_4_8'),
                  output_field=models.FloatField())
