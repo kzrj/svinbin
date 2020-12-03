@@ -487,6 +487,7 @@ class TourQuerySet(models.QuerySet):
 
     def add_prives(self):
         data = dict()
+        data['prives_3'] = (F('total2_3_4') / F('sv_age_3_4'))
         data['prives_4'] = (F('total2_4_8') - F('total2_3_4')) / (F('sv_age_4_8') - F('sv_age_3_4'))
         data['prives_8'] = (F('total2_ws8') - F('total2_4_8'))  / (F('sv_age_ws8') - F('sv_age_4_8'))
 
