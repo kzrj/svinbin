@@ -136,6 +136,11 @@ class TourQuerySet(models.QuerySet):
             data[f'week_weight_qnty_{place_formatted}'] = Coalesce(Subquery(weights_subquery_qnty_weight,
                  output_field=models.FloatField()), 0)
 
+            weights_subquery_count_weight = weights_subquery.annotate(count_weight=Count('*')) \
+                .values('count_weight')
+            data[f'week_weight_count_{place_formatted}'] = Subquery(weights_subquery_count_weight,
+                 output_field=models.FloatField())
+
         return self.annotate(**data)
 
     def add_week_weight_ws8_v2(self):
@@ -411,23 +416,6 @@ class TourQuerySet(models.QuerySet):
                 .annotate(**ann_data) \
                 .values(f'weight_sv_avg_age_{place_formatted}')
 
-        def subquery_total1_place(self, places):
-            place_formatted = get_place_formatted(places=places)
-            ann_data = {f'total1_{place_formatted}': Sum(
-                        ExpressionWrapper(
-                            F('piglets_quantity') 
-                            * F('average_weight'),
-                            output_field=models.FloatField())
-                        )
-                        }
-
-            return piglets_events.models.WeighingPiglets.objects.filter(
-                    week_tour__pk=OuterRef('pk'),
-                    place__in=places
-                ).values('week_tour') \
-                .annotate(**ann_data) \
-                .values(f'total1_{place_formatted}')
-
         def subquery_total2_place(self, places):
             place_formatted = get_place_formatted(places=places)
             ann_data = {f'total2_{place_formatted}': Sum('total_weight')}
@@ -442,12 +430,22 @@ class TourQuerySet(models.QuerySet):
         for place in ['3/4', '4/8', '8/5', '8/6', '8/7']:
             place_formatted = place.replace('/', '_')
             data[f'sv_age_{place_formatted}']  = subquery_sv_age_at_place(self, [place])
-            data[f'total1_{place_formatted}']  = subquery_total1_place(self, [place])
             data[f'total2_{place_formatted}']  = subquery_total2_place(self, [place])
 
+
         data['sv_age_ws8'] = subquery_sv_age_at_place(self, ['8/5', '8/6', '8/7'])
-        data['total1_ws8'] = subquery_total1_place(self, ['8/5', '8/6', '8/7'])
         data['total2_ws8'] = subquery_total2_place(self, ['8/5', '8/6', '8/7'])
+
+        return self.annotate(**data)
+
+    def add_prives_prepare_otkorm_weight_data_without_remont(self):
+        data = dict()
+        for ws_number in [5, 6, 7]:
+            data[f'total3_8_{ws_number}'] = ExpressionWrapper(
+                F(f'week_weight_8_{ws_number}') - \
+                    (F(f'ws{ws_number}_remont') * F(f'week_weight_avg_8_{ws_number}')),
+                output_field=models.FloatField()
+                )
 
         return self.annotate(**data)
 
@@ -491,28 +489,42 @@ class TourQuerySet(models.QuerySet):
         data = dict()
         data['prives_4'] = (F('total2_4_8') - F('total2_3_4')) / (F('sv_age_4_8') - F('sv_age_3_4'))
         data['prives_8'] = (F('total2_ws8') - F('total2_4_8'))  / (F('sv_age_ws8') - F('sv_age_4_8'))
-        data['prives_5'] = (F('spec_weight_total_ws5') - F('total2_8_5')) / \
-                             (F('spec_sv_avg_age_ws5') - F('sv_age_8_5'))
-        data['prives_6'] = (F('spec_weight_total_ws6') - F('total2_8_6')) / \
-                             (F('spec_sv_avg_age_ws6') - F('sv_age_8_6'))
-        data['prives_7'] = (F('spec_weight_total_ws7') - F('total2_8_7')) / \
-                             (F('spec_sv_avg_age_ws7') - F('sv_age_8_7'))
 
-        # should annotate self.add_culling_data_by_week_tour
-        for o in [5, 6, 7]:
-            data[f'prives_1g_{o}'] = ExpressionWrapper(
-                data[f'prives_{o}'] * 1000 / F(f'ws{o}_spec_quantity'),
+        for ws_number in [5, 6, 7]:
+            data[f'prives_{ws_number}'] = \
+                (F(f'spec_weight_total_ws{ws_number}') - F(f'total2_8_{ws_number}')) / \
+                    (F(f'spec_sv_avg_age_ws{ws_number}') - F(f'sv_age_8_{ws_number}'))
+
+            data[f'prives_without_remont_{ws_number}'] = \
+                (F(f'spec_weight_total_ws{ws_number}') - F(f'total3_8_{ws_number}')) / \
+                    (F(f'spec_sv_avg_age_ws{ws_number}') - F(f'sv_age_8_{ws_number}'))
+        
+        return self.add_prives_prepare() \
+                    .add_prives_prepare_spec() \
+                    .add_prives_prepare_otkorm_weight_data_without_remont() \
+                    .annotate(**data)
+
+    def add_prives_na_1g(self):
+        data = dict()
+
+        for ws_number in [5, 6, 7]:
+            data[f'prives_1g_{ws_number}'] = ExpressionWrapper(
+                F(f'prives_{ws_number}') * 1000 / F(f'ws{ws_number}_spec_quantity'),
+                 output_field=models.FloatField())
+
+            data[f'prives_without_remont_1g_{ws_number}'] = ExpressionWrapper(
+                F(f'prives_without_remont_{ws_number}') * 1000 / F(f'ws{ws_number}_spec_quantity'),
                  output_field=models.FloatField())
 
         data[f'prives_1g_4'] = ExpressionWrapper(
-                data[f'prives_4'] * 1000 / F('week_weight_qnty_4_8'),
+                F(f'prives_4') * 1000 / F('week_weight_qnty_4_8'),
                  output_field=models.FloatField())
 
         data[f'prives_1g_8'] = ExpressionWrapper(
-                data[f'prives_8'] * 1000 / F('week_weight_qnty_ws8'),
+                F(f'prives_8') * 1000 / F('week_weight_qnty_ws8'),
                  output_field=models.FloatField())
 
-        return self.add_prives_prepare().add_prives_prepare_spec().annotate(**data)
+        return self.annotate(**data)
 
 
 class TourManager(CoreModelManager):

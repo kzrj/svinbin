@@ -1150,10 +1150,16 @@ class TourPrivesTest(TestCase):
             piglets_group=self.piglets6, total_weight=15700,
             place='8/7', date=self.piglets6.birthday + datetime.timedelta(days=150))
 
-        
+        # simulate remont transfer
+        transaction, self.moved_piglets1, self.stayed_piglets1, split_event, merge_event = \
+            PigletsTransaction.objects.transaction_with_split_and_merge(piglets=self.piglets1,
+                to_location=self.loc_ws2, date=self.piglets1.birthday + datetime.timedelta(days=175),
+                new_amount=75)
+
         CullingPiglets.objects.create_culling_piglets(
-            piglets_group=self.piglets1, culling_type='spec', quantity=50, total_weight=20000,
-            date=self.piglets1.birthday + datetime.timedelta(days=200))
+            piglets_group=self.stayed_piglets1, culling_type='spec', quantity=25, total_weight=10000,
+            date=self.stayed_piglets1.birthday + datetime.timedelta(days=200))
+
         CullingPiglets.objects.create_culling_piglets(
             piglets_group=self.piglets2, culling_type='spec', quantity=50, total_weight=20000,
             date=self.piglets2.birthday + datetime.timedelta(days=200))
@@ -1170,25 +1176,23 @@ class TourPrivesTest(TestCase):
     def test_add_prives_prepare(self):
         tours = Tour.objects.all().add_prives_prepare()
         self.assertEqual(round(tours[0].sv_age_3_4, 2), 64.67)
-        self.assertEqual(tours[0].total1_3_4, 16400)
         self.assertEqual(tours[0].total2_3_4, 16400)
         
         self.assertEqual(round(tours[0].sv_age_4_8, 2), 110.67)
-        self.assertEqual(tours[0].total1_4_8, 32100)
         self.assertEqual(tours[0].total2_4_8, 32100)
 
         self.assertEqual(round(tours[0].sv_age_ws8, 2), 150.67)
-        self.assertEqual(tours[0].total1_ws8, 92100)
         self.assertEqual(tours[0].total2_ws8, 92100)
 
     def test_add_prives_prepare_spec(self):
         tours = Tour.objects.all().add_prives_prepare_spec()
 
-        self.assertEqual(tours[0].spec_weight_total_ws5, 100000)
+        self.assertEqual(tours[0].spec_weight_total_ws5, 90000)
         self.assertEqual(tours[0].spec_sv_avg_age_ws5, 200)
 
     def test_add_prives(self):
         tours = Tour.objects.all() \
+            .add_remont_trs_out() \
             .add_culling_data_by_week_tour() \
             .add_week_weight() \
             .add_week_weight_ws8_v2() \
@@ -1205,10 +1209,27 @@ class TourPrivesTest(TestCase):
 
         self.assertEqual(round(tours[0].prives_5, 2),
             round(((tours[0].spec_weight_total_ws5 - tours[0].total2_8_5) / 
-                (tours[0].spec_sv_avg_age_ws5 - tours[0].sv_age_8_5)), 2))      
+                (tours[0].spec_sv_avg_age_ws5 - tours[0].sv_age_8_5)), 2))
+
+        self.assertEqual(round(tours[0].prives_without_remont_5, 2),
+            round(((tours[0].spec_weight_total_ws5 - tours[0].total3_8_5) / 
+                (tours[0].spec_sv_avg_age_ws5 - tours[0].sv_age_8_5)), 2))
+
+    def test_add_prives_na_1g(self):
+        tours = Tour.objects.all() \
+            .add_remont_trs_out() \
+            .add_culling_data_by_week_tour() \
+            .add_week_weight() \
+            .add_week_weight_ws8_v2() \
+            .add_prives() \
+            .add_prives_na_1g()
+        bool(tours)
 
         self.assertEqual(round(tours[0].prives_1g_5, 2),
          round(tours[0].prives_5 * 1000 / tours[0].ws5_spec_quantity, 2))
+
+        self.assertEqual(round(tours[0].prives_without_remont_1g_5, 2),
+         round(tours[0].prives_without_remont_5 * 1000 / tours[0].ws5_spec_quantity, 2))
 
         self.assertEqual(round(tours[0].prives_1g_4, 2),
          round(tours[0].prives_4 * 1000 / tours[0].week_weight_qnty_4_8, 2))
@@ -1230,19 +1251,20 @@ class TourPrivesTest(TestCase):
 
         bool(tours)
         self.assertEqual(round(tours[0].sv_age_3_4, 2), 64.67)
-        self.assertEqual(tours[0].total1_3_4, 16400)
         self.assertEqual(tours[0].total2_3_4, 16400)
         
         self.assertEqual(round(tours[0].sv_age_4_8, 2), 110.67)
-        self.assertEqual(tours[0].total1_4_8, 32100)
         self.assertEqual(tours[0].total2_4_8, 32100)
 
         self.assertEqual(round(tours[0].sv_age_ws8, 2), 150.67)
-        self.assertEqual(tours[0].total1_ws8, 92100)
         self.assertEqual(tours[0].total2_ws8, 92100)
 
+    def test_add_prives_prepare_otkorm_weight_data_without_remont(self):
+        tours = Tour.objects.all() \
+                .add_remont_trs_out() \
+                .add_week_weight() \
+                .add_prives_prepare_otkorm_weight_data_without_remont()
 
-    # def test_sum_avgs_in_total(self):
-    #     tours = Tour.objects.all().add_weight_avg_age()
-    #     print(tours[0].sum_avgs_in_total_3_4)
-    #     print(tours[0].sum_avgs_in_total2_3_4)
+        bool(tours)
+        self.assertEqual(round(tours[0].total3_8_5, 2), round(tours[0].week_weight_8_5 - \
+            (tours[0].ws5_remont * tours[0].week_weight_avg_8_5), 2))

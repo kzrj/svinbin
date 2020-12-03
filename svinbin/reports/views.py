@@ -48,6 +48,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
             .add_culling_data_by_week_tour() \
             .add_culling_percentage() \
             .add_prives() \
+            .add_prives_na_1g() \
             .order_by('-year','-week_number', ) \
             )
         serializer = ReportTourSerializer(queryset, many=True)
