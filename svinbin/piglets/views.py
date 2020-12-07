@@ -282,6 +282,14 @@ class PigletsViewSet(viewsets.ModelViewSet):
                     allow_split_gilt=True
                   )
 
+            piglets_events_models.WeighingPiglets.objects.create_weighing(
+                piglets_group=moved_piglets,
+                total_weight=serializer.validated_data['total_weight'],
+                place='o/2',
+                date=timezone.now(),
+                initiator=request.user
+                )
+
             sows_events_models.PigletsToSowsEvent.objects.create_event(piglets=moved_piglets,
              initiator=request.user, date=timezone.now())
 

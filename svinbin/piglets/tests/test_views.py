@@ -484,7 +484,10 @@ class PigletsViewSetTest(APITestCase):
 
         self.client.force_authenticate(user=self.brig5)
         response = self.client.post('/api/piglets/%s/move_gilts_to_12/' % piglets.pk,
-            {})
+            {'new_amount': 25, 'total_weight': 750 })
+
+        wp = WeighingPiglets.objects.all().first()
+        self.assertEqual(wp.total_weight, 750)
         self.assertEqual(response.data['message'], 'Ремонтные свинки переведены успешно.')
         self.client.logout()
 

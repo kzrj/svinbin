@@ -48,6 +48,7 @@ class MovePigletsSerializer(serializers.Serializer):
 
 class MoveGiltsToWs12Serializer(serializers.Serializer):
     new_amount = serializers.IntegerField(allow_null=True, default=None)
+    total_weight = serializers.FloatField()
 
 
 class InitPigletsSerializer(serializers.Serializer):

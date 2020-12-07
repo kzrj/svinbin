@@ -269,7 +269,7 @@ class WeighingPigletsManager(CoreModelManager):
 
 class WeighingPiglets(PigletsEvent):
     WEIGHING_PLACES = [('3/4', '3/4'), ('4/8', '4/8'), ('8/5', '8/5'), ('8/6', '8/6'),
-        ('8/7', '8/7')]
+        ('8/7', '8/7'), ('o/2', 'o/2')]
 
     piglets_group = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name="weighing_records")
     total_weight = models.FloatField()
