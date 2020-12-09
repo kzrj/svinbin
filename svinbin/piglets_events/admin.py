@@ -17,7 +17,7 @@ class PigletsEventFormMixin(object):
         if context['adminform'].form.fields.get('created_piglets'):
             context['adminform'].form.fields['created_piglets'].queryset = \
                 Piglets.objects.get_all()
-                
+
         return super(PigletsEventFormMixin, self).render_change_form(request, context, *args, **kwargs)
 
 
@@ -32,21 +32,15 @@ class CullingPigletsAdmin(PigletsEventFormMixin, admin.ModelAdmin):
     search_fields = ['piglets_group__id']
     list_display = [f.name for f in models.CullingPiglets._meta.fields]
 
-    # def get_queryset(self, request):
-    #     qs = super(CullingPigletsAdmin, self).get_queryset(request)
-    #     if request.user.is_superuser:
-    #         return qs
-    #     return qs.filter(author=request.user)
-
 
 @admin.register(models.PigletsSplit)
-class PigletsSplitAdmin(admin.ModelAdmin):
+class PigletsSplitAdmin(PigletsEventFormMixin, admin.ModelAdmin):
     # search_fields = ['sow__farm_id']
     list_display = [f.name for f in models.PigletsSplit._meta.fields]
 
 
 @admin.register(models.PigletsMerger)
-class PigletsMergerAdmin(admin.ModelAdmin):
+class PigletsMergerAdmin(PigletsEventFormMixin, admin.ModelAdmin):
     # search_fields = ['piglets__id']
     list_display = [f.name for f in models.PigletsMerger._meta.fields]
 
