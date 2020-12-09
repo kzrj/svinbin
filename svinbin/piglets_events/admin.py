@@ -6,12 +6,18 @@ from piglets.models import Piglets
 
 class PigletsEventFormMixin(object):
     def render_change_form(self, request, context, *args, **kwargs):
-        context['adminform'].form.fields['piglets_group'].queryset = \
-            Piglets.objects.get_all()
-        context['adminform'].form.fields['parent_piglets'].queryset = \
-            Piglets.objects.get_all()
-        context['adminform'].form.fields['created_piglets'].queryset = \
-            Piglets.objects.get_all()
+        if context['adminform'].form.fields.get('piglets_group'):
+            context['adminform'].form.fields['piglets_group'].queryset = \
+                Piglets.objects.get_all()
+
+        if context['adminform'].form.fields.get('parent_piglets'):
+            context['adminform'].form.fields['parent_piglets'].queryset = \
+                Piglets.objects.get_all()
+
+        if context['adminform'].form.fields.get('created_piglets'):
+            context['adminform'].form.fields['created_piglets'].queryset = \
+                Piglets.objects.get_all()
+                
         return super(PigletsEventFormMixin, self).render_change_form(request, context, *args, **kwargs)
 
 
