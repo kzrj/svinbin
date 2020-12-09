@@ -16,7 +16,7 @@ class CullingPigletsAdmin(admin.ModelAdmin):
     list_display = [f.name for f in models.CullingPiglets._meta.fields]
 
     def render_change_form(self, request, context, *args, **kwargs):
-        context['adminform'].form.fields['pilgets_group'].queryset = \
+        context['adminform'].form.fields['piglets_group'].queryset = \
             Piglets.objects.get_all()
         return super(CullingPigletsAdmin, self).render_change_form(request, context, *args, **kwargs)
 
