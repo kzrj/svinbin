@@ -4,11 +4,11 @@ from piglets_events import models
 from piglets.models import Piglets
 
 
-class PigletsEventFormMixin():
+class PigletsEventFormMixin(admin.ModelAdmin):
     def render_change_form(self, request, context, *args, **kwargs):
         context['adminform'].form.fields['piglets_group'].queryset = \
             Piglets.objects.get_all()
-        return super(CullingPigletsAdmin, self).render_change_form(request, context, *args, **kwargs)
+        return super(PigletsEventFormMixin, self).render_change_form(request, context, *args, **kwargs)
 
 
 @admin.register(models.WeighingPiglets, PigletsEventFormMixin)
