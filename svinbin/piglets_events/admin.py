@@ -4,21 +4,23 @@ from piglets_events import models
 from piglets.models import Piglets
 
 
-@admin.register(models.WeighingPiglets)
+class PigletsEventFormMixin():
+    def render_change_form(self, request, context, *args, **kwargs):
+        context['adminform'].form.fields['piglets_group'].queryset = \
+            Piglets.objects.get_all()
+        return super(CullingPigletsAdmin, self).render_change_form(request, context, *args, **kwargs)
+
+
+@admin.register(models.WeighingPiglets, PigletsEventFormMixin)
 class WeighingPigletsAdmin(admin.ModelAdmin):
     search_fields = ['piglets_group__id']
     list_display = [f.name for f in models.WeighingPiglets._meta.fields]
 
 
-@admin.register(models.CullingPiglets)
+@admin.register(models.CullingPiglets, PigletsEventFormMixin)
 class CullingPigletsAdmin(admin.ModelAdmin):
     search_fields = ['piglets_group__id']
     list_display = [f.name for f in models.CullingPiglets._meta.fields]
-
-    def render_change_form(self, request, context, *args, **kwargs):
-        context['adminform'].form.fields['piglets_group'].queryset = \
-            Piglets.objects.get_all()
-        return super(CullingPigletsAdmin, self).render_change_form(request, context, *args, **kwargs)
 
     # def get_queryset(self, request):
     #     qs = super(CullingPigletsAdmin, self).get_queryset(request)
@@ -40,6 +42,6 @@ class PigletsMergerAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Recount)
-class RecountAdmin(admin.ModelAdmin):
+class RecountAdmin(admin.ModelAdmin, PigletsEventFormMixin):
     search_fields = ['piglets__id']
     list_display = [f.name for f in models.Recount._meta.fields]
