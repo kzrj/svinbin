@@ -17,8 +17,8 @@ class WeighingPigletsAdmin(admin.ModelAdmin):
     list_display = [f.name for f in models.WeighingPiglets._meta.fields]
 
 
-@admin.register(PigletsEventFormMixin, models.CullingPiglets)
-class CullingPigletsAdmin(admin.ModelAdmin):
+@admin.register(models.CullingPiglets)
+class CullingPigletsAdmin(PigletsEventFormMixin, admin.ModelAdmin):
     search_fields = ['piglets_group__id']
     list_display = [f.name for f in models.CullingPiglets._meta.fields]
 
