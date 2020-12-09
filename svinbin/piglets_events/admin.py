@@ -1,6 +1,7 @@
 from django.contrib import admin
 
 from piglets_events import models
+from piglets.models import Piglets
 
 
 @admin.register(models.WeighingPiglets)
@@ -13,6 +14,17 @@ class WeighingPigletsAdmin(admin.ModelAdmin):
 class CullingPigletsAdmin(admin.ModelAdmin):
     search_fields = ['piglets_group__id']
     list_display = [f.name for f in models.CullingPiglets._meta.fields]
+
+    def render_change_form(self, request, context, *args, **kwargs):
+        context['adminform'].form.fields['pilgets_group'].queryset = \
+            Piglets.objects.get_all()
+        return super(CullingPigletsAdmin, self).render_change_form(request, context, *args, **kwargs)
+
+    # def get_queryset(self, request):
+    #     qs = super(CullingPigletsAdmin, self).get_queryset(request)
+    #     if request.user.is_superuser:
+    #         return qs
+    #     return qs.filter(author=request.user)
 
 
 @admin.register(models.PigletsSplit)
