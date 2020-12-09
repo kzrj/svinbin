@@ -8,11 +8,15 @@ class PigletsEventFormMixin(object):
     def render_change_form(self, request, context, *args, **kwargs):
         context['adminform'].form.fields['piglets_group'].queryset = \
             Piglets.objects.get_all()
+        context['adminform'].form.fields['parent_piglets'].queryset = \
+            Piglets.objects.get_all()
+        context['adminform'].form.fields['created_piglets'].queryset = \
+            Piglets.objects.get_all()
         return super(PigletsEventFormMixin, self).render_change_form(request, context, *args, **kwargs)
 
 
 @admin.register(models.WeighingPiglets)
-class WeighingPigletsAdmin(admin.ModelAdmin):
+class WeighingPigletsAdmin(PigletsEventFormMixin, admin.ModelAdmin):
     search_fields = ['piglets_group__id']
     list_display = [f.name for f in models.WeighingPiglets._meta.fields]
 
@@ -42,6 +46,6 @@ class PigletsMergerAdmin(admin.ModelAdmin):
 
 
 @admin.register(models.Recount)
-class RecountAdmin(admin.ModelAdmin):
+class RecountAdmin(PigletsEventFormMixin, admin.ModelAdmin):
     search_fields = ['piglets__id']
     list_display = [f.name for f in models.Recount._meta.fields]
