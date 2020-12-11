@@ -337,12 +337,6 @@ class PigletsMergerModelTest(TransactionTestCase):
         piglets2.refresh_from_db()
         self.assertEqual(piglets1.active, False)
 
-    def test_merge_piglets_from_init_list(self):
-        init_list = [{'week': 9, 'quantity': 40}, {'week': 8, 'quantity': 60}]
-        merged_piglets = PigletsMerger.objects.merge_piglets_from_init_list(init_list)
-
-        self.assertEqual(merged_piglets.quantity, 100)
-
     def test_create_from_merging_list_v5_with_gilts_quantity(self):
         # without gilts
         piglets1 = piglets_testing.create_from_sow_farrow(self.tour1,

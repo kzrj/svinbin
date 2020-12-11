@@ -142,6 +142,11 @@ class TestMetaTourRecordModel(TestCase):
         pigs_testings.create_statuses()
         piglets_testing.create_piglets_statuses()
 
+        self.tour51 = Tour.objects.get_or_create_by_week_in_current_year(51)
+        self.tour52 = Tour.objects.get_or_create_by_week_in_current_year(52)
+
+        self.loc_cells = Location.objects.filter(pigletsGroupCell__isnull=False)
+
     def test_create_record_without_percentage(self):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         location = Location.objects.get(section__number=1, section__workshop__number=3)
@@ -249,6 +254,45 @@ class TestMetaTourRecordModel(TestCase):
             isinstance(meta_tour.records_repr()[1]['days_left_from_farrow_approx'], str), True)
 
         self.assertEqual(isinstance(meta_tour.records_repr()[1]['days_left_from_farrow'], str), False)
+
+    # def test_create_record_v2_cal_qnty(self):
+    #     piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+    #         tour=self.tour51,
+    #         location=self.loc_cells[0],
+    #         quantity=100,
+    #         birthday=(datetime.datetime.now() - datetime.timedelta(days=100))
+    #         )
+    #     metatour1 = piglets1.metatour
+    #     mtr_main = piglets1.metatour.records.all().first()
+
+    #     qnty = 90
+
+    #     mtr1 = MetaTourRecord.objects.create_record(
+    #         metatour=metatour1,
+    #         tour=self.tour51,
+    #         quantity=42 * qnty / 100,
+    #         total_quantity=qnty,
+    #         percentage=41.66
+    #         )
+    #     print(mtr1.quantity)
+
+    #     mtr2 = MetaTourRecord.objects.create_record(
+    #         metatour=metatour1,
+    #         tour=self.tour51,
+    #         quantity=8 * qnty / 100,
+    #         total_quantity=qnty,
+    #         percentage=8.33
+    #         )
+    #     print(mtr2.quantity)
+
+    #     mtr3 = MetaTourRecord.objects.create_record(
+    #         metatour=metatour1,
+    #         tour=self.tour51,
+    #         quantity=50 * qnty / 100,
+    #         total_quantity=qnty,
+    #         percentage=50
+    #         )
+    #     print(mtr3.quantity)
 
 
 class TourQuerysetAddPigletsDataTest(TestCase):
@@ -1268,3 +1312,17 @@ class TourPrivesTest(TestCase):
         bool(tours)
         self.assertEqual(round(tours[0].total3_8_5, 2), round(tours[0].week_weight_8_5 - \
             (tours[0].ws5_remont * tours[0].week_weight_avg_8_5), 2))
+
+
+# class MetaTourRecordsTestV2(TestCase):
+#     def setUp(self):
+#         locations_testing.create_workshops_sections_and_cells()
+#         pigs_testings.create_statuses()
+#         sows_events_testing.create_types()
+#         piglets_testing.create_piglets_statuses()
+
+#         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+#         self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+#     def test_create_record(self):
+#         pass

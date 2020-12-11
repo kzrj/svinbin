@@ -13,23 +13,6 @@ from locations.models import Location
 from tours.models import MetaTour, MetaTourRecord, Tour
 
 
-# use only for phase "Piglets". In full version piglets will create at sow_farrow
-def init_piglets_with_single_tour(week, quantity):
-    # init_piglets_one_tour()
-     
-    tour = Tour.objects.get_or_create_by_week_in_current_year(week)
-    location = Location.objects.get(workshop__number=3)
-    piglets = Piglets.objects.create(
-                location=location,
-                start_quantity=quantity,
-                quantity=quantity,
-            )
-    metatour = MetaTour.objects.create(piglets=piglets)
-    MetaTourRecord.objects.create_record(metatour=metatour, tour=tour, quantity=quantity,
-     total_quantity=quantity, percentage=100)
-    return piglets
-
-
 class PigletsEvent(Event):
     class Meta:
         abstract = True
@@ -153,7 +136,9 @@ class PigletsMergerManager(CoreModelManager):
 
         # get set of tours from records then create records for each tour
         for tour in parent_records.get_set_of_tours():
-            tour.metatourrecords.create_record(metatour=metatour, tour=tour,
+            tour.metatourrecords.create_record(
+             metatour=metatour, 
+             tour=tour,
              quantity=parent_records.sum_quantity_by_tour(tour),
              total_quantity=total_quantity)
 
@@ -211,18 +196,7 @@ class PigletsMergerManager(CoreModelManager):
                  initiator=initiator)
 
         return self.create_merger_return_group(parent_piglets_ids, new_location, initiator, date)
-
-    # only for "Piglets" phase
-    def merge_piglets_from_init_list(self, init_list, initiator=None, date=timezone.now()):
-        piglets = list()
-        for init_record in init_list:
-            piglets.append(
-                init_piglets_with_single_tour(init_record['week'], init_record['quantity'])
-            )
-
-        return self.create_merger_return_group(parent_piglets=piglets,
-         new_location=Location.objects.get(workshop__number=3), initiator=initiator, date=date)
-                
+               
 
 class PigletsMerger(PigletsEvent):
     created_piglets = models.OneToOneField(Piglets, on_delete=models.SET_NULL, null=True,
