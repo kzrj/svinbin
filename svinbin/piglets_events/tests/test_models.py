@@ -567,9 +567,9 @@ class WeighingPigletsTest(TestCase):
         WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=360,
             place='4/8', date=datetime.datetime(2020,9,15,0,0))
 
-        data = WeighingPiglets.objects.all().get_tour_data_by_place(tour=self.tour1, place='3/4')
-        self.assertEqual(data['place'], '3/4')
-        self.assertEqual(data['total']['total_quantity'], 200)
+        qs, total = WeighingPiglets.objects.all().get_tour_data_by_place(tour=self.tour1, place='3/4')
+        self.assertEqual(qs.first().place, '3/4')
+        self.assertEqual(total['total_quantity'], 200)
 
 
 class CullingPigletsTest(TestCase):
@@ -687,11 +687,11 @@ class CullingPigletsTest(TestCase):
             )
 
         qs, total = CullingPiglets.objects\
-            .get_by_tour_and_ws_number(tour=self.tour1, ws_number=5)
+            .get_by_tour_and_ws_number(tour=self.tour1, ws_number=5, culling_type='spec')
 
-        self.assertEqual(qs.count(), 5)
-        self.assertEqual(total['total_quantity'], 20)
-        self.assertEqual(total['total_total_weight'], 198.5)
+        self.assertEqual(qs.count(), 2)
+        self.assertEqual(total['total_quantity'], 7)
+        self.assertEqual(total['total_total_weight'], 71)
 
 
 class RecountManagerTest(TestCase):
@@ -716,7 +716,7 @@ class RecountManagerTest(TestCase):
         recount = Recount.objects.create_recount(piglets, 110)
         self.assertEqual(recount.quantity_before, 100)
         self.assertEqual(recount.quantity_after, 110)
-        self.assertEqual(recount.balance, 10)
+        self.assertEqual(recount.balance, -10)
         self.assertEqual(recount.location, location)
 
         piglets.refresh_from_db()
@@ -744,9 +744,9 @@ class RecountManagerTest(TestCase):
         sec1 = Location.objects.filter(section__number=1, 
                 section__workshop__number=3).first().section
         sec1_locs = Location.objects.all().get_locations_in_section(sec1)
-        self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec1_locs), -3)
+        self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec1_locs), 3)
 
         sec2 = Location.objects.filter(section__number=2, 
                 section__workshop__number=3).first().section
         sec2_locs = Location.objects.all().get_locations_in_section(sec2)
-        self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec2_locs), 3)
+        self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec2_locs), -3)

@@ -86,20 +86,25 @@ class PigletsManager(CoreModelManager):
         return PigletsQuerySet(self.model, using=self._db)
 
     # for init and test only
-    def init_piglets_with_metatour(self, tour, location, quantity, gilts_quantity=0, created_at=None):
+    def init_piglets_with_metatour(self, tour, location, quantity, birthday=None, gilts_quantity=0, created_at=None):
+        if not birthday:
+            birthday = timezone.now()
+
         piglets = self.create(location=location,
                 start_quantity=quantity,
                 quantity=quantity,
-                gilts_quantity=gilts_quantity)
+                gilts_quantity=gilts_quantity,
+                birthday=birthday)
         metatour = MetaTour.objects.create(piglets=piglets)
         MetaTourRecord.objects.create_record(metatour=metatour, tour=tour, quantity=quantity,
          total_quantity=quantity, percentage=100)
         metatour.set_week_tour()
         return piglets
 
-    def init_piglets_by_farrow_date(self, farrow_date, location, quantity, gilts_quantity=0):
+    def init_piglets_by_farrow_date(self, farrow_date, location, quantity, birthday=None, gilts_quantity=0):
         tour = Tour.objects.create_tour_from_farrow_date_string(farrow_date)
-        return self.init_piglets_with_metatour(tour, location, quantity, gilts_quantity)
+        return self.init_piglets_with_metatour(tour=tour, location=location, 
+            quantity=quantity, gilts_quantity=gilts_quantity)
 
 
 class Piglets(CoreModel):

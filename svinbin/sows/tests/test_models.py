@@ -297,6 +297,8 @@ class SowModelTest(TransactionTestCase):
 
     def test_create_or_return_then_assing_farm_id_from_nowhere(self):
         self.assertEqual(Sow.objects.filter(farm_id=123).count(), 0)
+        rem1 = sows_testings.create_sow_remont_without_farm_id()
+        rem2 = sows_testings.create_sow_remont_without_farm_id()
 
         assigned_sow = Sow.objects.create_or_return_then_assing_farm_id(farm_id=123)
         self.assertEqual(Sow.objects.filter(farm_id=123).count(), 1)

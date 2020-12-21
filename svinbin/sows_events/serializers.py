@@ -31,7 +31,7 @@ class SimpleSeminationSerializer(serializers.ModelSerializer):
 class CreateDoubleSeminationSerializer(serializers.Serializer):
     farm_id = serializers.IntegerField()
     week = serializers.IntegerField()
-    date = serializers.DateTimeField()
+    date = serializers.DateTimeField(format='%d-%m-%Y')
 
     boar1 = serializers.PrimaryKeyRelatedField(queryset=Boar.objects.all())
     seminator1 = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
@@ -57,6 +57,7 @@ class UltrasoundSerializer(serializers.ModelSerializer):
 
 class SimpleUltrasoundSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(format="%d-%m-%Y")
+
     class Meta:
         model = Ultrasound
         fields = ['date', 'result', 'u_type']

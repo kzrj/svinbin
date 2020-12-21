@@ -32,6 +32,12 @@ class FarmImportXlsTest(TestCase):
         ivanov = staff_testings.create_employee('ИВАНО')
         semen = staff_testings.create_employee('СЕМЕН')
         boris = staff_testings.create_employee('БОРИС')
+
+        rem1 = sows_testings.create_sow_remont_without_farm_id()
+        rem2 = sows_testings.create_sow_remont_without_farm_id()
+        rem3 = sows_testings.create_sow_remont_without_farm_id()
+        rem4 = sows_testings.create_sow_remont_without_farm_id()
+        rem5 = sows_testings.create_sow_remont_without_farm_id()
         
         # all new sows
         rows1 = [

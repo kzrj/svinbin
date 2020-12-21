@@ -502,8 +502,8 @@ class PigletsTransactionManagerTest(TestCase):
          location=loc_ws_8, quantity=93)
         piglets2 = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31',
          location=loc_ws_8, quantity=94)
-        WeighingPiglets.objects.create_weighing(piglets1, 1000, '8/7')
-        WeighingPiglets.objects.create_weighing(piglets2, 1100, '8/7')
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1000, place='8/7')
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=1100, place='8/7')
 
         cell1 = Location.objects.get(
             pigletsGroupCell__workshop__number=8,

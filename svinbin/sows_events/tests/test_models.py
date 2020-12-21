@@ -424,15 +424,14 @@ class BoarEventTest(TestCase):
         d = 50
         c = a * b / 1000
         e = c * d / 100
-        f = e / 2.0
-        f2 = (e / 2.1) / (e / 1.8)
+        f_denom = 2
+        f = e / f_denom
         g = f * 90
         h = g - a
-        morphology_score = 2
         final_motility_score = 70
 
         semen_boar = SemenBoar.objects.create_semen_boar(boar=boar,
-          a=a, b=b, d=d, morphology_score=morphology_score,
+          a=a, b=b, d=d, f_denom=f_denom,
           final_motility_score=final_motility_score)
 
         self.assertEqual(semen_boar.boar, boar)
@@ -441,11 +440,9 @@ class BoarEventTest(TestCase):
         self.assertEqual(semen_boar.c, c)
         self.assertEqual(semen_boar.d, d)
         self.assertEqual(semen_boar.e, e)
-        self.assertEqual(semen_boar.f, f)
-        self.assertEqual(semen_boar.f2, f2)
         self.assertEqual(semen_boar.g, g)
         self.assertEqual(semen_boar.h, h)
-        self.assertEqual(semen_boar.morphology_score, morphology_score)
+        self.assertEqual(semen_boar.f, f)
         self.assertEqual(semen_boar.final_motility_score, final_motility_score)
 
 
@@ -472,7 +469,7 @@ class PigletsToSowsEventTest(TestCase):
 
         sow1 = Sow.objects.all()[1]
         self.assertEqual(sow1.status.title, 'Ремонтная')
-        self.assertEqual(sow1.location.workshop.number, 1)
+        self.assertEqual(sow1.location.workshop.number, 2)
         self.assertEqual(sow1.sow_group.title, 'Ремонтная')
 
         self.assertEqual(SowStatusRecord.objects.all().count(), 50)

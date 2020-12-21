@@ -63,14 +63,6 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.assertEqual(response.data['sow']['status'], 'Брак')
         self.client.logout()
 
-    def test_get_one(self):
-        self.client.force_authenticate(user=self.brig1)
-        sow = sows_testing.create_sow_and_put_in_workshop_one()
-        response = self.client.get('/api/workshoponetwo/sows/%s/' % sow.pk)
-
-        self.assertEqual(response.data['sow']['id'], sow.pk)
-        self.client.logout()
-
     def test_mass_semination(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         sow2 = sows_testing.create_sow_and_put_in_workshop_one()
@@ -175,8 +167,9 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         self.client.force_authenticate(user=self.brig1)
         response = self.client.post('/api/workshoponetwo/sows/double_semination/', 
             {'week': 55, 'seminator1': self.user.pk, 'seminator2': self.user.pk,
-             'boar1': self.boar.pk,
+             'boar1': self.boar.pk, 'date': '2020-09-09T00:00',
              'boar2': Boar.objects.all()[1].pk, 'farm_id': sow1.farm_id})
+
         self.assertEqual(response.data['semination1']['tour'], 'Тур 55 2020г')
         self.assertEqual(response.data['semination2']['tour'], 'Тур 55 2020г')
         self.assertEqual(response.data['semination1']['boar'], self.boar.pk)

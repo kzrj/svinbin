@@ -116,3 +116,7 @@ def create_boars():
         breed = BoarBreed.objects.all().first()
         Boar.objects.create_boar(farm_id=random.randint(1, FARM_ID_COUNT), breed=breed)
         Boar.objects.create_boar(farm_id=random.randint(100, FARM_ID_COUNT), breed=breed)
+
+def create_sow_remont_without_farm_id():
+    location = Location.objects.get(workshop__number=1)
+    return Sow.objects.create(location=location)

@@ -49,7 +49,8 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
         sow.change_sow_current_location(location)
         response = self.client.post('/api/workshopthree/sows/%s/sow_farrow/' %
-          sow.pk, {'alive_quantity': 10, 'dead_quantity': 1, 'mummy_quantity': 2, 'week': 7 })
+          sow.pk, {'alive_quantity': 10, 'dead_quantity': 1, 'mummy_quantity': 2, 'week': 7,
+          'date': '2020-09-09T00:00' })
 
         self.assertEqual(response.data['sow']['id'], sow.pk)
         self.assertEqual(response.data['sow']['farm_id'], sow.farm_id)

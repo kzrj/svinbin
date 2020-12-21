@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 
 from reports.models import ReportDate, gen_operations_dict, gen_megadict
 from sows.models import Sow
-from sows_events.models import CullingSow, SowFarrow, Semination, Ultrasound
+from sows_events.models import CullingSow, SowFarrow, Semination, Ultrasound, SeminationQuerySet
 from piglets.models import Piglets
 from piglets_events.models import CullingPiglets
 from tours.models import Tour
@@ -375,7 +375,7 @@ class OperationDataTest(TransactionTestCase):
             ops_dict = gen_operations_dict()
             self.assertEqual('ws1_semination' in ops_dict.keys(), True)
             self.assertEqual('ws7_piglets_to_75' in ops_dict.keys(), True)
-            self.assertEqual(type(ops_dict['ws1_semination']['qs']), models.query.QuerySet)
+            self.assertEqual(type(ops_dict['ws1_semination']['qs']), SeminationQuerySet)
 
     def test_op_semination_serializer(self):
         initiator = User.objects.get(username='brigadir1')

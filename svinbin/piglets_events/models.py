@@ -260,18 +260,21 @@ class WeighingPiglets(PigletsEvent):
 
 class CullingPigletsManager(CoreModelManager):
     def create_culling_piglets(self, piglets_group, culling_type, is_it_gilt=False, reason=None,
-         initiator=None, date=None, quantity=1, total_weight=None):
+         initiator=None, date=None, quantity=1, total_weight=0):
 
         if quantity > piglets_group.quantity:
             raise DjangoValidationError(
                 message=f'Указано большее количество поросят чем есть в группе. \
                 {quantity} > {piglets_group.quantity}.')
 
-        if not date:
-            date=timezone.now()
-
         if isinstance(date, str):           
             date = datetime.datetime.strptime(date, '%Y-%m-%d')
+
+        if isinstance(date, datetime.date):           
+            date = datetime.datetime.combine(date, datetime.datetime.min.time())
+
+        if not date:
+            date=timezone.now()
 
         if is_it_gilt:
             piglets_group.remove_gilts(quantity)

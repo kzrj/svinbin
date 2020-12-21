@@ -24,11 +24,6 @@ class TourFilter(filters.FilterSet):
     last_n = filters.NumberFilter(method='filter_last_n')
     ids = NumberInFilter(field_name='id', lookup_expr='in')
 
-    # def filter_ids(self, queryset, name, value):
-    #     print(name)
-    #     print(value)
-    #     return queryset
-
     def filter_by_workshop_number(self, queryset, name, value):
         pks = Sow.objects.all().get_tours_pks(workshop_number=value)
         return queryset.filter(pk__in=pks)

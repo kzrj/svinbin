@@ -125,7 +125,5 @@ class TourFiltersTest(TestCase):
 
     def test_tour_ids_filter(self):
         qs = Tour.objects.all()
-        f = filters.TourFilter({
-            'ids': [1, 2],
-            }, queryset=qs)
-        print(f.qs)
+        f = filters.TourFilter({'ids': f'{self.tour1.pk}, {self.tour2.pk}'}, queryset=qs)
+        self.assertEqual(f.qs.count(), 2)
