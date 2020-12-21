@@ -915,7 +915,7 @@ class TourQuerysetAddWeighingData(TestCase):
         with self.assertNumQueries(1):
             tours = Tour.objects.all().add_weighing_first_dates()
             bool(tours)
-            self.assertEqual(tours[0].first_date_3_4, datetime.datetime.today().date)
+            self.assertEqual(tours[0].first_date_3_4, datetime.date.today())
             self.assertEqual(tours[0].first_date_4_8, datetime.date(2020,9,15))
             # self.assertEqual(tours[0].ws1_count_tour_sow,2)
 

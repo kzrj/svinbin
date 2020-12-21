@@ -306,7 +306,7 @@ class SowModelTest(TransactionTestCase):
 
         assing_event = AssingFarmIdEvent.objects.all().first()
         self.assertEqual(assing_event.sow, assigned_sow)
-        self.assertEqual(assing_event.assing_type, 'nowhere')
+        self.assertEqual(assing_event.assing_type, 'gilt')
 
 class SowQueryTest(TransactionTestCase):
     def setUp(self):

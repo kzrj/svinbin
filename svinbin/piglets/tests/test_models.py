@@ -75,15 +75,6 @@ class PigletsModelmanagerTest(TestCase):
         total_gilts = Piglets.objects.all().get_total_gilts_quantity()
         self.assertEqual(total_gilts, 10)
 
-    def test_init_piglets_with_metatour(self):
-        piglets = Piglets.objects.init_piglets_with_metatour(self.tour1, self.loc_ws3, 100, 5)
-        self.assertEqual(piglets.quantity, 100)
-        self.assertEqual(piglets.gilts_quantity, 5)
-        self.assertEqual(piglets.location, self.loc_ws3)
-
-        self.assertEqual(piglets.metatour.records.all().count(), 1)
-        self.assertEqual(piglets.metatour.records.all().first().tour, self.tour1)
-
     def test_init_piglets_by_farrow_date(self):
         piglets = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31', location=self.loc_ws3,
          quantity=100, gilts_quantity=10)

@@ -224,9 +224,6 @@ class SowManager(CoreModelManager):
                     farm_id=farm_id, birth_id=sow.birth_id)
             else:
                 raise DjangoValidationError(message=f'Больше нет ремонтных свинок в Цехе 1. Переведите из Цеха 2')
-                # sow = self.create_new_and_put_in_workshop_one(farm_id=farm_id, birth_id=birth_id)
-                # AssingFarmIdEvent.objects.create_event(sow=sow, assing_type='nowhere',
-                #     farm_id=farm_id, birth_id=birth_id)
         else:
             if not sow.birth_id:
                 sow.birth_id = birth_id

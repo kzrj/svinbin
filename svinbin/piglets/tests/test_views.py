@@ -500,7 +500,7 @@ class PigletsViewSetTest(APITestCase):
 
         self.client.force_authenticate(user=self.brig6)
         response = self.client.post('/api/piglets/%s/move_gilts_to_12/' % piglets.pk,
-            {})
+            {'total_weight': 100})
         self.assertEqual(response.status_code, 403)
         self.client.logout()
 
