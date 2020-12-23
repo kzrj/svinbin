@@ -258,7 +258,6 @@ class SowFarrow(SowEvent):
         ordering = ['date']
 
 
-
 class CullingSowQuerySet(SowEventQuerySet):
     pass
 
@@ -465,7 +464,7 @@ class CullingBoarManager(CoreModelManager):
         boar.active = False
         boar.save()
         return self.create(boar=boar, location=boar.location, initiator=initiator,
-         culling_type=culling_type, reason=reason, date=date)
+         culling_type=culling_type, reason=reason, date=date, weight=weight)
 
 
 class CullingBoar(Event):

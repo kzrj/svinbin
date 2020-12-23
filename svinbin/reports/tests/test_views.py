@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import datetime
 from datetime import timedelta, date
+from freezegun import freeze_time
+
 import copy
 
 from django.utils import timezone
@@ -18,6 +20,9 @@ from locations.models import Location
 from tours.models import Tour, MetaTour
 from reports.models import ReportDate, gen_operations_dict
 from piglets_events.models import WeighingPiglets, CullingPiglets
+from sows_events.models import PigletsToSowsEvent, CullingSow
+from sows.models import Sow, SowStatus, Boar
+from transactions.models import SowTransaction
 
 from reports.serializers import ReportTourSerializer
 
@@ -149,5 +154,53 @@ class TourReportFilterViewSetTest(APITestCase):
 
     def test_tour_filter_ids(self):
         response = self.client.get('/api/reports/tours/?ids=1,2')
-        print(response.data)
+        # print(response.data)
 
+
+class ReportWS12Test(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+        sows_events_testings.create_types()
+
+        self.user = staff_testing.create_employee()
+        self.client.force_authenticate(user=self.user)
+
+        self.tour1 = Tour.objects.get_or_create_by_week(week_number=1, year=2020)
+        self.cells = Location.objects.filter(pigletsGroupCell__isnull=False)
+        self.piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, 
+            location=self.cells[0], quantity=100, birthday=date(2020, 1, 1))
+        self.piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, 
+            location=self.cells[1], quantity=100, birthday=date(2020, 1, 1))
+
+        self.loc1 = Location.objects.get(workshop__number=1)
+        self.loc2 = Location.objects.get(workshop__number=2)
+        self.loc3 = Location.objects.get(workshop__number=3)
+
+        start_date = date(2020, 1, 1)
+        end_date = timezone.now().date()
+        ReportDate.objects.create_bulk_if_none_from_range(start_date, end_date)
+
+        to_gilts_date = date(2020, 5, 5)
+        to_gilt_event = PigletsToSowsEvent.objects.create_event(piglets=self.piglets1, date=to_gilts_date)
+
+        for sow1 in Sow.objects.all()[:37]:
+            SowTransaction.objects.create_transaction(sow=sow1, to_location=self.loc1,
+             date=date(2020, 6, 15))
+
+        sows_ws1 = Sow.objects.filter(location__workshop__number=1)
+        status1 = SowStatus.objects.get(title='Супорос 35')
+        sows_ws1.filter(pk__in=sows_ws1.values_list('pk', flat=True)[:20]).update(status=status1)
+
+        with freeze_time("2020-06-25"):
+            for sow in Sow.objects.filter(location__workshop__number=1, status__title='Супорос 35')[:7]:
+                CullingSow.objects.create_culling(sow=sow, culling_type='padej', weight=100)
+
+            for sow in Sow.objects.filter(location__workshop__number=1, status__title='Ремонтная')[:2]:
+                CullingSow.objects.create_culling(sow=sow, culling_type='padej', weight=101)
+
+    def test_ws12_report(self):
+        response = self.client.get('/api/reports/director/ws12_report/?ws_number=1')
+        self.assertEqual(response.data['total_info']['total_padej_rem_weight'], 202)

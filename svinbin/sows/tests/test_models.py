@@ -308,6 +308,50 @@ class SowModelTest(TransactionTestCase):
         self.assertEqual(assing_event.sow, assigned_sow)
         self.assertEqual(assing_event.assing_type, 'gilt')
 
+
+class SowManagerV2Test(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week(week_number=1, year=2020)
+        self.cells = Location.objects.filter(pigletsGroupCell__isnull=False)
+        self.piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, 
+            location=self.cells[0], quantity=100, birthday=date(2020, 1, 1))
+        self.piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, 
+            location=self.cells[1], quantity=100, birthday=date(2020, 1, 1))
+
+    def test_get_sows_at_date(self):
+        to_gilts_date = date(2020, 5, 5)
+        target_date = date(2020, 10, 10)
+        to_gilt_event = PigletsToSowsEvent.objects.create_event(piglets=self.piglets1, date=to_gilts_date)
+
+        sow1 = Sow.objects.all().first()
+        CullingSow.objects.create_culling(sow=sow1, culling_type='padej', date=date(2020, 9, 9))
+
+        sow2 = Sow.objects.all()[1]
+        CullingSow.objects.create_culling(sow=sow2, culling_type='padej', date=date(2020, 10, 12))
+       
+        sows = Sow.objects.get_sows_at_date(date=target_date)
+        self.assertEqual(sows.count(), 99)
+
+    def test_count_sows_at_date(self):
+        to_gilts_date = date(2020, 5, 5)
+        target_date = date(2020, 10, 10)
+        to_gilt_event = PigletsToSowsEvent.objects.create_event(piglets=self.piglets1, date=to_gilts_date)
+
+        sow1 = Sow.objects.all().first()
+        CullingSow.objects.create_culling(sow=sow1, culling_type='padej', date=date(2020, 9, 9))
+
+        sow2 = Sow.objects.all()[1]
+        CullingSow.objects.create_culling(sow=sow2, culling_type='padej', date=date(2020, 10, 12))
+
+        sows_count = Sow.objects.count_sows_at_date(date=target_date)
+        self.assertEqual(sows_count, 99)
+
+        
 class SowQueryTest(TransactionTestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()

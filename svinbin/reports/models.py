@@ -10,11 +10,11 @@ from django.db.models.functions import Coalesce, Greatest
 from django.utils import timezone
 
 from core.models import CoreModel, CoreModelManager
-from sows.models import Sow, SowStatusRecord
+from sows.models import Sow, SowStatusRecord, Boar
 from piglets.models import Piglets
 from locations.models import Location
 from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse,
- MarkAsGilt )
+ MarkAsGilt, CullingBoar )
 from piglets_events.models import CullingPiglets, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
 
@@ -158,10 +158,12 @@ class ReportDateQuerySet(models.QuerySet):
                 )
 
     def add_sow_padej_qnty(self):
-        return self.annotate(sow_padej_qnty=self.gen_sow_culling_cnt_by_date_subquery('padej',  OuterRef('date')))
+        return self.annotate(sow_padej_qnty=self.gen_sow_culling_cnt_by_date_subquery('padej', 
+            OuterRef('date')))
 
     def add_sow_vinuzhd_qnty(self):
-        return self.annotate(sow_vinuzhd_qnty=self.gen_sow_culling_cnt_by_date_subquery('vinuzhd',  OuterRef('date')))
+        return self.annotate(sow_vinuzhd_qnty=self.gen_sow_culling_cnt_by_date_subquery('vinuzhd', 
+            OuterRef('date')))
         
     def add_piglets_today_quantity(self):
         count_piglets = Piglets.objects.all() \
@@ -697,6 +699,190 @@ class ReportDateQuerySet(models.QuerySet):
                 total_spec_total_weight=Sum('spec_total_weight'),
                 total_spec_avg_weight=Avg('spec_avg_weight'),
                 )
+
+    def add_count_sows_ws1(self):
+        data = dict()
+        # ws1_loc = 
+        # count_at_date = 
+        #    + trs from 2 to 1
+        #    + trs from 3 to 1
+        #    - trs from 1 to 2
+        #    - trs from 1 to anywhere
+        #    - all culls
+        #  ==  trs to - trs_out - culls
+
+        tr_in_qnty = Coalesce(Subquery(SowTransaction.objects \
+                        .filter(date__date__lt=OuterRef('date'), 
+                                to_location__workshop__number=1) \
+                        .values('to_location') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)
+
+        tr_out_qnty = Coalesce(Subquery(SowTransaction.objects \
+                        .filter(date__date__lt=OuterRef('date'), 
+                                from_location__workshop__number=1) \
+                        .values('from_location') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)
+
+        culls = Coalesce(Subquery(CullingSow.objects \
+                        .filter(date__date__lt=OuterRef('date'), 
+                                location__workshop__number=1) \
+                        .values('location') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)
+
+        count_sows = ExpressionWrapper(tr_in_qnty - tr_out_qnty - culls,
+             output_field=models.IntegerField())
+        
+        return self.annotate(ws1_count_sows=count_sows)
+
+    def add_count_boars(self):
+        data = dict()
+        # ws1_loc = 
+        # count_at_date = 
+        #    + boars created_at
+        #    - all culls
+
+        all_created_boars = Coalesce(Subquery(Boar.objects \
+                        .filter(created_at__lt=OuterRef('date')) \
+                        .annotate(flag_group=Value(0)) \
+                        .values('flag_group') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)
+
+        culls = Coalesce(Subquery(CullingBoar.objects \
+                        .filter(date__date__lt=OuterRef('date')) \
+                        .values('location') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)      
+
+        count_sows = ExpressionWrapper(all_created_boars - culls, output_field=models.IntegerField())
+        
+
+        return self.annotate(count_boars=count_sows)
+
+    def add_ws12_sow_cullings_data(self, ws_locs, ws_number):
+        data = dict()
+
+        for culling_type in ['padej', 'vinuzhd']:
+            osn_culls = CullingSow.objects \
+                            .filter(date__date=OuterRef('date'), culling_type=culling_type,
+                                location__in=ws_locs) \
+                            .exclude(sow_status__title='Ремонтная') \
+                            .values('date__date')
+
+            rem_culls = CullingSow.objects \
+                            .filter(date__date=OuterRef('date'), culling_type=culling_type,
+                                location__in=ws_locs) \
+                            .filter(sow_status__title='Ремонтная') \
+                            .values('date__date')
+
+            data[f'ws{ws_number}_{culling_type}_osn_count'] = osn_culls \
+                            .annotate(cnt=Count('*')) \
+                            .values('cnt')
+
+            data[f'ws{ws_number}_{culling_type}_osn_weight'] = osn_culls \
+                            .annotate(total_weight=Sum('weight')) \
+                            .values('total_weight')
+
+            data[f'ws{ws_number}_{culling_type}_rem_count'] = rem_culls \
+                            .annotate(cnt=Count('*')) \
+                            .values('cnt')
+
+            data[f'ws{ws_number}_{culling_type}_rem_weight'] = rem_culls \
+                            .annotate(total_weight=Sum('weight')) \
+                            .values('total_weight')
+
+        return self.annotate(**data)
+
+    def add_culling_boar_data(self):
+        data = dict()
+
+        culls = CullingBoar.objects \
+                        .filter(date__date=OuterRef('date')) \
+                        .values('date__date')
+
+        data['padej_boar_count'] = culls \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt')
+
+        data['padej_boar_weight'] = culls \
+                        .annotate(total_weight=Sum('weight')) \
+                        .values('total_weight')
+
+        return self.annotate(**data)
+
+    def add_ws12_sow_trs_data(self):
+        data = dict()
+        trs = SowTransaction.objects.filter(date__date=OuterRef('date')) \
+
+        data['trs_from_1_to_2'] = trs \
+                    .filter(from_location__workshop__number=1) \
+                    .filter(to_location__workshop__number=2) \
+                    .values('date__date') \
+                    .annotate(cnt=Count('*')) \
+                    .values('cnt')
+
+        data['trs_from_1_to_3'] = trs \
+                    .filter(from_location__workshop__number=1) \
+                    .filter(to_location__workshop__number=3) \
+                    .values('date__date') \
+                    .annotate(cnt=Count('*')) \
+                    .values('cnt')
+
+        data['trs_from_2_to_1'] = trs \
+                    .filter(from_location__workshop__number=2) \
+                    .filter(to_location__workshop__number=1) \
+                    .values('date__date') \
+                    .annotate(cnt=Count('*')) \
+                    .values('cnt')
+
+        data['trs_from_3_to_1'] = trs \
+                    .filter(from_location__workshop__number=3) \
+                    .filter(to_location__workshop__number=1) \
+                    .values('date__date') \
+                    .annotate(cnt=Count('*')) \
+                    .values('cnt')
+
+        data['trs_from_3_to_2'] = trs \
+                    .filter(from_location__workshop__number=3) \
+                    .filter(to_location__workshop__number=2) \
+                    .values('date__date') \
+                    .annotate(cnt=Count('*')) \
+                    .values('cnt')
+
+        data['trs_from_2_to_3'] = trs \
+                    .filter(from_location__workshop__number=2) \
+                    .filter(to_location__workshop__number=3) \
+                    .values('date__date') \
+                    .annotate(cnt=Count('*')) \
+                    .values('cnt')
+
+        return self.annotate(**data)
+
+    def ws12_aggregate_total(self, ws_number):
+        return self.aggregate(
+                total_trs_from_1_to_2=Sum('trs_from_1_to_2'),
+                total_trs_from_1_to_3=Sum('trs_from_1_to_3'),
+                total_trs_from_2_to_1=Sum('trs_from_2_to_1'),
+                total_trs_from_2_to_3=Sum('trs_from_2_to_3'),
+                total_trs_from_3_to_1=Sum('trs_from_3_to_1'),
+                total_trs_from_3_to_2=Sum('trs_from_3_to_2'),
+
+                total_padej_osn_count=Sum(f'ws{ws_number}_padej_osn_count'),
+                total_padej_osn_weight=Sum(f'ws{ws_number}_padej_osn_weight'),
+                total_vinuzhd_osn_count=Sum(f'ws{ws_number}_vinuzhd_osn_count'),
+                total_vinuzhd_osn_weight=Sum(f'ws{ws_number}_vinuzhd_osn_weight'),
+
+                total_padej_rem_count=Sum(f'ws{ws_number}_padej_rem_count'),
+                total_padej_rem_weight=Sum(f'ws{ws_number}_padej_rem_weight'),
+                total_vinuzhd_rem_count=Sum(f'ws{ws_number}_vinuzhd_rem_count'),
+                total_vinuzhd_rem_weight=Sum(f'ws{ws_number}_vinuzhd_rem_weight'),
+
+                total_padej_boar_count=Sum('padej_boar_count'),
+                total_padej_boar_weight=Sum('padej_boar_weight'),
+            )
 
 
 class ReportDateManager(CoreModelManager):

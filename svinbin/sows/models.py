@@ -245,12 +245,20 @@ class SowManager(CoreModelManager):
             .values_list('pk', flat=True)
 
         all_culls_sows_pk = CullingSow.objects.filter(date__date__lte=date).values_list('sow__pk', flat=True)
-        pks = [sow_pk for sow_pk in all_init_sows_pk if sow_pk not in all_culls_sows_pk]
 
         # all_sows = all_init_sows.difference(all_culls_sows)
-        # after difference you cant use annotate
+        # after difference we cant use annotate, so hasnt used it
+        pks = [sow_pk for sow_pk in all_init_sows_pk if sow_pk not in all_culls_sows_pk]
 
         return self.get_queryset_with_not_alive().filter(pk__in=pks)
+
+    def count_sows_at_date(self, date):
+        count_init = PigletsToSowsEvent.objects.filter(date__date__lte=date) \
+            .aggregate(models.Sum('quantity'))['quantity__sum']
+
+        count_culls = CullingSow.objects.filter(date__date__lte=date).count()
+
+        return count_init - count_culls
 
 
 class Sow(Pig):

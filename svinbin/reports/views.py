@@ -280,6 +280,29 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    @action(methods=['get'], detail=False, serializer_class=StartDateEndDateSerializer)
+    def ws12_report(self, request):
+        ws_number = request.GET.get('ws_number', 1)
+        ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
+        bool(ws_locs)
+        
+        queryset = ReportDate.objects.all()\
+                            .add_count_sows_ws1() \
+                            .add_count_boars() \
+                            .add_ws12_sow_cullings_data(ws_locs=ws_locs, ws_number=ws_number) \
+                            .add_culling_boar_data() \
+                            .add_ws12_sow_trs_data() 
+
+        queryset = self.filter_queryset(queryset)
+        total_data = queryset.ws12_aggregate_total(ws_number=ws_number)
+
+        serializer = ReportDateSerializer(queryset, many=True)
+
+        data = dict()
+        data['results'] = serializer.data
+        data['total_info'] = total_data
+
+        return Response(data)
 
 
 class ReportCountPigsView(views.APIView):

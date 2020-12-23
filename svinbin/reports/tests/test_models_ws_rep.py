@@ -8,8 +8,9 @@ from django.db import models
 from django.test import TransactionTestCase
 
 from reports.models import ReportDate
-from sows.models import Sow
-from sows_events.models import CullingSow, SowFarrow, Semination, Ultrasound
+from sows.models import Sow, Boar, SowStatus
+from sows_events.models import CullingSow, SowFarrow, Semination, Ultrasound, PigletsToSowsEvent, \
+     CullingBoar
 from piglets.models import Piglets
 from piglets_events.models import CullingPiglets, WeighingPiglets
 from tours.models import Tour
@@ -245,27 +246,271 @@ class ReportDateWSReportTest(TransactionTestCase):
         self.assertEqual(day3_rd.tr_in_qnty, None)
         self.assertEqual(day3_rd.tr_out_qnty, None)
 
-    # def test_serializer(self):
-    #     qs = ReportDate.objects.all()\
-    #             .add_ws3_sow_cullings_data(ws_locs=self.ws3_locs) \
-    #             .add_ws3_sow_trs_data(ws_locs=self.ws3_locs) \
-    #             .add_ws3_sow_farrow_data() \
-    #             .add_ws3_count_piglets_start_day(ws_locs=self.ws3_locs) \
-    #             .add_ws3_piglets_trs_out_aka_weighing() \
-    #             .add_ws3_piglets_cullings(ws_locs=self.ws3_locs)
 
-    #     sow1 = sows_testings.create_sow_and_put_in_workshop_one()
-    #     sow2 = sows_testings.create_sow_and_put_in_workshop_one()
-    #     sow3 = sows_testings.create_sow_and_put_in_workshop_one()
-    #     sow4 = sows_testings.create_sow_and_put_in_workshop_one()
+class ReportDateWS12ReportTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
 
-    #     with freeze_time("2020-05-14"):
-    #         sows = Sow.objects.all()
-    #         sows.update_status('Супорос 35')
-    #         SowTransaction.objects.create_many_transactions(sows, self.loc_ws3)
+        self.tour1 = Tour.objects.get_or_create_by_week(week_number=1, year=2020)
+        self.cells = Location.objects.filter(pigletsGroupCell__isnull=False)
+        self.piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, 
+            location=self.cells[0], quantity=100, birthday=date(2020, 1, 1))
+        self.piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, 
+            location=self.cells[1], quantity=100, birthday=date(2020, 1, 1))
 
-    #     qs = qs.filter(date__gte=date(2020, 5, 1), date__lte=date(2020, 5, 30))
+        self.loc1 = Location.objects.get(workshop__number=1)
+        self.loc2 = Location.objects.get(workshop__number=2)
+        self.loc3 = Location.objects.get(workshop__number=3)
 
-    #     # with self.assertNumQueries(1):
-    #     #     serializer = ReportDateWs3Serializer(qs, many=True)
-    #     #     print(serializer.data)
+        start_date = date(2020, 1, 1)
+        end_date = timezone.now().date()
+        ReportDate.objects.create_bulk_if_none_from_range(start_date, end_date)
+
+        to_gilts_date = date(2020, 5, 5)
+        to_gilt_event = PigletsToSowsEvent.objects.create_event(piglets=self.piglets1, date=to_gilts_date)
+
+    def test_add_count_sows_ws1(self):
+        for sow in Sow.objects.all()[:50]:
+            SowTransaction.objects.create_transaction(sow=sow, to_location=self.loc1,
+             date=date(2020, 5, 20))
+
+        self.assertEqual(Sow.objects.filter(location__workshop__number=1).count(), 50)
+        self.assertEqual(Sow.objects.filter(location__workshop__number=2).count(), 50)
+
+        Sow.objects.filter(location__workshop__number=2).update(location=self.loc3)
+
+        for sow1 in Sow.objects.filter(location__workshop__number=1)[:17]:
+            SowTransaction.objects.create_transaction(sow=sow1, to_location=self.loc2,
+             date=date(2020, 6, 15))
+
+        for sow3 in Sow.objects.filter(location__workshop__number=3)[:20]:
+            SowTransaction.objects.create_transaction(sow=sow3, to_location=self.loc1,
+             date=date(2020, 7, 5))
+
+        sows_qs = Sow.objects.filter(pk__in=Sow.objects.filter(location__workshop__number=1) \
+                .values_list('pk', flat=True)[:5])
+        CullingSow.objects.mass_culling(sows_qs=sows_qs, culling_type='padej', date=date(2020, 7, 10))
+
+        sows_qs = Sow.objects.filter(pk__in=Sow.objects.filter(location__workshop__number=2) \
+                .values_list('pk', flat=True)[:15])
+        CullingSow.objects.mass_culling(sows_qs=sows_qs, culling_type='padej', date=date(2020, 7, 10))
+
+        rds = ReportDate.objects.all().add_count_sows_ws1()
+        self.assertEqual(rds.filter(date=date(2020, 5, 4)).first().ws1_count_sows, 0)
+        self.assertEqual(rds.get(date=date(2020, 5, 5)).ws1_count_sows, 0)
+        self.assertEqual(rds.get(date=date(2020, 5, 6)).ws1_count_sows, 0)
+        self.assertEqual(rds.get(date=date(2020, 5, 20)).ws1_count_sows, 0)
+        self.assertEqual(rds.get(date=date(2020, 5, 21)).ws1_count_sows, 50)
+        self.assertEqual(rds.get(date=date(2020, 5, 25)).ws1_count_sows, 50)
+        self.assertEqual(rds.get(date=date(2020, 6, 25)).ws1_count_sows, 33)
+        self.assertEqual(rds.get(date=date(2020, 7, 10)).ws1_count_sows, 53)
+        self.assertEqual(rds.get(date=date(2020, 7, 11)).ws1_count_sows, 48)
+        self.assertEqual(rds.get(date=date(2020, 9, 25)).ws1_count_sows, 48)
+
+    def test_add_count_boars(self):
+        with freeze_time("2020-01-3"):
+            sows_testings.create_boar()
+
+        with freeze_time("2020-04-3"):
+            sows_testings.create_boar()
+
+        with freeze_time("2020-05-3"):
+            sows_testings.create_boar()
+
+        with freeze_time("2020-06-3"):
+            sows_testings.create_boar()
+
+        rds = ReportDate.objects.all().add_count_boars()
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).count_boars, 0)
+        self.assertEqual(rds.get(date=date(2020, 1, 3)).count_boars, 0)
+        self.assertEqual(rds.get(date=date(2020, 1, 4)).count_boars, 1)
+        self.assertEqual(rds.get(date=date(2020, 4, 4)).count_boars, 2)
+        self.assertEqual(rds.get(date=date(2020, 5, 4)).count_boars, 3)
+        self.assertEqual(rds.get(date=date(2020, 6, 4)).count_boars, 4)
+
+        with freeze_time("2020-05-6"):
+            boar = Boar.objects.all().first()
+            CullingBoar.objects.create_culling_boar(boar=boar, culling_type='padej', reason=None)
+
+        rds = ReportDate.objects.all().add_count_boars()
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).count_boars, 0)
+        self.assertEqual(rds.get(date=date(2020, 1, 3)).count_boars, 0)
+        self.assertEqual(rds.get(date=date(2020, 1, 4)).count_boars, 1)
+        self.assertEqual(rds.get(date=date(2020, 4, 4)).count_boars, 2)
+        self.assertEqual(rds.get(date=date(2020, 5, 4)).count_boars, 3)
+        self.assertEqual(rds.get(date=date(2020, 5, 6)).count_boars, 3)
+        self.assertEqual(rds.get(date=date(2020, 5, 7)).count_boars, 2)
+        self.assertEqual(rds.get(date=date(2020, 6, 4)).count_boars, 3)
+
+    def test_add_ws12_sow_cullings_data(self):
+        for sow in Sow.objects.all()[:50]:
+            SowTransaction.objects.create_transaction(sow=sow, to_location=self.loc1,
+             date=date(2020, 5, 20))
+
+        sows_ws1 = Sow.objects.filter(location__workshop__number=1)
+        status1 = SowStatus.objects.get(title='Ожидает осеменения')
+
+        # 30 rem 20 osn
+        sows_ws1.filter(pk__in=sows_ws1.values_list('pk', flat=True)[:20]).update(status=status1)
+
+        with freeze_time("2020-07-6"):
+            sow_osn = sows_ws1.filter(status__title='Ожидает осеменения').first()
+            CullingSow.objects.create_culling(sow=sow_osn, culling_type='padej', weight=200)
+
+        with freeze_time("2020-07-7"):
+            sow_osn = sows_ws1.filter(status__title='Ожидает осеменения').first()
+            CullingSow.objects.create_culling(sow=sow_osn, culling_type='padej', weight=202)
+
+            sow_rem = sows_ws1.filter(status__title='Ремонтная').first()
+            CullingSow.objects.create_culling(sow=sow_rem, culling_type='vinuzhd', weight=203)
+
+        with freeze_time("2020-07-17"):
+            sow_rem = sows_ws1.filter(status__title='Ремонтная').first()
+            CullingSow.objects.create_culling(sow=sow_rem, culling_type='padej', weight=204)
+
+        with freeze_time("2020-08-10"):
+            sow_osn = sows_ws1.filter(status__title='Ожидает осеменения').first()
+            CullingSow.objects.create_culling(sow=sow_osn, culling_type='vinuzd', weight=205)
+
+        rds = ReportDate.objects.all().add_ws12_sow_cullings_data(
+            ws_locs=Location.objects.filter(workshop__number=1), ws_number=1)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).ws1_padej_osn_count, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).ws1_padej_osn_weight, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).ws1_vinuzhd_osn_count, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).ws1_vinuzhd_osn_weight, None)
+
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).ws1_padej_rem_count, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).ws1_padej_rem_weight, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).ws1_vinuzhd_rem_count, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).ws1_vinuzhd_rem_weight, None)
+
+        self.assertEqual(rds.get(date=date(2020, 7, 6)).ws1_padej_osn_count, 1)
+        self.assertEqual(rds.get(date=date(2020, 7, 6)).ws1_padej_osn_weight, 200)
+        self.assertEqual(rds.get(date=date(2020, 7, 6)).ws1_vinuzhd_osn_count, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 6)).ws1_vinuzhd_osn_weight, None)
+
+        self.assertEqual(rds.get(date=date(2020, 7, 6)).ws1_padej_rem_count, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 6)).ws1_padej_rem_weight, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 6)).ws1_vinuzhd_rem_count, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 6)).ws1_vinuzhd_rem_weight, None)
+
+        self.assertEqual(rds.get(date=date(2020, 7, 7)).ws1_padej_osn_count, 1)
+        self.assertEqual(rds.get(date=date(2020, 7, 7)).ws1_padej_osn_weight, 202)
+        self.assertEqual(rds.get(date=date(2020, 7, 7)).ws1_vinuzhd_osn_count, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 7)).ws1_vinuzhd_osn_weight, None)
+
+        self.assertEqual(rds.get(date=date(2020, 7, 7)).ws1_padej_rem_count, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 7)).ws1_padej_rem_weight, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 7)).ws1_vinuzhd_rem_count, 1)
+        self.assertEqual(rds.get(date=date(2020, 7, 7)).ws1_vinuzhd_rem_weight, 203)
+
+        self.assertEqual(rds.get(date=date(2020, 7, 17)).ws1_padej_osn_count, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 17)).ws1_padej_osn_weight, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 17)).ws1_vinuzhd_osn_count, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 17)).ws1_vinuzhd_osn_weight, None)
+
+        self.assertEqual(rds.get(date=date(2020, 7, 17)).ws1_padej_rem_count, 1)
+        self.assertEqual(rds.get(date=date(2020, 7, 17)).ws1_padej_rem_weight, 204)
+        self.assertEqual(rds.get(date=date(2020, 7, 17)).ws1_vinuzhd_rem_count, None)
+        self.assertEqual(rds.get(date=date(2020, 7, 17)).ws1_vinuzhd_rem_weight, None)
+        
+    def test_add_culling_boar_data(self):
+        for i in range(1, 10):
+            sows_testings.create_boar()
+
+        with freeze_time("2020-05-6"):
+            boar = Boar.objects.all().first()
+            CullingBoar.objects.create_culling_boar(boar=boar, culling_type='padej',
+                reason=None, weight=100)
+
+        with freeze_time("2020-05-10"):
+            boar = Boar.objects.all().first()
+            CullingBoar.objects.create_culling_boar(boar=boar, culling_type='padej',
+                reason=None, weight=101)
+
+        rds = ReportDate.objects.all().add_culling_boar_data()
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).padej_boar_count, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).padej_boar_weight, None)
+
+        self.assertEqual(rds.get(date=date(2020, 5, 6)).padej_boar_count, 1)
+        self.assertEqual(rds.get(date=date(2020, 5, 6)).padej_boar_weight, 100)
+
+        self.assertEqual(rds.get(date=date(2020, 5, 10)).padej_boar_count, 1)
+        self.assertEqual(rds.get(date=date(2020, 5, 10)).padej_boar_weight, 101)
+
+    def test_add_ws12_sow_trs_data(self):
+        self.assertEqual(Sow.objects.filter(location__workshop__number=2).count(), 100)
+        
+        for sow1 in Sow.objects.all()[:17]:
+            SowTransaction.objects.create_transaction(sow=sow1, to_location=self.loc1,
+             date=date(2020, 6, 15))
+
+        sows_ws1 = Sow.objects.filter(location__workshop__number=2)
+        status1 = SowStatus.objects.get(title='Супорос 35')
+
+        sows_ws1.filter(pk__in=sows_ws1.values_list('pk', flat=True)[:20]).update(status=status1)
+        for sow1 in Sow.objects.filter(location__workshop__number=2)[:15]:
+            SowTransaction.objects.create_transaction(sow=sow1, to_location=self.loc3,
+             date=date(2020, 6, 25))
+
+        rds = ReportDate.objects.all().add_ws12_sow_trs_data()
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).trs_from_1_to_2, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).trs_from_1_to_3, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).trs_from_2_to_1, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).trs_from_3_to_1, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).trs_from_3_to_2, None)
+        self.assertEqual(rds.get(date=date(2020, 1, 1)).trs_from_2_to_3, None)
+
+        self.assertEqual(rds.get(date=date(2020, 6, 15)).trs_from_1_to_2, None)
+        self.assertEqual(rds.get(date=date(2020, 6, 15)).trs_from_1_to_3, None)
+        self.assertEqual(rds.get(date=date(2020, 6, 15)).trs_from_2_to_1, 17)
+        self.assertEqual(rds.get(date=date(2020, 6, 15)).trs_from_3_to_1, None)
+        self.assertEqual(rds.get(date=date(2020, 6, 15)).trs_from_3_to_2, None)
+        self.assertEqual(rds.get(date=date(2020, 6, 15)).trs_from_2_to_3, None)
+
+        self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_1_to_2, None)
+        self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_1_to_3, None)
+        self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_2_to_1, None)
+        self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_3_to_1, None)
+        self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_3_to_2, None)
+        self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_2_to_3, 15)
+
+    def test_ws12_aggregate_total(self):
+        for sow1 in Sow.objects.all()[:37]:
+            SowTransaction.objects.create_transaction(sow=sow1, to_location=self.loc1,
+             date=date(2020, 6, 15))
+
+        sows_ws1 = Sow.objects.filter(location__workshop__number=1)
+        status1 = SowStatus.objects.get(title='Супорос 35')
+        sows_ws1.filter(pk__in=sows_ws1.values_list('pk', flat=True)[:20]).update(status=status1)
+
+        with freeze_time("2020-06-25"):
+            for sow in Sow.objects.filter(location__workshop__number=1, status__title='Супорос 35')[:7]:
+                CullingSow.objects.create_culling(sow=sow, culling_type='padej', weight=100)
+
+            for sow in Sow.objects.filter(location__workshop__number=1, status__title='Ремонтная')[:2]:
+                CullingSow.objects.create_culling(sow=sow, culling_type='padej', weight=101)
+
+        ws1_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=1)
+        rds = ReportDate.objects.all() \
+                    .add_count_sows_ws1() \
+                    .add_count_boars() \
+                    .add_ws12_sow_cullings_data(ws_locs=ws1_locs, ws_number=1) \
+                    .add_culling_boar_data() \
+                    .add_ws12_sow_trs_data() 
+
+        total_data = rds.ws12_aggregate_total(ws_number=1)
+
+        self.assertEqual(total_data['total_trs_from_2_to_1'], 37)
+        self.assertEqual(total_data['total_padej_osn_count'], 7)
+        self.assertEqual(total_data['total_padej_osn_weight'], 700)
+        self.assertEqual(total_data['total_padej_rem_count'], 2)
+        self.assertEqual(total_data['total_padej_rem_weight'], 202)
+
+        self.assertEqual(total_data['total_padej_boar_count'], None)
+        self.assertEqual(total_data['total_padej_boar_weight'], None)
+        self.assertEqual(total_data['total_vinuzhd_rem_count'], None)
+        self.assertEqual(total_data['total_vinuzhd_rem_weight'], None)
