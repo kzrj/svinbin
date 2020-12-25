@@ -732,7 +732,7 @@ class ReportDateQuerySet(models.QuerySet):
                         .annotate(total=Count('*')) \
                         .values('total')), 0)
 
-        count_sows = ExpressionWrapper(tr_in_qnty - tr_out_qnty - culls,
+        count_sows = ExpressionWrapper(tr_in_qnty - tr_out_qnty - culls + 1639,
              output_field=models.IntegerField())
         
         return self.annotate(ws1_count_sows=count_sows)
