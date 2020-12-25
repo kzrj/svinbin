@@ -272,7 +272,7 @@ class ReportDateWS12ReportTest(TransactionTestCase):
         to_gilts_date = date(2020, 5, 5)
         to_gilt_event = PigletsToSowsEvent.objects.create_event(piglets=self.piglets1, date=to_gilts_date)
 
-    def test_add_count_sows_ws1(self):
+    def test_add_count_sows_ws12(self):
         for sow in Sow.objects.all()[:50]:
             SowTransaction.objects.create_transaction(sow=sow, to_location=self.loc1,
              date=date(2020, 5, 20))
@@ -298,7 +298,7 @@ class ReportDateWS12ReportTest(TransactionTestCase):
                 .values_list('pk', flat=True)[:15])
         CullingSow.objects.mass_culling(sows_qs=sows_qs, culling_type='padej', date=date(2020, 7, 10))
 
-        rds = ReportDate.objects.all().add_count_sows_ws1()
+        rds = ReportDate.objects.all().add_count_sows_ws12(ws_number=1)
         self.assertEqual(rds.filter(date=date(2020, 5, 4)).first().ws1_count_sows, 0)
         self.assertEqual(rds.get(date=date(2020, 5, 5)).ws1_count_sows, 0)
         self.assertEqual(rds.get(date=date(2020, 5, 6)).ws1_count_sows, 0)
@@ -478,6 +478,10 @@ class ReportDateWS12ReportTest(TransactionTestCase):
         self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_3_to_2, None)
         self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_2_to_3, 15)
 
+        self.assertEqual(rds.get(date=date(2020, 5, 5)).trs_from_otkorm_to_2, 100)
+        self.assertEqual(
+            SowTransaction.objects.filter(from_location__pigletsGroupCell__isnull=False).count(), 100)
+
     def test_ws12_aggregate_total(self):
         for sow1 in Sow.objects.all()[:37]:
             SowTransaction.objects.create_transaction(sow=sow1, to_location=self.loc1,
@@ -496,7 +500,7 @@ class ReportDateWS12ReportTest(TransactionTestCase):
 
         ws1_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=1)
         rds = ReportDate.objects.all() \
-                    .add_count_sows_ws1() \
+                    .add_count_sows_ws12(ws_number=1) \
                     .add_count_boars() \
                     .add_ws12_sow_cullings_data(ws_locs=ws1_locs, ws_number=1) \
                     .add_culling_boar_data() \

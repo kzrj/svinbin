@@ -57,12 +57,36 @@ class SowTransactionManager(CoreModelManager):
 
         return transaction
 
-    def create_many_transactions(self, sows, to_location, initiator=None):
+    def create_many_transactions(self, sows, to_location, initiator=None, date=None):
+        if not date:
+            date = timezone.now()
+
         transactions_ids = list()
         for sow in sows:
-            transaction = self.create_transaction(sow, to_location, initiator)
+            transaction = self.create_transaction(sow=sow, to_location=to_location, initiator=initiator,
+                date=date)
             transactions_ids.append(transaction.pk)
         return transactions_ids
+
+    def create_many_without_status_check(self, sows, to_location, initiator=None, date=None):
+        if not date:
+            date = timezone.now()
+
+        trs = list()
+        for sow in sows:
+            trs.append(
+                SowTransaction(
+                    date=date,
+                    initiator=initiator,
+                    from_location=sow.location,
+                    to_location=to_location,
+                    sow=sow,
+                    tour=sow.tour,
+                    sow_status=sow.status,
+                    sow_group=sow.sow_group)
+                )
+        self.bulk_create(trs)
+        sows.update(location=to_location)
 
     def trs_in_ws(self, ws_number, ws_locs, start_date=date(2020, 1, 1), end_date=datetime.today()):
         return self.filter(date__date__gte=start_date, date__date__lte=end_date,

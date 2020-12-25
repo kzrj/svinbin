@@ -700,7 +700,7 @@ class ReportDateQuerySet(models.QuerySet):
                 total_spec_avg_weight=Avg('spec_avg_weight'),
                 )
 
-    def add_count_sows_ws1(self):
+    def add_count_sows_ws12(self, ws_number=1, fix_number=0):
         data = dict()
         # ws1_loc = 
         # count_at_date = 
@@ -713,27 +713,29 @@ class ReportDateQuerySet(models.QuerySet):
 
         tr_in_qnty = Coalesce(Subquery(SowTransaction.objects \
                         .filter(date__date__lt=OuterRef('date'), 
-                                to_location__workshop__number=1) \
+                                to_location__workshop__number=ws_number) \
                         .values('to_location') \
                         .annotate(total=Count('*')) \
                         .values('total')), 0)
 
         tr_out_qnty = Coalesce(Subquery(SowTransaction.objects \
                         .filter(date__date__lt=OuterRef('date'), 
-                                from_location__workshop__number=1) \
+                                from_location__workshop__number=ws_number) \
                         .values('from_location') \
                         .annotate(total=Count('*')) \
                         .values('total')), 0)
 
         culls = Coalesce(Subquery(CullingSow.objects \
                         .filter(date__date__lt=OuterRef('date'), 
-                                location__workshop__number=1) \
+                                location__workshop__number=ws_number) \
                         .values('location') \
                         .annotate(total=Count('*')) \
                         .values('total')), 0)
 
-        count_sows = ExpressionWrapper(tr_in_qnty - tr_out_qnty - culls + 1639,
+        count_sows = ExpressionWrapper(tr_in_qnty - tr_out_qnty - culls + fix_number,
              output_field=models.IntegerField())
+
+        # 1639
         
         return self.annotate(ws1_count_sows=count_sows)
 
@@ -867,6 +869,13 @@ class ReportDateQuerySet(models.QuerySet):
                     .annotate(cnt=Count('*')) \
                     .values('cnt')
 
+        data['trs_from_otkorm_to_2'] = trs \
+                    .filter(from_location__pigletsGroupCell__isnull=False) \
+                    .filter(to_location__workshop__number=2) \
+                    .values('date__date') \
+                    .annotate(cnt=Count('*')) \
+                    .values('cnt')
+
         return self.annotate(**data)
 
     def ws12_aggregate_total(self, ws_number):
@@ -877,6 +886,7 @@ class ReportDateQuerySet(models.QuerySet):
                 total_trs_from_2_to_3=Sum('trs_from_2_to_3'),
                 total_trs_from_3_to_1=Sum('trs_from_3_to_1'),
                 total_trs_from_3_to_2=Sum('trs_from_3_to_2'),
+                total_trs_from_otkorm_to_2=Sum('trs_from_otkorm_to_2'),
 
                 total_padej_osn_count=Sum(f'ws{ws_number}_padej_osn_count'),
                 total_padej_osn_weight=Sum(f'ws{ws_number}_padej_osn_weight'),
@@ -893,6 +903,40 @@ class ReportDateQuerySet(models.QuerySet):
                 total_vinuzhd_boar_count=Sum('vinuzhd_boar_count'),
                 total_vinuzhd_boar_weight=Sum('vinuzhd_boar_weight'),
             )
+
+    def add_count_sows_ws2(self):
+        data = dict()
+        # ws1_loc = 
+        # count_at_date = 
+        #  + trs in
+        #  - trs out
+        #  - culls
+
+        tr_in_qnty = Coalesce(Subquery(SowTransaction.objects \
+                        .filter(date__date__lt=OuterRef('date'), 
+                                to_location__workshop__number=2) \
+                        .values('to_location') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)
+
+        tr_out_qnty = Coalesce(Subquery(SowTransaction.objects \
+                        .filter(date__date__lt=OuterRef('date'), 
+                                from_location__workshop__number=2) \
+                        .values('from_location') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)
+
+        culls = Coalesce(Subquery(CullingSow.objects \
+                        .filter(date__date__lt=OuterRef('date'), 
+                                location__workshop__number=2) \
+                        .values('location') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)
+
+        count_sows = ExpressionWrapper(tr_in_qnty - tr_out_qnty - culls + 0,
+             output_field=models.IntegerField())
+        
+        return self.annotate(ws1_count_sows=count_sows)
 
 
 class ReportDateManager(CoreModelManager):

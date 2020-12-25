@@ -10,6 +10,7 @@ from locations.models import Location
 from sows_events.models import Semination, AssingFarmIdEvent, PigletsToSowsEvent, CullingSow, SowFarrow, \
     MarkAsGilt
 from tours.models import Tour
+from transactions.models import SowTransaction
 
 
 class SowStatus(CoreModel):
@@ -231,13 +232,20 @@ class SowManager(CoreModelManager):
         return sow
         
     def create_bulk_sows_from_event(self, event):
-        location = Location.objects.get(workshop__number=2)
+        # tested in sows_events test_models
+        to_location = Location.objects.get(workshop__number=2)
+
         self.bulk_create([
-            Sow(creation_event=event, location=location) 
+            Sow(creation_event=event, location=event.piglets.location) 
                 for i in range(0, event.quantity)])
         sows = event.sows.all()
         sows.update_status(title='Ремонтная', date=event.date)
         sows.update_group(group_title='Ремонтная', date=event.date)
+
+        # sow to use related transaction manager
+        sow = self.all().first()
+        sow.transactions.create_many_without_status_check(sows=sows, to_location=to_location,
+         initiator=event.initiator, date=event.date)
 
     def get_sows_at_date(self, date):
         init_events = PigletsToSowsEvent.objects.filter(date__date__lte=date)

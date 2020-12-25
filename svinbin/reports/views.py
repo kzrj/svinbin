@@ -283,11 +283,17 @@ class ReportDateViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False, serializer_class=StartDateEndDateSerializer)
     def ws12_report(self, request):
         ws_number = request.GET.get('ws_number', 1)
+        fix_number = 0
+        if ws_number == 1:
+            fix_number = 1639
+        else:
+            fix_number = 0
+
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
         bool(ws_locs)
         
         queryset = ReportDate.objects.all()\
-                            .add_count_sows_ws1() \
+                            .add_count_sows_ws12(ws_number=ws_number, fix_number=fix_number) \
                             .add_count_boars() \
                             .add_ws12_sow_cullings_data(ws_locs=ws_locs, ws_number=ws_number) \
                             .add_culling_boar_data() \

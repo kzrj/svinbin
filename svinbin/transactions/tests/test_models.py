@@ -47,6 +47,19 @@ class SowTransactionManagerTest(TestCase):
             to_location)
         self.assertEqual(transactions, [1,2])
 
+    def test_create_many_without_status_check(self):
+        sow1 = sows_testing.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testing.create_sow_and_put_in_workshop_one()
+        to_location = Location.objects.get(workshop__number=3)
+
+        transactions = SowTransaction.objects.create_many_transactions([sow1, sow2],
+            to_location)
+        
+        sow1.refresh_from_db()
+        sow2.refresh_from_db()
+        self.assertEqual(sow1.location.workshop.number, 3)
+        self.assertEqual(sow2.location.workshop.number, 3)
+
     def test_trs_in_ws(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         sow2 = sows_testing.create_sow_and_put_in_workshop_one()

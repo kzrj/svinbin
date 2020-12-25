@@ -456,7 +456,7 @@ class PigletsToSowsEventTest(TestCase):
         sow = Sow.objects.create_new_and_put_in_workshop_one(farm_id=123)
 
         tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
-        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        location = Location.objects.filter(pigletsGroupCell__workshop__number=5).first()
         piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour, location=location, quantity=50)
 
@@ -468,9 +468,14 @@ class PigletsToSowsEventTest(TestCase):
         self.assertEqual(Sow.objects.all().count(), 51)
 
         sow1 = Sow.objects.all()[1]
+        self.assertEqual(sow1.location.workshop.number, 2)
         self.assertEqual(sow1.status.title, 'Ремонтная')
         self.assertEqual(sow1.location.workshop.number, 2)
         self.assertEqual(sow1.sow_group.title, 'Ремонтная')
+
+        tr = SowTransaction.objects.filter(sow=sow1).first()
+        self.assertEqual(tr.from_location.pigletsGroupCell.workshop.number, 5)
+        self.assertEqual(tr.to_location.workshop.number, 2)
 
         self.assertEqual(SowStatusRecord.objects.all().count(), 50)
         self.assertEqual(SowGroupRecord.objects.all().count(), 50)
@@ -479,3 +484,4 @@ class PigletsToSowsEventTest(TestCase):
 
         sows = Sow.objects.all().add_status_at_date(date=datetime.today())
         self.assertEqual(sows[1].status_at_date, 'Ремонтная')
+        self.assertEqual(sows[1].location.workshop.number, 2)
