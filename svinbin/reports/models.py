@@ -811,6 +811,14 @@ class ReportDateQuerySet(models.QuerySet):
                         .annotate(total_weight=Sum('weight')) \
                         .values('total_weight')
 
+        data['vinuzhd_boar_count'] = culls \
+                        .annotate(cnt=Count('*')) \
+                        .values('cnt')
+
+        data['vinuzhd_boar_weight'] = culls \
+                        .annotate(total_weight=Sum('weight')) \
+                        .values('total_weight')
+
         return self.annotate(**data)
 
     def add_ws12_sow_trs_data(self):
@@ -882,6 +890,8 @@ class ReportDateQuerySet(models.QuerySet):
 
                 total_padej_boar_count=Sum('padej_boar_count'),
                 total_padej_boar_weight=Sum('padej_boar_weight'),
+                total_vinuzhd_boar_count=Sum('vinuzhd_boar_count'),
+                total_vinuzhd_boar_weight=Sum('vinuzhd_boar_weight'),
             )
 
 
