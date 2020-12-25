@@ -473,10 +473,6 @@ class PigletsToSowsEventTest(TestCase):
         self.assertEqual(sow1.location.workshop.number, 2)
         self.assertEqual(sow1.sow_group.title, 'Ремонтная')
 
-        tr = SowTransaction.objects.filter(sow=sow1).first()
-        self.assertEqual(tr.from_location.pigletsGroupCell.workshop.number, 5)
-        self.assertEqual(tr.to_location.workshop.number, 2)
-
         self.assertEqual(SowStatusRecord.objects.all().count(), 50)
         self.assertEqual(SowGroupRecord.objects.all().count(), 50)
         piglets.refresh_from_db()

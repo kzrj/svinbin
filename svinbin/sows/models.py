@@ -242,11 +242,6 @@ class SowManager(CoreModelManager):
         sows.update_status(title='Ремонтная', date=event.date)
         sows.update_group(group_title='Ремонтная', date=event.date)
 
-        # sow to use related transaction manager
-        sow = self.all().first()
-        sow.transactions.create_many_without_status_check(sows=sows, to_location=to_location,
-         initiator=event.initiator, date=event.date)
-
     def get_sows_at_date(self, date):
         init_events = PigletsToSowsEvent.objects.filter(date__date__lte=date)
         all_init_sows_pk = self.get_queryset_with_not_alive().filter(creation_event__in=init_events) \

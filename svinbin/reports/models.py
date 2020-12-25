@@ -736,8 +736,9 @@ class ReportDateQuerySet(models.QuerySet):
              output_field=models.IntegerField())
 
         # 1639
+        data = {f'ws{ws_number}_count_sows': count_sows}
         
-        return self.annotate(ws1_count_sows=count_sows)
+        return self.annotate(**data)
 
     def add_count_boars(self):
         data = dict()
