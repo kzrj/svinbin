@@ -284,7 +284,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
     def ws12_report(self, request):
         ws_number = request.GET.get('ws_number', 1)
         fix_number = 0
-        if ws_number == 1:
+        if int(ws_number) == 1:
             fix_number = 1639
         else:
             fix_number = 0
