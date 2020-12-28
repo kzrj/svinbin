@@ -269,13 +269,16 @@ class PigletsViewSet(viewsets.ModelViewSet):
         if serializer.is_valid():
             piglets = self.get_object()
 
-            stayed_piglets, moved_piglets = piglets_events_models.PigletsSplit.objects.split_return_groups(
-                parent_piglets=piglets,
-                new_amount=serializer.validated_data.get('new_amount', None),
-                gilts_to_new=True,
-                initiator=request.user,
-                date=timezone.now(),
-                )
+            if serializer.validated_data.get('new_amount', None):
+                stayed_piglets, moved_piglets = piglets_events_models.PigletsSplit.objects.split_return_groups(
+                    parent_piglets=piglets,
+                    new_amount=serializer.validated_data.get('new_amount', None),
+                    gilts_to_new=True,
+                    initiator=request.user,
+                    date=timezone.now(),
+                    )
+            else:
+                move_piglets = piglets
 
             piglets_events_models.WeighingPiglets.objects.create_weighing(
                 piglets_group=moved_piglets,
