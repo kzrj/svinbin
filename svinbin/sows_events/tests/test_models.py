@@ -478,6 +478,8 @@ class PigletsToSowsEventTest(TestCase):
         piglets.refresh_from_db()
         self.assertEqual(piglets.active, False)
 
+        self.assertEqual(SowTransaction.objects.filter(to_location__workshop__number=2).count(), 50)
+
         sows = Sow.objects.all().add_status_at_date(date=datetime.today())
         self.assertEqual(sows[1].status_at_date, 'Ремонтная')
         self.assertEqual(sows[1].location.workshop.number, 2)

@@ -268,19 +268,14 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = piglets_serializers.MoveGiltsToWs12Serializer(data=request.data)
         if serializer.is_valid():
             piglets = self.get_object()
-            to_location = locations_models.Location.objects.get(workshop__number=2)
 
-            transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
-                transactions_models.PigletsTransaction.objects.transaction_with_split_and_merge(
-                    piglets=piglets,
-                    to_location=to_location,
-                    new_amount=serializer.validated_data.get('new_amount', None),
-                    gilts_contains=True,
-                    merge=False,
-                    initiator=request.user,
-                    date=timezone.now(),
-                    allow_split_gilt=True
-                  )
+            stayed_piglets, moved_piglets = piglets_events_models.PigletsSplit.split_return_groups(
+                parent_piglets=piglets,
+                new_amount=serializer.validated_data.get('new_amount', None),
+                gilts_to_new=True,
+                initiator=request.user,
+                date=timezone.now(),
+                )
 
             piglets_events_models.WeighingPiglets.objects.create_weighing(
                 piglets_group=moved_piglets,

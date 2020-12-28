@@ -20,7 +20,10 @@ class PigletsEvent(Event):
 
 class PigletsSplitManager(CoreModelManager):
     def split_return_groups(self, parent_piglets, new_amount, gilts_to_new=False, 
-        initiator=None, date=timezone.now(), allow_split_gilt=False):
+        initiator=None, date=None, allow_split_gilt=False):
+
+        if not date:
+            date=timezone.now()
         
         # validate
         if new_amount >= parent_piglets.quantity:

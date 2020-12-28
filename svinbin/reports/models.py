@@ -702,14 +702,6 @@ class ReportDateQuerySet(models.QuerySet):
 
     def add_count_sows_ws12(self, ws_number=1, fix_number=0):
         data = dict()
-        # ws1_loc = 
-        # count_at_date = 
-        #    + trs from 2 to 1
-        #    + trs from 3 to 1
-        #    - trs from 1 to 2
-        #    - trs from 1 to anywhere
-        #    - all culls
-        #  ==  trs to - trs_out - culls
 
         tr_in_qnty = Coalesce(Subquery(SowTransaction.objects \
                         .filter(date__date__lt=OuterRef('date'), 
@@ -904,40 +896,6 @@ class ReportDateQuerySet(models.QuerySet):
                 total_vinuzhd_boar_count=Sum('vinuzhd_boar_count'),
                 total_vinuzhd_boar_weight=Sum('vinuzhd_boar_weight'),
             )
-
-    def add_count_sows_ws2(self):
-        data = dict()
-        # ws1_loc = 
-        # count_at_date = 
-        #  + trs in
-        #  - trs out
-        #  - culls
-
-        tr_in_qnty = Coalesce(Subquery(SowTransaction.objects \
-                        .filter(date__date__lt=OuterRef('date'), 
-                                to_location__workshop__number=2) \
-                        .values('to_location') \
-                        .annotate(total=Count('*')) \
-                        .values('total')), 0)
-
-        tr_out_qnty = Coalesce(Subquery(SowTransaction.objects \
-                        .filter(date__date__lt=OuterRef('date'), 
-                                from_location__workshop__number=2) \
-                        .values('from_location') \
-                        .annotate(total=Count('*')) \
-                        .values('total')), 0)
-
-        culls = Coalesce(Subquery(CullingSow.objects \
-                        .filter(date__date__lt=OuterRef('date'), 
-                                location__workshop__number=2) \
-                        .values('location') \
-                        .annotate(total=Count('*')) \
-                        .values('total')), 0)
-
-        count_sows = ExpressionWrapper(tr_in_qnty - tr_out_qnty - culls + 0,
-             output_field=models.IntegerField())
-        
-        return self.annotate(ws1_count_sows=count_sows)
 
 
 class ReportDateManager(CoreModelManager):

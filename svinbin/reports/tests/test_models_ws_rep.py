@@ -478,9 +478,9 @@ class ReportDateWS12ReportTest(TransactionTestCase):
         self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_3_to_2, None)
         self.assertEqual(rds.get(date=date(2020, 6, 25)).trs_from_2_to_3, 15)
 
-        # self.assertEqual(rds.get(date=date(2020, 5, 5)).trs_from_otkorm_to_2, 100)
-        # self.assertEqual(
-        #     SowTransaction.objects.filter(from_location__pigletsGroupCell__isnull=False).count(), 100)
+        self.assertEqual(rds.get(date=date(2020, 5, 5)).trs_from_otkorm_to_2, 100)
+        self.assertEqual(
+            SowTransaction.objects.filter(from_location__pigletsGroupCell__isnull=False).count(), 100)
 
     def test_ws12_aggregate_total(self):
         for sow1 in Sow.objects.all()[:37]:
@@ -513,6 +513,7 @@ class ReportDateWS12ReportTest(TransactionTestCase):
         self.assertEqual(total_data['total_padej_osn_weight'], 700)
         self.assertEqual(total_data['total_padej_rem_count'], 2)
         self.assertEqual(total_data['total_padej_rem_weight'], 202)
+        self.assertEqual(total_data['total_trs_from_otkorm_to_2'], 100)
 
         self.assertEqual(total_data['total_padej_boar_count'], None)
         self.assertEqual(total_data['total_padej_boar_weight'], None)
