@@ -45,7 +45,7 @@ class SowTransactionManagerTest(TestCase):
 
         transactions = SowTransaction.objects.create_many_transactions([sow1, sow2],
             to_location)
-        self.assertEqual(transactions, [1,2])
+        self.assertEqual(len(transactions), 2)
 
     def test_create_many_without_status_check(self):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
