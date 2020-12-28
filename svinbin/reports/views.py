@@ -287,7 +287,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         if int(ws_number) == 1:
             fix_number = 1639
         else:
-            fix_number = 0
+            fix_number = 335
 
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
         bool(ws_locs)
