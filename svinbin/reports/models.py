@@ -700,6 +700,7 @@ class ReportDateQuerySet(models.QuerySet):
                 total_spec_avg_weight=Avg('spec_avg_weight'),
                 )
 
+    # ws12 report data
     def add_count_sows_ws12(self, ws_number=1, fix_number=0):
         data = dict()
 
@@ -869,6 +870,12 @@ class ReportDateQuerySet(models.QuerySet):
                     .annotate(cnt=Count('*')) \
                     .values('cnt')
 
+        data['trs_from_otkorm_to_2_weight'] = WeighingPiglets.objects \
+                    .filter(date__date=OuterRef('date'), place='o/2') \
+                    .values('date__date') \
+                    .annotate(total_total_weight=Count('total_weight')) \
+                    .values('total_total_weight')
+
         return self.annotate(**data)
 
     def ws12_aggregate_total(self, ws_number):
@@ -880,6 +887,7 @@ class ReportDateQuerySet(models.QuerySet):
                 total_trs_from_3_to_1=Sum('trs_from_3_to_1'),
                 total_trs_from_3_to_2=Sum('trs_from_3_to_2'),
                 total_trs_from_otkorm_to_2=Sum('trs_from_otkorm_to_2'),
+                total_trs_from_otkorm_to_2_weight=Sum('trs_from_otkorm_to_2_weight'),
 
                 total_padej_osn_count=Sum(f'ws{ws_number}_padej_osn_count'),
                 total_padej_osn_weight=Sum(f'ws{ws_number}_padej_osn_weight'),
