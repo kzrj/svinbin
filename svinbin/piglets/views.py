@@ -278,7 +278,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                     date=timezone.now(),
                     )
             else:
-                move_piglets = piglets
+                moved_piglets = piglets
 
             piglets_events_models.WeighingPiglets.objects.create_weighing(
                 piglets_group=moved_piglets,
