@@ -397,8 +397,8 @@ class Recount(PigletsEvent):
     objects = RecountManager()
 
 
-class PigletsVaccination(PigletsEvent):
-    VAC_TYPES = [('feed', 'feed'), ('water', 'water'), ('inj', 'inj') ]
-    vac_type = models.CharField(max_length=10, choices=VAC_TYPES)
+# class PigletsVaccination(PigletsEvent):
+#     VAC_TYPES = [('feed', 'feed'), ('water', 'water'), ('inj', 'inj') ]
+#     vac_type = models.CharField(max_length=10, choices=VAC_TYPES)
 
-    piglets = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name='recount')
+#     piglets = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name='recount')
