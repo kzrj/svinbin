@@ -397,8 +397,32 @@ class Recount(PigletsEvent):
     objects = RecountManager()
 
 
-# class PigletsVaccination(PigletsEvent):
-#     VAC_TYPES = [('feed', 'feed'), ('water', 'water'), ('inj', 'inj') ]
-#     vac_type = models.CharField(max_length=10, choices=VAC_TYPES)
+class PigletsMedEventManager(CoreModelManager):
+    def create_med(self, piglets, med_type, med_method, doze=None, initiator=None, date=None):
+        med_event = self.create(
+            med_type=med_type,
+            med_method=med_method,
+            doze=doze,
+            piglets=piglets, 
+            initiator=initiator,
+            date=date,
+            location=piglets.location)
+        
+        return med_event
 
-#     piglets = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name='recount')
+
+class PigletsMedEvent(PigletsEvent):
+    MED_METHODS = [('feed', 'feed'), ('water', 'water'), ('inj', 'inj') ]
+    MED_TYPES = [('vac', 'vac'), ('heal', 'heal'), ('prev', 'prev') ]
+    med_type = models.CharField(max_length=10, choices=MED_TYPES)
+    med_method = models.CharField(max_length=10, choices=MED_METHODS, null=True)
+    doze = models.CharField(max_length=50, null=True)
+
+    piglets = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name='meds')
+
+    location = models.ForeignKey('locations.Location', on_delete=models.CASCADE, null=True)
+
+    objects = PigletsMedEventManager()
+
+    def __str__(self):
+        return f'{self.med_type} {self.med_method} {self.piglets}'

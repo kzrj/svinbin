@@ -298,3 +298,26 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['post'], detail=True, permission_classes=[ObjAndUserSameLocationPermissions],
+        serializer_class=piglets_events_serializers.CreateMedEventPigletsSerializer)
+    def med_event(self, request, pk=None):
+        serializer = piglets_events_serializers.CreateMedEventPigletsSerializer(data=request.data)
+        if serializer.is_valid():
+            piglets_group = self.get_object()
+            piglets_events_models.PigletsMedEvent.objects.create_med(
+              piglets=piglets_group,
+              med_type=serializer.validated_data['med_type'],
+              med_method=serializer.validated_data['med_method'],
+              doze=serializer.validated_data.get('doze'),
+              date=serializer.validated_data['date'],
+              initiator=request.user,
+              )
+            return Response(
+                {
+                 "message": 'Мед. событие записано.',
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
