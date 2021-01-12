@@ -49,3 +49,9 @@ class PigletsMergerAdmin(PigletsEventFormMixin, admin.ModelAdmin):
 class RecountAdmin(PigletsEventFormMixin, admin.ModelAdmin):
     search_fields = ['piglets__id']
     list_display = [f.name for f in models.Recount._meta.fields]
+
+
+@admin.register(models.PigletsMedEvent)
+class PigletsMedEventAdmin(PigletsEventFormMixin, admin.ModelAdmin):
+    search_fields = ['piglets__id']
+    list_display = [f.name for f in models.PigletsMedEvent._meta.fields]
