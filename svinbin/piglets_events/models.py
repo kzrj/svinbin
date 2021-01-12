@@ -418,6 +418,8 @@ class PigletsMedEvent(PigletsEvent):
     med_method = models.CharField(max_length=10, choices=MED_METHODS, null=True)
     doze = models.CharField(max_length=50, null=True)
 
+    doze2 = models.CharField(max_length=50, null=True)
+
     piglets = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name='meds')
 
     location = models.ForeignKey('locations.Location', on_delete=models.CASCADE, null=True)
