@@ -18,7 +18,8 @@ import transactions.models as transactions_models
 import locations.models as locations_models
 
 from piglets.filters import PigletsFilter
-from core.permissions import ObjAndUserSameLocationPermissions, WS3Permissions, ReadOrAdminOnlyPermissions
+from core.permissions import ObjAndUserSameLocationPermissions, WS3Permissions, ReadOrAdminOnlyPermissions, \
+    VeterinarPermissions
 
 
 class PigletsViewSet(viewsets.ModelViewSet):
@@ -300,7 +301,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-    @action(methods=['post'], detail=True, permission_classes=[ObjAndUserSameLocationPermissions],
+    @action(methods=['post'], detail=True, permission_classes=[VeterinarPermissions],
         serializer_class=piglets_events_serializers.CreateMedEventPigletsSerializer)
     def med_event(self, request, pk=None):
         serializer = piglets_events_serializers.CreateMedEventPigletsSerializer(data=request.data)

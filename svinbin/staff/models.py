@@ -17,10 +17,11 @@ class WorkShopEmployeeModelManager(CoreModelManager):
 class WorkShopEmployee(CoreModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="employee")
     farm_name = models.CharField(max_length=20, default='')
-    workshop = models.ForeignKey('locations.WorkShop', on_delete=models.CASCADE, null=True)
+    workshop = models.ForeignKey('locations.WorkShop', on_delete=models.CASCADE, null=True, blank=True)
 
     is_officer = models.BooleanField(default=False)
     is_seminator = models.BooleanField(default=False)
+    is_veterinar = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
 
     objects = WorkShopEmployeeModelManager()
