@@ -19,10 +19,10 @@ services:
     restart: unless-stopped
     image: postgres:10.1-alpine
     ports: 
-      # - "5432:5432"
       - "5432"
-    environment:
-      - POSTGRES_PASSWORD
+      # - "5432:5432"
+    # environment:
+    #   - POSTGRES_PASSWORD
 
   backend:
     build: .
