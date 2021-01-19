@@ -141,6 +141,11 @@ class OpPigletsToSowSerializer(OpPigletsEventSerializer):
     from_location = serializers.ReadOnlyField(source='piglets.location.get_full_loc')
     week_tour = serializers.ReadOnlyField(source='metatour.week_tour')
 
+    age_at = serializers.SerializerMethodField()
+
+    def get_age_at(self, obj):
+        return obj.piglets.age_at_date(obj.date)
+
     class Meta:
         model = PigletsTransaction
         fields = ['oper_name', 'date', 'initiator', 'week_tour', 'age_at', 'from_location',
