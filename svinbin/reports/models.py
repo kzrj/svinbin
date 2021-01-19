@@ -14,7 +14,7 @@ from sows.models import Sow, SowStatusRecord, Boar
 from piglets.models import Piglets
 from locations.models import Location
 from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse,
- MarkAsGilt, CullingBoar )
+ MarkAsGilt, CullingBoar, PigletsToSowsEvent )
 from piglets_events.models import CullingPiglets, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
 
@@ -1319,6 +1319,17 @@ def gen_operations_dict():
                 ) \
                 .annotate(oper_name=Value(f'ws{ws_number}_piglets_to_75', output_field=models.CharField())),
             'serializer': operation_serializers.OpPigletsTransactionSerializer,
+            'target': 'piglets' }
+
+            operations_data[f'ws{ws_number}_remont_to_2'] = {'qs': PigletsToSowsEvent.objects
+                .filter(piglets__location__in=ws_locs)\
+                .select_related('initiator', 'week_tour',
+                    'piglets__location__pigletsGroupCell__workshop',
+                    'piglets__location__pigletsGroupCell__section',
+                    'piglets'
+                ) \
+                .annotate(oper_name=Value(f'ws{ws_number}_remont_to_2', output_field=models.CharField())),
+            'serializer': operation_serializers.OpPigletsToSowSerializer,
             'target': 'piglets' }
 
     return operations_data
