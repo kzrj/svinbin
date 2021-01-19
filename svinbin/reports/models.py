@@ -1323,7 +1323,7 @@ def gen_operations_dict():
 
             operations_data[f'ws{ws_number}_remont_to_2'] = {'qs': PigletsToSowsEvent.objects
                 .filter(piglets__location__in=ws_locs)\
-                .select_related('initiator', 'week_tour',
+                .select_related('initiator', 'metatour',
                     'piglets__location__pigletsGroupCell__workshop',
                     'piglets__location__pigletsGroupCell__section',
                     'piglets'
