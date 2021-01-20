@@ -139,7 +139,7 @@ class OpPigletsWeighingSerializer(OpPigletsEventSerializer):
 class OpPigletsToSowSerializer(OpPigletsEventSerializer):
     quantity = serializers.ReadOnlyField(source='piglets.quantity')
     from_location = serializers.ReadOnlyField(source='piglets.location.get_full_loc')
-    week_tour = serializers.ReadOnlyField(source='metatour.week_tour.str')
+    week_tour = serializers.StringRelatedField(source='metatour.week_tour')
 
     age_at = serializers.SerializerMethodField()
 
