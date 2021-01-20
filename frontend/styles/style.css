@@ -557,7 +557,9 @@ hr {
 .op-ws3_piglets_outer_trs,
 .op-ws4_piglets_outer_trs, .op-ws8_piglets_outer_trs,
 .op-ws5_piglets_to_75, .op-ws6_piglets_to_75,
-.op-ws7_piglets_to_75
+.op-ws7_piglets_to_75,
+.op-ws5_remont_to_2, .op-ws6_remont_to_2,
+.op-ws7_remont_to_2
 {
 	background-color: #7373f7;
 }
