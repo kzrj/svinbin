@@ -12,4 +12,4 @@ class SowTransactionAdmin(admin.ModelAdmin):
 @admin.register(PigletsTransaction)
 class PigletsTransactionAdmin(admin.ModelAdmin):
     list_display =  [f.name for f in PigletsTransaction._meta.fields]
-    search_fields = ['piglets_group__pk']
+    search_fields = ['piglets_group__pk', 'pk']
