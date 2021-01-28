@@ -55,6 +55,7 @@ OWN_APPS = [
     'workshopthree.apps.WorkshopthreeConfig',
     'veterinary.apps.VeterinaryConfig',
     'reports.apps.ReportsConfig',
+    'rollbacks.apps.RollbacksConfig',
 ]
 
 

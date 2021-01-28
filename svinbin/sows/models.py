@@ -185,18 +185,6 @@ class SowsQuerySet(models.QuerySet):
 
         return self.annotate(last_date_mark=Subquery(last_date), last_week_mark=Subquery(last_tour_week))
 
-    # def add_last_mark_gilts(self):
-    #     # MarkAsGilt.objects \
-    #     #     .filter(sow__pk=OuterRef('pk'), tour__week_number=OuterRef('last_week_mark')) \
-
-    #     return self.prefetch_related(
-    #         Prefetch(
-    #             'gilts',
-    #             queryset=Subquery(Gilt.objects.filter(tour__week_number=OuterRef('last_week_mark'))),
-    #             to_attr='gilts_last_mark'
-    #         )
-    #     )
-
 
 class SowManager(CoreModelManager):
     def get_queryset(self):
@@ -424,6 +412,12 @@ class Sow(Pig):
             .prepare_and_return_union_values(fields=['result','from_location', 'to_location'], 
                                             label='кормилица')) \
         .order_by('-op_date')[:10]
+
+    def change_status_to_previous_delete_current_status_record(self):
+        last_record = self.status_records.first()
+        self.status = last_record.status_before
+        self.save()
+        last_record.delete()
 
 
 class GiltManager(CoreModelManager):

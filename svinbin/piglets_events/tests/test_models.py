@@ -361,6 +361,28 @@ class PigletsMergerModelTest(TransactionTestCase):
         self.assertEqual(nomad_piglets.quantity, 17)
         self.assertEqual(nomad_piglets.gilts_quantity, 12)
 
+    def test_model_method_restore_parent_piglets_and_delete_created(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_sec1_cell1, 10)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3_sec1_cell1, 15)
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3_sec1_cell2, 15)
+
+        created_piglets = PigletsMerger.objects.merge_piglets_in_location(
+            location=self.loc_ws3_sec1_cell1)
+        merger = created_piglets.merger_as_child
+
+        merger.restore_parent_piglets_and_delete_created()
+
+        self.assertEqual(Piglets.objects.all().count(), 3)
+        self.assertEqual(MetaTour.objects.all().count(), 3)
+        self.assertEqual(Piglets.objects.get_all().count(), 3)
+        self.assertEqual(Piglets.objects.get_all().filter(pk=created_piglets.pk).count(), 0 )
+
+        self.assertEqual(merger.piglets_as_parents.all().active().count(), 2)
+
 
 class PigletsSplitModelTest(TestCase):
     def setUp(self):
@@ -474,6 +496,21 @@ class PigletsSplitModelTest(TestCase):
         with self.assertRaises(ValidationError):
             child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
                 parent_piglets=piglets1, new_amount=91, gilts_to_new=False)
+
+    def test_restore_parent_and_delete_children(self):
+        piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 100)
+
+        child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
+            parent_piglets=piglets, new_amount=40)
+
+        child_piglets1.split_as_child.restore_parent_and_delete_children()
+
+        piglets.refresh_from_db()
+        self.assertEqual(piglets.quantity, 100)
+        self.assertEqual(piglets.active, True)
+        self.assertEqual(Piglets.objects.get_all().filter(
+            pk__in=[child_piglets1.pk, child_piglets2.pk]).count(), 0)
 
 
 class WeighingPigletsTest(TestCase):

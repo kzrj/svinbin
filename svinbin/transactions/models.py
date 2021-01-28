@@ -23,7 +23,10 @@ class SowTransactionQuerySet(CoreQuerySet):
 class SowTransactionManager(CoreModelManager):
     def get_queryset(self):
         return SowTransactionQuerySet(self.model, using=self._db)
-        
+
+    def reset_related(self):
+        return SowTransactionQuerySet(self.model, using=self._db).all()
+
     def create_transaction(self, sow, to_location,  initiator=None, date=None):
         if isinstance(to_location.get_location, SowAndPigletsCell) and not to_location.is_sow_empty:
             raise DjangoValidationError(message='Клетка №{} не пустая'. \
@@ -43,10 +46,9 @@ class SowTransactionManager(CoreModelManager):
                 sow_group=sow.sow_group
                 )
 
-        if sow.status and (sow.status.title == 'Опоросилась' or sow.status.title == 'Отъем') and to_location.workshop:
-            if to_location.workshop.number == 1  and sow.location.sowAndPigletsCell:
-                sow.tour = None
-                sow.change_status_to('Ожидает осеменения')
+        if transaction.is_weaning_transaction_from_ws3_to_ws1():
+            sow.tour = None
+            sow.change_status_to('Ожидает осеменения')
 
         if sow.status and sow.status.title != 'Супорос 35' and to_location.workshop: 
             if to_location.workshop.number == 3 and sow.location.workshop and \
@@ -112,9 +114,17 @@ class SowTransaction(Transaction):
 
     objects = SowTransactionManager()
 
+    def is_weaning_transaction_from_ws3_to_ws1(self):
+        if self.sow_status \
+          and (self.sow_status.title == 'Опоросилась' or self.sow_status.title == 'Отъем') \
+          and self.to_location.workshop and self.to_location.workshop.number == 1 \
+          and self.from_location.sowAndPigletsCell:
+                return True
+        return False
 
 class PigletsTransactionManager(CoreModelManager):
-    def create_transaction(self, to_location, piglets_group, initiator=None, date=None):
+    def create_transaction(self, to_location, piglets_group, initiator=None, date=None, 
+        split_event=None):
         if not date:
             date= timezone.now()
 
@@ -125,12 +135,10 @@ class PigletsTransactionManager(CoreModelManager):
                 to_location=to_location,
                 piglets_group=piglets_group,
                 quantity=piglets_group.quantity,
-                week_tour=piglets_group.metatour.week_tour
+                week_tour=piglets_group.metatour.week_tour,
+                split_event=split_event
                 )
 
-        # we should remove status "взвешены"
-        if piglets_group.location.workshop and to_location.pigletsGroupCell:
-            piglets_group.change_status_to_without_save('Кормятся')
 
         if piglets_group.location.pigletsGroupCell and to_location.workshop:
             piglets_group.change_status_to_without_save('Готовы ко взвешиванию')
@@ -144,8 +152,9 @@ class PigletsTransactionManager(CoreModelManager):
 
         return transaction
 
-    def transaction_with_split_and_merge(self, piglets, to_location, new_amount=None, gilts_contains=False,
-         reverse=False, merge=False, initiator=None, date=None, allow_split_gilt=False):
+    def transaction_with_split_and_merge(self, piglets, to_location, new_amount=None,
+         gilts_contains=False, reverse=False, merge=False, initiator=None, date=None,
+         allow_split_gilt=False):
         # move second piglets from split, new_amount piglets
         split_event = None
         merge_event = None
@@ -166,7 +175,7 @@ class PigletsTransactionManager(CoreModelManager):
                 stayed_piglets = piglets2_new_amount
 
         transaction = self.create_transaction(to_location=to_location, piglets_group=moved_piglets,
-         initiator=initiator, date=date)
+         initiator=initiator, date=date, split_event=split_event)
 
         if merge:            
             moved_piglets = PigletsMerger.objects.merge_piglets_in_location(
@@ -228,6 +237,9 @@ class PigletsTransaction(Transaction):
      related_name="piglets_transaction_to")
     piglets_group = models.ForeignKey('piglets.Piglets', on_delete=models.CASCADE,
      related_name="transactions")
+
+    split_event = models.OneToOneField('piglets_events.PigletsSplit', on_delete=models.SET_NULL,
+        null=True, blank=True, related_name='transaction')
 
     week_tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
         related_name="piglets_transactions")

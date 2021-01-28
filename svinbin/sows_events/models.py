@@ -317,7 +317,11 @@ class CullingSow(SowEvent):
 
 
 class WeaningSowQuerySet(SowEventQuerySet):
-    pass
+    def restore_tour_status_delete_events(self):
+        for weaning in self:
+            weaning.sow.tour = weaning.tour
+            weaning.sow.change_status_to_previous_delete_current_status_record()
+        self.delete()
 
 
 class WeaningSowManager(SowEventManager):
@@ -395,6 +399,9 @@ class MarkAsNurse(SowEvent):
     class Meta:
         ordering = ['date']
 
+    def delete_event_change_status(self):
+        pass
+
 
 class MarkAsGiltManager(SowEventManager):
     def create_init_gilt_event(self, gilt, initiator=None, date=None):
@@ -413,6 +420,10 @@ class MarkAsGilt(SowEvent):
 
     class Meta:
         ordering = ['date']
+
+    def delete_gilt_and_event(self):
+        self.gilt.delete()
+        self.delete()
 
 
 class PigletsToSowsEventManager(CoreModelManager):
@@ -433,6 +444,14 @@ class PigletsToSowsEvent(Event):
     quantity = models.IntegerField()
 
     objects = PigletsToSowsEventManager()
+
+    def delete_event_sows_transactions(self):
+        sow = self.sows.all().first()
+        trs = sow.transactions.reset_related().filter(sow__in=self.sows.all(),
+            to_location__workshop__number=2)
+        trs.delete()
+        self.sows.all().delete()
+        self.delete()
 
 
 class AssingFarmIdEventManager(CoreModelManager):

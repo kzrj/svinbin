@@ -22,6 +22,10 @@ class SowTransactionManagerTest(TestCase):
         locations_testing.create_workshops_sections_and_cells()
         sows_testing.create_statuses()
         sows_events_testing.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.loc_ws3 = Location.objects.filter(sowAndPigletsCell__isnull=False)
 
     def test_create_transaction(self):
         sow = sows_testing.create_sow_and_put_in_workshop_one()
@@ -82,6 +86,19 @@ class SowTransactionManagerTest(TestCase):
 
         self.assertEqual(SowTransaction.objects.trs_in_ws(ws_number=3, ws_locs=ws_locs3).count(), 2)
         self.assertEqual(SowTransaction.objects.trs_out_ws(ws_locs=ws_locs1).count(), 3)
+
+    def test_weaning_trs_from_ws3_to_ws1(self):
+        piglets =  piglets_testing.create_from_sow_farrow(tour=self.tour1, location=self.loc_ws3[0],
+         quantity=10)
+        sow = piglets.farrow.sow
+        self.assertEqual(sow.status.title, 'Опоросилась')
+        self.assertEqual(sow.tour, self.tour1)
+        to_location = Location.objects.get(workshop__number=1)
+        transaction = SowTransaction.objects.create_transaction(sow=sow, to_location=to_location)
+
+        sow.refresh_from_db()
+        self.assertEqual(sow.status.title, 'Ожидает осеменения')
+        self.assertEqual(sow.tour, None)
                  
 
 class PigletsTransactionManagerTest(TestCase):
@@ -546,23 +563,6 @@ class PigletsTransactionManagerTest(TestCase):
         self.assertEqual(piglets3.metatour.records.all().count(), 1)
         self.assertEqual(piglets3.metatour.records.all().first().percentage, 100)
     
-    def test_create_transaction_change_piglets_status(self):
-        # if we transfer from workshop to cell we should change status to "Кормятся"
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws7, 50)
-
-        WeighingPiglets.objects.create_weighing(piglets1, 500, '8/7')
-
-        piglets1.refresh_from_db()
-        self.assertEqual(piglets1.status.title, 'Взвешены, готовы к заселению')
-
-        to_location = Location.objects.filter(pigletsGroupCell__number=1,
-         pigletsGroupCell__workshop__number=7).first()
-        PigletsTransaction.objects.create_transaction(to_location, piglets1)
-
-        piglets1.refresh_from_db()
-        self.assertEqual(piglets1.status.title, 'Кормятся')
-
 
 class PigletsTransactionToWs75Test(TestCase):
     def setUp(self):

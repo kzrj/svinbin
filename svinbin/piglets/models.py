@@ -169,6 +169,7 @@ class Piglets(CoreModel):
 
     def add_piglets(self, quantity):
         self.quantity = self.quantity + quantity
+        self.active = True
         self.save()
 
     @property

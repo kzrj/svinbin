@@ -308,6 +308,17 @@ class SowModelTest(TransactionTestCase):
         self.assertEqual(assing_event.sow, assigned_sow)
         self.assertEqual(assing_event.assing_type, 'gilt')
 
+    def test_change_status_to_previous(self):
+        sow = sows_testings.create_sow_and_put_in_workshop_three()
+        sow.change_status_to('Ремонтная')
+        sow.change_status_to('Супорос 28')
+        self.assertEqual(SowStatusRecord.objects.all().count(), 2)
+        self.assertEqual(sow.status.title, 'Супорос 28')
+
+        sow.change_status_to_previous_delete_current_status_record()
+        self.assertEqual(SowStatusRecord.objects.all().count(), 1)
+        self.assertEqual(sow.status.title, 'Ремонтная')
+
 
 class SowManagerV2Test(TransactionTestCase):
     def setUp(self):

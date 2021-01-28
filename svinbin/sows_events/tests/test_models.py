@@ -6,7 +6,7 @@ from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
 from sows_events.models import (
-    Semination, Ultrasound, SowFarrow, CullingSow,
+    Semination, Ultrasound, SowFarrow, CullingSow, WeaningSow,
     UltrasoundType, AbortionSow, MarkAsNurse, MarkAsGilt, CullingBoar,
     SemenBoar, PigletsToSowsEvent)
 from sows.models import Sow, Boar, Gilt, SowStatusRecord, SowGroupRecord
@@ -309,8 +309,26 @@ class WeaningSowTest(TestCase):
         self.assertEqual(weaning1.quantity, piglets.quantity)
 
         sow1.refresh_from_db()
-        # self.assertEqual(sow1.tour, None)
+        self.assertEqual(sow1.tour, None)
         self.assertEqual(sow1.status.title, 'Отъем')
+
+    def test_qs_restore_tour_status_delete_events(self):
+        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
+        sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=1)
+        farrow = SowFarrow.objects.create_sow_farrow(
+            sow=sow1,
+            alive_quantity=10,
+            dead_quantity=1
+            )
+        piglets = farrow.piglets_group
+        weaning1 = sow1.weaningsow_set.create_weaning(sow=sow1, piglets=piglets)
+
+        WeaningSow.objects.all().restore_tour_status_delete_events()
+
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.status.title, 'Опоросилась')
+        self.assertEqual(sow1.tour.week_number, 1)
+        self.assertEqual(WeaningSow.objects.all().count(), 0)
 
 
 class AbortionSowTest(TestCase):
@@ -483,3 +501,20 @@ class PigletsToSowsEventTest(TestCase):
         sows = Sow.objects.all().add_status_at_date(date=datetime.today())
         self.assertEqual(sows[1].status_at_date, 'Ремонтная')
         self.assertEqual(sows[1].location.workshop.number, 2)
+
+    def test_delete_event_sows_transactions(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
+        location1 = Location.objects.filter(pigletsGroupCell__workshop__number=5).first()
+        location2 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[1]
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour, location=location1, quantity=50)
+        event1 = PigletsToSowsEvent.objects.create_event(piglets=piglets1)
+
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour, location=location2, quantity=15)
+        event2 = PigletsToSowsEvent.objects.create_event(piglets=piglets2)
+
+        event1.delete_event_sows_transactions()
+        self.assertEqual(SowTransaction.objects.filter(to_location__workshop__number=2).count(), 15)
+        self.assertEqual(Sow.objects.all().count(), 15)
+        self.assertEqual(PigletsToSowsEvent.objects.all().count(), 1)

@@ -110,6 +110,11 @@ class PigletsSplit(PigletsEvent):
     def __str__(self):
         return 'PigletsSplit {}'.format(self.pk)
 
+    def restore_parent_and_delete_children(self):
+        self.parent_piglets.active = True
+        self.parent_piglets.save()
+        self.piglets_as_child.get_all().filter(split_as_child=self).delete()
+
 
 class PigletsMergerManager(CoreModelManager):
     def create_merger_return_group(self, parent_piglets, new_location, initiator=None,
@@ -207,6 +212,10 @@ class PigletsMerger(PigletsEvent):
 
     objects = PigletsMergerManager()
 
+    def restore_parent_piglets_and_delete_created(self):
+        self.created_piglets.delete()
+        self.piglets_as_parents.get_all().filter(merger_as_parent=self).update(active=True)
+
 
 class WeighingPigletsQuerySet(models.QuerySet):
     def get_tour_data_by_place(self, tour, place):
@@ -260,6 +269,9 @@ class WeighingPiglets(PigletsEvent):
 
     objects = WeighingPigletsManager()
 
+    def __str__(self):
+        return f'{self.pk} weighing_piglets'
+
 
 class CullingPigletsManager(CoreModelManager):
     def create_culling_piglets(self, piglets_group, culling_type, is_it_gilt=False, reason=None,
@@ -270,10 +282,10 @@ class CullingPigletsManager(CoreModelManager):
                 message=f'Указано большее количество поросят чем есть в группе. \
                 {quantity} > {piglets_group.quantity}.')
 
-        if isinstance(date, str):           
+        if isinstance(date, str):
             date = datetime.datetime.strptime(date, '%Y-%m-%d')
 
-        if isinstance(date, datetime.date):           
+        if isinstance(date, datetime.date):
             date = datetime.datetime.combine(date, datetime.datetime.min.time())
 
         if not date:
@@ -288,7 +300,9 @@ class CullingPigletsManager(CoreModelManager):
         if total_weight > 0:
             avg_weight = total_weight / quantity
 
-        culling = self.create(piglets_group=piglets_group, culling_type=culling_type, 
+        culling = self.create(
+            piglets_group=piglets_group,
+            culling_type=culling_type, 
             reason=reason,
             date=date, initiator=initiator, is_it_gilt=is_it_gilt, quantity=quantity,
             total_weight=total_weight, avg_weight=avg_weight,
