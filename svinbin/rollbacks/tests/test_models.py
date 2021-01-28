@@ -56,7 +56,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(piglets1.status.title, 'Взвешены, готовы к заселению')
 
         rollback = Rollback.objects.create_piglets_weighing_rollback(event_pk=operation.pk,
-         initiator=self.operator)
+         initiator=self.operator, operation_name='piglets_weighing')
 
         piglets1.refresh_from_db()
         self.assertEqual(piglets1.status.title, 'Готовы ко взвешиванию')
@@ -75,7 +75,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
             initiator=self.brig4, date=datetime(10,10,20))
 
         rollback = Rollback.objects.create_piglets_culling_rollback(event_pk=operation.pk,
-         initiator=self.operator)
+         initiator=self.operator, operation_name='piglets_culling')
 
         piglets1.refresh_from_db()
         self.assertEqual(piglets1.quantity, 10)
@@ -98,7 +98,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(Piglets.objects.all().count(), 0)
 
         rollback = Rollback.objects.create_piglets_culling_rollback(event_pk=operation.pk,
-         initiator=self.operator)
+         initiator=self.operator, operation_name='piglets_culling')
 
         piglets1.refresh_from_db()
         self.assertEqual(piglets1.quantity, 10)
@@ -131,7 +131,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(piglets2.active, False)
 
         Rollback.objects.create_piglets_transactions_rollback(
-            event_pk=transaction.pk, initiator=self.operator
+            event_pk=transaction.pk, initiator=self.operator, operation_name='piglets_transaction'
             )
 
         piglets1.refresh_from_db()
@@ -165,7 +165,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(from_location_piglets.quantity, 6)
 
         Rollback.objects.create_piglets_transactions_rollback(
-            event_pk=transaction.pk, initiator=self.operator
+            event_pk=transaction.pk, initiator=self.operator, operation_name='piglets_transaction'
             )
 
         self.assertEqual(Piglets.objects.get_all().filter(pk=to_location_piglets.pk).count(), 0)
@@ -205,7 +205,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(from_location_piglets.quantity, 6)
 
         Rollback.objects.create_piglets_transactions_rollback(
-            event_pk=transaction.pk, initiator=self.operator
+            event_pk=transaction.pk, initiator=self.operator, operation_name='piglets_transaction'
             )
 
         self.assertEqual(Piglets.objects.get_all().filter(pk=to_location_piglets.pk).count(), 0)
@@ -237,7 +237,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(from_location_piglets, None)
 
         Rollback.objects.create_piglets_transactions_rollback(
-            event_pk=transaction.pk, initiator=self.operator
+            event_pk=transaction.pk, initiator=self.operator, operation_name='piglets_transaction'
             )
 
         self.assertEqual(from_location_piglets, None)
@@ -270,7 +270,8 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(SowTransaction.objects.all().count(), 59)
         self.assertEqual(WeighingPiglets.objects.all().count(), 1)
 
-        rollback = Rollback.objects.create_piglets_to_sows_event_rollback(event_pk=pts_event.pk)
+        rollback = Rollback.objects.create_piglets_to_sows_event_rollback(event_pk=pts_event.pk,
+            initiator=self.operator, operation_name='piglets_to_sows')
         self.assertEqual(Sow.objects.all().count(), 0)
         self.assertEqual(SowTransaction.objects.all().count(), 0)
         self.assertEqual(PigletsToSowsEvent.objects.all().count(), 0)
@@ -297,7 +298,8 @@ class PigletsRollbackModelTest(TransactionTestCase):
         event = MarkAsGilt.objects.create_init_gilt_event(gilt=gilt,
          initiator=self.brig3)
 
-        rollback = Rollback.objects.create_mark_as_gilt_rollback(event_pk=event.pk)
+        rollback = Rollback.objects.create_mark_as_gilt_rollback(event_pk=event.pk,
+            initiator=self.operator, operation_name='mark_as_gilt')
         self.assertEqual(Gilt.objects.all().count(), 0)
         self.assertEqual(MarkAsGilt.objects.all().count(), 0)
 
@@ -335,7 +337,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(WeaningSow.objects.all().count(), 3)
 
         rollback = Rollback.objects.create_ws3_weaning_piglets_rollback(event_pk=transaction.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='ws3_weaning_piglets')
 
         self.assertEqual(Piglets.objects.get_all().count(), Piglets.objects.all().count())
         self.assertEqual(Piglets.objects.get_all().count(), 4)
@@ -380,7 +382,7 @@ class SowsRollbackModelTest(TransactionTestCase):
             1)
 
         rollback = Rollback.objects.create_mark_as_nurse_rollback(event_pk=mas_event.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='mark_as_nurse')
 
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Опоросилась')
@@ -402,7 +404,7 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(sow.status.title, 'Опоросилась')
 
         rollback = Rollback.objects.create_farrow_rollback(event_pk=farrow.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='farrow')
 
         self.assertEqual(Piglets.objects.filter(pk=piglets1.pk).count(), 0)
 
@@ -426,7 +428,7 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(Piglets.objects.all().first().quantity, 25)
 
         rollback = Rollback.objects.create_farrow_rollback(event_pk=farrow.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='farrow')
 
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Супорос 35')
@@ -448,7 +450,7 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(Sow.objects.get_queryset_with_not_alive().first().status.title, 'Брак')
 
         rollback = Rollback.objects.create_sow_culling_rollback(event_pk=culling.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='sow_culling')
 
         sow.refresh_from_db()
         self.assertEqual(sow.alive, True)
@@ -464,7 +466,7 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(sow.status.title, 'Супорос 28')
 
         rollback = Rollback.objects.create_ultrasound_rollback(event_pk=usound.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='ultrasound')
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Осеменена 1')
         self.assertEqual(Ultrasound.objects.filter(pk=usound.pk).count(), 0)
@@ -475,7 +477,7 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(sow.tour, None)
 
         rollback2 = Rollback.objects.create_ultrasound_rollback(event_pk=usound2.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='ultrasound')
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Осеменена 1')
         self.assertEqual(sow.tour, self.tour1)
@@ -489,7 +491,7 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(sow.status.title, 'Осеменена 1')
 
         rollback = Rollback.objects.create_semination_rollback(event_pk=semination.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='semination')
 
         sow.refresh_from_db()
         self.assertEqual(sow.status, None)
@@ -505,7 +507,7 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(sow.status.title, 'Осеменена 2')
 
         rollback = Rollback.objects.create_semination_rollback(event_pk=semination2.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='semination')
 
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Осеменена 1')
@@ -519,7 +521,7 @@ class SowsRollbackModelTest(TransactionTestCase):
             initiator=self.operator)
 
         rollback = Rollback.objects.create_sow_transaction_rollback(event_pk=transaction.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='sow_transaction')
 
         sow.refresh_from_db()
         self.assertEqual(sow.location, self.loc_ws1)
@@ -541,7 +543,7 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(sow.tour, None)
 
         rollback = Rollback.objects.create_sow_transaction_rollback(event_pk=transaction.pk,
-            initiator=self.operator)
+            initiator=self.operator, operation_name='sow_transaction')
 
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Опоросилась')
