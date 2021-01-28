@@ -18,7 +18,7 @@ class RollbackViewSet(viewsets.ModelViewSet):
 
     def create(self, request, serializer_class=None):
         operation_name = request.POST.get('operation_name')
-        event_pk = request.POST.get('event_pk')
+        event_pk = int(request.POST.get('event_pk')) if request.POST.get('event_pk') else
 
         rollback = None
 
