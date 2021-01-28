@@ -41,7 +41,7 @@ def create_svinbin_users():
      is_seminator=True, is_officer=True)
 
     create_workshop_user(username='shmigina', password='123', ws_number=1, farm_name='ШМЫГИ',
-     is_seminator=True)
+     is_seminator=True, is_officer=True)
     create_workshop_user(username='borisov', password='123', ws_number=1, farm_name='БОРИС', 
         is_seminator=True)
     create_workshop_user(username='semenova', password='123', ws_number=1, farm_name='СЕМЕН', 
