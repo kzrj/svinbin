@@ -35,6 +35,8 @@ class RollbackManager(CoreModelManager):
             workshop=cp.initiator.employee.workshop, user_employee=cp.initiator)
 
     def create_piglets_transactions_rollback(self, event_pk, operation_name, initiator=None, date=None):
+        print(f'event models {event_pk}')
+        print(PigletsTransaction.objects.filter(pk=event_pk))
         transaction = PigletsTransaction.objects.get(pk=event_pk)
         transacted_piglets = transaction.piglets_group
 
