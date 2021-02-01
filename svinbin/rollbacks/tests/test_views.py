@@ -14,6 +14,7 @@ from rollbacks.models import Rollback
 from locations.models import Location
 from tours.models import Tour, MetaTour
 from piglets_events.models import WeighingPiglets, CullingPiglets
+from transactions.models import PigletsTransaction
 
 
 class ReportDateViewSetTest(APITestCase):
@@ -59,6 +60,23 @@ class ReportDateViewSetTest(APITestCase):
         piglets1.refresh_from_db()
         self.assertEqual(piglets1.status.title, 'Готовы ко взвешиванию')
         self.assertEqual(WeighingPiglets.objects.all().count(), 0)
+        self.client.logout()
+
+    def test_piglets_transactions_rollback(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.locs_ws4[0], 10)
+
+        operation = PigletsTransaction.objects.create_transaction(piglets_group=piglets1,
+            to_location=self.locs_ws4[1], initiator=self.brig4)
+
+        self.client.force_authenticate(self.operator)
+        response = self.client.post('/api/rollbacks/', {'operation_name': 'ws3_piglets_inner_trs',
+            'event_pk': int(operation.pk),})
+
+        self.assertEqual(response.data['message'], 'Операция отменена.')
+
+        piglets1.refresh_from_db()
+        self.assertEqual(piglets1.location, self.locs_ws4[0])
         self.client.logout()
 
     def test_rollback_permissions(self):
