@@ -10,6 +10,7 @@ class TourAdmin(admin.ModelAdmin):
 @admin.register(MetaTour)
 class MetaTourAdmin(admin.ModelAdmin):
     list_display = [f.name for f in MetaTour._meta.fields]
+    search_fields = ['id', 'week_tour__pk']
 
 
 @admin.register(MetaTourRecord)
