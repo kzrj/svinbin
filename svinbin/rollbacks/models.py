@@ -62,9 +62,11 @@ class RollbackManager(CoreModelManager):
         piglets = pts_event.piglets
         piglets.weighing_records.filter(place='o/2').delete()
 
-        if piglets.split_as_child:
+        if piglets.split_as_child and not piglets.split_as_child.transaction:
             piglets.split_as_child.restore_parent_and_delete_children()
             piglets.split_as_child.delete()
+        else:
+            piglets.activate()
 
         pts_event.delete_event_sows_transactions()
 

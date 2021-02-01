@@ -186,7 +186,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(self.locs_ws4[1].piglets.all().count(), 1)
 
     def test_create_piglets_transactions_rollback_v3(self):
-        # piglets1 splitted in from_loc the one of children move to to_loc then not merge there
+        # piglets1 splitted in from_loc  one of children move to to_loc then not merge there
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.locs_ws4[0], 10)
 
@@ -251,7 +251,49 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(PigletsTransaction.objects.all().filter(pk=transaction.pk).count(), 0)
         self.assertEqual(self.locs_ws4[3].piglets.all().count(), 0)
 
-    def test_create_piglets_to_sows_event_rollback(self):
+    def test_create_piglets_transactions_rollback_v5(self):
+        # piglets1 splitted in ws, part settled in loc1 then transacted to loc2
+        location1 = Location.objects.get(workshop__number=4)
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            location1, 50)
+
+        transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
+            PigletsTransaction.objects.transaction_with_split_and_merge(
+            piglets=piglets1, to_location=self.locs_ws4[1], merge=True, initiator=self.brig4,
+            new_amount=40)
+
+        transaction2, moved_piglets2, stayed_piglets2, split_event2, merge_event2 = \
+            PigletsTransaction.objects.transaction_with_split_and_merge(
+            piglets=moved_piglets, to_location=self.locs_ws4[2], initiator=self.brig4)
+
+        piglets1.refresh_from_db()
+        stayed_piglets.refresh_from_db()
+        moved_piglets.refresh_from_db()
+        moved_piglets2.refresh_from_db()
+
+        self.assertEqual(piglets1.active, False)
+        self.assertEqual(stayed_piglets.active, True)
+        self.assertEqual(moved_piglets.active, True)
+        self.assertEqual(moved_piglets, moved_piglets2)
+        self.assertEqual(stayed_piglets2, None)
+        self.assertEqual(PigletsSplit.objects.all().count(), 1)
+
+        Rollback.objects.create_piglets_transactions_rollback(
+            event_pk=transaction2.pk, initiator=self.operator, operation_name='piglets_transaction'
+            )
+
+        piglets1.refresh_from_db()
+        stayed_piglets.refresh_from_db()
+        moved_piglets.refresh_from_db()
+        self.assertEqual(piglets1.active, False)
+        self.assertEqual(stayed_piglets.active, True)
+        self.assertEqual(moved_piglets.active, True)
+        self.assertEqual(moved_piglets.location, self.locs_ws4[1])
+        self.assertEqual(Piglets.objects.get_all().count(), 3)
+        self.assertEqual(PigletsSplit.objects.all().count(), 1)
+        self.assertEqual(PigletsTransaction.objects.all().count(), 1)
+
+    def test_create_piglets_to_sows_event_rollback_split(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.locs_ws5[0], 100)
 
@@ -279,7 +321,85 @@ class PigletsRollbackModelTest(TransactionTestCase):
 
         self.assertEqual(Piglets.objects.get_all().count(), 1)
         self.assertEqual(Piglets.objects.get_all().first(), piglets1)
+        self.assertEqual(Piglets.objects.all().count(), 1)
+        self.assertEqual(Piglets.objects.all().first(), piglets1)
+        
+        piglets1.refresh_from_db()
+        self.assertEqual(piglets1.active, True)
         self.assertEqual(PigletsSplit.objects.all().count(), 0)
+
+        self.assertEqual(rollback.user_employee.username, 'brigadir5')
+        self.assertEqual(rollback.workshop.number, 5)
+
+    def test_create_piglets_to_sows_event_rollback(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.locs_ws5[0], 100)
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1,
+            total_weight=1560, place='o/2')
+
+        pts_event = PigletsToSowsEvent.objects.create_event(piglets=piglets1,
+            initiator=self.brig5)
+        self.assertEqual(Sow.objects.all().count(), 100)
+        self.assertEqual(SowTransaction.objects.all().count(), 100)
+        self.assertEqual(WeighingPiglets.objects.all().count(), 1)
+        piglets1.refresh_from_db()
+        self.assertEqual(piglets1.active, False)
+
+        rollback = Rollback.objects.create_piglets_to_sows_event_rollback(event_pk=pts_event.pk,
+            initiator=self.operator, operation_name='piglets_to_sows')
+        self.assertEqual(Sow.objects.all().count(), 0)
+        self.assertEqual(SowTransaction.objects.all().count(), 0)
+        self.assertEqual(PigletsToSowsEvent.objects.all().count(), 0)
+        self.assertEqual(WeighingPiglets.objects.all().count(), 0)
+
+        piglets1.refresh_from_db()
+        self.assertEqual(piglets1.active, True)
+
+        self.assertEqual(rollback.user_employee.username, 'brigadir5')
+        self.assertEqual(rollback.workshop.number, 5)
+
+    def test_create_piglets_to_sows_event_rollback_split_before(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.locs_ws5[0], 100)
+
+        transaction, moved_piglets, stayed_piglets, split_event, merge_even = \
+            PigletsTransaction.objects.transaction_with_split_and_merge(
+                    piglets=piglets1,
+                    new_amount=60,
+                    to_location=self.locs_ws5[1],
+                    initiator=self.brig5
+                    )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=moved_piglets,
+            total_weight=1560, place='o/2')
+        pts_event = PigletsToSowsEvent.objects.create_event(piglets=moved_piglets,
+            initiator=self.brig5)
+
+        self.assertEqual(Sow.objects.all().count(), 60)
+        self.assertEqual(SowTransaction.objects.all().count(), 60)
+        self.assertEqual(WeighingPiglets.objects.all().count(), 1)
+        self.assertEqual(Piglets.objects.get_all().count(), 3)
+        self.assertEqual(Piglets.objects.all().count(), 1)
+        self.assertEqual(Piglets.objects.all().first(), stayed_piglets)
+        self.assertEqual(PigletsSplit.objects.all().count(), 1)
+
+        rollback = Rollback.objects.create_piglets_to_sows_event_rollback(event_pk=pts_event.pk,
+            initiator=self.operator, operation_name='piglets_to_sows')
+
+        self.assertEqual(Sow.objects.all().count(), 0)
+        self.assertEqual(SowTransaction.objects.all().count(), 0)
+        self.assertEqual(PigletsToSowsEvent.objects.all().count(), 0)
+        self.assertEqual(WeighingPiglets.objects.all().count(), 0)
+        self.assertEqual(PigletsSplit.objects.all().count(), 1)
+
+        self.assertEqual(Piglets.objects.get_all().count(), 3)
+        piglets1.refresh_from_db()
+        moved_piglets.refresh_from_db()
+        stayed_piglets.refresh_from_db()
+        self.assertEqual(piglets1.active, False)
+        self.assertEqual(stayed_piglets.active, True)
+        self.assertEqual(moved_piglets.active, True)
 
         self.assertEqual(rollback.user_employee.username, 'brigadir5')
         self.assertEqual(rollback.workshop.number, 5)

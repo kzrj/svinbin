@@ -136,6 +136,10 @@ class Piglets(CoreModel):
     def __str__(self):
         return 'Piglets {}'.format(self.pk)
 
+    def activate(self):
+        self.active = True
+        self.save()
+
     def deactivate(self):
         self.active = False
         self.save()
