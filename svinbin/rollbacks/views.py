@@ -19,8 +19,6 @@ class RollbackViewSet(viewsets.ModelViewSet):
     def create(self, request, serializer_class=None):
         operation_name = request.POST.get('operation_name')
         event_pk = int(request.POST.get('event_id')) if request.POST.get('event_id') else None
-        print(request.POST)
-        print(f'views event pk =  {event_pk}')
         rollback = None
 
         if 'weighing' in operation_name:
