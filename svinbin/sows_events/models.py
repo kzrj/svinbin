@@ -97,8 +97,8 @@ class SeminationManager(SowEventManager):
         seminations1 = self.create_semination_tour(sow=sow, tour=tour, date=date, initiator=initiator,
             boar=boar1, semination_employee=semination_employee1)
 
-        seminations2 = self.create_semination_tour(sow=sow, tour=tour, date=date, initiator=initiator,
-            boar=boar2, semination_employee=semination_employee2)
+        seminations2 = self.create_semination_tour(sow=sow, tour=tour, date=date + timedelta(seconds=15),
+            initiator=initiator, boar=boar2, semination_employee=semination_employee2)
 
         return sow, True
 
