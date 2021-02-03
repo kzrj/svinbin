@@ -279,7 +279,9 @@ class CullingSowManager(SowEventManager):
         sow.change_status_to(status_title='Брак', alive=False, date=date)
         return culling
 
-    def in_ws(self, ws_locs, start_date=date(2020, 1, 1), end_date=datetime.today()):
+    def in_ws(self, ws_locs, start_date=date(2020, 1, 1), end_date=None):
+        if not end_date:
+            end_date=datetime.today()
         return self.filter(date__date__gte=start_date, date__date__lte=end_date,
             location__in=ws_locs)
 
