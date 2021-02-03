@@ -14,7 +14,7 @@ from piglets_events.models import (
     CullingPiglets, Recount
 )
 from sows_events.models import ( PigletsToSowsEvent, MarkAsGilt, MarkAsNurse, WeaningSow,
-    SowFarrow, CullingSow, Ultrasound, Semination )
+    SowFarrow, CullingSow, Ultrasound, Semination, AbortionSow )
 from transactions.models import PigletsTransaction, SowTransaction
 from rollbacks.models import Rollback
 
@@ -664,6 +664,29 @@ class SowsRollbackModelTest(TransactionTestCase):
 
         rollback = Rollback.objects.create_sow_transaction_rollback(event_pk=transaction.pk,
             initiator=self.operator, operation_name='sow_transaction')
+
+        sow.refresh_from_db()
+        self.assertEqual(sow.status.title, 'Опоросилась')
+        self.assertEqual(sow.tour, self.tour1)
+        self.assertEqual(sow.location, self.locs_ws3[0])
+        self.assertEqual(SowTransaction.objects.all().count(), 0)
+
+    def test_create_sow_abort_rollback(self):
+        # weaning transaction from cell to ws 1-2
+        piglets = piglets_testing.create_from_sow_farrow(location=self.locs_ws3[0], tour=self.tour1,
+            quantity=10)
+        sow = piglets.farrow.sow
+        self.assertEqual(sow.status.title, 'Опоросилась')
+        self.assertEqual(sow.tour, self.tour1)
+
+        transaction = AbortionSow.objects.create_abortion(sow=sow, initiator=self.operator)
+
+        sow.refresh_from_db()
+        self.assertEqual(sow.status.title, 'Аборт')
+        self.assertEqual(sow.tour, None)
+
+        rollback = Rollback.objects.create_abort_rollback(event_pk=transaction.pk,
+            initiator=self.operator, operation_name='sow_abort')
 
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Опоросилась')

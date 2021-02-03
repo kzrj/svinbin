@@ -8,7 +8,7 @@ from django.db import models
 from core.models import CoreModel, CoreModelManager, Event
 from piglets_events.models import ( WeighingPiglets, CullingPiglets )
 from sows_events.models import ( PigletsToSowsEvent, MarkAsGilt, MarkAsNurse, WeaningSow, SowFarrow,
-    CullingSow, Ultrasound, Semination )
+    CullingSow, Ultrasound, Semination, AbortionSow )
 from transactions.models import PigletsTransaction, SowTransaction
 
 

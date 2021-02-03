@@ -30,7 +30,7 @@ services:
     # command: bash -c "cd svinbin &&
     #                   python manage.py migrate &&
     #                   python manage.py makemigrations --no-input &&
-    #                   python manage.py test rollbacks.tests.test_models.PigletsRollbackModelTest"
+    #                   python manage.py test rollbacks.tests.test_models.SowsRollbackModelTest.test_create_sow_abort_rollback"
 
     restart: unless-stopped
     command: bash -c "cd svinbin &&
