@@ -53,8 +53,9 @@ OWN_APPS = [
     'staff.apps.StaffConfig',
     'workshoponetwo.apps.WorkshoponetwoConfig',
     'workshopthree.apps.WorkshopthreeConfig',
-    # 'workshopfour.apps.WorkshopfourConfig',
     'reports.apps.ReportsConfig',
+    'veterinary.apps.VeterinaryConfig',
+    'rollbacks.apps.RollbacksConfig',
 ]
 
 

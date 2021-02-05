@@ -466,7 +466,7 @@ class OperationDataTest(TransactionTestCase):
             serializer = serializer(qs, many=True)
             self.assertEqual(serializer.data[0]['age_at'], 10)
             self.assertEqual(serializer.data[0]['location'], '3/1/1')
-            self.assertEqual(serializer.data[0]['week_tour'], 'Тур 1 2020г')
+            self.assertEqual('Тур 1' in serializer.data[0]['week_tour'], True)
             self.assertEqual(serializer.data[0]['initiator'], initiator.username)
 
     def test_op_piglets_transaction_serializer(self):
@@ -486,7 +486,7 @@ class OperationDataTest(TransactionTestCase):
             serializer = serializer(qs, many=True)
             self.assertEqual(serializer.data[0]['from_location'], '3/1/1')
             # self.assertEqual(serializer.data[0]['to_location'], self.loc_ws3_cells[2].get_full_loc)
-            self.assertEqual(serializer.data[0]['week_tour'], 'Тур 1 2020г')
+            self.assertEqual('Тур 1' in serializer.data[0]['week_tour'], True)
             self.assertEqual(serializer.data[0]['initiator'], initiator.username)
 
 

@@ -419,14 +419,14 @@ class Sow(Pig):
         self.save()
         last_record.delete()
 
-    def has_any_event_after(self, date):
-        return self.semination_set.filter(date__gt=date).exists() \
-               or self.ultrasound_set.filter(date__gt=date).exists() \
-               or self.sowfarrow_set.filter(date__gt=date).exists() \
-               or self.abortionsow_set.filter(date__gt=date).exists() \
-               or self.markasnurse_set.filter(date__gt=date).exists() \
-               or self.cullingsow_set.filter(date__gt=date).exists() \
-               or self.transactions.filter(date__gt=date).exists()
+    def has_any_event_after(self, created_at):
+        return self.semination_set.filter(created_at__gt=created_at).exists() \
+               or self.ultrasound_set.filter(created_at__gt=created_at).exists() \
+               or self.sowfarrow_set.filter(created_at__gt=created_at).exists() \
+               or self.abortionsow_set.filter(created_at__gt=created_at).exists() \
+               or self.markasnurse_set.filter(created_at__gt=created_at).exists() \
+               or self.cullingsow_set.filter(created_at__gt=created_at).exists() \
+               or self.transactions.filter(created_at__gt=created_at).exists()
 
 
 class GiltManager(CoreModelManager):

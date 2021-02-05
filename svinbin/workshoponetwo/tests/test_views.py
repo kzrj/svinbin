@@ -170,8 +170,8 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
              'boar1': self.boar.pk, 'date': '2020-09-09T00:00',
              'boar2': Boar.objects.all()[1].pk, 'farm_id': sow1.farm_id})
 
-        self.assertEqual(response.data['semination1']['tour'], 'Тур 55 2020г')
-        self.assertEqual(response.data['semination2']['tour'], 'Тур 55 2020г')
+        self.assertEqual('Тур 55' in response.data['semination1']['tour'], True)
+        self.assertEqual('Тур 55' in response.data['semination2']['tour'], True)
         self.assertEqual(response.data['semination1']['boar'], self.boar.pk)
         self.assertEqual(response.data['semination2']['boar'], Boar.objects.all()[1].pk)
         self.assertEqual(response.data['semination1']['semination_employee'], self.user.pk)

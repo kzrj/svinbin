@@ -218,8 +218,8 @@ class Piglets(CoreModel):
     def has_weighed_after_date(self, date):
         return self.weighing_records.filter(date__gt=date).exists()
 
-    def has_culled_after_date(self, date):
-        return self.cullings.filter(date__gt=date).exists()
+    def has_culled_after_date(self, created_at):
+        return self.cullings.filter(created_at__gt=created_at).exists()
 
     def has_transacted_after_date(self, date):
         return self.transactions.filter(date__gt=date).exists()

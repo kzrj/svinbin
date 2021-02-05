@@ -43,7 +43,7 @@ class TourModelManagerTest(TestCase):
         Tour.objects.get_or_create_by_week_in_current_year(1)
         self.assertEqual(Tour.objects.all().count(), 4)
         self.assertEqual(Tour.objects.all().first().week_number, 1)
-        self.assertEqual(Tour.objects.all().first().year, 2020)
+        self.assertEqual(Tour.objects.all().first().year, datetime.datetime.now().year)
 
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         self.assertEqual(Tour.objects.all().count(), 4)

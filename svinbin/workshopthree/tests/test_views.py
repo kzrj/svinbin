@@ -54,7 +54,7 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
 
         self.assertEqual(response.data['sow']['id'], sow.pk)
         self.assertEqual(response.data['sow']['farm_id'], sow.farm_id)
-        self.assertEqual(response.data['sow']['tour'], 'Тур 7 2020г')
+        self.assertEqual('Тур 7' in response.data['sow']['tour'], True)
         self.assertEqual(response.data['sow']['status'], 'Опоросилась')
         self.assertEqual(response.data['farrow']['alive_quantity'], 10)
         self.assertEqual(response.data['farrow']['dead_quantity'], 1)
