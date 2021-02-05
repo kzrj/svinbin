@@ -86,7 +86,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
         serializer = piglets_events_serializers.CullingPigletsSerializer(data=request.data)
         if serializer.is_valid():
             date = timezone.now()
-            if not serializer.validated_data['date']:
+            if serializer.validated_data['date']:
                 date = serializer.validated_data['date']
 
             piglets_events_models.CullingPiglets.objects.create_culling_piglets(
