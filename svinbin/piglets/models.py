@@ -207,4 +207,19 @@ class Piglets(CoreModel):
 
         return (date - self.birthday).days
 
+    @property
+    def has_splitted_as_parent(self):
+        return hasattr(self, 'split_as_parent')
 
+    @property
+    def has_merged_as_parent(self):
+        return self.merger_as_parent
+
+    def has_weighed_after_date(self, date):
+        return self.weighing_records.filter(date__gt=date).exists()
+
+    def has_culled_after_date(self, date):
+        return self.cullings.filter(date__gt=date).exists()
+
+    def has_transacted_after_date(self, date):
+        return self.transactions.filter(date__gt=date).exists()

@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from django.test import TransactionTestCase
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 from locations.models import Location
 from tours.models import Tour
@@ -36,6 +37,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
         self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
 
+        self.loc_ws1 = Location.objects.get(workshop__number=1)
         self.locs_ws3 = Location.objects.filter(sowAndPigletsCell__workshop__number=3)
         self.locs_ws4 = Location.objects.filter(pigletsGroupCell__workshop__number=4)
         self.locs_ws5 = Location.objects.filter(pigletsGroupCell__workshop__number=5)
@@ -466,6 +468,41 @@ class PigletsRollbackModelTest(TransactionTestCase):
         self.assertEqual(PigletsMerger.objects.all().count(), 0)
         self.assertEqual(WeaningSow.objects.all().count(), 0)
 
+    def test_check_piglets_permission(self):
+        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1,
+            self.locs_ws3[0], 100)
+
+        transaction, moved_piglets, stayed_piglets, split_event, merge_event = \
+            PigletsTransaction.objects.transaction_with_split_and_merge(
+            piglets=piglets1, to_location=self.locs_ws4[1], merge=True, initiator=self.brig4,
+            new_amount=40)
+
+        transaction2, moved_piglets, stayed_piglets, split_event, merge_event = \
+            PigletsTransaction.objects.transaction_with_split_and_merge(
+            piglets=moved_piglets, to_location=self.locs_ws4[2], merge=True, initiator=self.brig4,
+            new_amount=10)
+
+        with self.assertRaises(ValidationError):
+            rollback = Rollback.objects.create_piglets_transactions_rollback(event_pk=transaction.pk,
+                initiator=self.operator, operation_name='piglets_transaction')
+
+    def test_piglets_to_sows_permission(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.locs_ws5[0], 100)
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1,
+            total_weight=1560, place='o/2')
+
+        pts_event = PigletsToSowsEvent.objects.create_event(piglets=piglets1,
+            initiator=self.brig5)
+
+        sow = pts_event.sows.all().first()
+        SowTransaction.objects.create_transaction(sow=sow, to_location=self.loc_ws1)
+
+        with self.assertRaises(ValidationError):
+            rollback = Rollback.objects.create_piglets_to_sows_event_rollback(event_pk=pts_event.pk,
+                initiator=self.operator, operation_name='piglets_to_sows')
+
 
 class SowsRollbackModelTest(TransactionTestCase):
     def setUp(self):
@@ -495,7 +532,8 @@ class SowsRollbackModelTest(TransactionTestCase):
         sow = piglets1.farrow.sow
         self.assertEqual(sow.status.title, 'Опоросилась')
 
-        mas_event = MarkAsNurse.objects.create_nurse_event(sow=sow, initiator=self.brig3)
+        mas_event = MarkAsNurse.objects.create_nurse_event(sow=sow, initiator=self.brig3, 
+            date=datetime.now() + timedelta(seconds=10))
         self.assertEqual(sow.status.title, 'Кормилица')
         self.assertEqual(sow.tour, None)
         self.assertEqual(SowStatusRecord.objects.filter(status_after__title='Кормилица').count(),
@@ -656,7 +694,7 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(sow.tour, self.tour1)
 
         transaction = SowTransaction.objects.create_transaction(sow=sow, to_location=self.loc_ws1,
-            initiator=self.operator)
+            initiator=self.operator, date=(datetime.now() + timedelta(minutes=1)))
 
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Ожидает осеменения')
@@ -679,13 +717,13 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(sow.status.title, 'Опоросилась')
         self.assertEqual(sow.tour, self.tour1)
 
-        transaction = AbortionSow.objects.create_abortion(sow=sow, initiator=self.operator)
+        abortion = AbortionSow.objects.create_abortion(sow=sow, initiator=self.operator)
 
         sow.refresh_from_db()
         self.assertEqual(sow.status.title, 'Аборт')
         self.assertEqual(sow.tour, None)
 
-        rollback = Rollback.objects.create_abort_rollback(event_pk=transaction.pk,
+        rollback = Rollback.objects.create_abort_rollback(event_pk=abortion.pk,
             initiator=self.operator, operation_name='sow_abort')
 
         sow.refresh_from_db()
@@ -693,3 +731,16 @@ class SowsRollbackModelTest(TransactionTestCase):
         self.assertEqual(sow.tour, self.tour1)
         self.assertEqual(sow.location, self.locs_ws3[0])
         self.assertEqual(SowTransaction.objects.all().count(), 0)
+
+    def test_check_sow_permission(self):
+        sow = sows_testing.create_sow_with_location(location=self.loc_ws1)
+
+        transaction = SowTransaction.objects.create_transaction(sow=sow, to_location=self.loc_ws2,
+            initiator=self.operator, date=datetime(2021, 2, 3, 0, 0))
+
+        semination1 = Semination.objects.create_semination_tour(sow=sow, tour=self.tour1,
+         initiator=self.brig3, date=datetime(2021, 2, 3, 15, 0))
+
+        with self.assertRaises(ValidationError):
+            rollback = Rollback.objects.create_sow_transaction_rollback(event_pk=transaction.pk,
+                initiator=self.operator, operation_name='sow_transaction')

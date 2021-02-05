@@ -319,6 +319,30 @@ class SowModelTest(TransactionTestCase):
         self.assertEqual(SowStatusRecord.objects.all().count(), 1)
         self.assertEqual(sow.status.title, 'Ремонтная')
 
+    def test_has_any_event_after(self):
+        sow = sows_testings.create_sow_and_put_in_workshop_one()
+        self.assertEqual(sow.has_any_event_after(date=datetime(2021, 2, 2, 0, 0)), False)
+
+        Semination.objects.create_semination(sow=sow, week=1, initiator=None,
+         semination_employee=None, date=datetime(2021, 2, 3, 0, 0))
+        self.assertEqual(sow.has_any_event_after(date=datetime(2021, 2, 2, 0, 0)), True)
+
+        Ultrasound.objects.create_ultrasound(sow=sow, result=True, days=60,
+             date=datetime(2021, 2, 3, 10, 0))
+        self.assertEqual(sow.has_any_event_after(date=datetime(2021, 2, 3, 0, 0)), True)
+        self.assertEqual(sow.has_any_event_after(date=datetime(2021, 2, 3, 20, 0)), False)
+
+        SowTransaction.objects.create_transaction(sow=sow, 
+            to_location=Location.objects.filter(sowAndPigletsCell__isnull=False)[0],
+            date=datetime(2021, 2, 4, 10, 0))
+        self.assertEqual(sow.has_any_event_after(date=datetime(2021, 2, 4, 0, 0)), True)
+        self.assertEqual(sow.has_any_event_after(date=datetime(2021, 2, 4, 20, 0)), False)
+
+        SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=7, mummy_quantity=1,
+            date=datetime(2021, 2, 5, 10, 0))
+        self.assertEqual(sow.has_any_event_after(date=datetime(2021, 2, 5, 0, 0)), True)
+        self.assertEqual(sow.has_any_event_after(date=datetime(2021, 2, 5, 20, 0)), False)
+
 
 class SowManagerV2Test(TransactionTestCase):
     def setUp(self):

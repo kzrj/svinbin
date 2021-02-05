@@ -5,7 +5,7 @@ from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
 from piglets.models import Piglets
-from piglets_events.models import PigletsMerger
+from piglets_events.models import PigletsMerger, CullingPiglets, WeighingPiglets
 from tours.models import Tour
 from locations.models import Location
 
@@ -49,6 +49,13 @@ class PigletsModelTest(TestCase):
     def test_change_status_to(self):
         self.piglets.change_status_to('Родились, кормятся')
         self.assertEqual(self.piglets.status.title, 'Родились, кормятся')
+
+    def test_has_weighed_after_date(self):
+        weighing = WeighingPiglets.objects.create_weighing(piglets_group=self.piglets, total_weight=100,
+         place='3/4', date=datetime(2021, 2, 3, 0, 0))
+
+        self.assertEqual(self.piglets.has_weighed_after_date(date=datetime(2021, 2, 3, 0, 1)), False)
+        self.assertEqual(self.piglets.has_weighed_after_date(date=datetime(2021, 2, 3, 0, 0)), True)
 
 
 class PigletsModelmanagerTest(TestCase):
