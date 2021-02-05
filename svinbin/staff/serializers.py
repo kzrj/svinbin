@@ -21,4 +21,5 @@ class WorkshopEmployeeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorkShopEmployee
-        fields = ['user', 'workshop_number', 'is_officer', 'is_seminator']
+        fields = ['user', 'workshop_number', 'is_officer', 'is_seminator', 'is_veterinar',
+         'is_admin', 'is_operator']
