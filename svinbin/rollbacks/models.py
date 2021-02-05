@@ -36,13 +36,13 @@ class RollbackManager(CoreModelManager):
         if 'split' in events and piglets.has_splitted_as_parent:
             raise DjangoValidationError(message=message)
 
-        if 'weighing' in events and piglets.has_weighed_after_date(date=rollback_event.date):
+        if 'weighing' in events and piglets.has_weighed_after_date(created_at=rollback_event.created_at):
             raise DjangoValidationError(message=message)
 
         if 'culling' in events and piglets.has_culled_after_date(created_at=rollback_event.created_at):
             raise DjangoValidationError(message=message)
 
-        if 'transaction' in events and piglets.has_transacted_after_date(date=rollback_event.date):
+        if 'transaction' in events and piglets.has_transacted_after_date(created_at=rollback_event.created_at):
             raise DjangoValidationError(message=message)
 
         if 'merge' in events and piglets.has_merged_as_parent:
@@ -51,9 +51,9 @@ class RollbackManager(CoreModelManager):
         if 'tr_merge' in events and piglets.has_merged_as_parent:
             created_piglets = piglets.has_merged_as_parent.created_piglets
             if created_piglets.has_culled_after_date(created_at=rollback_event.created_at) \
-               or created_piglets.has_transacted_after_date(date=rollback_event.date) \
+               or created_piglets.has_transacted_after_date(created_at=rollback_event.created_at) \
                or created_piglets.has_merged_as_parent \
-               or created_piglets.has_weighed_after_date(date=rollback_event.date) \
+               or created_piglets.has_weighed_after_date(created_at=rollback_event.created_at) \
                or created_piglets.has_splitted_as_parent:
                     raise DjangoValidationError(message=message)
 
