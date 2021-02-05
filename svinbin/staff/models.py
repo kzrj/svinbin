@@ -20,6 +20,7 @@ class WorkShopEmployee(CoreModel):
     workshop = models.ForeignKey('locations.WorkShop', on_delete=models.CASCADE, null=True, blank=True)
 
     is_officer = models.BooleanField(default=False)
+    is_operator = models.BooleanField(default=False)
     is_seminator = models.BooleanField(default=False)
     is_veterinar = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
