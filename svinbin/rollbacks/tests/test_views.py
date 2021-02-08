@@ -53,7 +53,7 @@ class ReportDateViewSetTest(APITestCase):
 
         self.client.force_authenticate(self.operator)
         response = self.client.post('/api/rollbacks/', {'operation_name': 'piglets_weighing',
-            'event_pk': operation.pk, 'operation_name': 'ws3_weighing'})
+            'event_id': operation.pk, 'operation_name': 'ws3_weighing'})
 
         self.assertEqual(response.data['message'], 'Операция отменена.')
 
@@ -71,7 +71,7 @@ class ReportDateViewSetTest(APITestCase):
 
         self.client.force_authenticate(self.operator)
         response = self.client.post('/api/rollbacks/', {'operation_name': 'ws3_piglets_inner_trs',
-            'event_pk': int(operation.pk),})
+            'event_id': int(operation.pk),})
 
         self.assertEqual(response.data['message'], 'Операция отменена.')
 
@@ -88,6 +88,6 @@ class ReportDateViewSetTest(APITestCase):
         
         self.client.force_authenticate(self.brig4)
         response = self.client.post('/api/rollbacks/', {'operation_name': 'piglets_weighing',
-            'event_pk': operation.pk, 'operation_name': 'ws3_weighing'})
+            'event_id': operation.pk, 'operation_name': 'ws3_weighing'})
 
         self.assertEqual(response.status_code, 403)

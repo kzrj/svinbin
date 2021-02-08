@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from freezegun import freeze_time
+
 from datetime import datetime, timedelta
 
 from django.test import TestCase, TransactionTestCase
@@ -51,11 +53,13 @@ class PigletsModelTest(TestCase):
         self.assertEqual(self.piglets.status.title, 'Родились, кормятся')
 
     def test_has_weighed_after_date(self):
-        weighing = WeighingPiglets.objects.create_weighing(piglets_group=self.piglets, total_weight=100,
-         place='3/4', date=datetime(2021, 2, 3, 0, 0))
+        with freeze_time("2021-02-3"):
+            weighing = WeighingPiglets.objects.create_weighing(piglets_group=self.piglets, total_weight=100,
+             place='3/4', date=datetime(2021, 2, 3, 0, 0))
 
-        self.assertEqual(self.piglets.has_weighed_after_date(date=datetime(2021, 2, 3, 0, 1)), False)
-        self.assertEqual(self.piglets.has_weighed_after_date(date=datetime(2021, 2, 3, 0, 0)), True)
+
+        self.assertEqual(self.piglets.has_weighed_after_date(created_at=datetime(2021, 2, 3, 0, 1)), False)
+        self.assertEqual(self.piglets.has_weighed_after_date(created_at=datetime(2021, 2, 2, 0, 0)), True)
 
 
 class PigletsModelmanagerTest(TestCase):
