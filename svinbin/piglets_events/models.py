@@ -96,6 +96,9 @@ class PigletsSplitManager(CoreModelManager):
         metatour1.set_week_tour()
         metatour2.set_week_tour()
 
+        for pve in parent_piglets.pigletsvetevent_set.all():
+            pve.piglets.add(piglets1, piglets2_new_amount)
+
         parent_piglets.deactivate()
 
         return piglets1, piglets2_new_amount
@@ -132,6 +135,7 @@ class PigletsMergerManager(CoreModelManager):
         total_quantity = parent_piglets.get_total_quantity()
         gilts_quantity = parent_piglets.get_total_gilts_quantity()
         avg_birthday = parent_piglets.gen_avg_birthday(total_quantity=total_quantity)
+        bigger_group = parent_piglets.get_bigger_group()
 
         piglets = Piglets.objects.create(location=new_location, status=None, start_quantity=total_quantity,
             quantity=total_quantity, gilts_quantity=gilts_quantity, birthday=avg_birthday)
@@ -154,7 +158,11 @@ class PigletsMergerManager(CoreModelManager):
         metatour.set_week_tour()
 
         # create merger
-        merger = self.create(created_piglets=piglets, initiator=initiator, date=timezone.now())
+        merger = self.create(created_piglets=piglets, initiator=initiator, date=date)
+
+        # set vet events
+        for pve in bigger_group.pigletsvetevent_set.all():
+            pve.piglets.add(piglets)
 
         # deactivate and update piglets 
         # !!! when input parent_piglets is queryset it can include created piglets, qs is lazy.
@@ -409,36 +417,3 @@ class Recount(PigletsEvent):
     comment = models.TextField(null=True)
 
     objects = RecountManager()
-
-
-class PigletsMedEventManager(CoreModelManager):
-    def create_med(self, piglets, med_type, med_method, doze=None, initiator=None, date=None):
-        med_event = self.create(
-            med_type=med_type,
-            med_method=med_method,
-            doze=doze,
-            piglets=piglets, 
-            initiator=initiator,
-            date=date,
-            location=piglets.location)
-        
-        return med_event
-
-
-class PigletsMedEvent(PigletsEvent):
-    MED_METHODS = [('feed', 'feed'), ('water', 'water'), ('inj', 'inj') ]
-    MED_TYPES = [('vac', 'vac'), ('heal', 'heal'), ('prev', 'prev') ]
-    med_type = models.CharField(max_length=10, choices=MED_TYPES)
-    med_method = models.CharField(max_length=10, choices=MED_METHODS, null=True)
-    doze = models.CharField(max_length=50, null=True)
-
-    comment = models.CharField(max_length=500, null=True)
-
-    piglets = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name='meds')
-
-    location = models.ForeignKey('locations.Location', on_delete=models.CASCADE, null=True)
-
-    objects = PigletsMedEventManager()
-
-    def __str__(self):
-        return f'{self.med_type} {self.med_method} {self.piglets}'

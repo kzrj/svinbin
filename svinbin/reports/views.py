@@ -94,22 +94,22 @@ class TourReportV2ViewSet(viewsets.ModelViewSet):
 
 class ReportDateViewSet(viewsets.ModelViewSet):
     queryset = ReportDate.objects.all() \
-                .add_today_sows_qnty() \
-                .add_sows_quantity_at_date_start() \
-                .add_sow_padej_qnty() \
-                .add_sow_vinuzhd_qnty() \
-                .add_sows_quantity_at_date_end() \
-                .add_piglets_today_quantity() \
-                .add_piglets_quantity_at_date_start() \
-                .add_born_alive() \
-                .add_piglets_padej_qnty() \
-                .add_piglets_prirezka_qnty() \
-                .add_piglets_vinuzhd_qnty() \
-                .add_piglets_spec_qnty() \
-                .add_piglets_quantity_at_date_end() \
-                .add_piglets_qnty_in_transactions() \
-                .add_piglets_spec_total_weight() \
-                .add_priplod_by_sow() \
+        .add_today_sows_qnty() \
+        .add_sows_quantity_at_date_start() \
+        .add_sow_padej_qnty() \
+        .add_sow_vinuzhd_qnty() \
+        .add_sows_quantity_at_date_end() \
+        .add_piglets_today_quantity() \
+        .add_piglets_quantity_at_date_start() \
+        .add_born_alive() \
+        .add_piglets_padej_qnty() \
+        .add_piglets_prirezka_qnty() \
+        .add_piglets_vinuzhd_qnty() \
+        .add_piglets_spec_qnty() \
+        .add_piglets_quantity_at_date_end() \
+        .add_piglets_qnty_in_transactions() \
+        .add_piglets_spec_total_weight() \
+        .add_priplod_by_sow() \
 
     serializer_class = ReportDateSerializer
     filter_class = ReportDateFilter

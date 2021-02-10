@@ -68,6 +68,9 @@ class PigletsQuerySet(models.QuerySet):
 
         return datetime.fromtimestamp(avg_ts)
 
+    def get_bigger_group(self):
+        return self.order_by('-quantity').first()
+
 
 class PigletsManager(CoreModelManager):
     # def create(self, *args, **kwargs):

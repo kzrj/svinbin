@@ -5,51 +5,54 @@ from django.db import models
 from core.models import CoreModel, CoreModelManager, Event
 
 
-# class VetEvent(Event):
-#     sow = models.ForeignKey('sows.Sow', on_delete=models.SET_NULL, null=True, blank=True)
-#     piglets = models.ForeignKey('piglets.Piglets', on_delete=models.SET_NULL, null=True, blank=True)
+class Drug(CoreModel):
+    name = models.CharField(max_length=100)
 
-#     VET_METHODS = [('feed', 'feed'), ('water', 'water'), ('inj', 'inj') ]
-#     med_method = models.CharField(max_length=10, choices=MED_METHODS, null=True, blank=True)
-
-#     comment = models.CharField(max_length=200, null=True, blank=True)
-
-#     class Meta:
-#         abstract = True
+    def __str__(self):
+        return self.name
 
 
-# class VetItem(CoreModel):
-#     VET_GROUPS = [('sows', 'sows'), ('gilts', 'gilts'), ('piglets', 'piglets') ]
-#     vet_group = models.CharField(max_length=10, choices=VET_GROUPS, default='piglets')   
-#     name = models.CharField(max_length=100)
+class Recipe(CoreModel):
+    MED_TYPES = [
+        ('vac', 'vaccine'), ('heal', 'healing'),
+        ('prev', 'prevention'),]
+    MED_METHODS = [
+        ('feed', 'feed'), ('inj', 'injection'),
+        ('water', 'water'),]
 
-#     class Meta:
-#         abstract = True
-    
+    med_type = models.CharField(max_length=50, choices=MED_TYPES)
+    med_method = models.CharField(max_length=30, choices=MED_METHODS)
+    drug = models.ForeignKey(Drug, on_delete=models.CASCADE, related_name='recipes')
+    doze = models.CharField(max_length=50, null=True, blank=True)
 
-# class Vaccine(VetItem):
-#     def __str__(self):
-#         return f'vac {self.name}'
-
-
-# class VaccinationEvent(VetEvent):
-#     vaccine = models.ForeignKey(Vaccine, on_delete=models.CASCADE)
-
-#     def __str__(self):
-#         return f'vac event {self.pk}'
+    def __str__(self):
+        return f'{self.med_type} {self.med_method} {self.drug} {self.doze}'
 
 
-# class Drug(VetItem):
-#     def __str__(self):
-#         return f'drug {self.name}'
+class PigletsVetEventManager(CoreModelManager):
+    def create_vet_event(self, piglets, recipe, date=None, initiator=None):
+        event = self.create(recipe=recipe, date=date, initiator=initiator, location=piglets.location,
+            piglets_quantity=piglets.quantity, week_tour=piglets.metatour.week_tour,
+            target_piglets=piglets)
+        event.piglets.add(piglets)
+        return event
 
 
-# class DrugEvent(VetEvent):
-#     HEAL_TYPES = [('heal', 'heal'), ('prof', 'prof')]
-#     heal_type = models.CharField(max_length=20, choices=HEAL_TYPES, default='heal')
+class PigletsVetEvent(Event):
+    location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL, null=True, 
+        related_name='piglets_vet_events')
+    week_tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, 
+        related_name='piglets_vet_events')
+    piglets_quantity = models.IntegerField(null=True)
 
-#     drug = models.ForeignKey(Drug, on_delete=models.CASCADE, related_name='drugs')
-#     doze = models.CharField(max_length=100)
+    target_piglets = models.ForeignKey('piglets.Piglets', on_delete=models.SET_NULL, null=True,
+        related_name='piglets_vet_events_as_target')
 
-#     def __str__(self):
-#         return f'drug event {self.pk}'
+    piglets = models.ManyToManyField('piglets.Piglets')
+    recipe = models.ForeignKey(Recipe, on_delete=models.SET_NULL, null=True, 
+        related_name='piglets_vet_events')
+
+    objects = PigletsVetEventManager()
+
+    def __str__(self):
+        return f'{self.recipe} {self.piglets}'

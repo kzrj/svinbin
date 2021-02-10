@@ -24,6 +24,7 @@ from workshopthree import views as workshopthree_views
 from reports import views as reports_views
 from piglets_events import views as piglets_events_views
 from rollbacks.views import RollbackViewSet
+from veterinary import views as veterinary_views
 
 router = routers.DefaultRouter()
 
@@ -73,6 +74,10 @@ router.register(r'reports/recounts', piglets_events_views.RecountViewSet,
 
 # rollbacks
 router.register(r'rollbacks', RollbackViewSet, basename='rollbacks')
+
+# veterinary
+router.register(r'veterinary/recipes', veterinary_views.RecipeViewSet, basename='veterinary-recipes')
+router.register(r'veterinary/drugs', veterinary_views.DrugViewSet, basename='veterinary-drugs')
 
 schema_view = get_swagger_view(title='API Docs')
 

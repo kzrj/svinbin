@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 
 class CoreQuerySet(models.QuerySet):
@@ -31,7 +32,11 @@ class CoreQuerySet(models.QuerySet):
 
 
 class CoreModelManager(models.Manager):
-    pass
+    def create(self, *args, **kwargs):
+        if 'date' in kwargs and not kwargs['date']:
+            kwargs['date'] = timezone.now()
+
+        return super(CoreModelManager, self).create(*args, **kwargs)  
 
 
 class CoreModel(models.Model):

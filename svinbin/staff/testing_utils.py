@@ -19,11 +19,11 @@ def create_user(username, farm_name, workshop=None):
     return user
 
 def create_workshop_user(username, password, ws_number, farm_name, is_seminator=False, is_officer=False,
-        is_staff=False):
+        is_staff=False, is_veterinar=False):
     workshop = WorkShop.objects.filter(number=ws_number).first()
     user = User.objects.create_user(username=username, email='t@t.ru', password=password, is_staff=is_staff)
     WorkShopEmployee.objects.create(user=user, workshop=workshop, farm_name=farm_name, \
-        is_seminator=is_seminator, is_officer=is_officer)
+        is_seminator=is_seminator, is_officer=is_officer, is_veterinar=is_veterinar)
     return user
 
 
@@ -52,6 +52,8 @@ def create_svinbin_users():
         is_seminator=True)
     create_workshop_user(username='stude', password='123', ws_number=1, farm_name='СТУДЕ', 
         is_seminator=True)
+    create_workshop_user(username='veterinar', password='123', ws_number=1, farm_name='СТУДЕ', 
+        is_seminator=True, is_veterinar=True)
 
     create_workshop_user(username='brigadir1', password='123', ws_number=1, farm_name='ИВАНО')
     create_workshop_user(username='brigadir2', password='123', ws_number=2, farm_name='ИВАНО')

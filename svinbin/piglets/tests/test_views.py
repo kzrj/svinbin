@@ -17,10 +17,11 @@ import staff.testing_utils as staff_testing
 from piglets.models import Piglets
 from locations.models import Location
 from tours.models import Tour, MetaTour
-from piglets_events.models import WeighingPiglets, PigletsMedEvent
+from piglets_events.models import WeighingPiglets
 from sows.models import Sow
 from sows_events.models import SowFarrow
 from transactions.models import PigletsTransaction, SowTransaction
+from veterinary.models import PigletsVetEvent, Recipe
 
 
 class PigletsViewSetTest(APITestCase):
@@ -67,6 +68,7 @@ class PigletsViewSetTest(APITestCase):
         self.brig8 = staff_testing.create_employee(workshop=self.loc_ws8.workshop)
 
         self.admin = User.objects.get(username='test_admin1')
+        self.veterinar = User.objects.get(username='veterinar')
 
     def test_create_from_merging_list(self):
         self.client.force_authenticate(user=self.brig3)
@@ -504,27 +506,22 @@ class PigletsViewSetTest(APITestCase):
         self.assertEqual(response.status_code, 403)
         self.client.logout()
 
-    # def test_med_event(self):
-    #     tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
-    #     location = Location.objects.filter(pigletsGroupCell__isnull=False,
-    #         pigletsGroupCell__workshop__number=5 ).first()
-    #     piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(
-    #         tour=tour, location=location, quantity=50)
+    def test_vet_event(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 10)
 
-    #     self.client.force_authenticate(user=self.brig5)
-    #     response = self.client.post('/api/piglets/%s/med_event/' % piglets.pk,
-    #         {'med_type': 'vac', 'med_method': 'feed', 'doze': '100',  'date': '2020-01-20T00:00'})
+        self.client.force_authenticate(user=self.veterinar)
+        response = self.client.post(f'/api/piglets/{piglets1.pk}/vet_event/', 
+            data={'recipe': ''})
+        self.assertEqual(response.data['message'], 'Мед. событие записано.')
 
-    #     medp = PigletsMedEvent.objects.all().first()
-    #     self.assertEqual(medp.med_type, 'vac')
-    #     self.assertEqual(medp.med_method, 'feed')
-    #     self.assertEqual(response.data['message'], 'Мед. событие записано.')
+        pve = PigletsVetEvent.objects.all().first()
+        self.assertEqual(pve.week_tour, self.tour1)
+        self.assertEqual(pve.target_piglets, piglets1)
+        self.assertEqual(pve.piglets_quantity, 10)
+        self.assertEqual(pve.recipe, None)
 
-    #     response = self.client.post('/api/piglets/%s/med_event/' % piglets.pk,
-    #         {'med_type': 'heal', 'med_method': 'water', 'date': '2020-01-20T00:00'})
-    #     self.assertEqual(response.data['message'], 'Мед. событие записано.')
-
-    #     self.client.logout()
+        self.client.logout()
 
 
 class PigletsFilterTest(APITestCase):

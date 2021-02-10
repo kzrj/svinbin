@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAuthenticated
 import piglets.serializers as piglets_serializers
 import piglets_events.serializers as piglets_events_serializers
 import sows.serializers as sows_serializers
+import veterinary.serializers as veterinary_serializers
 
 import piglets.models as piglets_models
 import piglets_events.models as piglets_events_models
@@ -16,6 +17,7 @@ import sows.models as sows_models
 import sows_events.models as sows_events_models
 import transactions.models as transactions_models
 import locations.models as locations_models
+import veterinary.models as veterinary_models
 
 from piglets.filters import PigletsFilter
 from core.permissions import ObjAndUserSameLocationPermissions, WS3Permissions, ReadOrAdminOnlyPermissions, \
@@ -300,19 +302,16 @@ class PigletsViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
     @action(methods=['post'], detail=True, permission_classes=[VeterinarPermissions],
-        serializer_class=piglets_events_serializers.CreateMedEventPigletsSerializer)
-    def med_event(self, request, pk=None):
-        serializer = piglets_events_serializers.CreateMedEventPigletsSerializer(data=request.data)
+        serializer_class=veterinary_serializers.CreatePigletsVetEventSerializer)
+    def vet_event(self, request, pk=None):
+        serializer = veterinary_serializers.CreatePigletsVetEventSerializer(data=request.data)
         if serializer.is_valid():
-            piglets_group = self.get_object()
-            piglets_events_models.PigletsMedEvent.objects.create_med(
-              piglets=piglets_group,
-              med_type=serializer.validated_data['med_type'],
-              med_method=serializer.validated_data['med_method'],
-              doze=serializer.validated_data.get('doze'),
-              date=serializer.validated_data['date'],
+            piglets = self.get_object()
+            veterinary_models.PigletsVetEvent.objects.create_vet_event(
+              piglets=piglets,
+              recipe=serializer.validated_data['recipe'],
+              date=serializer.validated_data.get('date'),
               initiator=request.user,
               )
             return Response(
