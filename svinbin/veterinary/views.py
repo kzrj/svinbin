@@ -12,6 +12,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
     serializer_class = RecipeSerializer
     permission_classes = [VeterinarPermissions]
 
+    def destroy(self, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object())
+        super().destroy(*args, **kwargs)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class DrugViewSet(viewsets.ModelViewSet):
     queryset = Drug.objects.all()
