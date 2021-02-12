@@ -30,8 +30,8 @@ class ChoiceField(serializers.ChoiceField):
 
 class RecipeSerializer(serializers.ModelSerializer):
     drug_name = serializers.StringRelatedField(source='drug', read_only=True)
-    ru_type = ChoiceField(choices=Recipe.MED_TYPES)
-    ru_method = ChoiceField(choices=Recipe.MED_METHODS)
+    ru_type = ChoiceField(source='med_type', read_only=True, choices=Recipe.MED_TYPES)
+    ru_method = ChoiceField(source='med_method', read_only=True, choices=Recipe.MED_METHODS)
 
     class Meta:
         model = Recipe
