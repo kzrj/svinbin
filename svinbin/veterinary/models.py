@@ -25,8 +25,11 @@ class Recipe(CoreModel):
     drug = models.ForeignKey(Drug, on_delete=models.CASCADE, related_name='recipes')
     doze = models.CharField(max_length=50, null=True, blank=True)
 
+    def get_med_method(self):
+        pass
+
     def __str__(self):
-        return f'{med_type[1] if self.med_type == med_type[0] else for med_type in self.MED_TYPES} {self.med_method} {self.drug} {self.doze}'
+        return f'{med_type[1] if self.med_type == med_type[0] else None for med_type in self.MED_TYPES} {self.med_method} {self.drug} {self.doze}'
 
 
 class PigletsVetEventManager(CoreModelManager):
