@@ -2,6 +2,7 @@
 from rest_framework import serializers
 
 from veterinary.models import PigletsVetEvent, Recipe, Drug
+from piglets.models import Piglets
 
 
 class CreatePigletsVetEventSerializer(serializers.ModelSerializer):
@@ -42,3 +43,22 @@ class DrugSerializer(serializers.ModelSerializer):
     class Meta:
         model = Drug
         fields = '__all__'
+
+
+class PigletsVetEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PigletsVetEvent
+        fields = '__all__'
+
+
+class PigletsVetEventsSerializer(serializers.ModelSerializer):
+    # metatour_repr = serializers.ReadOnlyField()
+    week_tour = serializers.StringRelatedField(source='metatour.week_tour')
+    age = serializers.DurationField()
+    tagret_vet_events = serializers.StringRelatedField(source='piglets_vet_events_as_target.recipe',
+         many=True)
+
+    class Meta:
+        model = Piglets
+        fields = ['id', 'quantity', 'gilts_quantity', 'transfer_part_number', 
+            'birthday', 'week_tour', 'age', 'tagret_vet_events']

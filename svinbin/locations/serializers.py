@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 import sows.serializers as sows_serializers
 import piglets.serializers as piglets_serializers
+import veterinary.serializers as veterinary_serializers
 
 from locations.models import Location, Section
 
@@ -43,6 +44,20 @@ class LocationCellSerializer(serializers.ModelSerializer):
 class LocationPigletsCellSerializer(serializers.ModelSerializer):
     cell = serializers.ReadOnlyField(source='get_cell_number')
     piglets = piglets_serializers.PigletsSimpleSerializer(many=True, read_only=True)
+    is_piglets_empty = serializers.ReadOnlyField()
+
+    class Meta:
+        model = Location
+        fields = [
+            'id',
+            'cell',
+            'piglets',
+            'is_piglets_empty']
+
+
+class LocationPigletsVetCellSerializer(serializers.ModelSerializer):
+    cell = serializers.ReadOnlyField(source='get_cell_number')
+    piglets = veterinary_serializers.PigletsVetEventsSerializer(many=True, read_only=True)
     is_piglets_empty = serializers.ReadOnlyField()
 
     class Meta:
