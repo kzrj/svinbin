@@ -14,11 +14,11 @@ class Drug(CoreModel):
 
 class Recipe(CoreModel):
     MED_TYPES = [
-        ('vac', 'vaccine'), ('heal', 'healing'),
-        ('prev', 'prevention'),]
+        ('vac', 'Вакцинация'), ('heal', 'Лечение'),
+        ('prev', 'Профилактика'),]
     MED_METHODS = [
-        ('feed', 'feed'), ('inj', 'injection'),
-        ('water', 'water'),]
+        ('feed', 'Корм'), ('inj', 'Инъекция'),
+        ('water', 'Вода'),]
 
     med_type = models.CharField(max_length=50, choices=MED_TYPES)
     med_method = models.CharField(max_length=30, choices=MED_METHODS)
