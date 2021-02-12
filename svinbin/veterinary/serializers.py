@@ -12,6 +12,8 @@ class CreatePigletsVetEventSerializer(serializers.ModelSerializer):
 
 class RecipeSerializer(serializers.ModelSerializer):
     drug_name = serializers.StringRelatedField(source='drug', read_only=True)
+    ru_type = serializers.ChoiceField(source='med_type', read_only=True)
+    ru_method = serializers.ChoiceField(source='med_method', read_only=True)
 
     class Meta:
         model = Recipe
