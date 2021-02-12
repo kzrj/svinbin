@@ -32,8 +32,15 @@ class Recipe(CoreModel):
                 return mt[1]
         return None
 
+    @property
+    def get_med_method(self):
+        for mm in self.MED_METHODS:
+            if self.med_method == mm[0]:
+                return mm[1]
+        return None
+
     def __str__(self):
-        return f'{self.get_med_type} {self.med_method} {self.drug} {self.doze}'
+        return f'{self.get_med_type} {self.get_med_method} {self.drug} {self.doze}'
 
 
 class PigletsVetEventManager(CoreModelManager):
