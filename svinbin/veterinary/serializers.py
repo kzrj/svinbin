@@ -55,10 +55,9 @@ class PigletsVetEventsSerializer(serializers.ModelSerializer):
     # metatour_repr = serializers.ReadOnlyField()
     week_tour = serializers.StringRelatedField(source='metatour.week_tour')
     age = serializers.DurationField()
-    tagret_vet_events = serializers.StringRelatedField(source='piglets_vet_events_as_target',
-         many=True)
-    history_vet_events = serializers.StringRelatedField(source='pigletsvetevent_set',
-         many=True)
+    # tagret_vet_events = serializers.StringRelatedField(source='piglets_vet_events_as_target',
+    #      many=True)
+    history_vet_events = RecipeSerializer(source='pigletsvetevent_set', many=True)
 
     class Meta:
         model = Piglets
