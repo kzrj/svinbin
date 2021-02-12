@@ -36,7 +36,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Recipe
-        fields = '__all__'
+        exclude = ['created_at', 'modified_at']
 
 
 class DrugSerializer(serializers.ModelSerializer):
@@ -47,14 +47,13 @@ class DrugSerializer(serializers.ModelSerializer):
 
 class PigletsVetEventSerializer(serializers.ModelSerializer):
     recipe = RecipeSerializer()
-    
+
     class Meta:
         model = PigletsVetEvent
-        fields = '__all__'
+        fields = ['recipe', 'date']
 
 
 class PigletsVetEventsSerializer(serializers.ModelSerializer):
-    # metatour_repr = serializers.ReadOnlyField()
     week_tour = serializers.StringRelatedField(source='metatour.week_tour')
     age = serializers.DurationField()
     # tagret_vet_events = serializers.StringRelatedField(source='piglets_vet_events_as_target',
