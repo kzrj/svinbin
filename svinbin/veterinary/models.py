@@ -25,6 +25,7 @@ class Recipe(CoreModel):
     drug = models.ForeignKey(Drug, on_delete=models.CASCADE, related_name='recipes')
     doze = models.CharField(max_length=50, null=True, blank=True)
 
+    @property
     def get_med_type(self):
         for mt in self.MED_TYPES:
             if self.med_type == mt[0]:
