@@ -46,6 +46,8 @@ class DrugSerializer(serializers.ModelSerializer):
 
 
 class PigletsVetEventSerializer(serializers.ModelSerializer):
+    recipe = RecipeSerializer()
+    
     class Meta:
         model = PigletsVetEvent
         fields = '__all__'
@@ -57,7 +59,7 @@ class PigletsVetEventsSerializer(serializers.ModelSerializer):
     age = serializers.DurationField()
     # tagret_vet_events = serializers.StringRelatedField(source='piglets_vet_events_as_target',
     #      many=True)
-    history_vet_events = RecipeSerializer(source='pigletsvetevent_set', many=True)
+    history_vet_events = PigletsVetEventSerializer(source='pigletsvetevent_set', many=True)
 
     class Meta:
         model = Piglets
