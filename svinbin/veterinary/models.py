@@ -26,7 +26,7 @@ class Recipe(CoreModel):
     doze = models.CharField(max_length=50, null=True, blank=True)
 
     def __str__(self):
-        return f'{self.med_type} {self.med_method} {self.drug} {self.doze}'
+        return f'{med_type[1] if self.med_type == med_type[0] else for med_type in self.MED_TYPES} {self.med_method} {self.drug} {self.doze}'
 
 
 class PigletsVetEventManager(CoreModelManager):
@@ -55,4 +55,4 @@ class PigletsVetEvent(Event):
     objects = PigletsVetEventManager()
 
     def __str__(self):
-        return f'{self.recipe} {self.piglets}'
+        return f'{self.recipe}'
