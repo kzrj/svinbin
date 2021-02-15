@@ -47,7 +47,7 @@ class DrugSerializer(serializers.ModelSerializer):
 
 class PigletsVetEventSerializer(serializers.ModelSerializer):
     recipe = RecipeSerializer()
-    date_date = serializers.DateTimeField(source='date', format='%d-%m-%Y', read_only=True)
+    date_date = serializers.DateTimeField(source='date', format='%d-%m', read_only=True)
 
     class Meta:
         model = PigletsVetEvent
