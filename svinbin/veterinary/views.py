@@ -32,7 +32,8 @@ class DrugViewSet(viewsets.ModelViewSet):
 
 
 class PigletsVetEventViewSet(viewsets.ModelViewSet):
-    queryset = PigletsVetEvent.objects.all()
+    queryset = PigletsVetEvent.objects.all().select_related('recipe__location__pigletsGroupCell',
+     'recipe__drug')
     serializer_class = PigletsVetEventSerializer
     permission_classes = [VeterinarPermissions]
     # filter_class = RecipeFilter
