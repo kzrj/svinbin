@@ -70,3 +70,6 @@ class PigletsVetEvent(Event):
 
     def __str__(self):
         return f'{self.recipe}'
+
+    class Meta:
+        ordering = ['date']
