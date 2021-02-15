@@ -78,7 +78,7 @@ router.register(r'rollbacks', RollbackViewSet, basename='rollbacks')
 # veterinary
 router.register(r'veterinary/recipes', veterinary_views.RecipeViewSet, basename='veterinary-recipes')
 router.register(r'veterinary/drugs', veterinary_views.DrugViewSet, basename='veterinary-drugs')
-router.register(r'veterinary/piglets_events', veterinary_views.DrugViewSet, 
+router.register(r'veterinary/piglets_events', veterinary_views.PigletsVetEventViewSet, 
 	basename='veterinary-piglets-events')
 
 schema_view = get_swagger_view(title='API Docs')
