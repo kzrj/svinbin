@@ -3,7 +3,7 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 
 from veterinary.models import PigletsVetEvent, Recipe, Drug
-from veterinary.serializers import RecipeSerializer, DrugSerializer
+from veterinary.serializers import RecipeSerializer, DrugSerializer, PigletsVetEventSerializer
 from veterinary.filters import RecipeFilter
 from core.permissions import VeterinarPermissions
 
@@ -33,7 +33,7 @@ class DrugViewSet(viewsets.ModelViewSet):
 
 class PigletsVetEventViewSet(viewsets.ModelViewSet):
     queryset = PigletsVetEvent.objects.all()
-    serializer_class = PigletsVetEvent
+    serializer_class = PigletsVetEventSerializer
     permission_classes = [VeterinarPermissions]
     # filter_class = RecipeFilter
 
