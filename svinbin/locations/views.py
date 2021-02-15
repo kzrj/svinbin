@@ -79,7 +79,7 @@ class LocationViewSet(viewsets.ModelViewSet):
                         ) \
                     .prefetch_related(
                         'piglets__metatour__week_tour',
-                        'piglets__piglets_vet_events_as_target__recipe',
+                        'piglets__pigletsvetevent_set__recipe',
                         )
             )
 
