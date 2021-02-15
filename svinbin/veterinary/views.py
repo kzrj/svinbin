@@ -29,3 +29,18 @@ class DrugViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(self.get_object())
         super().destroy(*args, **kwargs)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class PigletsVetEventViewSet(viewsets.ModelViewSet):
+    queryset = PigletsVetEvent.objects.all()
+    serializer_class = PigletsVetEvent
+    permission_classes = [VeterinarPermissions]
+    # filter_class = RecipeFilter
+
+    def create(self, *args, **kwargs):
+        pass
+
+    def destroy(self, *args, **kwargs):
+        serializer = self.get_serializer(self.get_object())
+        super().destroy(*args, **kwargs)
+        return Response(serializer.data, status=status.HTTP_200_OK)
