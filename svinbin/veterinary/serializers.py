@@ -49,10 +49,12 @@ class PigletsVetEventSerializer(serializers.ModelSerializer):
     recipe = RecipeSerializer()
     date_date = serializers.DateTimeField(source='date', format='%d-%m', read_only=True)
     location = serializers.ReadOnlyField(source='location.get_full_loc')
+    week_tour = serializers.ReadOnlyField()
+    piglets_quantity = serializers.ReadOnlyField()
 
     class Meta:
         model = PigletsVetEvent
-        fields = ['recipe', 'date', 'date_date', 'location']
+        fields = ['recipe', 'date', 'date_date', 'location', 'week_tour', 'piglets_quantity']
 
 
 class PigletsVetEventsSerializer(serializers.ModelSerializer):
