@@ -72,4 +72,4 @@ class PigletsVetEvent(Event):
         return f'{self.recipe}'
 
     class Meta:
-        ordering = ['date']
+        ordering = ['-date']
