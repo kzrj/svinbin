@@ -18,7 +18,7 @@ class SectionSerializer(serializers.ModelSerializer):
 
 class SectionFilterSerializer(serializers.ModelSerializer):
     location = serializers.PrimaryKeyRelatedField(read_only=True)
-    workshop = serializers.StringRelatedKey(read_only=True)
+    workshop = serializers.StringRelatedField(read_only=True)
     
     class Meta:
         model = Section
