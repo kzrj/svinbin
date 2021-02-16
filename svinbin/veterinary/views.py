@@ -57,7 +57,7 @@ class PigletsVetEventViewSet(viewsets.ModelViewSet):
     @action(methods=['get'], detail=False)
     def get_filters_data(self, request):
         data = dict()
-        data['sections'] = SectionFilterSerializer(Section.objects.exclude(workshop__number__in=[1, 2]),
+        data['sections'] = SectionFilterSerializer(Section.objects.exclude(workshop__number__in=[1, 2, 11]),
              many=True).data
 
         tours = Tour.objects.get_week_tours_by_piglets(piglets=Piglets.objects.all())
