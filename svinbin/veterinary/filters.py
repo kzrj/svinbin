@@ -16,12 +16,9 @@ class RecipeFilter(filters.FilterSet):
 
 
 class PigletsVetEventFilter(filters.FilterSet):
-    ru_type = filters.CharFilter(method='filter_ru_type')
     sections = NumberInFilter(method='filter_sections')
     tours = NumberInFilter(field_name='week_tour__id', lookup_expr='in')
-
-    def filter_ru_type(self, queryset, name, value):
-        return queryset.filter(recipe__med_type=value)
+    med_type = filters.CharFilter(field_name='recipe__med_type', lookup_expr='exact')
 
     def filter_sections(self, queryset, name, value):
         return queryset.filter(Q(
