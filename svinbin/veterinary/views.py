@@ -12,7 +12,7 @@ from piglets.models import Piglets
 
 from veterinary.models import PigletsVetEvent, Recipe, Drug
 from veterinary.serializers import RecipeSerializer, DrugSerializer, PigletsVetEventSerializer
-from veterinary.filters import RecipeFilter
+from veterinary.filters import RecipeFilter, PigletsVetEventFilter
 from core.permissions import VeterinarPermissions
 
 
@@ -44,7 +44,7 @@ class PigletsVetEventViewSet(viewsets.ModelViewSet):
         'location__section', 'recipe__drug')
     serializer_class = PigletsVetEventSerializer
     permission_classes = [VeterinarPermissions]
-    # filter_class = RecipeFilter
+    filter_class = PigletsVetEventFilter
 
     def create(self, *args, **kwargs):
         pass
