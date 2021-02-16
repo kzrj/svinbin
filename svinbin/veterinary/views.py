@@ -60,7 +60,7 @@ class PigletsVetEventViewSet(viewsets.ModelViewSet):
         data['sections'] = SectionFilterSerializer(Section.objects.exclude(workshop__number__in=[1, 2]),
              many=True).data
 
-        tours = Tour.objects.get_tours_by_piglets(piglets=Piglets.objects.all())
+        tours = Tour.objects.get_week_tours_by_piglets(piglets=Piglets.objects.all())
         data['tours'] = TourSimpleSerializer(tours, many=True).data
 
         return Response(data)

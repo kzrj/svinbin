@@ -27,18 +27,18 @@ services:
     depends_on:
       - db
       - nginx
-    # command: bash -c "cd svinbin &&
-    #                   python manage.py migrate &&
-    #                   python manage.py makemigrations --no-input &&
-    #                   python manage.py test veterinary.tests.test_views.RecipeDrugsViewSetTest.test_create_druf_recipe"
+    command: bash -c "cd svinbin &&
+                      python manage.py migrate &&
+                      python manage.py makemigrations --no-input &&
+                      python manage.py test tours.tests.test_models.TourModelManagerTest.test_get_week_tours_by_piglets"
                       # python manage.py test veterinary.tests.test_models.PigletsVetEventModelTest"
 
-    restart: unless-stopped
-    command: bash -c "cd svinbin &&
-                      python manage.py makemigrations --no-input &&
-                      python manage.py migrate &&
-                      python manage.py collectstatic --no-input &&
-                      gunicorn svinbin.wsgi -b 0.0.0.0:8000"
+    # restart: unless-stopped
+    # command: bash -c "cd svinbin &&
+    #                   python manage.py makemigrations --no-input &&
+    #                   python manage.py migrate &&
+    #                   python manage.py collectstatic --no-input &&
+    #                   gunicorn svinbin.wsgi -b 0.0.0.0:8000"
    
     volumes:
       - .:/code

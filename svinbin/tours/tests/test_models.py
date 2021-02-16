@@ -111,6 +111,26 @@ class TourModelManagerTest(TestCase):
         all_piglets_tours = Piglets.objects.all()
         self.assertEqual(Tour.objects.get_tours_by_piglets(all_piglets_tours).count(), 4)
 
+    def test_get_week_tours_by_piglets(self):
+        # piglets in ws5
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws4, 100)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_cell_ws4_3, 100)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour3,
+            self.loc_ws5, 100)
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour4,
+            self.loc_ws5, 100)
+
+        piglets_t1_t2 = Piglets.objects.filter(pk__in=[piglets1.pk, piglets2.pk])
+        t1_t_2 = Tour.objects.get_week_tours_by_piglets(piglets=piglets_t1_t2)
+        self.assertEqual(t1_t_2.count(), 2)
+        self.assertEqual(t1_t_2[0].week_number in [1,2], True)
+        self.assertEqual(t1_t_2[1].week_number in [1,2], True)
+
+        all_piglets_tours = Piglets.objects.all()
+        self.assertEqual(Tour.objects.get_week_tours_by_piglets(all_piglets_tours).count(), 4)
+
     
 class TourModelTest(TestCase):
     def setUp(self):

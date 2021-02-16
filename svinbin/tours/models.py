@@ -571,6 +571,9 @@ class TourManager(CoreModelManager):
     def get_tours_by_piglets(self, piglets):
         return self.get_queryset().filter(metatourrecords__metatour__piglets__in=piglets).distinct()
 
+    def get_week_tours_by_piglets(self, piglets):
+        return self.get_queryset().filter(id__in=piglets.values_list('metatour__week_tour', flat=True))
+
 
 class Tour(CoreModel):
     start_date = models.DateTimeField()
