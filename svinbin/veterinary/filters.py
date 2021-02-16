@@ -19,6 +19,7 @@ class PigletsVetEventFilter(filters.FilterSet):
     sections = NumberInFilter(method='filter_sections')
     tours = NumberInFilter(field_name='week_tour__id', lookup_expr='in')
     med_type = filters.CharFilter(field_name='recipe__med_type', lookup_expr='exact')
+    date = filters.DateFromToRangeFilter()
 
     def filter_sections(self, queryset, name, value):
         return queryset.filter(Q(
