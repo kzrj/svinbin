@@ -13,6 +13,12 @@ class TourSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class TourSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tour
+        fields = ['id', 'year', 'week_number']
+
+
 class SowCycleSerializer(serializers.ModelSerializer):
     sow_semination = SimpleSeminationSerializer(many=True)
     sow_ultrasound = SimpleUltrasoundSerializer(many=True)

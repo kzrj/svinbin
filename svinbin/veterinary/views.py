@@ -2,6 +2,13 @@
 from rest_framework import status, viewsets
 from rest_framework.response import Response
 
+from locations.models import Section
+from locations.serializers import SectionFilterSerializer
+
+from tours.models import Tour
+from tours.serializers import TourSimpleSerializer
+from piglets.models import Piglets
+
 from veterinary.models import PigletsVetEvent, Recipe, Drug
 from veterinary.serializers import RecipeSerializer, DrugSerializer, PigletsVetEventSerializer
 from veterinary.filters import RecipeFilter
@@ -45,3 +52,14 @@ class PigletsVetEventViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(self.get_object())
         super().destroy(*args, **kwargs)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['get'], detail=False)
+    def get_filters_data(self, request):
+        data = dict()
+        data['sections'] = SectionFilterSerializer(data=Section.objects.exclude(workshop__number__in=[1, 2]),
+             many=True)
+
+        tours = Tour.objects.get_tours_by_piglets(piglets=Piglets.objects.all())
+        data['tours'] = TourSimpleSerializer(data=tours, many=True)
+
+        return Response(data)

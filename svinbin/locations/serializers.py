@@ -10,6 +10,16 @@ from locations.models import Location, Section
 
 class SectionSerializer(serializers.ModelSerializer):
     location = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Section
+        exclude = ['created_at', 'modified_at' ]
+
+
+class SectionFilterSerializer(serializers.ModelSerializer):
+    location = serializers.PrimaryKeyRelatedField(read_only=True)
+    workshop = serializers.StringRelatedKey(read_only=True)
+    
     class Meta:
         model = Section
         exclude = ['created_at', 'modified_at' ]  
