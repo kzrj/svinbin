@@ -18,13 +18,12 @@ def create_piglets_statuses():
             ])
 
 
-def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_quantity=0,
-     status=None, birthday=None):
+def create_new_group_with_metatour_by_one_tour(tour, location, quantity, status=None, birthday=None):
     if not birthday:
         birthday = timezone.now()
 
     piglets = Piglets.objects.create(location=location, quantity=quantity,
-     start_quantity=quantity, gilts_quantity=gilts_quantity, status=status, birthday=birthday)
+     start_quantity=quantity, status=status, birthday=birthday)
 
     meta_tour = MetaTour.objects.create(piglets=piglets)
     meta_tour.records.create_record(metatour=meta_tour, tour=tour, 
@@ -34,7 +33,7 @@ def create_new_group_with_metatour_by_one_tour(tour, location, quantity, gilts_q
     return piglets
 
 
-def create_from_sow_farrow(tour, location, quantity=0, gilts_quantity=0, status=None, date=timezone.now()):
+def create_from_sow_farrow(tour, location, quantity=0, status=None, date=timezone.now()):
     sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=tour.week_number)
     alive_quantity = 10
 

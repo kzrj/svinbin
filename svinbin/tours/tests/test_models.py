@@ -170,8 +170,7 @@ class TestMetaTourRecordModel(TestCase):
     def test_create_record_without_percentage(self):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         location = Location.objects.get(section__number=1, section__workshop__number=3)
-        piglets = Piglets.objects.create(location=location, quantity=10, start_quantity=10,
-        gilts_quantity=0, status=None)
+        piglets = Piglets.objects.create(location=location, quantity=10, start_quantity=10, status=None)
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
         record = meta_tour.records.create_record(metatour=meta_tour, tour=tour,
@@ -184,8 +183,7 @@ class TestMetaTourRecordModel(TestCase):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
         location = Location.objects.get(section__number=1, section__workshop__number=3)
-        piglets = Piglets.objects.create(location=location, quantity=10, start_quantity=10,
-        gilts_quantity=0, status=None)
+        piglets = Piglets.objects.create(location=location, quantity=10, start_quantity=10, status=None)
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
         record = meta_tour.records.create_record(metatour=meta_tour, tour=tour,
@@ -204,8 +202,7 @@ class TestMetaTourRecordModel(TestCase):
         tour = Tour.objects.get_or_create_by_week_in_current_year(1)
         tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
         location = Location.objects.get(section__number=1, section__workshop__number=3)
-        piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100,
-        gilts_quantity=0, status=None)
+        piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100, status=None)
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
         record1 = meta_tour.records.create_record(metatour=meta_tour, tour=tour, 
@@ -258,8 +255,7 @@ class TestMetaTourRecordModel(TestCase):
         SowFarrow.objects.create_sow_farrow(sow=sow, alive_quantity=10, date=farrow_date)
         
         location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
-        piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100,
-        gilts_quantity=0, status=None)
+        piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100, status=None)
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
         record1 = meta_tour.records.create_record(meta_tour, tour1, 60, piglets.quantity)
@@ -1332,17 +1328,3 @@ class TourPrivesTest(TestCase):
         bool(tours)
         self.assertEqual(round(tours[0].total3_8_5, 2), round(tours[0].week_weight_8_5 - \
             (tours[0].ws5_remont * tours[0].week_weight_avg_8_5), 2))
-
-
-# class MetaTourRecordsTestV2(TestCase):
-#     def setUp(self):
-#         locations_testing.create_workshops_sections_and_cells()
-#         pigs_testings.create_statuses()
-#         sows_events_testing.create_types()
-#         piglets_testing.create_piglets_statuses()
-
-#         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
-#         self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
-
-#     def test_create_record(self):
-#         pass

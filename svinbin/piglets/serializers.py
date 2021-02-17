@@ -16,21 +16,18 @@ class PigletsSerializer(serializers.ModelSerializer):
 
 
 class PigletsSimpleSerializer(serializers.ModelSerializer):
-    # metatour_repr = serializers.ReadOnlyField()
     week_tour = serializers.StringRelatedField(source='metatour.week_tour')
     age = serializers.DurationField()
 
     class Meta:
         model = Piglets
-        fields = ['id', 'quantity', 'gilts_quantity', 'transfer_part_number', 
+        fields = ['id', 'quantity', 'transfer_part_number', 
             'birthday', 'week_tour', 'age']
 
 
 class MergeFromListRecordSerializer(serializers.Serializer):
     piglets_id = serializers.IntegerField()
     quantity = serializers.IntegerField()
-    gilts_contains = serializers.BooleanField(default=False)
-    gilts_quantity = serializers.IntegerField(default=0)
     changed = serializers.BooleanField(default=False)
 
 
@@ -42,7 +39,6 @@ class MergeFromListSerializer(serializers.Serializer):
 class MovePigletsSerializer(serializers.Serializer):
     to_location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     new_amount = serializers.IntegerField(required=False)
-    gilts_contains = serializers.BooleanField(default=False, required=False, allow_null=True)
     merge = serializers.BooleanField(default=False)
 
 
@@ -57,7 +53,6 @@ class InitPigletsSerializer(serializers.Serializer):
      required=False, allow_null=True)
     location = serializers.PrimaryKeyRelatedField(queryset=Location.objects.all())
     quantity = serializers.IntegerField()
-    gilts_quantity = serializers.IntegerField(required=False, allow_null=True)
 
     transaction_date = serializers.CharField(required=False, allow_null=True)
 

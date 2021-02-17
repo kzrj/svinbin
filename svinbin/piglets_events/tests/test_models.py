@@ -131,8 +131,8 @@ class PigletsMergerModelTest(TransactionTestCase):
         piglets3 = piglets_testing.create_from_sow_farrow(self.tour3, self.loc_ws3_sec1_cell3, 10)
 
         merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
+            {'piglets_id': piglets1.pk, 'quantity': 10, 'changed': False },
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False }
         ]
 
         nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
@@ -157,10 +157,8 @@ class PigletsMergerModelTest(TransactionTestCase):
          self.loc_ws3_sec1_cell3, 10)
 
         merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True,
-             'gilts_contains': False},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False,
-             'gilts_contains': False}
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True },
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False }
         ]
 
         nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list,
@@ -205,8 +203,8 @@ class PigletsMergerModelTest(TransactionTestCase):
         piglets3 = piglets_testing.create_from_sow_farrow(self.tour3, self.loc_ws3_sec1_cell3, 10)
 
         merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True, 'gilts_contains': False},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True },
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False }
         ]
 
         nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
@@ -216,8 +214,6 @@ class PigletsMergerModelTest(TransactionTestCase):
         sow1.refresh_from_db()
         sow2.refresh_from_db()
 
-        # self.assertEqual(sow1.tour, None)
-        # self.assertEqual(sow2.tour, None)
         self.assertEqual(sow1.status.title, 'Отъем')
         self.assertEqual(sow2.status.title, 'Отъем')
 
@@ -235,8 +231,8 @@ class PigletsMergerModelTest(TransactionTestCase):
         sow2.mark_as_nurse
 
         merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True, 'gilts_contains': False},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False, 'gilts_contains': False}
+            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True },
+            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False }
         ]
 
         nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list, self.loc_ws3)
@@ -245,121 +241,25 @@ class PigletsMergerModelTest(TransactionTestCase):
         sow1.refresh_from_db()
         sow2.refresh_from_db()
 
-        # self.assertEqual(sow1.tour, None)
-        # self.assertEqual(sow2.tour, None)
         self.assertEqual(sow1.status.title, 'Отъем')
         self.assertEqual(sow2.status.title, 'Отъем')
 
         self.assertEqual(sow1.weaningsow_set.all().count(), 1)
         self.assertEqual(sow2.weaningsow_set.all().count(), 1)
-
-    def test_create_from_merging_list_v3(self):
-        # with gilts
-        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1,
-         self.loc_ws3_sec1_cell1, 10)
-        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2,
-         self.loc_ws3_sec1_cell2, 10)
-
-        piglets1.add_gilts_without_increase_quantity(3)
-        piglets2.add_gilts_without_increase_quantity(2)
-
-        merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True,
-             'gilts_contains': True},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False,
-             'gilts_contains': False}
-        ]
-
-        nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list,
-         self.loc_ws3)
-        self.assertEqual(nomad_piglets.location, self.loc_ws3)
-        self.assertEqual(nomad_piglets.quantity, 17)
-        self.assertEqual(nomad_piglets.gilts_quantity, 5)
-
-    def test_create_from_merging_list_v4(self):
-        # without gilts
-        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1,
-         self.loc_ws3_sec1_cell1, 10)
-        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2,
-         self.loc_ws3_sec1_cell2, 10)
-        
-        piglets1.add_gilts_without_increase_quantity(3)
-        piglets2.add_gilts_without_increase_quantity(2)
-
-        merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True,
-             'gilts_contains': False},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False,
-             'gilts_contains': False}
-        ]
-
-        nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list,
-         self.loc_ws3)
-        self.assertEqual(nomad_piglets.location, self.loc_ws3)
-        self.assertEqual(nomad_piglets.quantity, 17)
-        self.assertEqual(nomad_piglets.gilts_quantity, 2)
-
-    def test_create_from_merging_list_v5_validate(self):
-        # without gilts
-        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1,
-         self.loc_ws3_sec1_cell1, 10)
-        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2,
-         self.loc_ws3_sec1_cell2, 10)
-        
-        piglets1.add_gilts_without_increase_quantity(3)
-        piglets2.add_gilts_without_increase_quantity(2)
-
-        merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 8, 'changed': True,
-             'gilts_contains': False},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False,
-             'gilts_contains': False}
-        ]
-
-        with self.assertRaises(ValidationError):
-            nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list,
-             self.loc_ws3)
-       
+      
     def test_merge_piglets_in_location(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3_sec1_cell1, 10)
-        piglets1.add_gilts_without_increase_quantity(3)
         piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
             self.loc_ws3_sec1_cell1, 10)
-        piglets2.add_gilts_without_increase_quantity(2)
 
         merged_piglets = PigletsMerger.objects.merge_piglets_in_location(
             self.loc_ws3_sec1_cell1)
         self.assertEqual(merged_piglets.quantity, 20)
-        self.assertEqual(merged_piglets.gilts_quantity, 5)
 
         piglets1.refresh_from_db()
         piglets2.refresh_from_db()
-        self.assertEqual(piglets1.active, False)
-
-    def test_create_from_merging_list_v5_with_gilts_quantity(self):
-        # without gilts
-        piglets1 = piglets_testing.create_from_sow_farrow(self.tour1,
-         self.loc_ws3_sec1_cell1, 10)
-        piglets2 = piglets_testing.create_from_sow_farrow(self.tour2,
-         self.loc_ws3_sec1_cell2, 10)
-        
-        piglets1.add_gilts_without_increase_quantity(3)
-        piglets2.add_gilts_without_increase_quantity(2)
-
-        merging_list = [
-            {'piglets_id': piglets1.pk, 'quantity': 7, 'changed': True,
-             'gilts_contains': False, 'gilts_quantity': 7},
-            {'piglets_id': piglets2.pk, 'quantity': 10, 'changed': False,
-             'gilts_contains': True, 'gilts_quantity': 5}
-        ]
-
-        nomad_piglets = PigletsMerger.objects.create_from_merging_list(merging_list,
-         self.loc_ws3)
-
-        self.assertEqual(nomad_piglets.location, self.loc_ws3)
-        self.assertEqual(nomad_piglets.quantity, 17)
-        self.assertEqual(nomad_piglets.gilts_quantity, 12)
+        self.assertEqual(piglets1.active, False)      
 
     def test_model_method_restore_parent_piglets_and_delete_created(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
@@ -449,24 +349,7 @@ class PigletsSplitModelTest(TestCase):
 
         self.assertEqual(Piglets.objects.get_all(). \
             filter(split_as_child=split_record).count(), 2)
-
-    def test_split_with_gilts(self):
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws3, 100)
-        piglets1.add_gilts_without_increase_quantity(10)
-
-        self.assertEqual(piglets1.gilts_quantity, 10)
-        self.assertEqual(piglets1.quantity, 100)
-
-        child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
-            parent_piglets=piglets1, new_amount=50, gilts_to_new=True)
-
-        self.assertEqual(child_piglets1.gilts_quantity, 0)
-        self.assertEqual(child_piglets1.quantity, 50)
-
-        self.assertEqual(child_piglets2.gilts_quantity, 10)
-        self.assertEqual(child_piglets2.quantity, 50)
-       
+     
     def test_split_validate(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3, 100)
@@ -477,25 +360,6 @@ class PigletsSplitModelTest(TestCase):
         with self.assertRaises(ValidationError):
             child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
                 parent_piglets=piglets, new_amount=100)
-
-    def test_split_with_gilts_validate(self):
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws3, 100)
-        piglets1.add_gilts_without_increase_quantity(10)
-
-        with self.assertRaises(ValidationError):
-            child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
-                parent_piglets=piglets1, new_amount=9, gilts_to_new=True)
-
-
-    def test_split_with_gilts_validate2(self):
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws3, 100)
-        piglets1.add_gilts_without_increase_quantity(10)
-
-        with self.assertRaises(ValidationError):
-            child_piglets1, child_piglets2 = PigletsSplit.objects.split_return_groups(
-                parent_piglets=piglets1, new_amount=91, gilts_to_new=False)
 
     def test_restore_parent_and_delete_children(self):
         piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,

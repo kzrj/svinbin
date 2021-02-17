@@ -21,9 +21,6 @@ class PigletsQuerySet(models.QuerySet):
     def get_total_quantity(self):
         return self.aggregate(models.Sum('quantity'))['quantity__sum']
 
-    def get_total_gilts_quantity(self):
-        return self.aggregate(models.Sum('gilts_quantity'))['gilts_quantity__sum']
-
     def active(self):
         return self.filter(active=True)
 
@@ -73,41 +70,11 @@ class PigletsQuerySet(models.QuerySet):
 
 
 class PigletsManager(CoreModelManager):
-    # def create(self, *args, **kwargs):
-    #     # try:
-    #     #     super(PigletsManager, self).create(*args, **kwargs)
-    #     # except:
-    #     last_pk = self.get_all().order_by('-pk').first().pk
-    #     kwargs['id'] = last_pk + 1
-    #     print(kwargs)
-    #     return super(PigletsManager, self).create(*args, **kwargs)
-
     def get_queryset(self):
         return PigletsQuerySet(self.model, using=self._db).select_related('metatour').active()
 
     def get_all(self):
         return PigletsQuerySet(self.model, using=self._db)
-
-    # for init and test only
-    def init_piglets_with_metatour(self, tour, location, quantity, birthday=None, gilts_quantity=0, created_at=None):
-        if not birthday:
-            birthday = timezone.now()
-
-        piglets = self.create(location=location,
-                start_quantity=quantity,
-                quantity=quantity,
-                gilts_quantity=gilts_quantity,
-                birthday=birthday)
-        metatour = MetaTour.objects.create(piglets=piglets)
-        MetaTourRecord.objects.create_record(metatour=metatour, tour=tour, quantity=quantity,
-         total_quantity=quantity, percentage=100)
-        metatour.set_week_tour()
-        return piglets
-
-    def init_piglets_by_farrow_date(self, farrow_date, location, quantity, birthday=None, gilts_quantity=0):
-        tour = Tour.objects.create_tour_from_farrow_date_string(farrow_date)
-        return self.init_piglets_with_metatour(tour=tour, location=location, 
-            quantity=quantity, gilts_quantity=gilts_quantity)
 
 
 class Piglets(CoreModel):
@@ -117,7 +84,6 @@ class Piglets(CoreModel):
 
     start_quantity = models.IntegerField()
     quantity = models.IntegerField()
-    gilts_quantity = models.IntegerField(default=0)
 
     merger_as_parent = models.ForeignKey('piglets_events.PigletsMerger', on_delete=models.SET_NULL,
         null=True, blank=True, related_name='piglets_as_parents')
@@ -153,20 +119,6 @@ class Piglets(CoreModel):
             self.active = False
         self.save()
 
-    def remove_gilts(self, quantity):
-        if self.gilts_quantity > 0:
-            self.quantity -= quantity
-            self.gilts_quantity -= quantity
-            self.save()
-
-    def remove_gilts_without_decrease_quantity(self, quantity):
-        self.gilts_quantity -= quantity
-        self.save()
-
-    def add_gilts_without_increase_quantity(self, quantity):
-        self.gilts_quantity += quantity
-        self.save()
-
     def change_status_to(self, status_title):
         self.status = PigletsStatus.objects.get(title=status_title)
         self.save()
@@ -190,12 +142,6 @@ class Piglets(CoreModel):
     def assign_transfer_part_number(self, number):
         self.transfer_part_number = number
         self.save()
-
-    @property
-    def is_it_gilts_group(self):
-        if self.gilts_quantity > 0:
-            return True
-        return False
 
     @property
     def age(self):

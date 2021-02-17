@@ -442,7 +442,6 @@ class GiltManager(CoreModelManager):
         tour = mother_sow.tour
         if not tour:
             tour = mother_sow.get_last_farrow.tour
-            # raise DjangoValidationError(message=f'У свиноматки {mother_sow.farm_id} не текущего тура.')
 
         gilt = self.create(
             birth_id=birth_id,
@@ -450,9 +449,6 @@ class GiltManager(CoreModelManager):
             tour=tour,
             farrow=mother_sow.get_last_farrow
          )
-
-        if piglets:
-            piglets.add_gilts_without_increase_quantity(1)
 
         return gilt
 

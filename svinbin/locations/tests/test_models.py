@@ -192,31 +192,26 @@ class LocationQsPopulationTest(TransactionTestCase):
 
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[0], quantity=15,
-            gilts_quantity=0,
             birthday=(datetime.today() - timedelta(days=1))
             )
 
         piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[1], quantity=16,
-            gilts_quantity=5,
             birthday=(datetime.today() - timedelta(days=5))
             )
 
         piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[2], quantity=17,
-            gilts_quantity=5,
             birthday=(datetime.today() - timedelta(days=8))
             )
 
         piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[3], quantity=18,
-            gilts_quantity=0,
             birthday=(datetime.today() - timedelta(days=20))
             )
 
         piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[46], quantity=19,
-            gilts_quantity=6,
             birthday=(datetime.today() - timedelta(days=30))
             )
 
@@ -251,8 +246,6 @@ class LocationQsPopulationTest(TransactionTestCase):
         self.assertEqual(ws3.count_piglets_15_21, 18)
         self.assertEqual(ws3.count_piglets_28_plus, 19)
 
-        self.assertEqual(ws3.gilts_count, (5 + 5 + 6))
-
     def test_add_pigs_count_by_ws3_sections_by_age(self):
         today = datetime.today()
         section_locs = Location.objects.filter(section__workshop__number=3,
@@ -267,9 +260,7 @@ class LocationQsPopulationTest(TransactionTestCase):
         self.assertEqual(section_locs[0].count_piglets_8_14, 17)
         self.assertEqual(section_locs[0].count_piglets_15_21, 18)
         self.assertEqual(section_locs[0].count_piglets_28_plus, None)
-        self.assertEqual(section_locs[0].gilts_count, (5 + 5))
         
         self.assertEqual(section_locs[1].pigs_count, 19)
         self.assertEqual(section_locs[1].count_piglets_0_7, None)
         self.assertEqual(section_locs[1].count_piglets_28_plus, 19)
-        self.assertEqual(section_locs[1].gilts_count, 6)

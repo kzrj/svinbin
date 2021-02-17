@@ -505,9 +505,6 @@ class SowQueryTest(TransactionTestCase):
         self.assertEqual(sows_qs.first().last_date_mark, mg6.date)
         self.assertEqual(sows_qs.first().last_week_mark, mg6.tour.week_number)
 
-        # sows_qs = sows_qs.add_last_mark_gilts()
-        # print(sows_qs.first().gilt_list_by_last_tour)
-
 
 class GiltModelManagerTest(TransactionTestCase):
     def setUp(self):
@@ -529,8 +526,6 @@ class GiltModelManagerTest(TransactionTestCase):
         self.assertEqual(gilt.mother_sow, sow)
         self.assertEqual(gilt.tour.week_number, 1)
         self.assertEqual(gilt.farrow, sow.get_last_farrow)
-        self.assertEqual(piglets.gilts_quantity, 1)
-
 
 class Sow24fReportTest(TransactionTestCase):
     def setUp(self):

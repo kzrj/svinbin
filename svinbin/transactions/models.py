@@ -139,7 +139,6 @@ class PigletsTransactionManager(CoreModelManager):
                 split_event=split_event
                 )
 
-
         if piglets_group.location.pigletsGroupCell and to_location.workshop:
             piglets_group.change_status_to_without_save('Готовы ко взвешиванию')
 
@@ -152,9 +151,8 @@ class PigletsTransactionManager(CoreModelManager):
 
         return transaction
 
-    def transaction_with_split_and_merge(self, piglets, to_location, new_amount=None,
-         gilts_contains=False, reverse=False, merge=False, initiator=None, date=None,
-         allow_split_gilt=False):
+    def transaction_with_split_and_merge(self, piglets, to_location, new_amount=None, reverse=False,
+         merge=False, initiator=None, date=None):
         # move second piglets from split, new_amount piglets
         split_event = None
         merge_event = None
@@ -163,8 +161,7 @@ class PigletsTransactionManager(CoreModelManager):
 
         if new_amount:
             piglets1, piglets2_new_amount = PigletsSplit.objects.split_return_groups( \
-                parent_piglets=piglets, new_amount=new_amount, gilts_to_new=gilts_contains,\
-                initiator=initiator, allow_split_gilt=allow_split_gilt)
+                parent_piglets=piglets, new_amount=new_amount, initiator=initiator)
             
             moved_piglets = piglets2_new_amount
             stayed_piglets = piglets1
@@ -184,50 +181,6 @@ class PigletsTransactionManager(CoreModelManager):
                 merge_event = moved_piglets.merger_as_child
 
         return transaction, moved_piglets, stayed_piglets, split_event, merge_event
-
-    def dercrease_gilts_from_ws(self, piglets, gilts_amount):
-        if piglets.gilts_quantity >= gilts_amount:
-            piglets.gilts_quantity = piglets.gilts_quantity - gilts_amount
-        else:
-            gilts_to_decrease = gilts_amount - piglets.gilts_quantity
-            piglets.gilts_quantity = 0
-
-            workshop = piglets.location.get_workshop
-            piglets_in_ws_with_gilts = Piglets.objects.all().all_in_workshop(workshop.number)\
-                    .filter(gilts_quantity__gt=0).exclude(pk=piglets.pk)
-
-            for piglets_with_gilts in piglets_in_ws_with_gilts:
-                if piglets_with_gilts.gilts_quantity >= gilts_to_decrease:
-                    piglets_with_gilts.gilts_quantity = piglets_with_gilts.gilts_quantity - gilts_to_decrease
-                    piglets_with_gilts.save()
-                    break
-                else:
-                    gilts_to_decrease = gilts_to_decrease - piglets_with_gilts.gilts_quantity
-                    piglets_with_gilts.gilts_quantity = 0
-                    piglets_with_gilts.save()
-
-        piglets.save()
-
-        return piglets
-
-    def transaction_gilts_to_7_5(self, piglets, gilts_amount=None, initiator=None, date=None):
-        # split or not
-        if gilts_amount and gilts_amount < piglets.quantity:
-            # split check amount
-            piglets = self.dercrease_gilts_from_ws(piglets=piglets, gilts_amount=gilts_amount)
-
-            stayed_piglets, piglets_to_transfer = PigletsSplit.objects.split_return_groups( \
-                parent_piglets=piglets, new_amount=gilts_amount, gilts_to_new=None, initiator=initiator)
-        else:
-            gilts_amount = piglets.quantity
-            piglets_to_transfer = self.dercrease_gilts_from_ws(piglets=piglets, gilts_amount=piglets.quantity)
-        
-        piglets_to_transfer.gilts_quantity = gilts_amount
-        piglets_to_transfer.save()
-
-        to_location = Location.objects.get(workshop__number=11)
-        return self.create_transaction(to_location=to_location, piglets_group=piglets_to_transfer,
-         initiator=initiator, date=date)
 
 
 class PigletsTransaction(Transaction):

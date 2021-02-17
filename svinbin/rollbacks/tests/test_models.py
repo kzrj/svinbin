@@ -300,10 +300,7 @@ class PigletsRollbackModelTest(TransactionTestCase):
             self.locs_ws5[0], 100)
 
         piglets2, piglets3_new_amount = PigletsSplit.objects.split_return_groups(
-                    parent_piglets=piglets1,
-                    new_amount=59,
-                    gilts_to_new=True,
-                    )
+                    parent_piglets=piglets1, new_amount=59)
 
         WeighingPiglets.objects.create_weighing(piglets_group=piglets3_new_amount,
             total_weight=1560, place='o/2')
@@ -437,11 +434,9 @@ class PigletsRollbackModelTest(TransactionTestCase):
 
         new_location = Location.objects.get(workshop__number=3)
         merging_list = [
-            {'piglets_id': piglets1.pk, 'changed': True, 'quantity': 7, 'gilts_contains': True,
-             'gilts_quantity': 2},
-            {'piglets_id': piglets2.pk, 'changed': True, 'quantity': 12, 'gilts_contains': False,
-             'gilts_quantity': 0},
-            {'piglets_id': piglets3.pk, 'changed': False, 'gilts_quantity': 1},
+            {'piglets_id': piglets1.pk, 'changed': True, 'quantity': 7 },
+            {'piglets_id': piglets2.pk, 'changed': True, 'quantity': 12 },
+            {'piglets_id': piglets3.pk, 'changed': False },
         ]
         piglets_to_ws4 = PigletsMerger.objects.create_from_merging_list(
             merging_list=merging_list, new_location=new_location, initiator=self.brig3,
@@ -454,7 +449,6 @@ class PigletsRollbackModelTest(TransactionTestCase):
             initiator=self.brig3)
 
         self.assertEqual(piglets_to_ws4.quantity, 32)
-        self.assertEqual(piglets_to_ws4.gilts_quantity, 3)
         self.assertEqual(piglets_to_ws4.location.workshop.number, 4)
         self.assertEqual(WeaningSow.objects.all().count(), 3)
 

@@ -138,16 +138,8 @@ class LocationQuerySet(models.QuerySet):
                         .annotate(all=alive_piglets)\
                         .values('all')
 
-        alive_gilts = Sum('piglets__gilts_quantity', filter=Q(piglets__active=True))
-        subquery_gilts_count = self.get_workshop_location(OuterRef('workshop')) \
-                        .annotate(flag=Value(0)) \
-                        .values('flag') \
-                        .annotate(all=alive_gilts)\
-                        .values('all')
-
         return self.annotate(
             pigs_count=models.Subquery(subquery, output_field=models.IntegerField()),
-            gilts_count=models.Subquery(subquery_gilts_count, output_field=models.IntegerField())
             )
 
     def gen_piglets_count_by_age_subqueries_ws3_locs(self, locs, date):
@@ -237,15 +229,8 @@ class LocationQuerySet(models.QuerySet):
                         .annotate(all=alive_piglets)\
                         .values('all')
 
-        alive_gilts = Sum('piglets__gilts_quantity', filter=Q(piglets__active=True))
-        subquery_gilts_count = self.get_locations_in_section(OuterRef('section')) \
-                        .values('workshop') \
-                        .annotate(all=alive_gilts)\
-                        .values('all')
-
         return self.annotate(
             pigs_count=models.Subquery(subquery_piglets_count),
-            gilts_count=models.Subquery(subquery_gilts_count),
             )
 
     def add_pigs_count_by_ws3_sections_by_age(self, date):

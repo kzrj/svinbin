@@ -728,17 +728,12 @@ class ReportDateQuerySet(models.QuerySet):
         count_sows = ExpressionWrapper(tr_in_qnty - tr_out_qnty - culls + fix_number,
              output_field=models.IntegerField())
 
-        # 1639
         data = {f'ws{ws_number}_count_sows': count_sows}
         
         return self.annotate(**data)
 
     def add_count_boars(self):
         data = dict()
-        # ws1_loc = 
-        # count_at_date = 
-        #    + boars created_at
-        #    - all culls
 
         all_created_boars = Coalesce(Subquery(Boar.objects \
                         .filter(created_at__lt=OuterRef('date')) \

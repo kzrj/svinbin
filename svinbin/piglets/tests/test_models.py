@@ -43,11 +43,6 @@ class PigletsModelTest(TestCase):
         self.piglets.remove_piglets(1)
         self.assertEqual(self.piglets.quantity, 100)
 
-    def test_remove_gilts(self):
-        self.piglets.remove_gilts(1)
-        self.assertEqual(self.piglets.quantity, 100)
-        self.assertEqual(self.piglets.gilts_quantity, 9)
-
     def test_change_status_to(self):
         self.piglets.change_status_to('Родились, кормятся')
         self.assertEqual(self.piglets.status.title, 'Родились, кормятся')
@@ -56,7 +51,6 @@ class PigletsModelTest(TestCase):
         with freeze_time("2021-02-3"):
             weighing = WeighingPiglets.objects.create_weighing(piglets_group=self.piglets, total_weight=100,
              place='3/4', date=datetime(2021, 2, 3, 0, 0))
-
 
         self.assertEqual(self.piglets.has_weighed_after_date(created_at=datetime(2021, 2, 3, 0, 1)), False)
         self.assertEqual(self.piglets.has_weighed_after_date(created_at=datetime(2021, 2, 2, 0, 0)), True)
@@ -81,17 +75,6 @@ class PigletsModelmanagerTest(TestCase):
     def test_manager_get_total_quantity(self):
         total = Piglets.objects.all().get_total_quantity()
         self.assertEqual(total, 333)
-
-    def test_manager_get_total_gilts_quantity(self):
-        total_gilts = Piglets.objects.all().get_total_gilts_quantity()
-        self.assertEqual(total_gilts, 10)
-
-    def test_init_piglets_by_farrow_date(self):
-        piglets = Piglets.objects.init_piglets_by_farrow_date(farrow_date='2019-12-31', location=self.loc_ws3,
-         quantity=100, gilts_quantity=10)
-        self.assertEqual(piglets.quantity, 100)
-        self.assertEqual(piglets.gilts_quantity, 10)        
-        self.assertEqual(piglets.metatour.records.all().first().tour.week_number, 33)
 
 
 class PigletsQueryTest(TransactionTestCase):

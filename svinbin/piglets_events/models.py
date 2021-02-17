@@ -19,9 +19,7 @@ class PigletsEvent(Event):
 
 
 class PigletsSplitManager(CoreModelManager):
-    def split_return_groups(self, parent_piglets, new_amount, gilts_to_new=False, 
-        initiator=None, date=None, allow_split_gilt=False):
-
+    def split_return_groups(self, parent_piglets, new_amount, initiator=None, date=None):
         if not date:
             date=timezone.now()
         
@@ -31,32 +29,14 @@ class PigletsSplitManager(CoreModelManager):
                 message=f'Отделяемое количество поросят больше чем есть в группе.\
                 {new_amount} > {parent_piglets.quantity}. Группа {parent_piglets.pk}')
 
-        # if gilts to new. Check parent gilts quantity should be less or equal new amount
-        # if not allow_split_gilt and gilts_to_new and \
-        #         parent_piglets.gilts_quantity > new_amount:
-        #     raise DjangoValidationError(message=f'new_amount должно быть больше количества ремонток \
-        #         в родительской группе #{parent_piglets.pk}. Клетка {parent_piglets.location.get_location}')
-
-        # if not gilts_to_new and (new_amount + parent_piglets.gilts_quantity) > parent_piglets.quantity:
-        #     raise DjangoValidationError(message=f'количество в родительской группе #{parent_piglets.pk} меньше чем new_amount + количество ремонток')
-
         # create split record
         split_record = self.create(parent_piglets=parent_piglets)
-
-        # gilts
-        piglets1_group_gilts_quantity = parent_piglets.gilts_quantity
-        piglets2_new_group_gilts_quantity = 0
-        
-        if gilts_to_new:
-            piglets1_group_gilts_quantity = 0
-            piglets2_new_group_gilts_quantity = parent_piglets.gilts_quantity
 
         # create two groups with metatours
         piglets1 = Piglets.objects.create(location=parent_piglets.location,
             status=parent_piglets.status,
             start_quantity=(parent_piglets.quantity - new_amount),
             quantity=(parent_piglets.quantity - new_amount),
-            gilts_quantity=piglets1_group_gilts_quantity,
             split_as_child=split_record,
             transfer_part_number=parent_piglets.transfer_part_number,
             birthday=parent_piglets.birthday
@@ -67,7 +47,6 @@ class PigletsSplitManager(CoreModelManager):
             status=parent_piglets.status,
             start_quantity=new_amount,
             quantity=new_amount,
-            gilts_quantity=piglets2_new_group_gilts_quantity,
             split_as_child=split_record,
             transfer_part_number=parent_piglets.transfer_part_number,
             birthday=parent_piglets.birthday
@@ -133,12 +112,11 @@ class PigletsMergerManager(CoreModelManager):
                 parent_piglets = Piglets.objects.filter(pk__in=pks)
 
         total_quantity = parent_piglets.get_total_quantity()
-        gilts_quantity = parent_piglets.get_total_gilts_quantity()
         avg_birthday = parent_piglets.gen_avg_birthday(total_quantity=total_quantity)
         bigger_group = parent_piglets.get_bigger_group()
 
         piglets = Piglets.objects.create(location=new_location, status=None, start_quantity=total_quantity,
-            quantity=total_quantity, gilts_quantity=gilts_quantity, birthday=avg_birthday)
+            quantity=total_quantity, birthday=avg_birthday)
 
         # create metatour
         metatour = MetaTour.objects.create(piglets=piglets)
@@ -195,15 +173,10 @@ class PigletsMergerManager(CoreModelManager):
                 not_merging_piglets, merging_piglets = \
                     PigletsSplit.objects.split_return_groups(parent_piglets=weaning_piglets,
                     new_amount=merging_record['quantity'],
-                    gilts_to_new=merging_record['gilts_contains'],
                     initiator=initiator,
                     date=date)
                 weaning_piglets = merging_piglets
             
-            if merging_record.get('gilts_quantity'):
-                weaning_piglets.gilts_quantity = merging_record.get('gilts_quantity')
-                weaning_piglets.save()
-
             parent_piglets_ids.append(weaning_piglets.id)
 
             sow_in_cell = weaning_piglets.location.sow_set.all().first()
@@ -282,8 +255,10 @@ class WeighingPiglets(PigletsEvent):
 
 
 class CullingPigletsManager(CoreModelManager):
-    def create_culling_piglets(self, piglets_group, culling_type, is_it_gilt=False, reason=None,
+    def create_culling_piglets(self, piglets_group, culling_type, reason=None,
          initiator=None, date=None, quantity=1, total_weight=0):
+        if not date:
+            date=timezone.now()
 
         if quantity > piglets_group.quantity:
             raise DjangoValidationError(
@@ -296,13 +271,7 @@ class CullingPigletsManager(CoreModelManager):
         if isinstance(date, datetime.date):
             date = datetime.datetime.combine(date, datetime.datetime.min.time())
 
-        if not date:
-            date=timezone.now()
-
-        if is_it_gilt:
-            piglets_group.remove_gilts(quantity)
-        else:
-            piglets_group.remove_piglets(quantity)
+        piglets_group.remove_piglets(quantity)
         
         avg_weight = 0
         if total_weight > 0:
@@ -312,20 +281,14 @@ class CullingPigletsManager(CoreModelManager):
             piglets_group=piglets_group,
             culling_type=culling_type, 
             reason=reason,
-            date=date, initiator=initiator, is_it_gilt=is_it_gilt, quantity=quantity,
+            date=date, initiator=initiator, 
+            quantity=quantity,
             total_weight=total_weight, avg_weight=avg_weight,
             location=piglets_group.location,
             week_tour=piglets_group.metatour.week_tour,
             piglets_age=(date-piglets_group.birthday).days)
 
         return culling
-
-    def create_culling_gilt(self, piglets_group, culling_type, reason=None, initiator=None,
-         date=timezone.now(), quantity=1):
-        piglets_group.remove_gilts(quantity)
-        return self.create(piglets_group=piglets_group, culling_type=culling_type, reason=reason,
-            date=date, initiator=initiator, is_it_gilt=True, quantity=quantity,
-            total_weight=total_weight, week_tour=piglets_group.metatour.week_tour)
 
     def get_culling_by_piglets(self, culling_type, piglets):
         return self.get_queryset().filter(piglets_group__in=piglets, culling_type=culling_type) \
@@ -358,7 +321,6 @@ class CullingPiglets(PigletsEvent):
     culling_type = models.CharField(max_length=50, choices=CULLING_TYPES)
     reason = models.CharField(max_length=200, null=True)
     piglets_group = models.ForeignKey(Piglets, on_delete=models.CASCADE, related_name="cullings")
-    is_it_gilt = models.BooleanField(default=False)
 
     total_weight = models.FloatField(null=True)
 

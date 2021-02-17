@@ -41,7 +41,7 @@ class RecipeDrugsViewSetTest(APITestCase):
         self.brig3 = User.objects.get(username='brigadir3')
         self.operator = User.objects.get(username='shmigina')
 
-    def test_create_druf_recipe(self):
+    def test_create_drug_recipe(self):
         self.client.force_authenticate(user=self.veterinar)
         response = self.client.post(f'/api/veterinary/drugs/', 
             data={'name': 'Пеницилин'})
@@ -59,7 +59,7 @@ class RecipeDrugsViewSetTest(APITestCase):
         self.assertEqual(response.data['doze'], '1')
 
         response = self.client.delete(f'/api/veterinary/recipes/{recipe.pk}/')
-        self.assertEqual(response.status_code, 204)
+        self.assertEqual(response.status_code, 200)
 
         self.client.logout()
 

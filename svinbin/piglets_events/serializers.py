@@ -6,14 +6,13 @@ from locations.models import Location
 
 
 class CullingPigletsSerializer(serializers.ModelSerializer):
-    is_it_gilt = serializers.BooleanField(default=False)
     date = serializers.CharField(default=None, allow_blank=True)
     quantity = serializers.IntegerField(default=1)
     total_weight = serializers.FloatField(required=False)
 
     class Meta:
         model = CullingPiglets
-        fields = ['culling_type', 'reason', 'is_it_gilt', 'quantity', 'date',
+        fields = ['culling_type', 'reason', 'quantity', 'date',
             'total_weight', 'piglets_age']
 
 

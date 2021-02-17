@@ -95,7 +95,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 piglets_group=self.get_object(),
                 culling_type=serializer.validated_data['culling_type'],
                 reason=serializer.validated_data['reason'],
-                is_it_gilt=serializer.validated_data['is_it_gilt'],
                 quantity=serializer.validated_data['quantity'],
                 total_weight=serializer.validated_data['total_weight'],
                 date=date,
@@ -150,7 +149,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
                         new_amount=serializer.validated_data['new_amount'],
                         reverse=True,
                         merge=False,
-                        gilts_contains=True,
                         initiator=request.user,
                         date=timezone.now()
                     )
@@ -210,7 +208,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
                     piglets= self.get_object(),
                     to_location=serializer.validated_data['to_location'],
                     new_amount=serializer.validated_data.get('new_amount', None),
-                    gilts_contains=serializer.validated_data.get('gilts_contains', False),
                     merge=serializer.validated_data['merge'],
                     initiator=request.user,
                     date=timezone.now()
@@ -276,7 +273,6 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 stayed_piglets, moved_piglets = piglets_events_models.PigletsSplit.objects.split_return_groups(
                     parent_piglets=piglets,
                     new_amount=serializer.validated_data.get('new_amount', None),
-                    gilts_to_new=False,
                     initiator=request.user,
                     date=timezone.now(),
                     )
