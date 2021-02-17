@@ -52,7 +52,8 @@ $(document).ready(function(){
             ["mainGrey", "#6c6c6c", "#6c6c6c", "#6c6c6c"],
             ["tourTT", "#f5e9ff", "#f5e9ff", "#f5e9ff"],
             ["white", "#FFFFFF", "#FFFFFF", "#FFFFFF"],
-
+            ["cellGray", "#525252", "#525252", "#525252"],
+            ["cellMint", "#43ab92", "#43ab92", "#43ab92"],
         ];
         var socialColorArray = [
             ["facebook","#3b5998"], 
