@@ -22,7 +22,7 @@ class CullingPigletsReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CullingPiglets
-        fields = ['culling_type', 'reason', 'is_it_gilt', 'quantity', 'date',
+        fields = ['culling_type', 'reason', 'quantity', 'date',
             'total_weight', 'piglets_age', 'average_weight']
 
 

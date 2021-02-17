@@ -45,13 +45,13 @@ class LocationsViewSetTest(APITestCase):
         SowFarrow.objects.create_sow_farrow(sow=sow3, alive_quantity=10)
 
         location8 = Location.objects.filter(pigletsGroupCell__isnull=False).first()
-        Piglets.objects.init_piglets_by_farrow_date('2020-01-01', location8, 20)
+        piglets_testing.create_from_sow_farrow(tour=self.tour1, location=location8, quantity=20)
 
         location9 = Location.objects.filter(pigletsGroupCell__isnull=False)[1]
-        Piglets.objects.init_piglets_by_farrow_date('2020-01-02', location9, 21)
+        piglets_testing.create_from_sow_farrow(tour=self.tour1, location=location9, quantity=21)
 
         location10 = Location.objects.filter(pigletsGroupCell__section__number=2).first()
-        Piglets.objects.init_piglets_by_farrow_date('2020-01-02', location10, 53)
+        piglets_testing.create_from_sow_farrow(tour=self.tour1, location=location10, quantity=53)
 
     def test_common_list_locations(self):
         response = self.client.get('/api/locations/')

@@ -608,7 +608,7 @@ class RecountManagerTest(TestCase):
         tour2 = Tour.objects.get_or_create_by_week_in_current_year(2)
         location = Location.objects.get(section__number=1, section__workshop__number=3)
         piglets = Piglets.objects.create(location=location, quantity=100, start_quantity=100,
-        gilts_quantity=0, status=None)
+            status=None)
         meta_tour = MetaTour.objects.create(piglets=piglets)
 
         record1 = meta_tour.records.create_record(meta_tour, tour, 60, piglets.quantity)
