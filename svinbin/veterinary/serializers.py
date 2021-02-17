@@ -54,7 +54,7 @@ class PigletsVetEventSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = PigletsVetEvent
-        fields = ['recipe', 'date', 'date_date', 'location', 'week_tour', 'piglets_quantity']
+        fields = ['recipe', 'date', 'date_date', 'location', 'week_tour', 'piglets_quantity', 'id']
 
 
 class PigletsVetEventsSerializer(serializers.ModelSerializer):
