@@ -32,13 +32,13 @@ class PigletsSplitManager(CoreModelManager):
                 {new_amount} > {parent_piglets.quantity}. Группа {parent_piglets.pk}')
 
         # if gilts to new. Check parent gilts quantity should be less or equal new amount
-        if not allow_split_gilt and gilts_to_new and \
-                parent_piglets.gilts_quantity > new_amount:
-            raise DjangoValidationError(message=f'new_amount должно быть больше количества ремонток \
-                в родительской группе #{parent_piglets.pk}. Клетка {parent_piglets.location.get_location}')
+        # if not allow_split_gilt and gilts_to_new and \
+        #         parent_piglets.gilts_quantity > new_amount:
+        #     raise DjangoValidationError(message=f'new_amount должно быть больше количества ремонток \
+        #         в родительской группе #{parent_piglets.pk}. Клетка {parent_piglets.location.get_location}')
 
-        if not gilts_to_new and (new_amount + parent_piglets.gilts_quantity) > parent_piglets.quantity:
-            raise DjangoValidationError(message=f'количество в родительской группе #{parent_piglets.pk} меньше чем new_amount + количество ремонток')
+        # if not gilts_to_new and (new_amount + parent_piglets.gilts_quantity) > parent_piglets.quantity:
+        #     raise DjangoValidationError(message=f'количество в родительской группе #{parent_piglets.pk} меньше чем new_amount + количество ремонток')
 
         # create split record
         split_record = self.create(parent_piglets=parent_piglets)

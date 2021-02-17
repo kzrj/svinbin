@@ -276,7 +276,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 stayed_piglets, moved_piglets = piglets_events_models.PigletsSplit.objects.split_return_groups(
                     parent_piglets=piglets,
                     new_amount=serializer.validated_data.get('new_amount', None),
-                    gilts_to_new=True,
+                    gilts_to_new=False,
                     initiator=request.user,
                     date=timezone.now(),
                     )
