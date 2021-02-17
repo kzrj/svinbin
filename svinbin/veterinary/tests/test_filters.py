@@ -71,18 +71,3 @@ class PVEFiltersTest(TestCase):
         f = filters.PigletsVetEventFilter(
             {'sections': f'{sec5_1.pk}'}, queryset=qs)
         self.assertTrue(pve3.pk in f.qs.values_list('id', flat=True))
-
-    def test_tours_filter(self):
-        pve1 = PigletsVetEvent.objects.create_vet_event(piglets=self.piglets1, recipe=self.recipe)
-        pve2 = PigletsVetEvent.objects.create_vet_event(piglets=self.piglets2, recipe=self.recipe)
-        pve3 = PigletsVetEvent.objects.create_vet_event(piglets=self.piglets3, recipe=self.recipe)
-
-        qs = PigletsVetEvent.objects.all()
-        f = filters.PigletsVetEventFilter(
-            {'tours': f'{self.tour1.pk}, {self.tour2.pk}'}, queryset=qs)
-        self.assertTrue(pve1.pk in f.qs.values_list('id', flat=True))
-        self.assertTrue(pve2.pk in f.qs.values_list('id', flat=True))
-
-        f = filters.PigletsVetEventFilter(
-            {'tours': f'{self.tour3.pk}'}, queryset=qs)
-        self.assertTrue(pve3.pk in f.qs.values_list('id', flat=True))

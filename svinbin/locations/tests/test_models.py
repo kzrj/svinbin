@@ -28,6 +28,9 @@ class LocationsTest(TransactionTestCase):
         sows_events_testing.create_types()
 
         self.ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.tour3 = Tour.objects.get_or_create_by_week_in_current_year(week_number=3)
 
         location1 = Location.objects.filter(sowAndPigletsCell__number=1).first()
         sow1 = sows_testing.create_sow_with_semination_usound(location=location1, week=1)
@@ -56,13 +59,16 @@ class LocationsTest(TransactionTestCase):
         piglets3_7.deactivate()
 
         location8 = Location.objects.filter(pigletsGroupCell__isnull=False).first()
-        piglets_testing.create_from_sow_farrow(tour=self.tour1, location=location8, quantity=20)
+        piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, location=location8,
+         quantity=20)
 
         location9 = Location.objects.filter(pigletsGroupCell__isnull=False)[1]
-        piglets_testing.create_from_sow_farrow(tour=self.tour1, location=location9, quantity=21)
+        piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, location=location9,
+         quantity=21)
 
         location10 = Location.objects.filter(pigletsGroupCell__section__number=2).first()        
-        piglets_testing.create_from_sow_farrow(tour=self.tour1, location=location10, quantity=53)
+        piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, location=location10,
+         quantity=53)        
 
     def test_location_cell_serializer_queries(self):
         with self.assertNumQueries(6):
