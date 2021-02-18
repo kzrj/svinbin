@@ -118,6 +118,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 piglets_group=piglets_group,
                 total_weight=serializer.validated_data['total_weight'],
                 place=serializer.validated_data['place'],
+                gilts_quantity=serializer.validated_data.get('gilts_quantity'),
                 initiator=request.user,
                 date=timezone.now()
                 )
@@ -159,6 +160,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 piglets_group=piglets_to_weight,
                 total_weight=serializer.validated_data['total_weight'],
                 place=serializer.validated_data['place'],
+                gilts_quantity=serializer.validated_data.get('gilts_quantity'),
                 initiator=request.user
                 )
 
@@ -185,6 +187,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 piglets_group=piglets_group,
                 total_weight=serializer.validated_data['total_weight'],
                 place=serializer.validated_data['place'],
+                gilts_quantity=serializer.validated_data.get('gilts_quantity'),
                 initiator=request.user,
                 date=timezone.now()
                 )

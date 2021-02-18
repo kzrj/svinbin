@@ -29,7 +29,7 @@ class CullingPigletsReadSerializer(serializers.ModelSerializer):
 class WeighingPigletsCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = WeighingPiglets
-        fields = ['total_weight', 'place',]
+        fields = ['total_weight', 'place', 'gilts_quantity']
 
 
 class WeighingReturnPigletsCreateSerializer(serializers.ModelSerializer):
@@ -38,7 +38,7 @@ class WeighingReturnPigletsCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WeighingPiglets
-        fields = ['total_weight', 'place', 'new_amount', 'to_location']
+        fields = ['total_weight', 'place', 'new_amount', 'to_location', 'gilts_quantity']
 
 
 class WeighingPigletsSerializer(serializers.ModelSerializer):
@@ -53,7 +53,8 @@ class WeighingPigletsReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WeighingPiglets
-        fields = ['date', 'total_weight', 'average_weight', 'piglets_quantity', 'piglets_age']
+        fields = ['date', 'total_weight', 'average_weight', 'piglets_quantity', 'piglets_age',
+             'gilts_quantity']
 
 
 class RecountWeighingPigletsSerializer(serializers.ModelSerializer):
