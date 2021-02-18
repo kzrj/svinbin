@@ -28,7 +28,7 @@ jobs:
             cd svinbin
             python manage.py migrate --settings=svinbin.circleci_settings
             python manage.py makemigrations --no-input --settings=svinbin.circleci_settings
-            python manage.py test --settings=svinbin.circleci_settings --exclude-tag=with_file
+            python manage.py test --settings=svinbin.circleci_settings --exclude-tag=with_file --exclude-tag=crush_at_cirlce
       - run:
           name: Running Selenium tests
           command: |

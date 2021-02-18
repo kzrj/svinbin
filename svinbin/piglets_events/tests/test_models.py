@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 from django.test import TestCase, TransactionTestCase
+from django.test import tag
 from django.core.exceptions import ValidationError
 from django.db import models
 
@@ -624,32 +625,32 @@ class RecountManagerTest(TestCase):
         piglets.refresh_from_db()
         self.assertEqual(piglets.quantity, 110)
 
-    # ??? pass at local machine, crush at circle ci
-    # def test_sum_balances_by_locations(self):
-    #     #section 1
-    #     piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
-    #         quantity=10, tour=self.tour1, location=self.ws3_cells[0])
-    #     piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
-    #         quantity=15, tour=self.tour1, location=self.ws3_cells[1])
+    @tag('crush_at_cirlce')
+    def test_sum_balances_by_locations(self):
+        #section 1
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            quantity=10, tour=self.tour1, location=self.ws3_cells[0])
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            quantity=15, tour=self.tour1, location=self.ws3_cells[1])
 
-    #     # section 2
-    #     piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
-    #         quantity=11, tour=self.tour1, location=self.ws3_cells[50])
+        # section 2
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            quantity=11, tour=self.tour1, location=self.ws3_cells[50])
 
-    #     recount1 = Recount.objects.create_recount(piglets=piglets1, new_quantity=9)
-    #     recount2 = Recount.objects.create_recount(piglets=piglets2, new_quantity=13)
-    #     recount3 = Recount.objects.create_recount(piglets=piglets3, new_quantity=14)
+        recount1 = Recount.objects.create_recount(piglets=piglets1, new_quantity=9)
+        recount2 = Recount.objects.create_recount(piglets=piglets2, new_quantity=13)
+        recount3 = Recount.objects.create_recount(piglets=piglets3, new_quantity=14)
 
-    #     ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
-    #     self.assertEqual(
-    #         Recount.objects.sum_balances_by_locations(locations=ws3_locs), 0)
+        ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+        self.assertEqual(
+            Recount.objects.sum_balances_by_locations(locations=ws3_locs), 0)
 
-    #     sec1 = Location.objects.filter(section__number=1, 
-    #             section__workshop__number=3).first().section
-    #     sec1_locs = Location.objects.all().get_locations_in_section(sec1)
-    #     self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec1_locs), 3)
+        sec1 = Location.objects.filter(section__number=1, 
+                section__workshop__number=3).first().section
+        sec1_locs = Location.objects.all().get_locations_in_section(sec1)
+        self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec1_locs), 3)
 
-    #     sec2 = Location.objects.filter(section__number=2, 
-    #             section__workshop__number=3).first().section
-    #     sec2_locs = Location.objects.all().get_locations_in_section(sec2)
-    #     self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec2_locs), -3)
+        sec2 = Location.objects.filter(section__number=2, 
+                section__workshop__number=3).first().section
+        sec2_locs = Location.objects.all().get_locations_in_section(sec2)
+        self.assertEqual(Recount.objects.sum_balances_by_locations(locations=sec2_locs), -3)

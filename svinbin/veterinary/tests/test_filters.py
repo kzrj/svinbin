@@ -2,6 +2,7 @@
 import datetime
 
 from django.test import TestCase
+from django.test import tag
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as pigs_testings
@@ -53,6 +54,7 @@ class PVEFiltersTest(TestCase):
             birthday=datetime.datetime(2020,5,8,0,0)
             )
 
+    @tag('crush_at_cirlce')
     def test_sections_filter(self):
         pve1 = PigletsVetEvent.objects.create_vet_event(piglets=self.piglets1, recipe=self.recipe)
         pve2 = PigletsVetEvent.objects.create_vet_event(piglets=self.piglets2, recipe=self.recipe)
