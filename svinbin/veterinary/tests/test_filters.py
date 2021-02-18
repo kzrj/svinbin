@@ -65,9 +65,9 @@ class PVEFiltersTest(TestCase):
 
         f = filters.PigletsVetEventFilter(
             {'sections': f'{sec3_1.pk}, {sec4_1.pk}'}, queryset=qs)
-        self.assertTrue(pve1.pk in f.qs.values_list('id', flat=True))
-        self.assertTrue(pve2.pk in f.qs.values_list('id', flat=True))
+        self.assertTrue(pve1.pk in f.qs.values_list('pk', flat=True))
+        self.assertTrue(pve2.pk in f.qs.values_list('pk', flat=True))
 
         f = filters.PigletsVetEventFilter(
             {'sections': f'{sec5_1.pk}'}, queryset=qs)
-        self.assertTrue(pve3.pk in f.qs.values_list('id', flat=True))
+        self.assertTrue(pve3.pk in f.qs.values_list('pk', flat=True))
