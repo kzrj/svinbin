@@ -438,13 +438,14 @@ class WeighingPigletsTest(TestCase):
             self.loc_ws3, 101)
 
         weighing_record = WeighingPiglets.objects.create_weighing(
-            piglets_group=piglets, total_weight=670, place='3/4'
+            piglets_group=piglets, total_weight=670, place='3/4', gilts_quantity=40
             )
         self.assertEqual(weighing_record.piglets_group, piglets)
         self.assertEqual(weighing_record.total_weight, 670)
         self.assertEqual(weighing_record.average_weight, round((670 / piglets.quantity), 2))
         self.assertEqual(weighing_record.piglets_quantity, piglets.quantity)
         self.assertEqual(weighing_record.place, '3/4')
+        self.assertEqual(weighing_record.gilts_quantity, 40)
 
     def test_queryset_get_tour_data_by_place(self):
         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(

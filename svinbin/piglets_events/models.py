@@ -215,7 +215,8 @@ class WeighingPigletsManager(CoreModelManager):
     def get_queryset(self):
             return WeighingPigletsQuerySet(self.model, using=self._db)
 
-    def create_weighing(self, piglets_group, total_weight, place, initiator=None, date=None):
+    def create_weighing(self, piglets_group, total_weight, place, initiator=None, date=None,
+         gilts_quantity=None):
         if not date:
             date=timezone.now()
         weighing_record = self.create(
@@ -227,7 +228,8 @@ class WeighingPigletsManager(CoreModelManager):
             initiator=initiator,
             date=date,
             week_tour=piglets_group.metatour.week_tour,
-            piglets_age=(date-piglets_group.birthday).days
+            piglets_age=(date-piglets_group.birthday).days,
+            gilts_quantity=gilts_quantity
             )
 
         piglets_group.change_status_to('Взвешены, готовы к заселению')
@@ -247,6 +249,8 @@ class WeighingPiglets(PigletsEvent):
 
     week_tour = models.ForeignKey('tours.Tour', on_delete=models.SET_NULL, null=True, blank=True,
         related_name="piglets_weights")
+
+    gilts_quantity = models.IntegerField(null=True, blank=True)
 
     objects = WeighingPigletsManager()
 
