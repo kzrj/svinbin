@@ -53,8 +53,8 @@ OWN_APPS = [
     'staff.apps.StaffConfig',
     'workshoponetwo.apps.WorkshoponetwoConfig',
     'workshopthree.apps.WorkshopthreeConfig',
-    'reports.apps.ReportsConfig',
     'veterinary.apps.VeterinaryConfig',
+    'reports.apps.ReportsConfig',
     'rollbacks.apps.RollbacksConfig',
 ]
 
