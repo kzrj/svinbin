@@ -130,7 +130,7 @@ class SowWithOpsSerializer(SowSerializer):
 
 
 class SowDowntimeSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
-    sub_result_days = serializers.DurationField()
+    sub_result_days = serializers.DurationField(format='%d')
 
     class Meta:
         model = Sow
