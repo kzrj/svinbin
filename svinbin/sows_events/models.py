@@ -337,8 +337,8 @@ class WeaningSowManager(SowEventManager):
          initiator=initiator, date=date, sow_group=sow.sow_group)
 
         # when set tour to None
-        sow.tour = None
-        sow.change_status_to(status_title='Отъем', date=date)
+        # sow.tour = None
+        # sow.change_status_to(status_title='Отъем', date=date)
         return weaning
 
 

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.db import models
 from django.utils import timezone
+from datetime import timedelta
 from django.db.models import Q, Prefetch, Subquery, OuterRef, Count, F, Value, Exists
 from django.db.models.functions import Coalesce
 from django.core.exceptions import ValidationError as DjangoValidationError
@@ -184,6 +185,23 @@ class SowsQuerySet(models.QuerySet):
             .order_by('-date').values('tour__week_number')[:1]
 
         return self.annotate(last_date_mark=Subquery(last_date), last_week_mark=Subquery(last_tour_week))
+
+    def add_last_status_record_date(self):
+        last_record_date = Subquery(
+                SowStatusRecord.objects.filter(sow__pk=OuterRef('pk')).order_by('-date') \
+                .values('date')[:1])
+
+        return self.annotate(last_record_date=last_record_date)
+
+    def add_last_status_record_date_substract_now_date(self):
+        return self.annotate(sub_result_days=(timezone.now() - F('last_record_date')))
+
+    def sows_by_statuses_count_and_downtime_qs(self, statuses, days_limit):
+        sows = self.filter(status__title__in=statuses)
+        return  sows.count(), \
+                sows.add_last_status_record_date() \
+                    .filter(last_record_date__lt=(timezone.now() - timedelta(days_limit))) \
+                    .add_last_status_record_date_substract_now_date()
 
 
 class SowManager(CoreModelManager):

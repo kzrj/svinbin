@@ -204,3 +204,53 @@ class ReportWS12Test(APITestCase):
     def test_ws12_report(self):
         response = self.client.get('/api/reports/director/ws12_report/?ws_number=1')
         self.assertEqual(response.data['total_info']['total_padej_rem_weight'], 202)
+
+
+class SowDowntimeReportTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+        sows_events_testings.create_types()
+
+        self.user = staff_testing.create_employee()
+        self.client.force_authenticate(user=self.user)
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+
+    def test_get_data(self):
+        loc = Location.objects.get(workshop__number=1)
+        sow1 = sows_testing.create_sow_with_location(location=loc)
+        with freeze_time("2021-01-5T10:00"):
+            sow1.change_status_to('Ремонтная')
+
+        sow2 = sows_testing.create_sow_with_location(location=loc)
+        with freeze_time("2021-01-5T10:00"):
+            sow2.change_status_to('Осеменена 2')
+
+        sow3 = sows_testing.create_sow_with_location(location=loc)
+        with freeze_time("2021-01-5T10:00"):
+            sow3.change_status_to('Супорос 35')
+
+        sow4 = sows_testing.create_sow_with_location(location=loc)
+        with freeze_time("2021-01-5T10:00"):
+            sow4.change_status_to('Опоросилась')
+
+        response = self.client.get('/api/reports/sows_downtime/')
+        
+        self.assertEqual(response.data['wait']['count_all'], 1)
+        self.assertEqual(response.data['wait']['downtime_count'], 1)
+        self.assertEqual(response.data['wait']['downtime_sows'][0]['id'], sow1.pk)
+
+        self.assertEqual(response.data['sem']['count_all'], 1)
+        self.assertEqual(response.data['sem']['downtime_count'], 1)
+        self.assertEqual(response.data['sem']['downtime_sows'][0]['id'], sow2.pk)
+
+        self.assertEqual(response.data['sup35']['count_all'], 1)
+        self.assertEqual(response.data['sup35']['downtime_count'], 1)
+        self.assertEqual(response.data['sup35']['downtime_sows'][0]['id'], sow3.pk)
+
+        self.assertEqual(response.data['farr']['count_all'], 1)
+        self.assertEqual(response.data['farr']['downtime_count'], 1)
+        self.assertEqual(response.data['farr']['downtime_sows'][0]['id'], sow4.pk)

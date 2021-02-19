@@ -26,6 +26,8 @@ from reports.serializers import ReportDateSerializer, ReportTourSerializer, Repo
     StartDateEndDateSerializer, TotalWeightsSerializer
 from piglets_events.serializers import WeighingPigletsReadSerializer, CullingPigletsReadSerializer
 from tours.serializers import TourSerializer
+from sows.serializers import SowDowntimeSerializer
+
 from reports.filters import ReportDateFilter
 from core.permissions import ReadOrAdminOnlyPermissions
 
@@ -324,7 +326,40 @@ class OperationsDataView(views.APIView):
         operations_data = gen_operations_dict()
         megadict = gen_megadict(request.data)
         return Response(megadict)
-        # return Response(self.pagination.get_paginated_response(data=megalist))
+
+
+class ReportSowsDowntimeByStatusesView(viewsets.ViewSet):
+    @staticmethod
+    def gen_data_dict(days, statuses):
+        data = dict()    
+        sows_count, downtime_sows_qs = Sow.objects.all().sows_by_statuses_count_and_downtime_qs(
+            days_limit=days, statuses=statuses)
+        data['count_all'] = Sow.objects.all().filter(status__title__in=statuses).count()
+        data['downtime_count'] = sows_count
+        data['downtime_sows'] = SowDowntimeSerializer(downtime_sows_qs, many=True).data
+
+        return data
+
+    def list(self, request):
+        downtime_wait_days  = request.GET.get('downtime_wait_days', 40)
+        downtime_sem_days   = request.GET.get('downtime_sem_days', 10)
+        downtime_sup28_days = request.GET.get('downtime_sup28_days', 28)
+        downtime_sup35_days = request.GET.get('downtime_sup35_days', 7)
+        downtime_farr_days  = request.GET.get('downtime_farr_days', 30)
+        downtime_nurse_days = request.GET.get('downtime_nurse_days', 21)
+
+        data = {'wait': dict(), 'sem': dict(), 'sup28': dict(), 'sup35': dict(),
+            'farr': dict(), 'nurse':dict() }
+
+        data['wait'] = self.gen_data_dict(days=downtime_wait_days, 
+            statuses=['Ремонтная', "Ожидает осеменения", "Прохолост", "Аборт"])
+        data['sem'] = self.gen_data_dict(days=downtime_sem_days, statuses=['Осеменена 2'])
+        data['sup28'] = self.gen_data_dict(days=downtime_sup28_days, statuses=['Супорос 28'])
+        data['sup35'] = self.gen_data_dict(days=downtime_sup35_days, statuses=['Супорос 35'])
+        data['farr'] = self.gen_data_dict(days=downtime_farr_days, statuses=['Опоросилась', 'Отъем'])
+        data['nurse'] = self.gen_data_dict(days=downtime_nurse_days, statuses=['Кормилица'])
+
+        return Response(data)
 
 
 # class ReportWsPopulation(viewsets.ViewSet):

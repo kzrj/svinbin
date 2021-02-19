@@ -836,3 +836,67 @@ class SowModelOperationsTest(TransactionTestCase):
         with self.assertNumQueries(5):
             ops = SowOperationSerializer(sow.last_operations, many=True).data
             self.assertEqual(ops[0]['op_label'], 'перемещение')
+
+
+class SowDowntimeTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_add_last_status_record_date(self):
+        loc = Location.objects.get(workshop__number=1)
+        sow = sows_testings.create_sow_with_location(location=loc)
+
+        with freeze_time("2021-02-5T10:00"):
+            sow.change_status_to('Ремонтная')
+
+        with freeze_time("2021-02-10T10:00"):
+            sow.change_status_to('Ожидает осеменения')
+
+        with freeze_time("2021-02-15T10:00"):
+            sow.change_status_to('Осеменена 1')
+
+        marked_sows = Sow.objects.all().add_last_status_record_date()
+        self.assertEqual(marked_sows.first().last_record_date, datetime(2021,2,15,10,0))
+
+    def test_add_last_status_record_date_substract_now_date(self):
+        loc = Location.objects.get(workshop__number=1)
+        sow1 = sows_testings.create_sow_with_location(location=loc)
+        with freeze_time("2021-02-5T10:00"):
+            sow1.change_status_to('Ремонтная')
+
+        sow2 = sows_testings.create_sow_with_location(location=loc)
+        with freeze_time("2021-02-10T10:00"):
+            sow2.change_status_to('Ремонтная')
+
+        with freeze_time("2021-02-25T10:00"):
+            sows = Sow.objects.all().add_last_status_record_date() \
+                .add_last_status_record_date_substract_now_date()
+            self.assertEqual(sows.get(pk=sow1.pk).sub_result_days.days, 20)
+            self.assertEqual(sows.get(pk=sow2.pk).sub_result_days.days, 15)
+
+    def test_sows_by_statuses_count_and_downtime_qs(self):
+        loc = Location.objects.get(workshop__number=1)
+        sow1 = sows_testings.create_sow_with_location(location=loc)
+        with freeze_time("2021-02-5T10:00"):
+            sow1.change_status_to('Ремонтная')
+
+        sow2 = sows_testings.create_sow_with_location(location=loc)
+        with freeze_time("2021-02-10T10:00"):
+            sow2.change_status_to('Ремонтная')
+
+        sow3 = sows_testings.create_sow_with_location(location=loc)
+        with freeze_time("2021-02-15T10:00"):
+            sow3.change_status_to('Ремонтная')
+
+        with freeze_time("2021-02-25T10:00"):
+            waiting_sem_count, downtime_sows_qs = Sow.objects.all() \
+                .sows_by_statuses_count_and_downtime_qs(statuses=["Ожидает осеменения", "Прохолост",
+                    "Аборт", "Ремонтная"], days_limit=11)
+            self.assertEqual(waiting_sem_count, 3)
+            self.assertEqual(downtime_sows_qs.count(), 2)
+            self.assertTrue(sow1.pk in downtime_sows_qs.values_list('pk', flat=True))
+            self.assertTrue(sow2.pk in downtime_sows_qs.values_list('pk', flat=True))
+            self.assertEqual(downtime_sows_qs.get(pk=sow1.pk).sub_result_days.days, 20)

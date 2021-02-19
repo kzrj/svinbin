@@ -5,6 +5,8 @@ from sows.models import Sow, Boar, Gilt, BoarBreed
 from sows_events.models import Semination
 from locations.models import Location
 
+from reports.serializers import AnnotateFieldsModelSerializer
+
 
 class SowSerializer(serializers.ModelSerializer):
     location = serializers.ReadOnlyField(source='get_location')
@@ -125,3 +127,11 @@ class SowOperationSerializer(serializers.Serializer):
 
 class SowWithOpsSerializer(SowSerializer):
     last_operations = SowOperationSerializer(many=True)
+
+
+class SowDowntimeSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
+    sub_result_days = serializers.DurationField()
+
+    class Meta:
+        model = Sow
+        fields = ['id', 'sub_result_days', 'farm_id']
