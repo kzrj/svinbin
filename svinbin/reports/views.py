@@ -340,12 +340,12 @@ class ReportSowsDowntimeByStatusesView(viewsets.ViewSet):
         return data
 
     def list(self, request):
-        downtime_wait_days  = request.GET.get('downtime_wait_days', 40)
-        downtime_sem_days   = request.GET.get('downtime_sem_days', 10)
-        downtime_sup28_days = request.GET.get('downtime_sup28_days', 28)
-        downtime_sup35_days = request.GET.get('downtime_sup35_days', 7)
-        downtime_farr_days  = request.GET.get('downtime_farr_days', 30)
-        downtime_nurse_days = request.GET.get('downtime_nurse_days', 21)
+        downtime_wait_days  = int(request.GET.get('downtime_wait_days', 40))
+        downtime_sem_days   = int(request.GET.get('downtime_sem_days', 10))
+        downtime_sup28_days = int(request.GET.get('downtime_sup28_days', 28))
+        downtime_sup35_days = int(request.GET.get('downtime_sup35_days', 7))
+        downtime_farr_days  = int(request.GET.get('downtime_farr_days', 30))
+        downtime_nurse_days = int(request.GET.get('downtime_nurse_days', 21))
 
         data = {'wait': dict(), 'sem': dict(), 'sup28': dict(), 'sup35': dict(),
             'farr': dict(), 'nurse':dict() }
