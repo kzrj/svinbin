@@ -900,3 +900,26 @@ class SowDowntimeTest(TransactionTestCase):
             self.assertTrue(sow1.pk in downtime_sows_qs.values_list('pk', flat=True))
             self.assertTrue(sow2.pk in downtime_sows_qs.values_list('pk', flat=True))
             self.assertEqual(downtime_sows_qs.get(pk=sow1.pk).sub_result_days.days, 20)
+
+    def test_queries(self):
+        loc = Location.objects.get(workshop__number=1)
+        sow1 = sows_testings.create_sow_with_location(location=loc)
+        with freeze_time("2021-01-5T10:00"):
+            sow1.change_status_to('Ремонтная')
+
+        sow2 = sows_testings.create_sow_with_location(location=loc)
+        with freeze_time("2021-01-5T10:00"):
+            sow2.change_status_to('Осеменена 2')
+
+        sow3 = sows_testings.create_sow_with_location(location=loc)
+        with freeze_time("2021-01-5T10:00"):
+            sow3.change_status_to('Супорос 35')
+
+        sow4 = sows_testings.create_sow_with_location(location=loc)
+        with freeze_time("2021-01-5T10:00"):
+            sow4.change_status_to('Опоросилась')
+
+        with self.assertNumQueries(1):
+            waiting_sem_count, downtime_sows_qs = Sow.objects.all() \
+                .sows_by_statuses_count_and_downtime_qs(statuses=["Ожидает осеменения", "Прохолост",
+                    "Аборт", "Ремонтная"], days_limit=11)
