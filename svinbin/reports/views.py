@@ -354,11 +354,11 @@ class ReportSowsDowntimeByStatusesView(viewsets.ViewSet):
 
         data['wait'] = self.gen_data_dict(days=downtime_wait_days, 
             statuses=['Ремонтная', "Ожидает осеменения", "Прохолост", "Аборт"])
-        data['sem'] = self.gen_data_dict(days=downtime_sem_days, statuses=['Осеменена 2'])
-        data['sup28'] = self.gen_data_dict(days=downtime_sup28_days, statuses=['Супорос 28'])
-        data['sup35'] = self.gen_data_dict(days=downtime_sup35_days, statuses=['Супорос 35'])
-        data['farr'] = self.gen_data_dict(days=downtime_farr_days, statuses=['Опоросилась', 'Отъем'])
-        data['nurse'] = self.gen_data_dict(days=downtime_nurse_days, statuses=['Кормилица'])
+        # data['sem'] = self.gen_data_dict(days=downtime_sem_days, statuses=['Осеменена 2'])
+        # data['sup28'] = self.gen_data_dict(days=downtime_sup28_days, statuses=['Супорос 28'])
+        # data['sup35'] = self.gen_data_dict(days=downtime_sup35_days, statuses=['Супорос 35'])
+        # data['farr'] = self.gen_data_dict(days=downtime_farr_days, statuses=['Опоросилась', 'Отъем'])
+        # data['nurse'] = self.gen_data_dict(days=downtime_nurse_days, statuses=['Кормилица'])
 
         return Response(data)
 
