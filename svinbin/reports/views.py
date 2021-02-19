@@ -334,9 +334,10 @@ class ReportSowsDowntimeByStatusesView(viewsets.ViewSet):
         data = dict()    
         sows_count, downtime_sows_qs = Sow.objects.all().sows_by_statuses_count_and_downtime_qs(
             days_limit=days, statuses=statuses)
-        data['count_all'] = Sow.objects.all().filter(status__title__in=statuses).count()
-        data['downtime_count'] = sows_count
-        data['downtime_sows'] = SowDowntimeSerializer(downtime_sows_qs, many=True).data
+        data['count_all'] = sows_count
+        sows = SowDowntimeSerializer(downtime_sows_qs, many=True).data
+        data['downtime_count'] = len(sows)
+        data['downtime_sows'] = sows
 
         return data
 
