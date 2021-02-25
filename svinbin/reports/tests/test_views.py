@@ -230,7 +230,7 @@ class SowDowntimeReportTest(APITestCase):
             sow2.change_status_to('Осеменена 2')
 
         sow3 = sows_testing.create_sow_with_location(location=loc)
-        with freeze_time("2021-01-5T10:00"):
+        with freeze_time("2020-12-5T10:00"):
             sow3.change_status_to('Супорос 35')
 
         sow4 = sows_testing.create_sow_with_location(location=loc)
