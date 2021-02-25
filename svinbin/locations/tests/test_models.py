@@ -239,11 +239,12 @@ class LocationQsPopulationTest(TransactionTestCase):
         self.assertEqual(section_locs[1].sows_count, 1)
         self.assertEqual(section_locs[1].sows_sup_count, 0)
     
-    def test_add_pigs_count_by_workshop3_by_age(self):
+    def test_add_pigs_count_by_workshop_by_age(self):
         today = datetime.today()
         ws3 = Location.objects.filter(workshop__number=3) \
                 .add_pigs_count_by_workshop() \
-                .add_pigs_count_by_workshop3_by_age(date=today) \
+                .add_pigs_count_by_workshop_by_age(date=today,
+                     age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]]) \
                 .first()
 
         self.assertEqual(ws3.pigs_count, (15 + 16 + 17 + 18 + 19))
@@ -252,12 +253,13 @@ class LocationQsPopulationTest(TransactionTestCase):
         self.assertEqual(ws3.count_piglets_15_21, 18)
         self.assertEqual(ws3.count_piglets_28_plus, 19)
 
-    def test_add_pigs_count_by_ws3_sections_by_age(self):
+    def test_add_pigs_count_by_ws_sections_by_age(self):
         today = datetime.today()
         section_locs = Location.objects.filter(section__workshop__number=3,
              section__isnull=False) \
                 .add_pigs_count_by_sections() \
-                .add_pigs_count_by_ws3_sections_by_age(date=today)
+                .add_pigs_count_by_ws_sections_by_age(date=today,
+                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
 
         bool(section_locs)
 

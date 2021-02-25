@@ -119,7 +119,8 @@ class LocationViewSet(viewsets.ModelViewSet):
                 .select_related('workshop') \
                 .add_sows_count_by_workshop() \
                 .add_pigs_count_by_workshop() \
-                .add_pigs_count_by_workshop3_by_age(date=today) \
+                .add_pigs_count_by_workshop_by_age(date=today,
+                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]]) \
                 .first()
 
         section_locs = Location.objects.filter(section__workshop__number=3,
@@ -127,7 +128,8 @@ class LocationViewSet(viewsets.ModelViewSet):
                 .select_related('section') \
                 .add_sows_count_by_sections() \
                 .add_pigs_count_by_sections() \
-                .add_pigs_count_by_ws3_sections_by_age(date=today)
+                .add_pigs_count_by_ws_sections_by_age(date=today,
+                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
 
         data = dict()
         data['ws'] = {

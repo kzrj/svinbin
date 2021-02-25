@@ -142,83 +142,42 @@ class LocationQuerySet(models.QuerySet):
             pigs_count=models.Subquery(subquery, output_field=models.IntegerField()),
             )
 
-    def gen_piglets_count_by_age_subqueries_ws3_locs(self, locs, date):
+    def gen_piglets_count_by_age_subquery(self, locs, date, start_age_days, end_age_days=None):
+        if end_age_days:
+            all_subquery = Sum('piglets__quantity',
+                                     filter=Q(
+                                        piglets__active=True,
+                                        piglets__birthday__gte=(date-timedelta(days=end_age_days)),
+                                        piglets__birthday__lte=(date-timedelta(days=start_age_days))
+                                        )
+                                     )
+        else:
+            all_subquery = Sum('piglets__quantity',
+                                     filter=Q(
+                                        piglets__active=True,
+                                        piglets__birthday__lte=(date-timedelta(days=start_age_days))
+                                        )
+                                     )
+        return models.Subquery(
+            locs \
+                .annotate(flag=Value(0)) \
+                .values('flag') \
+                .annotate(all=all_subquery)\
+                .values('all'), output_field=models.IntegerField())
+
+    def gen_piglets_count_by_age_subqueries_locs(self, locs, date, age_intervals):
         data = dict()
-
-        alive_piglets_0_7 = Sum('piglets__quantity',
-             filter=Q(
-                piglets__active=True,
-                piglets__birthday__gte=(date-timedelta(days=7)),
-                piglets__birthday__lte=(date-timedelta(days=0))
-                )
-             )
-        subquery_0_7 = locs \
-                    .annotate(flag=Value(0)) \
-                    .values('flag') \
-                    .annotate(all=alive_piglets_0_7)\
-                    .values('all')
-        data['count_piglets_0_7'] = models.Subquery(subquery_0_7, output_field=models.IntegerField())
-
-        alive_piglets_8_14 = Sum('piglets__quantity',
-             filter=Q(
-                piglets__active=True,
-                piglets__birthday__gte=(date-timedelta(days=14)),
-                piglets__birthday__lte=(date-timedelta(days=8))
-                )
-             )
-        subquery_8_14 = locs \
-                    .annotate(flag=Value(0)) \
-                    .values('flag') \
-                    .annotate(all=alive_piglets_8_14)\
-                    .values('all')
-        data['count_piglets_8_14'] = models.Subquery(subquery_8_14, output_field=models.IntegerField())
-
-        alive_piglets_15_21 = Sum('piglets__quantity',
-             filter=Q(
-                piglets__active=True,
-                piglets__birthday__gte=(date-timedelta(days=21)),
-                piglets__birthday__lte=(date-timedelta(days=15))
-                )
-             )
-        subquery_15_21 = locs \
-                    .annotate(flag=Value(0)) \
-                    .values('flag') \
-                    .annotate(all=alive_piglets_15_21)\
-                    .values('all')
-        data['count_piglets_15_21'] = models.Subquery(subquery_15_21, output_field=models.IntegerField())
-
-        alive_piglets_22_28 = Sum('piglets__quantity',
-             filter=Q(
-                piglets__active=True,
-                piglets__birthday__gte=(date-timedelta(days=28)),
-                piglets__birthday__lte=(date-timedelta(days=21))
-                )
-             )
-        subquery_22_28 = locs \
-                    .annotate(flag=Value(0)) \
-                    .values('flag') \
-                    .annotate(all=alive_piglets_22_28)\
-                    .values('all')
-        data['count_piglets_22_28'] = models.Subquery(subquery_22_28, output_field=models.IntegerField())
-
-        alive_piglets_28_plus = Sum('piglets__quantity',
-             filter=Q(
-                piglets__active=True,
-                piglets__birthday__lte=(date-timedelta(days=28))
-                )
-             )
-        subquery_28_plus = locs \
-                    .annotate(flag=Value(0)) \
-                    .values('flag') \
-                    .annotate(all=alive_piglets_28_plus)\
-                    .values('all')
-        data['count_piglets_28_plus'] = models.Subquery(subquery_28_plus, output_field=models.IntegerField())
+        for interval in age_intervals:
+            end_age = interval[1] if interval[1] else 'plus'
+            data[f'count_piglets_{interval[0]}_{end_age}'] = self.gen_piglets_count_by_age_subquery(
+                locs=locs, date=date, start_age_days=interval[0], end_age_days=interval[1])
 
         return data
 
-    def add_pigs_count_by_workshop3_by_age(self, date):
+    def add_pigs_count_by_workshop_by_age(self, date, age_intervals):
         locs = self.get_workshop_location(OuterRef('workshop'))
-        data = self.gen_piglets_count_by_age_subqueries_ws3_locs(locs=locs, date=date)
+        data = self.gen_piglets_count_by_age_subqueries_locs(locs=locs, date=date, 
+            age_intervals=age_intervals)
 
         return self.annotate(**data)
 
@@ -233,9 +192,10 @@ class LocationQuerySet(models.QuerySet):
             pigs_count=models.Subquery(subquery_piglets_count),
             )
 
-    def add_pigs_count_by_ws3_sections_by_age(self, date):
+    def add_pigs_count_by_ws_sections_by_age(self, date, age_intervals):
         locs = self.get_locations_in_section(OuterRef('section'))
-        data = self.gen_piglets_count_by_age_subqueries_ws3_locs(locs=locs, date=date)
+        data = self.gen_piglets_count_by_age_subqueries_locs(locs=locs, date=date, 
+            age_intervals=age_intervals)
 
         return self.annotate(**data)
 
