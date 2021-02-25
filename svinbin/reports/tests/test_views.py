@@ -240,17 +240,13 @@ class SowDowntimeReportTest(APITestCase):
         response = self.client.get('/api/reports/sows_downtime/')
         
         self.assertEqual(response.data['wait']['count_all'], 1)
-        self.assertEqual(response.data['wait']['downtime_count'], 1)
         self.assertEqual(response.data['wait']['downtime_sows'][0]['id'], sow1.pk)
 
         self.assertEqual(response.data['sem']['count_all'], 1)
-        self.assertEqual(response.data['sem']['downtime_count'], 1)
         self.assertEqual(response.data['sem']['downtime_sows'][0]['id'], sow2.pk)
 
         self.assertEqual(response.data['sup35']['count_all'], 1)
-        self.assertEqual(response.data['sup35']['downtime_count'], 1)
         self.assertEqual(response.data['sup35']['downtime_sows'][0]['id'], sow3.pk)
 
         self.assertEqual(response.data['farr']['count_all'], 1)
-        self.assertEqual(response.data['farr']['downtime_count'], 1)
         self.assertEqual(response.data['farr']['downtime_sows'][0]['id'], sow4.pk)

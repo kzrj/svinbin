@@ -309,26 +309,8 @@ class WeaningSowTest(TestCase):
         self.assertEqual(weaning1.quantity, piglets.quantity)
 
         sow1.refresh_from_db()
-        self.assertEqual(sow1.tour, None)
-        self.assertEqual(sow1.status.title, 'Отъем')
-
-    def test_qs_restore_tour_status_delete_events(self):
-        location = Location.objects.filter(sowAndPigletsCell__number=1).first()
-        sow1 = sows_testing.create_sow_with_semination_usound(location=location, week=1)
-        farrow = SowFarrow.objects.create_sow_farrow(
-            sow=sow1,
-            alive_quantity=10,
-            dead_quantity=1
-            )
-        piglets = farrow.piglets_group
-        weaning1 = sow1.weaningsow_set.create_weaning(sow=sow1, piglets=piglets)
-
-        WeaningSow.objects.all().restore_tour_status_delete_events()
-
-        sow1.refresh_from_db()
-        self.assertEqual(sow1.status.title, 'Опоросилась')
         self.assertEqual(sow1.tour.week_number, 1)
-        self.assertEqual(WeaningSow.objects.all().count(), 0)
+        self.assertEqual(sow1.status.title, 'Отъем')
 
 
 class AbortionSowTest(TestCase):

@@ -319,11 +319,7 @@ class CullingSow(SowEvent):
 
 
 class WeaningSowQuerySet(SowEventQuerySet):
-    def restore_tour_status_delete_events(self):
-        for weaning in self:
-            weaning.sow.tour = weaning.tour
-            weaning.sow.change_status_to_previous_delete_current_status_record()
-        self.delete()
+    pass
 
 
 class WeaningSowManager(SowEventManager):

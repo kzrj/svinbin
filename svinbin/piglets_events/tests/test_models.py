@@ -215,9 +215,6 @@ class PigletsMergerModelTest(TransactionTestCase):
         sow1.refresh_from_db()
         sow2.refresh_from_db()
 
-        self.assertEqual(sow1.status.title, 'Отъем')
-        self.assertEqual(sow2.status.title, 'Отъем')
-
         self.assertEqual(sow1.weaningsow_set.all().count(), 1)
         self.assertEqual(sow2.weaningsow_set.all().count(), 1)
 
@@ -241,9 +238,6 @@ class PigletsMergerModelTest(TransactionTestCase):
         sow1 = piglets1.farrow.sow
         sow1.refresh_from_db()
         sow2.refresh_from_db()
-
-        self.assertEqual(sow1.status.title, 'Отъем')
-        self.assertEqual(sow2.status.title, 'Отъем')
 
         self.assertEqual(sow1.weaningsow_set.all().count(), 1)
         self.assertEqual(sow2.weaningsow_set.all().count(), 1)
