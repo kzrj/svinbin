@@ -202,7 +202,9 @@ class SowsQuerySet(models.QuerySet):
                 sows.add_last_status_record_date() \
                     .filter(last_record_date__lt=(timezone.now() - timedelta(days_limit))) \
                     .add_last_status_record_date_substract_now_date() \
-                    .order_by('-sub_result_days')
+                    .order_by('-sub_result_days') \
+                    .select_related('location__workshop') \
+                    .select_related('location__sowAndPigletsCell__section')
 
 
 class SowManager(CoreModelManager):
