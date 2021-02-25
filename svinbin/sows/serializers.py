@@ -131,7 +131,7 @@ class SowWithOpsSerializer(SowSerializer):
 
 class SowDowntimeSerializer(serializers.ModelSerializer):
     sub_result_days = serializers.DurationField()
-    location = serializers.ReadOnlyField(source='locaiton.get_full_loc')
+    location = serializers.ReadOnlyField(source='location.get_full_loc')
 
     class Meta:
         model = Sow
