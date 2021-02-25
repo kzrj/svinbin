@@ -201,7 +201,8 @@ class SowsQuerySet(models.QuerySet):
         return  sows.count(), \
                 sows.add_last_status_record_date() \
                     .filter(last_record_date__lt=(timezone.now() - timedelta(days_limit))) \
-                    .add_last_status_record_date_substract_now_date()
+                    .add_last_status_record_date_substract_now_date() \
+                    .order_by('-sub_result_days')
 
 
 class SowManager(CoreModelManager):
