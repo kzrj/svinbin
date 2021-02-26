@@ -4,6 +4,7 @@ from rest_framework import serializers
 import sows.serializers as sows_serializers
 import piglets.serializers as piglets_serializers
 import veterinary.serializers as veterinary_serializers
+from core.serializers import AnnotateFieldsModelSerializer
 
 from locations.models import Location, Section
 
@@ -105,3 +106,23 @@ class LocationSectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
         fields = ['id', 'section_number', 'section_id', 'pigs_count', 'section_name']
+
+
+class LocationSectionPopulationSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
+    section_number = serializers.ReadOnlyField(source='section.number')
+    section_id = serializers.ReadOnlyField(source='section.id')
+    section_name = serializers.ReadOnlyField(source='section.name')
+
+    class Meta:
+        model = Location
+        exclude = ['section', 'workshop', 'sowAndPigletsCell', 'pigletsGroupCell', 'sowGroupCell', 
+            'sowSingleCell', 'created_at', 'modified_at']
+
+
+class LocationWSPopulationSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
+    ws_number = serializers.ReadOnlyField(source='workshop.number')
+
+    class Meta:
+        model = Location
+        exclude = ('section', 'workshop', 'sowAndPigletsCell', 'pigletsGroupCell', 'sowGroupCell', 
+            'sowSingleCell', 'created_at', 'modified_at')

@@ -15,15 +15,7 @@ from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow,
 from piglets_events.models import CullingPiglets, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
 
-
-class AnnotateFieldsModelSerializer(serializers.ModelSerializer):
-    def __init__(self, *args, **kwargs):
-        super(AnnotateFieldsModelSerializer, self).__init__(*args, **kwargs)
-        if len(args) > 0 and len(args[0]) > 0:
-            for field_name in args[0][0].__dict__.keys():
-                if field_name[0] == '_' or field_name in self.fields.keys():
-                    continue
-                self.fields[field_name] = serializers.ReadOnlyField()
+from core.serializers import AnnotateFieldsModelSerializer
 
 
 class ReportDateSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):

@@ -73,6 +73,8 @@ router.register(r'reports/recounts', piglets_events_views.RecountViewSet,
  basename='report-director')
 router.register(r'reports/sows_downtime', reports_views.ReportSowsDowntimeByStatusesView,
  basename='report-sowsdowntime')
+router.register(r'reports/ws_info', reports_views.ReportWSInfoView,
+ basename='report-wsinfo')
 
 # rollbacks
 router.register(r'rollbacks', RollbackViewSet, basename='rollbacks')

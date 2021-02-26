@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 from django.db.models import CharField, Value
 from django.utils import timezone
 from django.http import HttpResponse
@@ -27,6 +28,7 @@ from reports.serializers import ReportDateSerializer, ReportTourSerializer, Repo
 from piglets_events.serializers import WeighingPigletsReadSerializer, CullingPigletsReadSerializer
 from tours.serializers import TourSerializer
 from sows.serializers import SowDowntimeSerializer
+from locations.serializers import LocationWSPopulationSerializer, LocationSectionPopulationSerializer
 
 from reports.filters import ReportDateFilter
 from core.permissions import ReadOrAdminOnlyPermissions
@@ -361,7 +363,24 @@ class ReportSowsDowntimeByStatusesView(viewsets.ViewSet):
         return Response(data)
 
 
-# class ReportWsPopulation(viewsets.ViewSet):
-#     def ws_and_sections(self, request):
-#         ws_number = request.GET['ws_number']
-#         ws = Location.objects.filter(workshop__number=workshop_number)
+class ReportWSInfoView(viewsets.ViewSet):
+    @action(methods=['post'], detail=False)
+    def ws_population_and_tours(self, request):
+        ws_number = request.data.get('ws_number', 4)
+        age_intervals = request.data.get('age_intervals', [])
+        today = datetime.datetime.today()
+
+        ws = Location.objects.filter(workshop__number=ws_number) \
+            .add_pigs_count_by_workshop() \
+            .add_pigs_count_by_workshop_by_age(date=today, age_intervals=age_intervals)
+        sections = Location.objects.filter(section__workshop__number=ws_number) \
+            .add_pigs_count_by_sections() \
+            .add_pigs_count_by_ws_sections_by_age(date=today, age_intervals=age_intervals)
+
+        data = {'population': {}, 'tours': {}}
+        data['population']['sections'] = LocationSectionPopulationSerializer(sections, many=True).data
+        data['population']['ws'] = LocationWSPopulationSerializer(ws, many=True).data[0]
+
+        return Response(data)
+
+

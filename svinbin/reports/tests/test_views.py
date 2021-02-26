@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
-import datetime
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from freezegun import freeze_time
 
 import copy
@@ -250,3 +249,46 @@ class SowDowntimeReportTest(APITestCase):
 
         self.assertEqual(response.data['farr']['count_all'], 1)
         self.assertEqual(response.data['farr']['downtime_sows'][0]['id'], sow4.pk)
+
+
+class ReportWsInfoTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+        sows_events_testings.create_types()
+
+        self.user = staff_testing.create_employee()
+        self.client.force_authenticate(user=self.user)
+
+        tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.cells = Location.objects.filter(pigletsGroupCell__isnull=False)
+
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.cells[0], quantity=15,
+            birthday=(datetime.today() - timedelta(days=1)))
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.cells[1], quantity=16,
+            birthday=(datetime.today() - timedelta(days=5)))
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.cells[4], quantity=17,
+            birthday=(datetime.today() - timedelta(days=8)))
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.cells[5], quantity=18,
+            birthday=(datetime.today() - timedelta(days=20)))
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.cells[7], quantity=19,
+            birthday=(datetime.today() - timedelta(days=30)))
+
+    def test_report_population(self):
+        response = self.client.post('/api/reports/ws_info/ws_population_and_tours/', 
+            {'ws_number': 4, 'age_intervals': [[0, 7], [8, 14], [15, 21], [22, 28], [28, None]]},
+            format='json')
+        self.assertEqual(response.data['population']['sections'][0]['count_piglets_0_7'], 15 + 16)
+        self.assertEqual(response.data['population']['sections'][1]['count_piglets_0_7'], None)
+        self.assertEqual(response.data['population']['sections'][1]['count_piglets_8_14'], 17)
+
+        self.assertEqual(response.data['population']['ws']['count_piglets_0_7'], 15 + 16)
+        self.assertEqual(response.data['population']['ws']['count_piglets_8_14'], 17)
+        

@@ -5,7 +5,7 @@ from sows.models import Sow, Boar, Gilt, BoarBreed
 from sows_events.models import Semination
 from locations.models import Location
 
-from reports.serializers import AnnotateFieldsModelSerializer
+from core.serializers import AnnotateFieldsModelSerializer
 
 
 class SowSerializer(serializers.ModelSerializer):
