@@ -116,7 +116,7 @@ class LocationSectionPopulationSerializer(AnnotateFieldsModelSerializer, seriali
     class Meta:
         model = Location
         exclude = ['section', 'workshop', 'sowAndPigletsCell', 'pigletsGroupCell', 'sowGroupCell', 
-            'sowSingleCell', 'created_at', 'modified_at', 'count_full', 'count_all']
+            'sowSingleCell', 'created_at', 'modified_at']
 
 
 class LocationWSPopulationSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
