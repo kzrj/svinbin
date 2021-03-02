@@ -240,6 +240,27 @@ class LocationQuerySet(models.QuerySet):
 
         return data
 
+    def add_section_fullness(self):
+        subquery_full_cells = Location.objects.all().filter(
+                Q(Q(pigletsGroupCell__section=OuterRef('section')) |
+                  Q(sowAndPigletsCell__section=OuterRef('section'))),
+                  piglets__active=True) \
+            .values('section') \
+            .annotate(count_full=Count('id', distinct=True))\
+            .values('count_full')
+
+        subquery_all_cells = Location.objects.all().filter(
+                Q(Q(pigletsGroupCell__section=OuterRef('section')) |
+                  Q(sowAndPigletsCell__section=OuterRef('section')))) \
+            .values('section') \
+            .annotate(count_all=Count('*'))\
+            .values('count_all')
+
+        return self.annotate(
+            count_full=models.Subquery(subquery_full_cells),
+            count_all=models.Subquery(subquery_all_cells),
+            )
+
 
 class LocationManager(CoreModelManager):
     def get_queryset(self):

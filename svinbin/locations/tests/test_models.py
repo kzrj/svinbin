@@ -175,6 +175,7 @@ class LocationQsPopulationTest(TransactionTestCase):
         sows_events_testing.create_types()
 
         self.ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
+        self.piglets_cells = Location.objects.filter(pigletsGroupCell__isnull=False)
 
         tour1 = Tour.objects.get_or_create_by_week_in_current_year(1)
 
@@ -272,3 +273,27 @@ class LocationQsPopulationTest(TransactionTestCase):
         self.assertEqual(section_locs[1].pigs_count, 19)
         self.assertEqual(section_locs[1].count_piglets_0_7, None)
         self.assertEqual(section_locs[1].count_piglets_28_plus, 19)
+
+    def test_add_section_fullness(self):
+        tour1 = Tour.objects.get_or_create_by_week_in_current_year(1)
+        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.ws3_cells[47], quantity=19,
+            birthday=(datetime.today() - timedelta(days=30))
+            )
+        piglets6.deactivate()
+
+        piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.ws3_cells[47], quantity=19,
+            birthday=(datetime.today() - timedelta(days=30))
+            )
+        piglets8 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour1, location=self.ws3_cells[47], quantity=19,
+            birthday=(datetime.today() - timedelta(days=30))
+            )
+
+        section_locs = Location.objects.filter(section__workshop__number=3,
+             section__isnull=False).add_section_fullness()
+
+        self.assertEqual(section_locs[0].count_full, 4)
+        self.assertEqual(section_locs[0].count_all, 45)
+        self.assertEqual(section_locs[1].count_full, 2)

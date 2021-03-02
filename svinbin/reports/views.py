@@ -375,7 +375,8 @@ class ReportWSInfoView(viewsets.ViewSet):
             .add_pigs_count_by_workshop_by_age(date=today, age_intervals=age_intervals)
         sections = Location.objects.filter(section__workshop__number=ws_number) \
             .add_pigs_count_by_sections() \
-            .add_pigs_count_by_ws_sections_by_age(date=today, age_intervals=age_intervals)
+            .add_pigs_count_by_ws_sections_by_age(date=today, age_intervals=age_intervals) \
+            .add_section_fullness()
 
         data = {'population': {}, 'tours': {}}
         data['population']['sections'] = LocationSectionPopulationSerializer(sections, many=True).data
