@@ -19,13 +19,17 @@ def create_user(username, farm_name, workshop=None):
     return user
 
 def create_workshop_user(username, password, ws_number, farm_name, is_seminator=False, is_officer=False,
-        is_staff=False, is_veterinar=False):
+        is_staff=False, is_veterinar=False, access_ws_numbers=[]):
     workshop = WorkShop.objects.filter(number=ws_number).first()
-    user = User.objects.create_user(username=username, email='t@t.ru', password=password, is_staff=is_staff)
-    WorkShopEmployee.objects.create(user=user, workshop=workshop, farm_name=farm_name, \
+    user = User.objects.create_user(username=username, email='t@t.ru', password=password,
+         is_staff=is_staff)
+    employee = WorkShopEmployee.objects.create(user=user, workshop=workshop, farm_name=farm_name, \
         is_seminator=is_seminator, is_officer=is_officer, is_veterinar=is_veterinar)
-    return user
 
+    access_ws = WorkShop.objects.filter(number__in=access_ws_numbers)
+    if access_ws_numbers:
+        employee.access_workshops.add(*access_ws)
+    return user
 
 def create_svinbin_users():
     User.objects.create_superuser(username='kaizerj',email='kzrster@gmail.com', password='jikozfree')
@@ -59,7 +63,9 @@ def create_svinbin_users():
     create_workshop_user(username='brigadir2', password='123', ws_number=2, farm_name='ИВАНО')
     create_workshop_user(username='brigadir3', password='123', ws_number=3, farm_name='ИВАНО')
     create_workshop_user(username='brigadir4', password='123', ws_number=4, farm_name='ИВАНО')
-    create_workshop_user(username='brigadir5', password='123', ws_number=5, farm_name='ИВАНО')
+    create_workshop_user(username='brigadir5', password='123', ws_number=5, farm_name='ИВАНО', 
+        access_ws_numbers=[5,7,6])
     create_workshop_user(username='brigadir6', password='123', ws_number=6, farm_name='ИВАНО')
-    create_workshop_user(username='brigadir7', password='123', ws_number=7, farm_name='ИВАНО')
+    create_workshop_user(username='brigadir7', password='123', ws_number=7, farm_name='ИВАНО', 
+        access_ws_numbers=[5,7,6])
     create_workshop_user(username='brigadir8', password='123', ws_number=8, farm_name='ИВАНО')

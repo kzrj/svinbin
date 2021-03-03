@@ -18,6 +18,7 @@ class WorkShopEmployee(CoreModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="employee")
     farm_name = models.CharField(max_length=20, default='')
     workshop = models.ForeignKey('locations.WorkShop', on_delete=models.CASCADE, null=True, blank=True)
+    access_workshops = models.ManyToManyField('locations.WorkShop', related_name='access_employees') 
 
     is_officer = models.BooleanField(default=False)
     is_operator = models.BooleanField(default=False)

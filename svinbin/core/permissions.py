@@ -24,7 +24,8 @@ class ObjAndUserSameLocationPermissions(permissions.BasePermission):
                 return True
             if not hasattr(request.user, 'employee'):
                 return False
-            return obj.location.get_workshop == request.user.employee.workshop
+            return obj.location.get_workshop == request.user.employee.workshop \
+              or obj.location.get_workshop in request.user.employee.access_workshops.all()
 
         elif request.method == 'PATCH': 
             return request.user.is_staff

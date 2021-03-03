@@ -58,14 +58,14 @@ class PigletsViewSetTest(APITestCase):
         # self.user = staff_testing.create_employee()
         # self.client.force_authenticate(user=self.user)
 
-        self.brig1 = staff_testing.create_employee(workshop=self.loc_ws1.workshop)
-        self.brig2 = staff_testing.create_employee(workshop=self.loc_ws2.workshop)
-        self.brig3 = staff_testing.create_employee(workshop=self.loc_ws3.workshop)
-        self.brig4 = staff_testing.create_employee(workshop=self.loc_ws4.workshop)
-        self.brig5 = staff_testing.create_employee(workshop=self.loc_ws5.workshop)
-        self.brig6 = staff_testing.create_employee(workshop=self.loc_ws6.workshop)
-        self.brig7 = staff_testing.create_employee(workshop=self.loc_ws7.workshop)
-        self.brig8 = staff_testing.create_employee(workshop=self.loc_ws8.workshop)
+        self.brig1 = User.objects.get(username='brigadir1')
+        self.brig2 = User.objects.get(username='brigadir2')
+        self.brig3 = User.objects.get(username='brigadir3')
+        self.brig4 = User.objects.get(username='brigadir4')
+        self.brig5 = User.objects.get(username='brigadir5')
+        self.brig6 = User.objects.get(username='brigadir6')
+        self.brig7 = User.objects.get(username='brigadir7')
+        self.brig8 = User.objects.get(username='brigadir8')
 
         self.admin = User.objects.get(username='test_admin1')
         self.veterinar = User.objects.get(username='veterinar')
@@ -462,6 +462,30 @@ class PigletsViewSetTest(APITestCase):
         self.assertEqual(pve.piglets_quantity, 10)
         self.assertEqual(pve.recipe, None)
 
+        self.client.logout()
+
+    def test_access_workshop_permissions(self):
+        ws5_cells = Location.objects.filter(pigletsGroupCell__isnull=False,
+            pigletsGroupCell__workshop__number=5)
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            ws5_cells[0], 100)
+
+        self.client.force_authenticate(user=self.brig5)
+        response = self.client.post('/api/piglets/%s/move_piglets/' %
+          piglets1.pk, {'to_location': ws5_cells[2].pk })
+        self.assertEqual(response.status_code, 200) 
+        self.client.logout()
+
+        self.client.force_authenticate(user=self.brig7)
+        response = self.client.post('/api/piglets/%s/move_piglets/' %
+          piglets1.pk, {'to_location': ws5_cells[3].pk })
+        self.assertEqual(response.status_code, 200) 
+        self.client.logout()
+
+        self.client.force_authenticate(user=self.brig6)
+        response = self.client.post('/api/piglets/%s/move_piglets/' %
+          piglets1.pk, {'to_location': ws5_cells[4].pk })
+        self.assertEqual(response.status_code, 403) 
         self.client.logout()
 
 
