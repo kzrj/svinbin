@@ -90,33 +90,33 @@ class TourReportV2ViewSetTest(APITestCase):
             tour=self.tour1,
             location=self.loc_ws4,
             quantity=100,
-            birthday=datetime.datetime(2020,5,5,0,0)
+            birthday=datetime(2020,5,5,0,0)
             )
         piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=self.tour1,
             location=self.loc_ws4,
             quantity=100,
-            birthday=datetime.datetime(2020,5,8,0,0)
+            birthday=datetime(2020,5,8,0,0)
             )
 
         WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=120,
-            place='3/4', date=datetime.datetime.today())
+            place='3/4', date=datetime.today())
         WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=150,
-            place='3/4', date=datetime.datetime(2020,9,25,0,0))
+            place='3/4', date=datetime(2020,9,25,0,0))
 
         WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=360,
-            place='4/8', date=datetime.datetime(2020,9,15,0,0))
+            place='4/8', date=datetime(2020,9,15,0,0))
 
         piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=self.tour1,
             location=self.loc_ws5_cells[0],
             quantity=100,
-            birthday=datetime.datetime(2020,5,5,0,0))
+            birthday=datetime(2020,5,5,0,0))
         piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=self.tour1,
             location=self.loc_ws5_cells[0],
             quantity=100,
-            birthday=datetime.datetime(2020,5,5,0,0))
+            birthday=datetime(2020,5,5,0,0))
 
         CullingPiglets.objects.create_culling_piglets(
             piglets_group=piglets3, culling_type='spec', reason='xz', quantity=10, 
@@ -128,7 +128,7 @@ class TourReportV2ViewSetTest(APITestCase):
             )
 
         piglets_testing.create_from_sow_farrow(tour=self.tour1, location=self.loc_ws3_cells[0],
-            quantity=15, date=datetime.datetime(2020,8,5,0,0))
+            quantity=15, date=datetime(2020,8,5,0,0))
 
         response = self.client.get('/api/reports/tours_v2/%s/weights_data/' % self.tour1.pk)
         self.assertEqual(response.data['3/4']['total']['total_quantity'], 200)
