@@ -552,54 +552,54 @@ class TourQuerysetAddPigletsDataTest(TestCase):
             self.assertEqual(tours[1].ws5_spec_avg_weight, 14.5)
 
 
-class TourQuerysetAddPigletsData2Test(TestCase):
-    def setUp(self):
-        locations_testing.create_workshops_sections_and_cells()
-        pigs_testings.create_statuses()
-        sows_events_testing.create_types()
-        piglets_testing.create_piglets_statuses()
+# class TourQuerysetAddPigletsData2Test(TestCase):
+#     def setUp(self):
+#         locations_testing.create_workshops_sections_and_cells()
+#         pigs_testings.create_statuses()
+#         sows_events_testing.create_types()
+#         piglets_testing.create_piglets_statuses()
 
-        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
-        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+#         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+#         self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
 
-        self.loc_ws5 = Location.objects.get(workshop__number=5)
+#         self.loc_ws5 = Location.objects.get(workshop__number=5)
 
-    def test_week_culling(self):
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws5, 100)
+#     def test_week_culling(self):
+#         piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+#             self.loc_ws5, 100)
 
-        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws5, 100)
+#         piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+#             self.loc_ws5, 100)
 
-        # less tour1 30/70
-        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws5, 30)
-        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws5, 70)
-        loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
-        merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
-            parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
+#         # less tour1 30/70
+#         piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+#             self.loc_ws5, 30)
+#         piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+#             self.loc_ws5, 70)
+#         loc_cell_ws5_3 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[2]
+#         merged_piglets1 = PigletsMerger.objects.create_merger_return_group(
+#             parent_piglets=[piglets4, piglets5], new_location=loc_cell_ws5_3)
 
-        # 50/50
-        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws5, 50)
-        piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws5, 50)
-        loc_cell_ws5_4 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[3]
-        merged_piglets2 = PigletsMerger.objects.create_merger_return_group(
-            parent_piglets=[piglets6, piglets7], new_location=loc_cell_ws5_4)
+#         # 50/50
+#         piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+#             self.loc_ws5, 50)
+#         piglets7 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+#             self.loc_ws5, 50)
+#         loc_cell_ws5_4 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[3]
+#         merged_piglets2 = PigletsMerger.objects.create_merger_return_group(
+#             parent_piglets=[piglets6, piglets7], new_location=loc_cell_ws5_4)
 
-        # more tour 1 80/20
-        piglets8 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
-            self.loc_ws5, 80)
-        piglets9 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
-            self.loc_ws5, 20)
-        loc_cell_ws5_5 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[4]
-        merged_piglets3 = PigletsMerger.objects.create_merger_return_group(
-            parent_piglets=[piglets8, piglets9], new_location=loc_cell_ws5_5)
+#         # more tour 1 80/20
+#         piglets8 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+#             self.loc_ws5, 80)
+#         piglets9 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+#             self.loc_ws5, 20)
+#         loc_cell_ws5_5 = Location.objects.filter(pigletsGroupCell__workshop__number=5)[4]
+#         merged_piglets3 = PigletsMerger.objects.create_merger_return_group(
+#             parent_piglets=[piglets8, piglets9], new_location=loc_cell_ws5_5)
 
-        piglets = Piglets.objects.filter(metatour__records__tour=self.tour1,
-             metatour__records__percentage__lt=100)
+#         piglets = Piglets.objects.filter(metatour__records__tour=self.tour1,
+#              metatour__records__percentage__lt=100)
         # print(piglets)
 
         # print(piglets.values('metatour__records'))
@@ -993,6 +993,7 @@ class TourQuerysetAddDataByWs(TestCase):
             birthday=datetime.datetime(2020,5,8,0,0)
             )
 
+
         CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1,
          culling_type='spec', quantity=20, total_weight=400)
 
@@ -1016,6 +1017,48 @@ class TourQuerysetAddDataByWs(TestCase):
         self.assertEqual(tours[1].padej_quantity, 5)
         self.assertEqual(tours[1].padej_total, 120)
         self.assertEqual(tours[1].padej_avg, 24)
+
+    def test_culling_percentage(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[0],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour2,
+            location=self.loc_ws5_cells[1],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=120,
+            place='8/5', )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=360,
+            place='8/5', )
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1,
+         culling_type='padej', quantity=20, total_weight=400)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1,
+         culling_type='vinuzhd', quantity=12, total_weight=250)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2,
+         culling_type='padej', quantity=5, total_weight=120)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2,
+         culling_type='vinuzhd', quantity=16, total_weight=250)
+
+        tours = Tour.objects.all() \
+            .add_week_weight(places=['8/5']) \
+            .add_culling_data_by_week_tour(ws_numbers=[5]) \
+            .add_culling_percentage(ws_numbers=[5, ])
+
+        self.assertEqual(tours[0].ws5_padej_percentage, 20)
+        self.assertEqual(tours[0].ws5_vinuzhd_percentage, 12)
+        self.assertEqual(tours[1].ws5_padej_percentage, 5)
+        self.assertEqual(tours[1].ws5_vinuzhd_percentage, 16)
 
 
 class TourQuerysetAddRemont(TestCase):
@@ -1328,3 +1371,14 @@ class TourPrivesTest(TestCase):
         bool(tours)
         self.assertEqual(round(tours[0].total3_8_5, 2), round(tours[0].week_weight_8_5 - \
             (tours[0].ws5_remont * tours[0].week_weight_avg_8_5), 2))
+
+    def test_get_prives_data_only_by_one_ws(self):
+        tours = Tour.objects.all() \
+            .add_remont_trs_out(ws_numbers=[5, ]) \
+            .add_culling_data_by_week_tour(ws_numbers=[5, ]) \
+            .add_week_weight(places=['8/5', ]) \
+            .add_prives(ws_numbers=[5, ])
+
+        self.assertEqual(round(tours[0].prives_5,2),
+         round(((tours[0].spec_weight_total_ws5 - tours[0].total2_8_5) / 
+            (tours[0].spec_sv_avg_age_ws5 - tours[0].sv_age_8_5)), 2))

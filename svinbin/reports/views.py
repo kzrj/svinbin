@@ -64,6 +64,11 @@ class TourReportViewSet(viewsets.ModelViewSet):
 
         return super().list(request)
 
+    @action(methods=['get'], detail=False)
+    def by_ws(self, request):
+        data = dict()
+        return Response(data)
+
 
 class TourReportV2ViewSet(viewsets.ModelViewSet):
     queryset = Tour.objects.all() \
