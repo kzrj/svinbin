@@ -405,7 +405,7 @@ class ReportWSInfoView(viewsets.ViewSet):
                     .add_remont_trs_out(ws_numbers=[ws_number, ]) \
                     .add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
                     .add_week_weight(places=places) \
-                    .add_culling_percentage(ws_numbers=[ws_number])
+                    .add_culling_percentage(ws_numbers=[ws_number]) \
                     .add_prives(ws_numbers=[ws_number, ]) \
                     .order_by('-week_number')[:10]
 
