@@ -522,6 +522,7 @@ class TourQuerySet(models.QuerySet):
         if 4 in ws_numbers:
             data['prives_4'] = (F('total2_4_8') - F('total2_3_4')) / (F('sv_age_4_8') - F('sv_age_3_4'))
             prives_prepare_places.append('4/8')
+            prives_prepare_places.append('3/4')
         if 8 in ws_numbers:
             data['prives_8'] = (F('total2_ws8') - F('total2_4_8'))  / (F('sv_age_ws8') - F('sv_age_4_8'))
             prives_prepare_places.append('4/8')
