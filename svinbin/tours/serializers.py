@@ -3,6 +3,7 @@ from rest_framework import serializers
 
 from tours.models import Tour, MetaTour
 
+from core.serializers import AnnotateFieldsModelSerializer
 from sows_events.serializers import SimpleSeminationSerializer, SimpleUltrasoundSerializer, \
     SimpleSowFarrowSerializer, SimpleWeaningSowSerializer
 
@@ -28,3 +29,9 @@ class SowCycleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Tour
         fields = ['week_number', 'year', 'sow_semination', 'sow_ultrasound', 'sow_farrow', 'sow_weaning']
+
+
+class WSToursSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
+    class Meta:
+        model = Tour
+        exclude = ['created_at', 'modified_at']

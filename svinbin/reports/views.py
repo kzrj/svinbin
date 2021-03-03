@@ -369,9 +369,26 @@ class ReportSowsDowntimeByStatusesView(viewsets.ViewSet):
 
 
 class ReportWSInfoView(viewsets.ViewSet):
+    @staticmethod
+    def gen_places(self, ws_number):
+        places = ''
+        if ws_number == 3:
+            places = ['3/4']
+        if ws_number == 4:
+            places = ['3/4', '4/8']
+        if ws_number == 8:
+            places = ['4/8', '8/5', '8/6', '8/7']
+        if ws_number == 5:
+            places = ['8/5',]
+        if ws_number == 6:
+            places = ['8/6',]
+        if ws_number == 7:
+            places = ['8/7',]
+        return places
+
     @action(methods=['post'], detail=False)
     def ws_population_and_tours(self, request):
-        ws_number = request.data.get('ws_number', 4)
+        ws_number = int(request.data.get('ws_number', 4))
         age_intervals = request.data.get('age_intervals', [])
         today = datetime.datetime.today()
 
@@ -383,9 +400,19 @@ class ReportWSInfoView(viewsets.ViewSet):
             .add_pigs_count_by_ws_sections_by_age(date=today, age_intervals=age_intervals) \
             .add_section_fullness()
 
+        places = self.gen_places(ws_number=ws_number)
+        tours = Tour.objects.filter(piglets_weights__place__in=places) \
+                    .add_remont_trs_out(ws_numbers=[ws_number, ])
+                    .add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
+                    .add_week_weight(places=places) \
+                    .add_culling_percentage(ws_numbers=[ws_number])
+                    .add_prives(ws_numbers=[ws_number, ]) \
+                    .order_by('-week_number')[:10]
+
         data = {'population': {}, 'tours': {}}
         data['population']['sections'] = LocationSectionPopulationSerializer(sections, many=True).data
         data['population']['ws'] = LocationWSPopulationSerializer(ws, many=True).data[0]
+        data['tours'] = ReportTourSerializer(tours, many=True).data
 
         return Response(data)
 
