@@ -408,7 +408,7 @@ class ReportWSInfoView(viewsets.ViewSet):
                     .add_week_weight(places=places) \
                     .add_culling_percentage(ws_numbers=[ws_number]) \
                     .add_prives(ws_numbers=[ws_number, ]) \
-                    .order_by('-week_number')[:10]
+                    .order_by('year','-week_number')[:10]
 
         data = {'population': {}, 'tours': {}}
         data['population']['sections'] = LocationSectionPopulationSerializer(sections, many=True).data
