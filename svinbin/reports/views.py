@@ -402,7 +402,7 @@ class ReportWSInfoView(viewsets.ViewSet):
 
         places = self.gen_places(ws_number=ws_number)
         tours = Tour.objects.filter(piglets_weights__place__in=places) \
-                    .add_remont_trs_out(ws_numbers=[ws_number, ])
+                    .add_remont_trs_out(ws_numbers=[ws_number, ]) \
                     .add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
                     .add_week_weight(places=places) \
                     .add_culling_percentage(ws_numbers=[ws_number])
