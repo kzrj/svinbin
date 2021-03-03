@@ -370,7 +370,7 @@ class ReportSowsDowntimeByStatusesView(viewsets.ViewSet):
 
 class ReportWSInfoView(viewsets.ViewSet):
     @staticmethod
-    def gen_places(self, ws_number):
+    def gen_places(ws_number):
         places = ''
         if ws_number == 3:
             places = ['3/4']
