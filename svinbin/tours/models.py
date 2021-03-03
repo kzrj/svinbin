@@ -526,6 +526,7 @@ class TourQuerySet(models.QuerySet):
         if 8 in ws_numbers:
             data['prives_8'] = (F('total2_ws8') - F('total2_4_8'))  / (F('sv_age_ws8') - F('sv_age_4_8'))
             prives_prepare_places.append('4/8')
+            prives_prepare_places.append('8/5')
         if 5 in ws_numbers:
             data['prives_5'], data['prives_without_remont_5'] = \
                 self.gen_prives_otkorm(ws_number=5)
