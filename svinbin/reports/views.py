@@ -405,7 +405,7 @@ class ReportWSInfoView(viewsets.ViewSet):
                     .distinct() \
                     .add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
                     .add_week_weight(places=places)
-                    
+
         if ws_number == 8:
             tours = tours.add_week_weight_ws8_v2()
     
@@ -414,6 +414,7 @@ class ReportWSInfoView(viewsets.ViewSet):
 
         tours = tours.add_culling_percentage(ws_numbers=[ws_number]) \
                      .add_prives(ws_numbers=[ws_number, ]) \
+                     .add_prives_na_1g(ws_numbers=[ws_number, ]) \
                      .order_by('-year','-week_number')[:10]
 
         data = {'population': {}, 'tours': {}}
