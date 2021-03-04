@@ -412,9 +412,11 @@ class ReportWSInfoView(viewsets.ViewSet):
         if ws_number in [5, 6, 7]:
             tours = tours.add_remont_trs_out(ws_numbers=[ws_number])
 
+        prives_lookup = {f'prives_{str(ws_number)}__isnull': False}
         tours = tours.add_culling_percentage(ws_numbers=[ws_number]) \
                      .add_prives(ws_numbers=[ws_number, ]) \
                      .add_prives_na_1g(ws_numbers=[ws_number, ]) \
+                     .filter(**prives_lookup) \
                      .order_by('-year','-week_number')[:10]
 
         data = {'population': {}, 'tours': {}}
