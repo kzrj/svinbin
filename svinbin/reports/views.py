@@ -417,7 +417,7 @@ class ReportWSInfoView(viewsets.ViewSet):
         tours = tours.add_culling_percentage(ws_numbers=[ws_number]) \
                      .add_prives(ws_numbers=[ws_number, ]) \
                      .add_prives_na_1g(ws_numbers=[ws_number, ]) \
-                     .order_by('-year','-week_number')[:10]
+                     .order_by('-year','-week_number')[:15]
 
         data = {'population': {}, 'tours': {}}
         data['population']['sections'] = LocationSectionPopulationSerializer(sections, many=True).data
