@@ -276,15 +276,14 @@ class TourQuerySet(models.QuerySet):
                     ), output_field=models.FloatField()
                 )
 
-            if ws_number != 4:
-                data[f'ws{ws_number}_vinuzhd_percentage'] = Case(
-                    When(Q(**lookup1) | Q(**lookup2), then=0.0),
-                    When(**lookup3, 
-                            then=ExpressionWrapper(
-                                F(f'ws{ws_number}_vinuzhd_quantity') * 100.0 / F(f'week_weight_qnty_{place_number}'),
-                                output_field=models.FloatField())
-                        ), output_field=models.FloatField()
-                    )
+            data[f'ws{ws_number}_vinuzhd_percentage'] = Case(
+                When(Q(**lookup1) | Q(**lookup2), then=0.0),
+                When(**lookup3, 
+                        then=ExpressionWrapper(
+                            F(f'ws{ws_number}_vinuzhd_quantity') * 100.0 / F(f'week_weight_qnty_{place_number}'),
+                            output_field=models.FloatField())
+                    ), output_field=models.FloatField()
+                )
 
             if ws_number in [4, 8]:
                 data[f'ws{ws_number}_prirezka_percentage'] = Case(
