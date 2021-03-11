@@ -320,3 +320,22 @@ class PigletsViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['post'], detail=False, permission_classes=[VeterinarPermissions],
+        serializer_class=veterinary_serializers.CreateMassPigletsVetEventSerializer)
+    def mass_vet_event(self, request):
+        serializer = veterinary_serializers.CreateMassPigletsVetEventSerializer(data=request.data)
+        if serializer.is_valid():
+            veterinary_models.PigletsVetEvent.objects.create_many_vet_events(
+              piglets_qs=serializer.validated_data['piglets_list'],
+              recipe=serializer.validated_data['recipe'],
+              date=serializer.validated_data.get('date'),
+              initiator=request.user,
+              )
+            return Response(
+                {
+                 "message": 'Мед. событие записано.',
+                 },
+                status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

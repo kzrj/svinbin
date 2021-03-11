@@ -11,6 +11,14 @@ class CreatePigletsVetEventSerializer(serializers.ModelSerializer):
         fields = ['recipe', 'date']
 
 
+class CreateMassPigletsVetEventSerializer(serializers.ModelSerializer):
+    piglets_list = serializers.PrimaryKeyRelatedField(queryset=Piglets.objects.all(), many=True)
+
+    class Meta:
+        model = PigletsVetEvent
+        fields = ['piglets_list', 'recipe', 'date']
+
+
 class ChoiceField(serializers.ChoiceField):
 
     def to_representation(self, obj):

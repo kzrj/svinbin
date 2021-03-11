@@ -51,6 +51,13 @@ class PigletsVetEventManager(CoreModelManager):
         event.piglets.add(piglets)
         return event
 
+    def create_many_vet_events(self, piglets_qs, recipe, date=None, initiator=None):
+        for piglets in piglets_qs:
+            event = self.create(recipe=recipe, date=date, initiator=initiator, location=piglets.location,
+                piglets_quantity=piglets.quantity, week_tour=piglets.metatour.week_tour,
+                target_piglets=piglets)
+            event.piglets.add(piglets)
+            
 
 class PigletsVetEvent(Event):
     location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL, null=True, 

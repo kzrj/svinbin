@@ -82,3 +82,44 @@ class RecipeDrugsViewSetTest(APITestCase):
         self.assertEqual(response.status_code, 403)
         self.client.logout()
 
+
+class PigletsVetEventViewTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+        staff_testing.create_svinbin_users()
+
+        self.drug1 = Drug.objects.create(name='test drug1')
+        self.recipe1 = Recipe.objects.create(drug=self.drug1, med_type='vac', med_method='feed')
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+        self.tour3 = Tour.objects.get_or_create_by_week_in_current_year(week_number=3)
+        self.tour4 = Tour.objects.get_or_create_by_week_in_current_year(week_number=4)
+        self.loc_ws3 = Location.objects.get(workshop__number=3)
+        self.loc_ws3_sec1 = Location.objects.get(section__workshop__number=3, section__number=1)
+        self.loc_ws3_sec2 = Location.objects.get(section__workshop__number=3, section__number=2)
+
+        self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_ws4_cells = Location.objects.filter(pigletsGroupCell__isnull=False)
+
+        self.veterinar = User.objects.get(username='veterinar')
+        self.brig3 = User.objects.get(username='brigadir3')
+        self.operator = User.objects.get(username='shmigina')
+
+    def test_mass_create(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            location=self.loc_ws4_cells[0], quantity=50, tour=self.tour1)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            location=self.loc_ws4_cells[1], quantity=51, tour=self.tour1)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            location=self.loc_ws4_cells[2], quantity=52, tour=self.tour1)
+
+        self.client.force_authenticate(user=self.veterinar)
+        response = self.client.post(f'/api/piglets/mass_vet_event/', 
+            data={'piglets_list': [piglets1.pk, piglets2.pk, piglets3.pk], 'recipe': self.recipe1.pk})
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(PigletsVetEvent.objects.all().count(), 3)
