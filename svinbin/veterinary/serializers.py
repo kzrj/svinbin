@@ -13,6 +13,7 @@ class CreatePigletsVetEventSerializer(serializers.ModelSerializer):
 
 class CreateMassPigletsVetEventSerializer(serializers.ModelSerializer):
     piglets_list = serializers.PrimaryKeyRelatedField(queryset=Piglets.objects.all(), many=True)
+    date = serializers.DateTimeField(format="%Y-%m-%d")
 
     class Meta:
         model = PigletsVetEvent
