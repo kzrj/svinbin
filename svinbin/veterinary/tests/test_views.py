@@ -119,7 +119,9 @@ class PigletsVetEventViewTest(APITestCase):
 
         self.client.force_authenticate(user=self.veterinar)
         response = self.client.post(f'/api/piglets/mass_vet_event/', 
-            data={'piglets_list': [piglets1.pk, piglets2.pk, piglets3.pk], 'recipe': self.recipe1.pk})
+            data={'piglets_list': [piglets1.pk, piglets2.pk, piglets3.pk], 'recipe': self.recipe1.pk,
+            'date': '2021-03-15T00:00'})
+        print(response.data)
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(PigletsVetEvent.objects.all().count(), 3)

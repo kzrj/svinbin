@@ -402,18 +402,17 @@ class ReportWSInfoView(viewsets.ViewSet):
 
         places = self.gen_places(ws_number=ws_number)
         tours = Tour.objects.filter(piglets_weights__place__in=places) \
-                    .distinct() \
-                    .add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
-                    .add_week_weight(places=places)
+                    .distinct()
+
+        if ws_number in [5, 6, 7]:
+            tours = tours.add_remont_trs_out(ws_numbers=[ws_number])
+
+        tours = tours.add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
+                	.add_week_weight(places=places)
 
         if ws_number == 8:
             tours = tours.add_week_weight_ws8_v2()
     
-        if ws_number in [5, 6, 7]:
-            tours = tours.add_remont_trs_out(ws_numbers=[ws_number])
-
-        # prives_lookup = {f'prives_{str(ws_number)}__isnull': False}
-        # .filter(**prives_lookup) \
         tours = tours.add_culling_percentage(ws_numbers=[ws_number]) \
                      .add_prives(ws_numbers=[ws_number, ]) \
                      .add_prives_na_1g(ws_numbers=[ws_number, ]) \
