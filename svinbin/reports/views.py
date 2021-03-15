@@ -403,7 +403,7 @@ class ReportWSInfoView(viewsets.ViewSet):
         places = self.gen_places(ws_number=ws_number)
         # tours = Tour.objects.filter(piglets_weights__place__in=places) \
         #             .distinct()
-        tours = Tour.objects.filter(week_number__in=[1,2,3, 24, 25]).distinct()
+        tours = Tour.objects.filter(week_number__in=[1,2,3, 24, 25]).distinct().add_remont_to_sows()
 
         if ws_number in [5, 6, 7]:
             # tours = tours.add_remont_trs_out(ws_numbers=[ws_number,])
