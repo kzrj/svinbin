@@ -43,7 +43,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
     def list(self, request):
         queryset = self.filter_queryset(
             self.queryset \
-            .add_remont_trs_out() \
+            .add_remont_to_sows() \
             .add_farrow_data() \
             .add_sow_data() \
             .add_farrow_percentage() \
@@ -404,8 +404,7 @@ class ReportWSInfoView(viewsets.ViewSet):
         tours = Tour.objects.filter(piglets_weights__place__in=places).distinct()
 
         if ws_number in [5, 6, 7]:
-            # tours = tours.add_remont_trs_out(ws_numbers=[ws_number,])
-            tours = tours.add_remont_to_sows()
+            tours = tours.add_remont_to_sows(ws_numbers=[ws_number,])
 
         tours = tours.add_week_weight(places=places)
 

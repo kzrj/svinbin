@@ -405,12 +405,25 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def add_remont_to_sows(self, ):
-        subquery = events_models.PigletsToSowsEvent.objects.filter(metatour__week_tour__pk=OuterRef('pk')) \
-            .values('metatour__week_tour') \
-            .annotate(remont_total=Sum('quantity')) \
-            .values('remont_total')
-        return self.annotate(remont_total=Subquery(subquery))
+    def add_remont_to_sows(self, ws_numbers=[5, 6, 7]):
+        data = dict()
+
+        for ws_number in ws_numbers:
+            data[f'ws{ws_number}_remont'] = Subquery(events_models.PigletsToSowsEvent.objects \
+                .filter(metatour__week_tour__pk=OuterRef('pk'),
+                    piglets__location__pigletsGroupCell__workshop__number=ws_number) \
+                .values('metatour__week_tour') \
+                .annotate(ws_remont_total=Sum('quantity')) \
+                .values('ws_remont_total'))
+
+        if ws_numbers == [5, 6, 7]:
+            data['count_remont_total'] = events_models.PigletsToSowsEvent.objects \
+                .filter(metatour__week_tour__pk=OuterRef('pk')) \
+                .values('metatour__week_tour') \
+                .annotate(remont_total=Sum('quantity')) \
+                .values('remont_total')
+
+        return self.annotate(**data)
 
     @staticmethod
     def get_place_formatted(places):
