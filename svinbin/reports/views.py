@@ -401,7 +401,7 @@ class ReportWSInfoView(viewsets.ViewSet):
             .add_section_fullness()
 
         places = self.gen_places(ws_number=ws_number)
-        tours = Tour.objects.filter(piglets_weights__place__in=places) 
+        tours = Tour.objects.filter(piglets_weights__place__in=places) \
                     .distinct()
 
         if ws_number in [5, 6, 7]:
