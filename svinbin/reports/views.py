@@ -412,7 +412,7 @@ class ReportWSInfoView(viewsets.ViewSet):
         if ws_number == 8:
             tours = tours.add_week_weight_ws8_v2()
     
-        tours = tours.add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) 
+        tours = tours.add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
         		.add_culling_percentage(ws_numbers=[ws_number,]) \
           #       .add_prives(ws_numbers=[ws_number, ]) \
           #       .add_prives_na_1g(ws_numbers=[ws_number, ]) \
