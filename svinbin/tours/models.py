@@ -394,7 +394,7 @@ class TourQuerySet(models.QuerySet):
                         ) \
                     .values('piglets_transactions__week_tour') \
                     .annotate(**ann)
-                    .values('ws_remont_total'))
+                    .values(f'ws{ws_number}_remont'))
 
         if ws_numbers == [5, 6, 7]:
             data['count_remont_total'] = Subquery(
