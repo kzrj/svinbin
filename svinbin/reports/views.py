@@ -401,24 +401,22 @@ class ReportWSInfoView(viewsets.ViewSet):
             .add_section_fullness()
 
         places = self.gen_places(ws_number=ws_number)
-        # tours = Tour.objects.filter(piglets_weights__place__in=places) \
-        #             .distinct()
-        tours = Tour.objects.filter(week_number__in=[1,2,3, 24, 25]).distinct().add_remont_to_sows()
+        tours = Tour.objects.filter(piglets_weights__place__in=places).distinct()
 
         if ws_number in [5, 6, 7]:
             # tours = tours.add_remont_trs_out(ws_numbers=[ws_number,])
-            tours = tours.add_remont_trs_out()
+            tours = tours.add_remont_to_sows()
 
-        # tours = tours.add_week_weight(places=places)
+        tours = tours.add_week_weight(places=places)
 
         if ws_number == 8:
             tours = tours.add_week_weight_ws8_v2()
     
-        # tours = tours.add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
-        # 		.add_culling_percentage(ws_numbers=[ws_number,]) \
-        #   #       .add_prives(ws_numbers=[ws_number, ]) \
-          #       .add_prives_na_1g(ws_numbers=[ws_number, ]) \
-          #       .order_by('-year','-week_number')[:15]
+        tours = tours.add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
+                .add_culling_percentage(ws_numbers=[ws_number,]) \
+                .add_prives(ws_numbers=[ws_number, ]) \
+                .add_prives_na_1g(ws_numbers=[ws_number, ]) \
+                .order_by('-year','-week_number')[:15]
 
         data = {'population': {}, 'tours': {}}
         data['population']['sections'] = LocationSectionPopulationSerializer(sections, many=True).data
