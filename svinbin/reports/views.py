@@ -407,7 +407,7 @@ class ReportWSInfoView(viewsets.ViewSet):
         if ws_number in [5, 6, 7]:
             tours = tours.add_remont_trs_out(ws_numbers=[ws_number,])
 
-        tours = tours.add_week_weight(places=places)
+        # tours = tours.add_week_weight(places=places)
 
         if ws_number == 8:
             tours = tours.add_week_weight_ws8_v2()
