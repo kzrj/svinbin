@@ -405,7 +405,8 @@ class ReportWSInfoView(viewsets.ViewSet):
                     .distinct()
 
         if ws_number in [5, 6, 7]:
-            tours = tours.add_remont_trs_out(ws_numbers=[ws_number,])
+            # tours = tours.add_remont_trs_out(ws_numbers=[ws_number,])
+            tours = tours.add_remont_trs_out()
 
         # tours = tours.add_week_weight(places=places)
 
