@@ -385,7 +385,7 @@ class TourQuerySet(models.QuerySet):
     def add_remont_trs_out(self, ws_numbers=[5, 6, 7]):
         data = dict()
         for ws_number in ws_numbers:
-            ann = {f'ws{ws_number}_remont_total' :Sum('piglets_transactions__quantity')}
+            ann = {f'ws{ws_number}_remont' :Sum('piglets_transactions__quantity')}
             data[f'ws{ws_number}_remont'] = Subquery(
                     self.filter(
                         piglets_transactions__week_tour__pk=OuterRef('pk'),
