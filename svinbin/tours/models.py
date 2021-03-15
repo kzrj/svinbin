@@ -394,13 +394,14 @@ class TourQuerySet(models.QuerySet):
                     .values('piglets_transactions__week_tour') \
                     .annotate(ws_remont_total=Sum('piglets_transactions__quantity'))
                     .values('ws_remont_total'))
-
-        data['count_remont_total'] = Subquery(
-                self.filter(piglets_transactions__week_tour__pk=OuterRef('pk'),
-                    piglets_transactions__to_location__workshop__number=2) \
-                .values('piglets_transactions__week_tour') \
-                .annotate(remont_total=Sum('piglets_transactions__quantity'))
-                .values('remont_total'))
+            
+        if ws_numbers == [5, 6, 7]:
+            data['count_remont_total'] = Subquery(
+                    self.filter(piglets_transactions__week_tour__pk=OuterRef('pk'),
+                        piglets_transactions__to_location__workshop__number=2) \
+                    .values('piglets_transactions__week_tour') \
+                    .annotate(remont_total=Sum('piglets_transactions__quantity'))
+                    .values('remont_total'))
 
         return self.annotate(**data)
 

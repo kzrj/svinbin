@@ -405,7 +405,7 @@ class ReportWSInfoView(viewsets.ViewSet):
                     .distinct()
 
         if ws_number in [5, 6, 7]:
-            tours = tours.add_remont_trs_out(ws_numbers=[ws_number])
+            tours = tours.add_remont_trs_out(ws_numbers=[ws_number,])
 
         tours = tours.add_week_weight(places=places)
 
@@ -413,7 +413,7 @@ class ReportWSInfoView(viewsets.ViewSet):
             tours = tours.add_week_weight_ws8_v2()
     
         tours = tours.add_culling_data_by_week_tour(ws_numbers=[ws_number, ]) \
-        		.add_culling_percentage(ws_numbers=[ws_number]) \
+        		.add_culling_percentage(ws_numbers=[ws_number,]) \
                 .add_prives(ws_numbers=[ws_number, ]) \
                 .add_prives_na_1g(ws_numbers=[ws_number, ]) \
                 .order_by('-year','-week_number')[:15]
