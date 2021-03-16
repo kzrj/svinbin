@@ -268,14 +268,19 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         serializer = StartDateEndDateSerializer(data=request.data)
         if serializer.is_valid():
             start_date = serializer.validated_data['start_date']
+            end_date = serializer.validated_data['end_date']
             start_date_sows = Sow.objects.get_sows_at_date(date=start_date) \
                                          .add_group_at_date(date=start_date) \
-                                         .add_group_at_date_count()
+                                         .add_group_at_date_count('Ремонтная', 'rem') \
+                                         .add_group_at_date_count('Проверяемая', 'check') \
+                                         .add_group_at_date_count('С опоросом', 'osn')
 
-            end_date = serializer.validated_data['end_date']
             end_date_sows = Sow.objects.get_sows_at_date(date=end_date) \
                                          .add_group_at_date(date=end_date) \
-                                         .add_group_at_date_count()
+                                         .add_group_at_date_count('Ремонтная', 'rem') \
+                                         .add_group_at_date_count('Проверяемая', 'check') \
+                                         .add_group_at_date_count('С опоросом', 'osn')
+                                         
 
             # todo:
             # count boars start end

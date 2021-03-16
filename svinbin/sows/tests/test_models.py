@@ -734,6 +734,7 @@ class SowGroupTest(TransactionTestCase):
         self.assertEqual(sow1_group_record.group_after.title, 'С опоросом')
 
     def test_qs_add_group_at_date(self):
+        # add_group_at_date
         date1 = date(2020, 5, 1)
         date2 = date(2020, 5, 15)
         date3 = date(2020, 6, 25)

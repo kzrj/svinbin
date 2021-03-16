@@ -80,4 +80,10 @@ class PigletsToSowsEventAdmin(SowsEventFormMixin, admin.ModelAdmin):
 @admin.register(models.SemenBoar)
 class SemenBoarAdmin(SowsEventFormMixin, admin.ModelAdmin):
     list_display = [f.name for f in models.SemenBoar._meta.fields]
-    search_fields = ['boar__far_id']
+    search_fields = ['boar__farm_id']
+
+
+@admin.register(models.CullingBoar)
+class CullingBoarAdmin(SowsEventFormMixin, admin.ModelAdmin):
+    list_display = [f.name for f in models.CullingBoar._meta.fields]
+    search_fields = ['boar__farm_id']

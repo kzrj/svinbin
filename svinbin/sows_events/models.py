@@ -438,8 +438,8 @@ class PigletsToSowsEventManager(CoreModelManager):
 
 
 class PigletsToSowsEvent(Event):
-    piglets = models.OneToOneField('piglets.Piglets', on_delete=models.SET_NULL, null=True)
-    metatour = models.OneToOneField('tours.MetaTour', on_delete=models.SET_NULL, null=True)
+    piglets = models.OneToOneField('piglets.Piglets', on_delete=models.SET_NULL, null=True, blank=True)
+    metatour = models.OneToOneField('tours.MetaTour', on_delete=models.SET_NULL, null=True, blank=True)
     quantity = models.IntegerField()
 
     objects = PigletsToSowsEventManager()
