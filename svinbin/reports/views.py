@@ -266,12 +266,10 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=False, serializer_class=StartDateEndDateSerializer)
     def ws_24f_report(self, request):
-        serializer = StartDateEndDateSerializer(data=request.data)
-        if serializer.is_valid():
+        start_date = request.GET.get('start_date', None)
+        end_date = request.GET.get('start_date', None)
+        if end_date and start_date:
             data = dict()
-            start_date = serializer.validated_data['start_date']
-            end_date = serializer.validated_data['end_date']
-
             ws3_locs = Location.objects.get_workshop_location_by_number(ws_number=3)
             ws48_locs = Location.objects.get_workshop_location_by_number(ws_number=4) | \
                         Location.objects.get_workshop_location_by_number(ws_number=8)
@@ -350,7 +348,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
             return Response(data)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': 'Неверные даты.'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['get'], detail=False, serializer_class=StartDateEndDateSerializer)
     def ws12_report(self, request):
