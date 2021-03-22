@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-from django.db.models import CharField, Value
+from django.db.models import CharField, Value, Q
 from django.utils import timezone
 from django.http import HttpResponse
 from rest_framework.permissions import IsAuthenticated
