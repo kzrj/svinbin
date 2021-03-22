@@ -272,7 +272,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
             data = dict()
             ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
             ws48_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=4) | \
-                        Location.objects.get_workshop_location_by_number(workshop_number=8)
+                        Location.objects.all().get_workshop_location_by_number(workshop_number=8)
 
             ws567_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=5) | \
                         Location.objects.all().get_workshop_location_by_number(workshop_number=6) | \
