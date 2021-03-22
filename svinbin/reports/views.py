@@ -270,13 +270,13 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         end_date = request.GET.get('start_date', None)
         if end_date and start_date:
             data = dict()
-            ws3_locs = Location.objects.all().get_workshop_location_by_number(ws_number=3)
-            ws48_locs = Location.objects.all().get_workshop_location_by_number(ws_number=4) | \
-                        Location.objects.get_workshop_location_by_number(ws_number=8)
+            ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
+            ws48_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=4) | \
+                        Location.objects.get_workshop_location_by_number(workshop_number=8)
 
-            ws567_locs = Location.objects.all().get_workshop_location_by_number(ws_number=5) | \
-                        Location.objects.all().get_workshop_location_by_number(ws_number=6) | \
-                        Location.objects.all().get_workshop_location_by_number(ws_number=7)
+            ws567_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=5) | \
+                        Location.objects.all().get_workshop_location_by_number(workshop_number=6) | \
+                        Location.objects.all().get_workshop_location_by_number(workshop_number=7)
 
             # count start date, end date
             start_date_sows = Sow.objects.get_sows_at_date(date=start_date) \
