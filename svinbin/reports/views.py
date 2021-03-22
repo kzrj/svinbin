@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.http import HttpResponse
 from rest_framework.permissions import IsAuthenticated
 
-from rest_framework import viewsets, views
+from rest_framework import viewsets, views, status
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.decorators import action
@@ -304,7 +304,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                         .add_ws3_count_piglets_start_day(ws_locs=ws3_locs) \
                         .add_ws_count_piglets_start_day(ws_locs=ws48_locs, ws_numbers=[4, 8]) \
                         .add_ws_count_piglets_start_day(ws_locs=ws567_locs, ws_numbers=[5, 6, 7])
-                        
+
             data['start_ws3_piglets_count'] = dates[0].count_piglets_at_start
             data['start_ws48_piglets_count'] = dates[0].ws48_count_piglets_at_start
             data['start_ws567_piglets_count'] = dates[0].ws567_count_piglets_at_start
