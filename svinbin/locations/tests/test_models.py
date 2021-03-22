@@ -9,7 +9,8 @@ import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 import sows_events.utils as sows_events_testing
 
-from locations.models import  Location, Section
+from sows.models import Sow
+from locations.models import  Location, Section, WorkShop
 from sows_events.models import SowFarrow
 from piglets.models import Piglets
 from tours.models import Tour
@@ -228,6 +229,8 @@ class LocationQsPopulationTest(TransactionTestCase):
 
         self.assertEqual(ws3.sows_count, 6,)
         self.assertEqual(ws3.sows_sup_count, 3)
+        self.assertEqual(ws3.sows_far_count, 1)
+        self.assertEqual(ws3.sows_nurse_count, 2)
 
     def test_add_sows_count_by_sections(self):
         section_locs = Location.objects.filter(section__workshop__number=3,
@@ -253,6 +256,28 @@ class LocationQsPopulationTest(TransactionTestCase):
         self.assertEqual(ws3.count_piglets_8_14, 17)
         self.assertEqual(ws3.count_piglets_15_21, 18)
         self.assertEqual(ws3.count_piglets_28_plus, 19)
+
+    def test_add_pigs_count_by_workshop_by_age_concat_qs(self):
+        today = datetime.today()
+        ws3 = Location.objects.filter(workshop__number=3) \
+                .add_pigs_count_by_workshop_by_age(date=today,
+                     age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+
+        ws4 = Location.objects.filter(workshop__number=4) \
+                .add_pigs_count_by_workshop_by_age(date=today,
+                     age_intervals=[[29, 39], [40, 50],])
+
+        ws8 = Location.objects.filter(workshop__number=8) \
+                .add_pigs_count_by_workshop_by_age(date=today,
+                     age_intervals=[[60, 70], [80, 90],])
+
+        ws34 = ws3 | ws4 | ws8
+        ws34 = ws34.add_pigs_count_by_workshop()
+        self.assertEqual(ws34[0].pigs_count, 85)
+        self.assertEqual(ws34[1].pigs_count, None)
+        self.assertEqual(ws34[0].count_piglets_0_7, 31)
+        self.assertEqual(ws34[1].count_piglets_0_7, None)
+        self.assertEqual(ws34[2].count_piglets_0_7, None)
 
     def test_add_pigs_count_by_ws_sections_by_age(self):
         today = datetime.today()

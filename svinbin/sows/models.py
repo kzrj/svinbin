@@ -9,7 +9,7 @@ from django.core.exceptions import ValidationError as DjangoValidationError
 from core.models import CoreModel, CoreModelManager
 from locations.models import Location
 from sows_events.models import Semination, AssingFarmIdEvent, PigletsToSowsEvent, CullingSow, SowFarrow, \
-    MarkAsGilt
+    MarkAsGilt, CullingBoar
 from tours.models import Tour
 from transactions.models import SowTransaction
 
@@ -43,6 +43,19 @@ class SowGroup(CoreModel):
         return self.title
 
 
+class SowGroupRecordQuerySet(models.QuerySet):
+    def count_group_tranfer_in_daterange(self, start_date, end_date):
+        return self.filter(date__date__gte=start_date,
+                    date__date__lt=end_date,
+                    ) \
+            .aggregate(
+                count_prov_to_osn=Count('id', filter=Q(group_before__title='Проверяемая',
+                    group_after__title='С опоросом',)),
+                count_rem_to_prov=Count('id', filter=Q(group_before__title='Ремонтная',
+                    group_after__title='Проверяемая',)),
+                )
+
+
 class SowGroupRecord(CoreModel):
     group_before = models.ForeignKey(SowGroup, null=True, on_delete=models.CASCADE,
         related_name='records_before')
@@ -50,6 +63,8 @@ class SowGroupRecord(CoreModel):
         related_name='records_after')
     sow = models.ForeignKey('sows.Sow', on_delete=models.CASCADE, related_name='group_records')
     date = models.DateTimeField(default=timezone.now)
+
+    objects = SowGroupRecordQuerySet.as_manager()
 
     class Meta:
         ordering = ['-date']
@@ -508,6 +523,17 @@ class BoarManager(CoreModelManager):
             boar.breed = breed
             boar.save()
         return boar
+
+    def count_alive_at_date(self, date, count_at_end_date=False):
+        lt_filters = tuple()
+        if count_at_end_date:
+            lt_filters = ({f'created_at__date__lte': date}, {f'date__date__lte': date})
+        else:
+            lt_filters = ({f'created_at__date__lt': date}, {f'date__date__lt': date})
+
+        all_boars_at_date_count = self.filter(**lt_filters[0]).count()
+        culls_count = CullingBoar.objects.filter(**lt_filters[1]).count()
+        return all_boars_at_date_count - culls_count
 
 
 class Boar(Pig):

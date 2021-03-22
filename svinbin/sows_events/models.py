@@ -259,7 +259,35 @@ class SowFarrow(SowEvent):
 
 
 class CullingSowQuerySet(SowEventQuerySet):
-    pass
+    def count_by_groups(self):
+        return self.aggregate(
+            padej_qnty_osn=models.Count('id', filter=models.Q(sow_group__title='С опоросом',
+                culling_type='padej')),
+            padej_total_osn=models.Sum('weight', filter=models.Q(sow_group__title='С опоросом',
+                culling_type='padej')),
+            vinuzhd_qnty_osn=models.Count('id', filter=models.Q(sow_group__title='С опоросом',
+                culling_type='vinuzhd')),
+            vinuzhd_total_osn=models.Sum('weight', filter=models.Q(sow_group__title='С опоросом',
+                culling_type='vinuzhd')),
+
+            padej_qnty_prov=models.Count('id', filter=models.Q(sow_group__title='Проверяемая',
+                culling_type='padej')),
+            padej_total_prov=models.Sum('weight', filter=models.Q(sow_group__title='Проверяемая',
+                culling_type='padej')),
+            vinuzhd_qnty_prov=models.Count('id', filter=models.Q(sow_group__title='Проверяемая',
+                culling_type='vinuzhd')),
+            vinuzhd_total_prov=models.Sum('weight', filter=models.Q(sow_group__title='Проверяемая',
+                culling_type='vinuzhd')),
+
+            padej_qnty_rem=models.Count('id', filter=models.Q(sow_group__title='Ремонтная',
+                culling_type='padej')),
+            padej_total_rem=models.Sum('weight', filter=models.Q(sow_group__title='Ремонтная',
+                culling_type='padej')),
+            vinuzhd_qnty_rem=models.Count('id', filter=models.Q(sow_group__title='Ремонтная',
+                culling_type='vinuzhd')),
+            vinuzhd_total_rem=models.Sum('weight', filter=models.Q(sow_group__title='Ремонтная',
+                culling_type='vinuzhd')),
+            )
 
 
 class CullingSowManager(SowEventManager):
@@ -312,6 +340,7 @@ class CullingSow(SowEvent):
      related_name='sow_cullings_here')
 
     sow_status = models.ForeignKey('sows.SowStatus', on_delete=models.SET_NULL, null=True, blank=True)
+    sow_group = models.ForeignKey('sows.SowGroup', on_delete=models.SET_NULL, null=True, blank=True)
 
     weight = models.FloatField(null=True)
 
@@ -474,8 +503,20 @@ class AssingFarmIdEvent(Event):
 
 
 # Boar Events
+class CullingBoarQuerySet(SowEventQuerySet):
+    def count_by_groups(self):
+        return self.aggregate(
+            padej_qnty_osn=models.Count('id'),
+            padej_total_osn=models.Sum('weight'),
+            vinuzhd_qnty_osn=models.Count('id'),
+            vinuzhd_total_osn=models.Sum('weight'),
+            )
+
 class CullingBoarManager(CoreModelManager):
-    def create_culling_boar(self, boar, culling_type, reason, weight=None,
+    def get_queryset(self):
+        return CullingBoarQuerySet(self.model, using=self._db)
+
+    def create_culling_boar(self, boar, culling_type, reason=None, weight=None,
          initiator=None, date=None):
         if not date:
             date = timezone.now()

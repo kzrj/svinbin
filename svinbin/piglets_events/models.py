@@ -210,10 +210,24 @@ class WeighingPigletsQuerySet(models.QuerySet):
                 )
         return qs, total
 
+    def count_doros_otkorm_in_out(self):
+        return self.aggregate(
+                qnty_to_doros=Sum('piglets_quantity', filter=Q(place='3/4')),
+                avg_to_doros=Avg('average_weight', filter=Q(place='3/4')),
+                total_to_doros=Sum('total_weight', filter=Q(place='3/4')),
+
+                qnty_to_otkorm=Sum('piglets_quantity', 
+                    filter=Q(Q(place='8/5') | Q(place='8/6') | Q(place='8/7'))),
+                avg_to_otkorm=Avg('average_weight', 
+                    filter=Q(Q(place='8/5') | Q(place='8/6') | Q(place='8/7'))),
+                total_to_otkorm=Sum('total_weight',
+                     filter=Q(Q(place='8/5') | Q(place='8/6') | Q(place='8/7'))),
+                )
+
 
 class WeighingPigletsManager(CoreModelManager):
     def get_queryset(self):
-            return WeighingPigletsQuerySet(self.model, using=self._db)
+        return WeighingPigletsQuerySet(self.model, using=self._db)
 
     def create_weighing(self, piglets_group, total_weight, place, initiator=None, date=None,
          gilts_quantity=None):
@@ -258,7 +272,43 @@ class WeighingPiglets(PigletsEvent):
         return f'{self.pk} weighing_piglets'
 
 
+class CullingPigletsQuerySet(models.QuerySet):
+    def count_at_loc(self, locs, label=''):
+        data = {  
+            f'padej_qnty{label}': Sum('quantity', filter=Q(culling_type='padej')),
+            f'padej_avg{label}': Avg('avg_weight', filter=Q(culling_type='padej')),
+            f'padej_total{label}': Sum('total_weight', filter=Q(culling_type='padej')),
+
+            f'vinuzhd_qnty{label}': Sum('quantity', filter=Q(culling_type='vinuzhd')),
+            f'vinuzhd_avg{label}': Avg('avg_weight', filter=Q(culling_type='vinuzhd')),
+            f'vinuzhd_total{label}': Sum('total_weight', filter=Q(culling_type='vinuzhd')),
+        }
+
+        if label in ['_ws3', '_ws48']:
+            data.update(
+                {  
+                    f'prirezka_qnty{label}': Sum('quantity', filter=Q(culling_type='prirezka')),
+                    f'prirezka_avg{label}': Avg('avg_weight', filter=Q(culling_type='prirezka')),
+                    f'prirezka_total{label}': Sum('total_weight', filter=Q(culling_type='prirezka')),
+
+                })
+
+        if label in ['_ws567']:
+            data.update(
+                {  
+                    f'spec_qnty{label}': Sum('quantity', filter=Q(culling_type='spec')),
+                    f'spec_avg{label}': Avg('avg_weight', filter=Q(culling_type='spec')),
+                    f'spec_total{label}': Sum('total_weight', filter=Q(culling_type='spec')),
+
+                })
+
+        return self.filter(location__in=locs).aggregate(**data)
+
+
 class CullingPigletsManager(CoreModelManager):
+    def get_queryset(self):
+        return CullingPigletsQuerySet(self.model, using=self._db)
+
     def create_culling_piglets(self, piglets_group, culling_type, reason=None,
          initiator=None, date=None, quantity=1, total_weight=0):
         if not date:

@@ -10,7 +10,7 @@ from django.db.models.functions import Coalesce, Greatest
 from django.utils import timezone
 
 from core.models import CoreModel, CoreModelManager
-from sows.models import Sow, SowStatusRecord, Boar
+from sows.models import Sow, SowStatusRecord, Boar, SowGroupRecord
 from piglets.models import Piglets
 from locations.models import Location
 from sows_events.models import ( SowFarrow, Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse,
@@ -384,7 +384,7 @@ class ReportDateQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def add_ws3_count_piglets_start_day(self, ws_locs):
+    def add_ws3_count_piglets_start_day(self, ws_locs, add_live=True):
         # add date__date__gt 24\06
         total_alive = Coalesce(
                         Subquery(SowFarrow.objects \
@@ -422,8 +422,12 @@ class ReportDateQuerySet(models.QuerySet):
 
         # + count piglets at 24/06 
         # - count init piglets 3715
+        additional_count = 0 
+        if add_live:
+            additional_count = 3715 + 2167
+
         return self.annotate(count_piglets_at_start=ExpressionWrapper(
-            3715 + 2167 + total_alive - trs_out_qnty + trs_in_qnty - culling_qnty, output_field=models.IntegerField()))
+            additional_count + total_alive - trs_out_qnty + trs_in_qnty - culling_qnty, output_field=models.IntegerField()))
 
     def add_ws3_piglets_trs_out_aka_weighing(self):
         data = dict()
@@ -449,28 +453,28 @@ class ReportDateQuerySet(models.QuerySet):
 
     def add_ws3_piglets_cullings(self, ws_locs):
         data = dict()
-        data['piglets_padej_qnty'] = CullingPiglets.objects \
+        data['ws3_piglets_padej_qnty'] = CullingPiglets.objects \
                     .filter(date__date=OuterRef('date'), culling_type__in=['padej', 'prirezka'],
                         location__in=ws_locs) \
                     .values('date__date') \
                     .annotate(qnty=Sum('quantity')) \
                     .values('qnty')
 
-        data['piglets_vinuzhd_qnty'] = CullingPiglets.objects \
+        data['ws3_piglets_vinuzhd_qnty'] = CullingPiglets.objects \
                     .filter(date__date=OuterRef('date'), culling_type__in=['vinuzhd'],
                         location__in=ws_locs) \
                     .values('date__date') \
                     .annotate(qnty=Sum('quantity')) \
                     .values('qnty')
 
-        data['piglets_padej_weight'] = CullingPiglets.objects \
+        data['ws3_piglets_padej_weight'] = CullingPiglets.objects \
                     .filter(date__date=OuterRef('date'), culling_type__in=['padej', 'prirezka'],
                         location__in=ws_locs) \
                     .values('date__date') \
                     .annotate(weight=Sum('total_weight')) \
                     .values('weight')
 
-        data['piglets_vinuzhd_weight'] = CullingPiglets.objects \
+        data['ws3_piglets_vinuzhd_weight'] = CullingPiglets.objects \
                     .filter(date__date=OuterRef('date'), culling_type__in=['vinuzhd'],
                         location__in=ws_locs) \
                     .values('date__date') \
@@ -514,7 +518,8 @@ class ReportDateQuerySet(models.QuerySet):
                 total_piglets_vinuzhd_weight=Sum('piglets_vinuzhd_weight'),
                 )
 
-    def add_ws_count_piglets_start_day(self, ws_locs, ws_number=None):
+    @staticmethod
+    def gen_subqueries_count_piglets_start_date(ws_locs, ws_numbers=[], add_live=True):
         trs_in_qnty = Coalesce(
                         Subquery(PigletsTransaction.objects \
                             .filter(date__date__lt=OuterRef('date'), to_location__in=ws_locs) \
@@ -541,20 +546,40 @@ class ReportDateQuerySet(models.QuerySet):
                             .annotate(culling_qnty=Sum('quantity')) \
                             .values('culling_qnty')), 0)
 
-        additonal_count = 0
-        if ws_number == 4:
-            additonal_count = 2892
-        if ws_number == 8:
-            additonal_count = 4137
-        if ws_number == 5:
-            additonal_count = -68
-        if ws_number == 6:
-            additonal_count = 1099
-        if ws_number == 7:
-            additonal_count = 131
+        additional_count = 0
+        if add_live:
+            if 4 in ws_numbers:
+                additional_count = additional_count + 2892
+            if 8 in ws_numbers:
+                additional_count = additional_count + 4137
+            if 5 in ws_numbers:
+                additional_count = additional_count + (-68)
+            if 6 in ws_numbers:
+                additional_count = additional_count + 1099
+            if 7 in ws_numbers:
+                additional_count = additional_count + 131
 
-        return self.annotate(count_piglets_at_start=ExpressionWrapper(
-          additonal_count + trs_in_qnty - trs_out_qnty - culling_qnty, output_field=models.IntegerField()))
+        return trs_in_qnty, trs_out_qnty, culling_qnty, additional_count
+
+    def add_ws_count_piglets_start_day(self, ws_locs, ws_numbers=[], add_live=True):
+        trs_in_qnty, trs_out_qnty, culling_qnty, additional_count = \
+            self.gen_subqueries_count_piglets_start_date(ws_locs=ws_locs, ws_numbers=ws_numbers,
+             add_live=add_live)
+
+        expression = ExpressionWrapper(
+          additional_count + trs_in_qnty - trs_out_qnty - culling_qnty,
+          output_field=models.IntegerField())
+
+        data = dict()
+        if len(ws_numbers) > 1:
+            label = ''
+            for ws in ws_numbers:
+                label = label + str(ws)    
+            data = {f'ws{label}_count_piglets_at_start': expression}
+        else:
+            data = {'count_piglets_at_start': expression}
+
+        return self.annotate(**data)
 
     def add_ws_weighing_in(self, ws_number):
         place = None
@@ -615,10 +640,15 @@ class ReportDateQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
-    def add_ws_piglets_culling_data(self, ws_locs):
+    def add_ws_piglets_culling_data(self, ws_locs, ws_numbers=[]):
         data = dict()
+        label = 'ws'
+        if len(ws_numbers) > 0:
+            for ws_number in ws_numbers:
+                label = label + str(ws_number)
+
         for culling_type in ['padej', 'prirezka', 'vinuzhd', 'spec']:
-            data[f'{culling_type}_qnty'] = Subquery(
+            data[f'{label}_{culling_type}_qnty'] = Subquery(
                         CullingPiglets.objects.filter(
                             date__date=OuterRef('date'), culling_type=culling_type,
                             location__in=ws_locs) \
@@ -627,7 +657,7 @@ class ReportDateQuerySet(models.QuerySet):
                                     .values('qnty')
                         )
 
-            data[f'{culling_type}_total_weight'] = Subquery(
+            data[f'{label}_{culling_type}_total_weight'] = Subquery(
                         CullingPiglets.objects.filter(
                             date__date=OuterRef('date'), culling_type=culling_type,
                             location__in=ws_locs) \
@@ -636,7 +666,7 @@ class ReportDateQuerySet(models.QuerySet):
                                     .values('all_total_weight')
                     )
 
-            data[f'{culling_type}_avg_weight'] = Subquery(
+            data[f'{label}_{culling_type}_avg_weight'] = Subquery(
                         CullingPiglets.objects.filter(
                             date__date=OuterRef('date'), culling_type=culling_type,
                             location__in=ws_locs) \
@@ -750,7 +780,6 @@ class ReportDateQuerySet(models.QuerySet):
 
         count_sows = ExpressionWrapper(all_created_boars - culls, output_field=models.IntegerField())
         
-
         return self.annotate(count_boars=count_sows)
 
     def add_ws12_sow_cullings_data(self, ws_locs, ws_number):
@@ -900,6 +929,29 @@ class ReportDateQuerySet(models.QuerySet):
                 total_vinuzhd_boar_weight=Sum('vinuzhd_boar_weight'),
             )
 
+    def add_count_sow_group_transfer(self):
+        data = dict()
+        data['count_sows_to_osn'] = Subquery(SowGroupRecord.objects \
+            .filter(date__date=OuterRef('date'), group_after__title='С опоросом') \
+            .values('group_after') \
+            .annotate(count_sows_to_osn=Count('*')) \
+            .values('count_sows_to_osn'))
+
+        data['count_sows_to_prov'] = Subquery(SowGroupRecord.objects \
+            .filter(date__date=OuterRef('date'), group_after__title='Проверяемая') \
+            .values('group_after') \
+            .annotate(count_sows_to_prov=Count('*')) \
+            .values('count_sows_to_prov'))
+
+        return self.annotate(**data)
+
+    def add_new_remont(self):
+        return self.annotate(rem_qnty=Subquery(PigletsToSowsEvent.objects \
+            .filter(date__date=OuterRef('date'))\
+            .values('date__date') \
+            .annotate(qnty=Sum('quantity')) \
+            .values('qnty')))
+
 
 class ReportDateManager(CoreModelManager):
     def get_queryset(self):
@@ -980,9 +1032,6 @@ class ReportDate(CoreModel):
             'podsos': sow.count_status_oporos + sow.count_status_otiem + sow.count_status_korm,
         }
 
-    # def count_all_pigs_ws3(self):
-
-        
 
 # For operations view
 def gen_operations_dict():

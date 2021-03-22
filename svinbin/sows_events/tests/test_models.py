@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime, date
+from freezegun import freeze_time
 
 from django.utils import timezone
 from django.test import TestCase, TransactionTestCase
@@ -281,6 +282,52 @@ class CullingSowManagerTest(TestCase):
 
         self.assertEqual(CullingSow.objects.all().count(), 3)
 
+    def test_qs_count_by_groups(self):
+        sows_testing.create_sow_and_put_in_workshop_one()
+        sows_testing.create_sow_and_put_in_workshop_one()
+        Sow.objects.all().update_group(group_title='Ремонтная')
+
+        for sow in Sow.objects.all():
+            CullingSow.objects.create_culling(sow=sow, culling_type='padej', weight=250, 
+                date=datetime(2020, 5, 5))
+
+        sows_testing.create_sow_and_put_in_workshop_one()
+        sows_testing.create_sow_and_put_in_workshop_one()
+        Sow.objects.all().update_group(group_title='Проверяемая')
+
+        for sow in Sow.objects.all():
+            CullingSow.objects.create_culling(sow=sow, culling_type='padej', weight=250, 
+                date=datetime(2020, 5, 15))
+
+        sows_testing.create_sow_and_put_in_workshop_one()
+        sows_testing.create_sow_and_put_in_workshop_one()
+        Sow.objects.all().update_group(group_title='С опоросом')
+
+        for sow in Sow.objects.all():
+            CullingSow.objects.create_culling(sow=sow, culling_type='padej', weight=250, 
+                date=datetime(2020, 5, 25))
+
+        sows_testing.create_sow_and_put_in_workshop_one()
+        sows_testing.create_sow_and_put_in_workshop_one()
+        Sow.objects.all().update_group(group_title='С опоросом')
+
+        for sow in Sow.objects.all():
+            CullingSow.objects.create_culling(sow=sow, culling_type='vinuzhd', weight=250, 
+                date=datetime(2020, 5, 25))
+
+        data = CullingSow.objects.filter(date__date__gte=date(2020, 5, 1),
+            date__date__lt=date(2020, 6, 1),).count_by_groups()
+
+        self.assertEqual(data['padej_qnty_osn'], 2)
+        self.assertEqual(data['padej_total_osn'], 500)
+        self.assertEqual(data['padej_qnty_prov'], 2)
+        self.assertEqual(data['padej_total_prov'], 500)
+        self.assertEqual(data['padej_qnty_rem'], 2)
+        self.assertEqual(data['padej_total_rem'], 500)
+
+        self.assertEqual(data['vinuzhd_qnty_osn'], 2)
+        self.assertEqual(data['vinuzhd_total_osn'], 500)
+
 
 class WeaningSowTest(TestCase):
     def setUp(self):
@@ -416,6 +463,17 @@ class BoarEventTest(TestCase):
         self.assertEqual(culling.boar, boar)
         self.assertEqual(culling.culling_type, 'padej')
         self.assertEqual(culling.reason, 'test reason')
+
+    def test_culls_count_by_groups(self):
+        boar = Boar.objects.all().first()
+
+        with freeze_time("2020-06-15"):
+            culling = CullingBoar.objects.create_culling_boar(boar=boar,
+                culling_type='padej', reason='test reason', weight=100)
+
+        culls_data = CullingBoar.objects.filter(date__date__gte=date(2020, 12, 1),
+                date__date__lt=date(2020, 12, 20)).count_by_groups()
+        print(culls_data)
 
     def test_semen_boar(self):
         boar = Boar.objects.all().first()

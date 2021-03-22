@@ -16,9 +16,9 @@ import sows_events.utils as sows_events_testings
 import piglets.testing_utils as piglets_testing
 
 from locations.models import Location, Section
-from sows.models import Sow, Gilt, Boar, SowStatus, SowStatusRecord
+from sows.models import Sow, Gilt, Boar, SowStatus, SowStatusRecord, SowGroupRecord
 from sows_events.models import SowFarrow, Ultrasound, Semination, AssingFarmIdEvent, \
-    PigletsToSowsEvent, CullingSow, MarkAsGilt
+    PigletsToSowsEvent, CullingSow, MarkAsGilt, CullingBoar
 from tours.models import Tour
 from transactions.models import SowTransaction
 
@@ -527,6 +527,7 @@ class GiltModelManagerTest(TransactionTestCase):
         self.assertEqual(gilt.tour.week_number, 1)
         self.assertEqual(gilt.farrow, sow.get_last_farrow)
 
+
 class Sow24fReportTest(TransactionTestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()
@@ -644,8 +645,54 @@ class Sow24fReportTest(TransactionTestCase):
         self.assertEqual(sow3.status_at_date, 'Ремонтная')
         self.assertEqual(sow3.is_checking, False)
 
-        # for sow in sows:
-        #     print(sow, sow.pk, sow.is_oporos_before, sow.status_at_date, sow.is_checking, sow.tour)
+    def test_count_boar_at_date(self):
+        with freeze_time("2020-11-5T10:00"):
+            boar1 = Boar.objects.get_or_create_boar(farm_id=100)
+
+        with freeze_time("2020-11-15T10:00"):
+            boar2 = Boar.objects.get_or_create_boar(farm_id=101)
+
+        with freeze_time("2020-11-25T10:00"):
+            boar3 = Boar.objects.get_or_create_boar(farm_id=102)
+
+        with freeze_time("2020-12-25T10:00"):
+            boar4 = Boar.objects.get_or_create_boar(farm_id=103)
+
+        with freeze_time("2021-01-07T10:00"):
+            boar5 = Boar.objects.get_or_create_boar(farm_id=104)
+            boar6 = Boar.objects.get_or_create_boar(farm_id=105)
+            boar7 = Boar.objects.get_or_create_boar(farm_id=106)
+
+        with freeze_time("2021-01-5T10:00"):
+            CullingBoar.objects.create_culling_boar(boar=boar1, culling_type='padej')
+
+        with freeze_time("2021-01-10T10:00"):
+            CullingBoar.objects.create_culling_boar(boar=boar2, culling_type='padej')
+
+        with freeze_time("2021-01-15T10:00"):
+            CullingBoar.objects.create_culling_boar(boar=boar3 , culling_type='padej')
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 3)), 4)
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 5)), 4)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 5),
+         count_at_end_date=True), 3)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 6)), 3)
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 7)), 3)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 7),
+         count_at_end_date=True), 6)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 8)), 6)
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 10)), 6)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 10),
+         count_at_end_date=True), 5)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 11)), 5)
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 15)), 5)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 15),
+         count_at_end_date=True), 4)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 16)), 4)
 
 
 class SowGroupTest(TransactionTestCase):
@@ -811,6 +858,32 @@ class SowGroupTest(TransactionTestCase):
         self.assertEqual(sow.count_group_rem, 0)
         self.assertEqual(sow.count_group_check, 0)
         self.assertEqual(sow.count_group_oporos, 3)
+
+    def test_manager_count_prov_to_osn_in_daterange(self):
+        date1 = date(2020, 5, 1)
+        date2 = date(2020, 5, 15)
+        date3 = date(2020, 6, 25)
+
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testings.create_sow_and_put_in_workshop_one()
+
+        sows = Sow.objects.all()
+        sows.update_group(group_title='Ремонтная', date=date1)
+        sows.update_group(group_title='Проверяемая', date=date2)
+        sows.update_group(group_title='С опоросом', date=date3)
+
+        data = (SowGroupRecord.objects.all().count_group_tranfer_in_daterange(
+            start_date=date(2020, 5, 1), end_date=date(2020, 5, 16)
+            ))
+        self.assertEqual(data['count_prov_to_osn'], 0)
+        self.assertEqual(data['count_rem_to_prov'], 3)
+
+        data = (SowGroupRecord.objects.all().count_group_tranfer_in_daterange(
+            start_date=date(2020, 5, 16), end_date=date(2020, 6, 26)
+            ))
+        self.assertEqual(data['count_prov_to_osn'], 3)
+        self.assertEqual(data['count_rem_to_prov'], 0)
 
 
 class SowModelOperationsTest(TransactionTestCase):

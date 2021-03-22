@@ -118,16 +118,62 @@ class LocationQuerySet(models.QuerySet):
                         .annotate(all=alive_sows)\
                         .values('all')
 
-        alive_sup_sows = Count('sow', filter=Q(sow__alive=True, sow__status__title='Супорос 35'))
+        alive_sup_sows = Count('sow', filter=Q(sow__alive=True,
+                            sow__status__title__in=['Супорос 28', 'Супорос 35']))
         subquery_sows_sup_count = self.get_workshop_location(OuterRef('workshop')) \
                         .annotate(flag=Value(0)) \
                         .values('flag') \
                         .annotate(all=alive_sup_sows)\
                         .values('all')
 
+        alive_sem_sows = Count('sow', filter=Q(sow__alive=True,
+             sow__status__title__in=['Осеменена 1', 'Осеменена 2']))
+        subquery_sows_sem_count = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=alive_sem_sows)\
+                        .values('all')
+
+        alive_wait_sows = Count('sow', filter=Q(sow__alive=True,
+             sow__status__title__in=['Ожидает осеменения', 'Прохолост', 'Аборт']))
+        subquery_sows_wait_count = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=alive_wait_sows)\
+                        .values('all')
+
+        alive_rem_sows = Count('sow', filter=Q(sow__alive=True,
+             sow__status__title__in=['Ремонтная']))
+        subquery_sows_rem_count = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=alive_rem_sows)\
+                        .values('all')
+
+        alive_far_sows = Count('sow', filter=Q(sow__alive=True,
+             sow__status__title__in=['Опоросилась']))
+        subquery_sows_far_count = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=alive_far_sows)\
+                        .values('all')
+
+        alive_nurse_sows = Count('sow', filter=Q(sow__alive=True,
+             sow__status__title__in=['Кормилица']))
+        subquery_sows_nurse_count = self.get_workshop_location(OuterRef('workshop')) \
+                        .annotate(flag=Value(0)) \
+                        .values('flag') \
+                        .annotate(all=alive_nurse_sows)\
+                        .values('all')
+
         return self.annotate(
             sows_count=models.Subquery(subquery, output_field=models.IntegerField()),
-            sows_sup_count=models.Subquery(subquery_sows_sup_count, output_field=models.IntegerField())
+            sows_sup_count=models.Subquery(subquery_sows_sup_count, output_field=models.IntegerField()),
+            sows_sem_count=models.Subquery(subquery_sows_sem_count, output_field=models.IntegerField()),
+            sows_wait_count=models.Subquery(subquery_sows_wait_count, output_field=models.IntegerField()),
+            sows_rem_count=models.Subquery(subquery_sows_rem_count, output_field=models.IntegerField()),
+            sows_far_count=models.Subquery(subquery_sows_far_count, output_field=models.IntegerField()),
+            sows_nurse_count=models.Subquery(subquery_sows_nurse_count, output_field=models.IntegerField()),
         )
 
     def add_pigs_count_by_workshop(self):    

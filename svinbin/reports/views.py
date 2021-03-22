@@ -17,7 +17,8 @@ from tours.filters import TourFilter
 from tours.models import Tour
 from reports.models import ReportDate, gen_operations_dict, gen_megadict
 from locations.models import Location
-from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt )
+from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt,
+    CullingBoar)
 from piglets_events.models import CullingPiglets, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
 from sows.models import Sow
@@ -204,7 +205,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
         ws_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
         bool(ws_locs)
         queryset = ReportDate.objects.all()\
-                            .add_ws_count_piglets_start_day(ws_locs=ws_locs, ws_number=ws_number) \
+                            .add_ws_count_piglets_start_day(ws_locs=ws_locs, ws_numbers=[ws_number]) \
                             .add_ws_weighing_in(ws_number=ws_number) \
                             .add_ws_piglets_trs_in_out(ws_locs=ws_locs) \
                             .add_ws_weighing_out(ws_number=ws_number) \
@@ -267,30 +268,87 @@ class ReportDateViewSet(viewsets.ModelViewSet):
     def ws_24f_report(self, request):
         serializer = StartDateEndDateSerializer(data=request.data)
         if serializer.is_valid():
+            data = dict()
             start_date = serializer.validated_data['start_date']
             end_date = serializer.validated_data['end_date']
+
+            ws3_locs = Location.objects.get_workshop_location_by_number(ws_number=3)
+            ws48_locs = Location.objects.get_workshop_location_by_number(ws_number=4) | \
+                        Location.objects.get_workshop_location_by_number(ws_number=8)
+
+            ws567_locs = Location.objects.get_workshop_location_by_number(ws_number=5) | \
+                        Location.objects.get_workshop_location_by_number(ws_number=6) | \
+                        Location.objects.get_workshop_location_by_number(ws_number=7)
+
+            # count start date, end date
             start_date_sows = Sow.objects.get_sows_at_date(date=start_date) \
                                          .add_group_at_date(date=start_date) \
                                          .add_group_at_date_count('Ремонтная', 'rem') \
-                                         .add_group_at_date_count('Проверяемая', 'check') \
-                                         .add_group_at_date_count('С опоросом', 'osn')
+                                         .add_group_at_date_count('Проверяемая', 'prov') \
+                                         .add_group_at_date_count('С опоросом', 'osn').first()
+            data['start_sows_osn_count'] = start_date_sows.count_group_osn
+            data['start_sows_prov_count'] = start_date_sows.count_group_prov
+            data['start_sows_rem_count'] = start_date_sows.count_group_rem
 
             end_date_sows = Sow.objects.get_sows_at_date(date=end_date) \
                                          .add_group_at_date(date=end_date) \
                                          .add_group_at_date_count('Ремонтная', 'rem') \
-                                         .add_group_at_date_count('Проверяемая', 'check') \
-                                         .add_group_at_date_count('С опоросом', 'osn')
+                                         .add_group_at_date_count('Проверяемая', 'prov') \
+                                         .add_group_at_date_count('С опоросом', 'osn').first()
+            data['end_sows_osn_count'] = end_date_sows.count_group_osn
+            data['end_sows_prov_count'] = end_date_sows.count_group_prov
+            data['end_sows_rem_count'] = end_date_sows.count_group_rem
                                          
+            dates = ReportDate.objects.filter(Q(date=start_date) | Q(date=end_date)) \
+                        .add_count_boars() \
+                        .add_ws3_count_piglets_start_day(ws_locs=ws3_locs) \
+                        .add_ws_count_piglets_start_day(ws_locs=ws48_locs, ws_numbers=[4, 8]) \
+                        .add_ws_count_piglets_start_day(ws_locs=ws567_locs, ws_numbers=[5, 6, 7])
+                        
+            data['start_ws3_piglets_count'] = dates[0].count_piglets_at_start
+            data['start_ws48_piglets_count'] = dates[0].ws48_count_piglets_at_start
+            data['start_ws567_piglets_count'] = dates[0].ws567_count_piglets_at_start
+            data['start_boars_count'] = dates[0].count_boars
+            data['end_ws3_piglets_count'] = dates[1].count_piglets_at_start
+            data['end_ws48_piglets_count'] = dates[1].ws48_count_piglets_at_start
+            data['end_ws567_piglets_count'] = dates[1].ws567_count_piglets_at_start
+            data['end_boars_count'] = dates[1].count_boars
 
-            # todo:
-            # count boars start end
-            # count piglets start end
-            
-            # count cullings by group, boar, piglets
-            # count transactions by group, boar, piglets
+            # aggregates. calc between start and end
+            # 1. prov to osn
+            # 2. rem to prov
+            data['sow_group_transfer'] = SowGroupRecord.objects.all().count_group_tranfer_in_daterange(
+                start_date=start_date, end_date=end_date)
+            # 3. to rem
+            data['sow_group_transfer']['to_rem'] = PigletsToSowsEvent.objects.filter(
+                date__date__gte=start_date, date__date__lt=end_date).aggregate(qnty=Sum('quantity'))['qnty']
 
-            # rest
+            # 4. total born alive
+            data['total_born_alive'] = SowFarrow.objects.filter(date__date__gte=start_date,
+                date__date__lt=end_date).aggregate(qnty=Sum('alive_quantity'))['qnty']
 
+            # 5. 3\4 8\otkorm weighing
+            data['count_doros_otkorm_in_out'] = WeighingPiglets.objects \
+                .filter(date__date__gte=start_date, date__date__lt=end_date) \
+                .count_doros_otkorm_in_out()
+
+            # 6. culls sows + rem
+            data['culls_sows'] = CullingSow.objects.filter(date__date__gte=start_date,
+                date__date__lt=end_date).count_by_groups()
+
+            # 7. culls piglets by ws
+            data['ws3_culls'] = CullingPiglets.objects.filter(date__date__gte=start_date,
+                date__date__lt=end_date).count_at_loc(locs=ws3_locs, label='_ws3')
+            data['ws48_culls'] = CullingPiglets.objects.filter(date__date__gte=start_date,
+                date__date__lt=end_date).count_at_loc(locs=ws48_locs, label='_ws48')
+            data['ws567_culls'] = CullingPiglets.objects.filter(date__date__gte=start_date,
+                date__date__lt=end_date).count_at_loc(locs=ws567_locs, label='_ws567')
+
+            # 8. culls boars
+            data['ws567_culls'] = CullingBoar.objects.filter(date__date__gte=start_date,
+                date__date__lt=end_date).count_by_groups()
+
+            return Response(data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -429,4 +487,40 @@ class ReportWSInfoView(viewsets.ViewSet):
 
         return Response(data)
 
+    @action(methods=['post'], detail=False)
+    def main_page_population(self, request):
+        today = datetime.datetime.today()
+        ws12 = Location.objects.filter(workshop__number__in=[1,2]).add_sows_count_by_workshop()
 
+        ws3 = Location.objects.filter(workshop__number=3) \
+                .add_sows_count_by_workshop() \
+                .add_pigs_count_by_workshop(date=today, 
+                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+
+        ws4 = Location.objects.filter(workshop__number=4) \
+                .add_pigs_count_by_workshop(date=today, 
+                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+
+        ws5 = Location.objects.filter(workshop__number=5) \
+                .add_pigs_count_by_workshop(date=today, 
+                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+
+        ws6 = Location.objects.filter(workshop__number=6) \
+                .add_pigs_count_by_workshop(date=today, 
+                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+
+        ws7 = Location.objects.filter(workshop__number=7) \
+                .add_pigs_count_by_workshop(date=today, 
+                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+
+        ws8 = Location.objects.filter(workshop__number=8) \
+                .add_pigs_count_by_workshop(date=today, 
+                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+
+        wss = ws12 | ws3 | ws4 | ws8 | ws5 | ws6 | ws7
+
+        wss = wss.add_pigs_count_by_workshop()
+
+        # to do:
+        # final data
+        # add cullings today by ws

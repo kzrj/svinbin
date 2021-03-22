@@ -468,6 +468,37 @@ class WeighingPigletsTest(TestCase):
         self.assertEqual(qs.first().place, '3/4')
         self.assertEqual(total['total_quantity'], 200)
 
+    def test_count_doros_otkorm_in_out(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 100)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 100)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3, 100)
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=120,
+            place='3/4', date=datetime.datetime(2020, 5, 10))
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=100,
+            place='3/4', date=datetime.datetime(2020, 5, 15))
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=110,
+            place='3/4', date=datetime.datetime(2020, 5, 18))
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=1120,
+            place='8/5', date=datetime.datetime(2020, 10, 10))
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=1300,
+            place='8/6', date=datetime.datetime(2020, 10, 15))
+        
+        data = WeighingPiglets.objects.filter(date__date__gte=datetime.date(2020, 5, 5),
+            date__date__lt=datetime.date(2020, 10, 25)).count_doros_otkorm_in_out()
+
+        self.assertEqual(data['qnty_to_doros'], 300)
+        self.assertEqual(data['avg_to_doros'], 1.1)
+        self.assertEqual(data['total_to_doros'], 330)
+
+        self.assertEqual(data['qnty_to_otkorm'], 200)
+        self.assertEqual(data['avg_to_otkorm'], 12.1)
+        self.assertEqual(data['total_to_otkorm'], 2420)      
+
 
 class CullingPigletsTest(TestCase):
     def setUp(self):
@@ -477,7 +508,10 @@ class CullingPigletsTest(TestCase):
         self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
         self.loc_ws3 = Location.objects.get(workshop__number=3)
         self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
+        self.loc_ws8_cells = Location.objects.filter(pigletsGroupCell__workshop__number=8)
         self.loc_ws5_cells = Location.objects.filter(pigletsGroupCell__workshop__number=5)
+        self.loc_ws7_cells = Location.objects.filter(pigletsGroupCell__workshop__number=7)
 
         self.piglets = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
             self.loc_ws3, 101)
@@ -589,6 +623,59 @@ class CullingPigletsTest(TestCase):
         self.assertEqual(qs.count(), 2)
         self.assertEqual(total['total_quantity'], 7)
         self.assertEqual(total['total_total_weight'], 71)
+
+    def test_count_at_loc(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws5_cells[0], 101)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws7_cells[2], 105)
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws8_cells[1], 99)
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.loc_ws3_cells[2], 105)
+
+        for i in range(0, 5):
+            CullingPiglets.objects.create_culling_piglets(
+                piglets_group=piglets1, culling_type='spec', reason='xz', quantity=5, 
+                total_weight=53, date='2020-12-09'
+                )
+        CullingPiglets.objects.create_culling_piglets(
+                piglets_group=piglets2, culling_type='padej', reason='xz', quantity=3, 
+                total_weight=53, date='2020-12-09'
+                )
+
+        for i in range(0, 3):
+            CullingPiglets.objects.create_culling_piglets(
+                piglets_group=piglets3, culling_type='padej', reason='xz', quantity=2, 
+                total_weight=53, date='2020-12-09'
+                )
+            CullingPiglets.objects.create_culling_piglets(
+                piglets_group=piglets3, culling_type='vinuzhd', reason='xz', quantity=1, 
+                total_weight=53, date='2020-12-09'
+                )
+
+        for i in range(0, 3):
+            CullingPiglets.objects.create_culling_piglets(
+                piglets_group=piglets4, culling_type='prirezka', reason='xz', quantity=5, 
+                total_weight=53, date='2020-12-09'
+                )
+
+        culls567 = CullingPiglets.objects.all().count_at_loc(
+            locs=self.loc_ws5_cells | self.loc_ws7_cells, label='_ws567')
+        self.assertEqual(culls567['spec_qnty_ws567'], 25)
+        self.assertEqual(culls567['spec_avg_ws567'], 10.6)
+        self.assertEqual(culls567['padej_qnty_ws567'], 3)
+        self.assertEqual(round(culls567['padej_avg_ws567'],2), 17.67)
+
+        culls48 = CullingPiglets.objects.all().count_at_loc(
+            locs=self.loc_ws8_cells, label='_ws48')
+        self.assertEqual(culls48['vinuzhd_qnty_ws48'], 3)
+        self.assertEqual(culls48['padej_qnty_ws48'], 6)
+
+        culls3 = CullingPiglets.objects.all().count_at_loc(
+            locs=self.loc_ws3_cells, label='_ws3')
+        self.assertEqual(culls3['prirezka_qnty_ws3'], 15)
+        self.assertEqual(culls3['prirezka_avg_ws3'], 10.6)
 
 
 class RecountManagerTest(TestCase):

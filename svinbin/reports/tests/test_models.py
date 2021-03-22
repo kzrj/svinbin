@@ -12,7 +12,8 @@ from django.core.exceptions import ValidationError
 
 from reports.models import ReportDate, gen_operations_dict, gen_megadict
 from sows.models import Sow
-from sows_events.models import CullingSow, SowFarrow, Semination, Ultrasound, SeminationQuerySet
+from sows_events.models import CullingSow, SowFarrow, Semination, Ultrasound, SeminationQuerySet, \
+    PigletsToSowsEvent
 from piglets.models import Piglets
 from piglets_events.models import CullingPiglets
 from tours.models import Tour
@@ -754,3 +755,88 @@ class OperationDataAdditionInfoTest(TransactionTestCase):
 
         self.assertEqual(megadict['additional_data']['piglets_padej_data']['total_qnty'], None)
         self.assertEqual(megadict['additional_data']['piglets_padej_data']['total_weight'], None)
+
+
+class Report24fReportTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        start_date = date(2020, 1, 1)
+        end_date = timezone.now().date() + timedelta(1)
+        ReportDate.objects.create_bulk_if_none_from_range(start_date, end_date)
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
+
+        self.ws5_cells = Location.objects.filter(pigletsGroupCell__isnull=False,
+            pigletsGroupCell__workshop__number=5)
+
+    # tested at sows test_models:
+        # get_sows_at_date
+        # add_group_at_date
+        # add_group_at_date_count
+        # count_alive_at_date
+
+    # tested at reports test_models_ws_rep
+        # add_ws_count_piglets_start_day
+        # add_count_boars
+
+    # tested at reports test_models_ws3_rep
+        # add_ws3_count_piglets_start_day
+        # add_ws3_sow_farrow_data
+        # add_ws3_piglets_trs_out_aka_weighing
+        # add_ws3_piglets_cullings()
+
+    def test_add_sow_group_transfer(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow2 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow3 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow4 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow5 = sows_testings.create_sow_and_put_in_workshop_one()
+
+        with freeze_time("2020-06-7"):
+            sows = Sow.objects.filter(pk__in=[sow1.pk, sow2.pk, sow3.pk]) \
+                .update_group(group_title='Проверяемая')
+
+        with freeze_time("2020-06-15"):
+            sow1.refresh_from_db()
+            sow2.refresh_from_db()
+            sow4.refresh_from_db()
+            sow5.refresh_from_db()
+            sows = Sow.objects.filter(pk__in=[sow2.pk, sow4.pk, sow5.pk, sow1.pk]) \
+                .update_group(group_title='С опоросом')
+
+        rds = ReportDate.objects.all().add_count_sow_group_transfer()
+
+        day0_rd = rds.filter(date=date(2020, 6, 3)).first()
+        self.assertEqual(day0_rd.count_sows_to_prov, None)
+        self.assertEqual(day0_rd.count_sows_to_osn, None)
+
+        day1_rd = rds.filter(date=date(2020, 6, 7)).first()
+        self.assertEqual(day1_rd.count_sows_to_prov, 3)
+        self.assertEqual(day1_rd.count_sows_to_osn, None)
+
+        day2_rd = rds.filter(date=date(2020, 6, 10)).first()
+        self.assertEqual(day2_rd.count_sows_to_prov, None)
+        self.assertEqual(day2_rd.count_sows_to_osn, None)
+
+        day3_rd = rds.filter(date=date(2020, 6, 15)).first()
+        self.assertEqual(day3_rd.count_sows_to_prov, None)
+        self.assertEqual(day3_rd.count_sows_to_osn, 4)
+
+    def test_add_new_remont(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=self.ws5_cells[0], quantity=10)
+
+        with freeze_time("2020-06-7"):
+            sows = PigletsToSowsEvent.objects.create_event(piglets=piglets1)
+        
+        rds = ReportDate.objects.all().add_new_remont()
+        day0_rd = rds.filter(date=date(2020, 6, 3)).first()
+        self.assertEqual(day0_rd.rem_qnty, None)
+
+        day1_rd = rds.filter(date=date(2020, 6, 7)).first()
+        self.assertEqual(day1_rd.rem_qnty, 10)
