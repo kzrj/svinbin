@@ -356,7 +356,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                 date__date__lt=end_date).count_at_loc(locs=ws567_locs, label='_ws567')
 
             # 8. culls boars
-            data['ws567_culls'] = CullingBoar.objects.filter(date__date__gte=start_date,
+            data['boars_culls'] = CullingBoar.objects.filter(date__date__gte=start_date,
                 date__date__lt=end_date).count_by_groups()
             return Response(data)
         else:
