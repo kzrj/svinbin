@@ -292,3 +292,26 @@ class ReportWsInfoTest(APITestCase):
         self.assertEqual(response.data['population']['ws']['count_piglets_0_7'], 15 + 16)
         self.assertEqual(response.data['population']['ws']['count_piglets_8_14'], 17)
         
+
+class Report24fTest(APITestCase):
+    def setUp(self):
+        self.client = APIClient()
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testing.create_statuses()
+        piglets_testing.create_piglets_statuses()
+        sows_events_testings.create_types()
+
+        self.user = staff_testing.create_employee()
+        self.client.force_authenticate(user=self.user)
+
+        tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.cells = Location.objects.filter(pigletsGroupCell__isnull=False)
+
+        start_date = date(2020, 12, 31)
+        end_date = timezone.now().date()
+        ReportDate.objects.create_bulk_if_none_from_range(start_date, end_date)
+
+    def test_view(self):
+        response = self.client.get('/api/reports/director/ws_24f_report/?start_date=2021-01-01&end_date=2021-01-30')
+
+        self.assertEqual(response.status_code, 200)

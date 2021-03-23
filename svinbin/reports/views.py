@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import datetime
-from django.db.models import CharField, Value, Q
+from django.db.models import CharField, Value, Q, Sum
 from django.utils import timezone
 from django.http import HttpResponse
 from rest_framework.permissions import IsAuthenticated
@@ -18,10 +18,10 @@ from tours.models import Tour
 from reports.models import ReportDate, gen_operations_dict, gen_megadict
 from locations.models import Location
 from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt,
-    CullingBoar)
+    CullingBoar, PigletsToSowsEvent, SowFarrow)
 from piglets_events.models import CullingPiglets, WeighingPiglets
 from transactions.models import SowTransaction, PigletsTransaction
-from sows.models import Sow
+from sows.models import Sow, SowGroupRecord
 from piglets.models import Piglets
 
 from reports.serializers import ReportDateSerializer, ReportTourSerializer, ReportDateWs3Serializer, \
@@ -266,9 +266,12 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
     @action(methods=['get'], detail=False, serializer_class=StartDateEndDateSerializer)
     def ws_24f_report(self, request):
-        start_date = request.GET.get('start_date', None)
-        end_date = request.GET.get('start_date', None)
-        if end_date and start_date:
+        serializer = StartDateEndDateSerializer(data={'start_date': request.GET.get('start_date', None),
+         'end_date': request.GET.get('end_date', None)})
+
+        if serializer.is_valid():
+            start_date = serializer.validated_data['start_date']
+            end_date = serializer.validated_data['end_date']
             data = dict()
             ws3_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
             ws48_locs = Location.objects.all().get_workshop_location_by_number(workshop_number=4) | \
@@ -284,18 +287,28 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                                          .add_group_at_date_count('Ремонтная', 'rem') \
                                          .add_group_at_date_count('Проверяемая', 'prov') \
                                          .add_group_at_date_count('С опоросом', 'osn').first()
-            data['start_sows_osn_count'] = start_date_sows.count_group_osn
-            data['start_sows_prov_count'] = start_date_sows.count_group_prov
-            data['start_sows_rem_count'] = start_date_sows.count_group_rem
+            if start_date_sows:
+                data['start_sows_osn_count'] = start_date_sows.count_group_osn
+                data['start_sows_prov_count'] = start_date_sows.count_group_prov
+                data['start_sows_rem_count'] = start_date_sows.count_group_rem
+            else:
+                data['start_sows_osn_count'] = None
+                data['start_sows_prov_count'] = None
+                data['start_sows_rem_count'] = None
 
             end_date_sows = Sow.objects.get_sows_at_date(date=end_date) \
                                          .add_group_at_date(date=end_date) \
                                          .add_group_at_date_count('Ремонтная', 'rem') \
                                          .add_group_at_date_count('Проверяемая', 'prov') \
                                          .add_group_at_date_count('С опоросом', 'osn').first()
-            data['end_sows_osn_count'] = end_date_sows.count_group_osn
-            data['end_sows_prov_count'] = end_date_sows.count_group_prov
-            data['end_sows_rem_count'] = end_date_sows.count_group_rem
+            if end_date_sows:
+                data['end_sows_osn_count'] = end_date_sows.count_group_osn
+                data['end_sows_prov_count'] = end_date_sows.count_group_prov
+                data['end_sows_rem_count'] = end_date_sows.count_group_rem
+            else:
+                data['end_sows_osn_count'] = None
+                data['end_sows_prov_count'] = None
+                data['end_sows_rem_count'] = None
                                          
             dates = ReportDate.objects.filter(Q(date=start_date) | Q(date=end_date)) \
                         .add_count_boars() \
@@ -345,7 +358,6 @@ class ReportDateViewSet(viewsets.ModelViewSet):
             # 8. culls boars
             data['ws567_culls'] = CullingBoar.objects.filter(date__date__gte=start_date,
                 date__date__lt=end_date).count_by_groups()
-
             return Response(data)
         else:
             return Response({'message': 'Неверные даты.'}, status=status.HTTP_400_BAD_REQUEST)
