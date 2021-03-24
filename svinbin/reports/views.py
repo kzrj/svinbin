@@ -282,8 +282,8 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                         Location.objects.all().get_workshop_location_by_number(workshop_number=7)
 
             # count start date, end date
-            start_date_sows = Sow.objects.get_sows_at_date(date=start_date) \
-                                         .add_group_at_date(date=start_date) \
+            start_date_sows = Sow.objects.get_sows_at_date(date=(start_date-datetime(timedelta(days=1))) \
+                                         .add_group_at_date(date=(start_date-datetime(timedelta(days=1))) \
                                          .add_group_at_date_count('Ремонтная', 'rem') \
                                          .add_group_at_date_count('Проверяемая', 'prov') \
                                          .add_group_at_date_count('С опоросом', 'osn').first()
@@ -296,8 +296,8 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                 data['start_sows_prov_count'] = None
                 data['start_sows_rem_count'] = None
 
-            end_date_sows = Sow.objects.get_sows_at_date(date=end_date) \
-                                         .add_group_at_date(date=end_date) \
+            end_date_sows = Sow.objects.get_sows_at_date(date=(end_date-datetime(timedelta(days=1))) \
+                                         .add_group_at_date(date=(end_date-datetime(timedelta(days=1))) \
                                          .add_group_at_date_count('Ремонтная', 'rem') \
                                          .add_group_at_date_count('Проверяемая', 'prov') \
                                          .add_group_at_date_count('С опоросом', 'osn').first()
