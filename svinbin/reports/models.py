@@ -538,6 +538,16 @@ class ReportDateQuerySet(models.QuerySet):
                             .annotate(trs_out_qnty=Sum('quantity')) \
                             .values('trs_out_qnty')), 0)
 
+        rem_out_qnty = Coalesce(
+                        Subquery(PigletsToSowsEvent.objects \
+                            .filter(date__date__lt=OuterRef('date'), piglets__location__in=ws_locs) \
+                            .annotate(flag_group=Value(0)) \
+                            .values('flag_group') \
+                            .annotate(rem_out_qnty=Sum('quantity')) \
+                            .values('rem_out_qnty')), 0)
+
+        trs_out_qnty = trs_out_qnty + rem_out_qnty
+
         culling_qnty = Coalesce(
                         Subquery(CullingPiglets.objects \
                             .filter(date__date__lt=OuterRef('date'), location__in=ws_locs) \
