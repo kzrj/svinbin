@@ -212,17 +212,21 @@ class WeighingPigletsQuerySet(models.QuerySet):
 
     def count_doros_otkorm_in_out(self):
         return self.aggregate(
-                qnty_to_doros=Sum('piglets_quantity', filter=Q(place='3/4')),
-                avg_to_doros=Avg('average_weight', filter=Q(place='3/4')),
-                total_to_doros=Sum('total_weight', filter=Q(place='3/4')),
+            qnty_to_doros=Sum('piglets_quantity', filter=Q(place='3/4')),
+            avg_to_doros=Avg('average_weight', filter=Q(place='3/4')),
+            total_to_doros=Sum('total_weight', filter=Q(place='3/4')),
 
-                qnty_to_otkorm=Sum('piglets_quantity', 
-                    filter=Q(Q(place='8/5') | Q(place='8/6') | Q(place='8/7'))),
-                avg_to_otkorm=Avg('average_weight', 
-                    filter=Q(Q(place='8/5') | Q(place='8/6') | Q(place='8/7'))),
-                total_to_otkorm=Sum('total_weight',
-                     filter=Q(Q(place='8/5') | Q(place='8/6') | Q(place='8/7'))),
-                )
+            qnty_to_otkorm=Sum('piglets_quantity', 
+                filter=Q(Q(place='8/5') | Q(place='8/6') | Q(place='8/7'))),
+            avg_to_otkorm=Avg('average_weight', 
+                filter=Q(Q(place='8/5') | Q(place='8/6') | Q(place='8/7'))),
+            total_to_otkorm=Sum('total_weight',
+                 filter=Q(Q(place='8/5') | Q(place='8/6') | Q(place='8/7'))),
+
+            qnty_to_rem=Sum('piglets_quantity', filter=Q(place='o/2')),
+            avg_to_rem=Avg('average_weight', filter=Q(place='o/2')),
+            total_to_rem=Sum('total_weight', filter=Q(place='o/2')),
+            )
 
 
 class WeighingPigletsManager(CoreModelManager):
