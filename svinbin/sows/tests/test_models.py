@@ -359,6 +359,7 @@ class SowManagerV2Test(TransactionTestCase):
         piglets_testing.create_piglets_statuses()
 
         self.tour1 = Tour.objects.get_or_create_by_week(week_number=1, year=2020)
+        self.tour2 = Tour.objects.get_or_create_by_week(week_number=2, year=2020)
         self.cells = Location.objects.filter(pigletsGroupCell__isnull=False)
         self.piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(tour=self.tour1, 
             location=self.cells[0], quantity=100, birthday=date(2020, 1, 1))
@@ -392,6 +393,20 @@ class SowManagerV2Test(TransactionTestCase):
 
         sows_count = Sow.objects.count_sows_at_date(date=target_date)
         self.assertEqual(sows_count, 99)
+
+    def test_update_info_after_semination1(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow1.change_status_to('Ремонтная')
+        sow1.change_group_to('Ремонтная')
+
+        Semination.objects.create_semination_tour(sow=sow1, tour=self.tour1)
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'Проверяемая')
+
+        sow1.change_group_to('С опоросом')
+        Semination.objects.create_semination_tour(sow=sow1, tour=self.tour1)
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'С опоросом')
 
         
 class SowQueryTest(TransactionTestCase):
@@ -526,173 +541,6 @@ class GiltModelManagerTest(TransactionTestCase):
         self.assertEqual(gilt.mother_sow, sow)
         self.assertEqual(gilt.tour.week_number, 1)
         self.assertEqual(gilt.farrow, sow.get_last_farrow)
-
-
-class Sow24fReportTest(TransactionTestCase):
-    def setUp(self):
-        locations_testing.create_workshops_sections_and_cells()
-        sows_testings.create_statuses()
-        sows_events_testings.create_types()
-        piglets_testing.create_piglets_statuses()
-
-    def test_get_sows_at_date(self):
-        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
-        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
-            tour=tour, location=location, quantity=10)
-        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
-            tour=tour, location=location, quantity=15)
-
-        date0 = date(2020, 6, 5)
-        event = PigletsToSowsEvent.objects.create_event(piglets=piglets1, date=date0)
-
-        date01 = date(2020, 6, 25)
-        event = PigletsToSowsEvent.objects.create_event(piglets=piglets2, date=date01)
-
-        date02 = date(2020, 7, 1)
-        sow1 = Sow.objects.all().first()
-        CullingSow.objects.create_culling(sow=sow1, culling_type='padej', date=date02)
-
-        date03 = date(2020, 7, 5)
-        sow2 = Sow.objects.all().first()
-        CullingSow.objects.create_culling(sow=sow2, culling_type='padej', date=date03)
-
-        with self.assertNumQueries(3):
-            date1 = date(2020, 8, 5)
-            sows = Sow.objects.get_sows_at_date(date=date1)
-            self.assertEqual(len(sows), 23)
-
-        date2 = date(2020, 7, 2)
-        sows = Sow.objects.get_sows_at_date(date=date2)
-        self.assertEqual(len(sows), 24)
-
-    def test_qs_add_label_is_oporos_before(self):
-        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
-        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
-            tour=tour, location=location, quantity=10)
-
-        date0 = date(2020, 6, 5)
-        event = PigletsToSowsEvent.objects.create_event(piglets=piglets1, date=date0)
-
-        date01 = date(2020, 6, 25)
-        sow1 = Sow.objects.all().first()
-        sow1.farm_id = '123'
-        sow1.tour = tour
-        sow1.location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
-        sow1.save()
-        event = SowFarrow.objects.create_sow_farrow(sow=sow1, alive_quantity=11, date=date01)
-
-        date2 = date(2020, 7, 2)
-        sows = Sow.objects.get_sows_at_date(date=date2)
-        self.assertEqual(len(sows), 10)
-
-        sows = sows.add_label_is_oporos_before(date=date2).add_status_at_date(date=date2)
-
-        sow1  = sows.get(farm_id=123)
-        self.assertEqual(sow1.is_oporos_before, True)
-        self.assertEqual(sow1.status_at_date, 'Опоросилась')
-
-        sow2  = sows.filter(farm_id__isnull=True).first()
-        self.assertEqual(sow2.is_oporos_before, False)
-        self.assertEqual(sow2.status_at_date, 'Ремонтная')
-
-    def test_qs_add_label_is_checking(self):
-        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
-        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
-            tour=tour, location=location, quantity=10)
-
-        date0 = date(2020, 6, 5)
-        event = PigletsToSowsEvent.objects.create_event(piglets=piglets1, date=date0)
-
-        # one sow farrow
-        date01 = date(2020, 6, 10)
-        sow1 = Sow.objects.all().first()
-        sow1.farm_id = '123'
-        sow1.tour = tour
-        sow1.location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
-        sow1.save()
-        event = SowFarrow.objects.create_sow_farrow(sow=sow1, alive_quantity=11, date=date01)
-
-        # one sow semination
-        date02 = date(2020, 6, 12)
-        sow2 = Sow.objects.filter(farm_id__isnull=True).first()
-        sow2.farm_id = '124'
-        sow2.save()
-        event = Semination.objects.create_semination_tour(sow=sow2, tour=tour, date=date02)
-
-        date2 = date(2020, 7, 2)
-        sows = Sow.objects.get_sows_at_date(date=date2)
-        self.assertEqual(len(sows), 10)
-
-        sows = sows.add_label_is_oporos_before(date=date2) \
-                   .add_status_at_date(date=date2) \
-                   .add_label_is_checking()
-
-        sow1  = sows.get(farm_id=123)
-        self.assertEqual(sow1.is_oporos_before, True)
-        self.assertEqual(sow1.status_at_date, 'Опоросилась')
-        self.assertEqual(sow1.is_checking, False)
-
-        sow2  = sows.get(farm_id=124)
-        self.assertEqual(sow2.is_oporos_before, False)
-        self.assertEqual(sow2.is_checking, True)
-        self.assertEqual(sow2.status_at_date, 'Осеменена 1')
-
-        sow3  = sows.filter(farm_id__isnull=True).first()
-        self.assertEqual(sow3.is_oporos_before, False)
-        self.assertEqual(sow3.status_at_date, 'Ремонтная')
-        self.assertEqual(sow3.is_checking, False)
-
-    def test_count_boar_at_date(self):
-        with freeze_time("2020-11-5T10:00"):
-            boar1 = Boar.objects.get_or_create_boar(farm_id=100)
-
-        with freeze_time("2020-11-15T10:00"):
-            boar2 = Boar.objects.get_or_create_boar(farm_id=101)
-
-        with freeze_time("2020-11-25T10:00"):
-            boar3 = Boar.objects.get_or_create_boar(farm_id=102)
-
-        with freeze_time("2020-12-25T10:00"):
-            boar4 = Boar.objects.get_or_create_boar(farm_id=103)
-
-        with freeze_time("2021-01-07T10:00"):
-            boar5 = Boar.objects.get_or_create_boar(farm_id=104)
-            boar6 = Boar.objects.get_or_create_boar(farm_id=105)
-            boar7 = Boar.objects.get_or_create_boar(farm_id=106)
-
-        with freeze_time("2021-01-5T10:00"):
-            CullingBoar.objects.create_culling_boar(boar=boar1, culling_type='padej')
-
-        with freeze_time("2021-01-10T10:00"):
-            CullingBoar.objects.create_culling_boar(boar=boar2, culling_type='padej')
-
-        with freeze_time("2021-01-15T10:00"):
-            CullingBoar.objects.create_culling_boar(boar=boar3 , culling_type='padej')
-
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 3)), 4)
-
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 5)), 4)
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 5),
-         count_at_end_date=True), 3)
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 6)), 3)
-
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 7)), 3)
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 7),
-         count_at_end_date=True), 6)
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 8)), 6)
-
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 10)), 6)
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 10),
-         count_at_end_date=True), 5)
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 11)), 5)
-
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 15)), 5)
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 15),
-         count_at_end_date=True), 4)
-        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 16)), 4)
 
 
 class SowGroupTest(TransactionTestCase):
@@ -997,3 +845,226 @@ class SowDowntimeTest(TransactionTestCase):
             waiting_sem_count, downtime_sows_qs = Sow.objects.all() \
                 .sows_by_statuses_count_and_downtime_qs(statuses=["Ожидает осеменения", "Прохолост",
                     "Аборт", "Ремонтная"], days_limit=11)
+
+
+class Sow24fReportTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+    def test_get_sows_at_date(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
+        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour, location=location, quantity=10)
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour, location=location, quantity=15)
+
+        date0 = date(2020, 6, 5)
+        event = PigletsToSowsEvent.objects.create_event(piglets=piglets1, date=date0)
+
+        date01 = date(2020, 6, 25)
+        event = PigletsToSowsEvent.objects.create_event(piglets=piglets2, date=date01)
+
+        date02 = date(2020, 7, 1)
+        sow1 = Sow.objects.all().first()
+        CullingSow.objects.create_culling(sow=sow1, culling_type='padej', date=date02)
+
+        date03 = date(2020, 7, 5)
+        sow2 = Sow.objects.all().first()
+        CullingSow.objects.create_culling(sow=sow2, culling_type='padej', date=date03)
+
+        with self.assertNumQueries(3):
+            date1 = date(2020, 8, 5)
+            sows = Sow.objects.get_sows_at_date(date=date1)
+            self.assertEqual(len(sows), 23)
+
+        date2 = date(2020, 7, 2)
+        sows = Sow.objects.get_sows_at_date(date=date2)
+        self.assertEqual(len(sows), 24)
+
+    def test_qs_add_label_is_oporos_before(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
+        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour, location=location, quantity=10)
+
+        date0 = date(2020, 6, 5)
+        event = PigletsToSowsEvent.objects.create_event(piglets=piglets1, date=date0)
+
+        date01 = date(2020, 6, 25)
+        sow1 = Sow.objects.all().first()
+        sow1.farm_id = '123'
+        sow1.tour = tour
+        sow1.location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
+        sow1.save()
+        event = SowFarrow.objects.create_sow_farrow(sow=sow1, alive_quantity=11, date=date01)
+
+        date2 = date(2020, 7, 2)
+        sows = Sow.objects.get_sows_at_date(date=date2)
+        self.assertEqual(len(sows), 10)
+
+        sows = sows.add_label_is_oporos_before(date=date2).add_status_at_date(date=date2)
+
+        sow1  = sows.get(farm_id=123)
+        self.assertEqual(sow1.is_oporos_before, True)
+        self.assertEqual(sow1.status_at_date, 'Опоросилась')
+
+        sow2  = sows.filter(farm_id__isnull=True).first()
+        self.assertEqual(sow2.is_oporos_before, False)
+        self.assertEqual(sow2.status_at_date, 'Ремонтная')
+
+    def test_qs_add_label_is_checking(self):
+        tour = Tour.objects.get_or_create_by_week_in_current_year(week_number=10)
+        location = Location.objects.filter(pigletsGroupCell__isnull=False).first()
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=tour, location=location, quantity=10)
+
+        date0 = date(2020, 6, 5)
+        event = PigletsToSowsEvent.objects.create_event(piglets=piglets1, date=date0)
+
+        # one sow farrow
+        date01 = date(2020, 6, 10)
+        sow1 = Sow.objects.all().first()
+        sow1.farm_id = '123'
+        sow1.tour = tour
+        sow1.location = Location.objects.filter(sowAndPigletsCell__isnull=False).first()
+        sow1.save()
+        event = SowFarrow.objects.create_sow_farrow(sow=sow1, alive_quantity=11, date=date01)
+
+        # one sow semination
+        date02 = date(2020, 6, 12)
+        sow2 = Sow.objects.filter(farm_id__isnull=True).first()
+        sow2.farm_id = '124'
+        sow2.save()
+        event = Semination.objects.create_semination_tour(sow=sow2, tour=tour, date=date02)
+
+        date2 = date(2020, 7, 2)
+        sows = Sow.objects.get_sows_at_date(date=date2)
+        self.assertEqual(len(sows), 10)
+
+        sows = sows.add_label_is_oporos_before(date=date2) \
+                   .add_status_at_date(date=date2) \
+                   .add_label_is_checking()
+
+        sow1  = sows.get(farm_id=123)
+        self.assertEqual(sow1.is_oporos_before, True)
+        self.assertEqual(sow1.status_at_date, 'Опоросилась')
+        self.assertEqual(sow1.is_checking, False)
+
+        sow2  = sows.get(farm_id=124)
+        self.assertEqual(sow2.is_oporos_before, False)
+        self.assertEqual(sow2.is_checking, True)
+        self.assertEqual(sow2.status_at_date, 'Осеменена 1')
+
+        sow3  = sows.filter(farm_id__isnull=True).first()
+        self.assertEqual(sow3.is_oporos_before, False)
+        self.assertEqual(sow3.status_at_date, 'Ремонтная')
+        self.assertEqual(sow3.is_checking, False)
+
+    def test_count_boar_at_date(self):
+        with freeze_time("2020-11-5T10:00"):
+            boar1 = Boar.objects.get_or_create_boar(farm_id=100)
+
+        with freeze_time("2020-11-15T10:00"):
+            boar2 = Boar.objects.get_or_create_boar(farm_id=101)
+
+        with freeze_time("2020-11-25T10:00"):
+            boar3 = Boar.objects.get_or_create_boar(farm_id=102)
+
+        with freeze_time("2020-12-25T10:00"):
+            boar4 = Boar.objects.get_or_create_boar(farm_id=103)
+
+        with freeze_time("2021-01-07T10:00"):
+            boar5 = Boar.objects.get_or_create_boar(farm_id=104)
+            boar6 = Boar.objects.get_or_create_boar(farm_id=105)
+            boar7 = Boar.objects.get_or_create_boar(farm_id=106)
+
+        with freeze_time("2021-01-5T10:00"):
+            CullingBoar.objects.create_culling_boar(boar=boar1, culling_type='padej')
+
+        with freeze_time("2021-01-10T10:00"):
+            CullingBoar.objects.create_culling_boar(boar=boar2, culling_type='padej')
+
+        with freeze_time("2021-01-15T10:00"):
+            CullingBoar.objects.create_culling_boar(boar=boar3 , culling_type='padej')
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 3)), 4)
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 5)), 4)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 5),
+         count_at_end_date=True), 3)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 6)), 3)
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 7)), 3)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 7),
+         count_at_end_date=True), 6)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 8)), 6)
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 10)), 6)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 10),
+         count_at_end_date=True), 5)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 11)), 5)
+
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 15)), 5)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 15),
+         count_at_end_date=True), 4)
+        self.assertEqual(Boar.objects.count_alive_at_date(date=date(2021, 1, 16)), 4)
+
+
+class Sow24fReportCalculationsInDayTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        sows_testings.create_statuses()
+        sows_events_testings.create_types()
+        piglets_testing.create_piglets_statuses()
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        location = Location.objects.filter(pigletsGroupCell__workshop__number=5).first()
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1, location=location, quantity=30)
+
+        # create 30 rem sows via pts event
+        date0 = date(2020, 6, 5)
+        event = PigletsToSowsEvent.objects.create_event(piglets=piglets1, date=date0)
+
+    def test_rem_period_tr_in(self):
+        date1 = date(2020, 6, 7)
+        start_date_sows = Sow.objects.get_sows_at_date(date=date1) \
+                             .add_group_at_date(date=date1) \
+                             .add_group_at_date_count('Ремонтная', 'rem').first()
+        self.assertEqual(start_date_sows.count_group_rem, 30)
+
+    def test_rem_period_tr_in_some_to_prov(self):
+        date2 = date(2020, 6, 12)
+        sows_to_prov = Sow.objects.filter(pk__in=Sow.objects.all().values_list('pk', flat=True)[:7])
+        sows_to_prov.update_group(group_title='Проверяемая', date=date2)
+
+        date1 = date(2020, 6, 13)
+        start_date_sows = Sow.objects.get_sows_at_date(date=date1) \
+                             .add_group_at_date(date=date1) \
+                             .add_group_at_date_count('Ремонтная', 'rem').first()
+        self.assertEqual(start_date_sows.count_group_rem, 23)
+
+    def test_rem_period_culls(self):
+        date2 = date(2020, 6, 12)
+        sows_to_padej = Sow.objects.filter(pk__in=Sow.objects.all().values_list('pk', flat=True)[:4])
+        CullingSow.objects.mass_culling(sows_qs=sows_to_padej, culling_type='padej', date=date2)
+
+        sows_to_vinuzhd = Sow.objects.filter(pk__in=Sow.objects.all().values_list('pk', flat=True)[:3])
+        CullingSow.objects.mass_culling(sows_qs=sows_to_vinuzhd, culling_type='vinuzhd',
+         date=date(2020, 6, 14))
+
+        date1 = date(2020, 6, 13)
+        start_date_sows = Sow.objects.get_sows_at_date(date=date1) \
+                             .add_group_at_date(date=date1) \
+                             .add_group_at_date_count('Ремонтная', 'rem').first()
+        self.assertEqual(start_date_sows.count_group_rem, 26)
+
+        date1 = date(2020, 6, 15)
+        start_date_sows = Sow.objects.get_sows_at_date(date=date1) \
+                             .add_group_at_date(date=date1) \
+                             .add_group_at_date_count('Ремонтная', 'rem').first()
+        self.assertEqual(start_date_sows.count_group_rem, 23)                             

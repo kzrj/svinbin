@@ -396,7 +396,10 @@ class Sow(Pig):
         self.tour = tour
         if len(self.semination_set.filter(tour=self.tour)) == 1:
             self.change_status_to(status_title='Осеменена 1', date=date)
-            self.change_group_to(group_title='Проверяемая', date=date)
+            
+            if self.sow_group.title == 'Ремонтная':
+                self.change_group_to(group_title='Проверяемая', date=date)
+                
         if len(self.semination_set.filter(tour=self.tour)) > 1:
             self.change_status_to(status_title='Осеменена 2', date=date)
 
