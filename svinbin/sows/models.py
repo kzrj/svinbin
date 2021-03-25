@@ -67,7 +67,7 @@ class SowGroupRecord(CoreModel):
     objects = SowGroupRecordQuerySet.as_manager()
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['-created_at']
 
     def __str__(self):
         return f'sow group record {self.pk}'

@@ -585,6 +585,24 @@ class SowGroupTest(TransactionTestCase):
         self.assertEqual(sow1_group_record.group_before, None)
         self.assertEqual(sow1_group_record.group_after.title, 'Ремонтная')
 
+    def test_model_change_group_to2(self):
+        sow1 = sows_testings.create_sow_and_put_in_workshop_one()
+        sow1.change_group_to('С опоросом')
+ 
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'С опоросом')
+        self.assertEqual(sow1.group_records.all().count(), 1)
+
+        sow1.change_group_to('С опоросом')
+        self.assertEqual(sow1.group_records.all().count(), 1)
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'С опоросом')
+
+        sow1.change_group_to('Проверяемая')
+        self.assertEqual(sow1.group_records.all().count(), 1)
+        sow1.refresh_from_db()
+        self.assertEqual(sow1.sow_group.title, 'С опоросом')
+
     def test_model_change_group_to_restrict1(self):
         # should not change to Проверяемая if not Ремонтная
         sow1 = sows_testings.create_sow_and_put_in_workshop_one()
