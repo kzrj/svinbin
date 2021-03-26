@@ -77,7 +77,7 @@ class PigletsManager(CoreModelManager):
         return PigletsQuerySet(self.model, using=self._db)
 
     def aggregate_by_tour_in_ws(self, ws_number):
-        return self.get_queryset().all_in_workshop(workshop_number=ws_number) \
+        return Piglets.objects.all().all_in_workshop(workshop_number=ws_number) \
             .values('metatour__week_tour__week_number', 'metatour__week_tour__year')\
             .annotate(qnty=Sum('quantity'))
 
