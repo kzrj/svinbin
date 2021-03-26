@@ -509,28 +509,30 @@ class ReportWSInfoView(viewsets.ViewSet):
 
         ws4 = Location.objects.filter(workshop__number=4) \
                 .add_pigs_count_by_workshop(date=today, 
-                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
-
-        ws5 = Location.objects.filter(workshop__number=5) \
-                .add_pigs_count_by_workshop(date=today, 
-                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
-
-        ws6 = Location.objects.filter(workshop__number=6) \
-                .add_pigs_count_by_workshop(date=today, 
-                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
-
-        ws7 = Location.objects.filter(workshop__number=7) \
-                .add_pigs_count_by_workshop(date=today, 
-                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+                    age_intervals=[[21, 28], [29, 36], [37, 44], [44, 53], [53, None]])
 
         ws8 = Location.objects.filter(workshop__number=8) \
                 .add_pigs_count_by_workshop(date=today, 
-                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+                    age_intervals=[[44, 53], [54, 61], [62, 69], [70, 77], [77, None]])
+
+        ws5 = Location.objects.filter(workshop__number=5) \
+                .add_pigs_count_by_workshop(date=today, 
+                    age_intervals=[[70, 77], [78, 85], [86, 93], [94, 101], [102, None]])
+
+        ws6 = Location.objects.filter(workshop__number=6) \
+                .add_pigs_count_by_workshop(date=today, 
+                    age_intervals=[[70, 77], [78, 85], [86, 93], [94, 101], [102, None]])
+
+        ws7 = Location.objects.filter(workshop__number=7) \
+                .add_pigs_count_by_workshop(date=today, 
+                    age_intervals=[[70, 77], [78, 85], [86, 93], [94, 101], [102, None]])
 
         wss = ws12 | ws3 | ws4 | ws8 | ws5 | ws6 | ws7
 
         wss = wss.add_pigs_count_by_workshop()
 
         # to do:
-        # final data
+        # [1, 2020, 450] by tours
         # add cullings today by ws
+
+        return Response(LocationWSPopulationSerializer(wss, many=True).data)
