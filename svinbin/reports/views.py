@@ -497,7 +497,7 @@ class ReportWSInfoView(viewsets.ViewSet):
 
         return Response(data)
 
-    @action(methods=['post'], detail=False)
+    @action(methods=['get'], detail=False)
     def main_page_population(self, request):
         today = datetime.datetime.today()
         ws12 = Location.objects.filter(workshop__number__in=[1,2]).add_sows_count_by_workshop()
