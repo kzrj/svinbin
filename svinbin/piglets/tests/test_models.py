@@ -71,22 +71,25 @@ class PigletsModelManagerTest(TestCase):
 
         self.piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
             self.loc_ws3, 232)
+        self.piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
+            self.loc_ws3, 5)
         self.piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour2,
             self.loc_ws3, 50)
         self.piglets3.deactivate()
         
     def test_manager_get_total_quantity(self):
         total = Piglets.objects.all().get_total_quantity()
-        self.assertEqual(total, 333)
+        self.assertEqual(total, 338)
 
     def test_aggregate_by_tour_in_ws(self):
         data = Piglets.objects.aggregate_by_tour_in_ws(ws_number=3)
+        print(data)
         self.assertEqual(data[0]['qnty'], 101)
-        self.assertEqual(data[1]['qnty'], 232)
-        self.assertEqual(data[0]['metatour__week_tour__week_number'], 1)
-        self.assertEqual(data[1]['metatour__week_tour__week_number'], 2)
-        self.assertEqual(data[0]['metatour__week_tour__year'], 2021)
-        self.assertEqual(data[1]['metatour__week_tour__year'], 2021)
+        self.assertEqual(data[1]['qnty'], 237)
+        self.assertEqual(data[0]['week_number'], 1)
+        self.assertEqual(data[1]['week_number'], 2)
+        self.assertEqual(data[0]['year'], 2021)
+        self.assertEqual(data[1]['year'], 2021)
 
 
 class PigletsQueryTest(TransactionTestCase):

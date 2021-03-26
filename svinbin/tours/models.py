@@ -676,7 +676,7 @@ class MetaTourManager(CoreModelManager):
 
 class MetaTour(CoreModel):
     piglets = models.OneToOneField('piglets.Piglets', on_delete=models.CASCADE)
-    week_tour = models.ForeignKey(Tour, on_delete=models.SET_NULL, null=True)
+    week_tour = models.ForeignKey(Tour, on_delete=models.SET_NULL, null=True, related_name='week_tours')
 
     objects = MetaTourManager()
 
