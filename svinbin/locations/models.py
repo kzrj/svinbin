@@ -307,6 +307,12 @@ class LocationQuerySet(models.QuerySet):
             count_all=models.Subquery(subquery_all_cells),
             )
 
+    # def get(self):
+    #     subquery = self.values('piglets__metatour__week_tour')[:1]
+    #     return self.annotate(
+    #         tour=Subquery(subquery)
+    #         )
+
 
 class LocationManager(CoreModelManager):
     def get_queryset(self):
@@ -437,3 +443,9 @@ class Location(CoreModel):
     @property
     def get_piglets(self):
         return self.piglets.all().first()
+
+    @property
+    def ws_aggregate_piglets_by_tours(self):
+        if self.workshop:
+            return self.piglets.aggregate_by_tour_in_ws(ws_number=self.workshop.number)
+        return None

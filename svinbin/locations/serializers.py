@@ -121,6 +121,7 @@ class LocationSectionPopulationSerializer(AnnotateFieldsModelSerializer, seriali
 
 class LocationWSPopulationSerializer(AnnotateFieldsModelSerializer, serializers.ModelSerializer):
     ws_number = serializers.ReadOnlyField(source='workshop.number')
+    piglets_by_tours = serializers.ReadOnlyField(source='ws_aggregate_piglets_by_tours')
 
     class Meta:
         model = Location

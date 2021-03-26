@@ -322,3 +322,7 @@ class LocationQsPopulationTest(TransactionTestCase):
         self.assertEqual(section_locs[0].count_full, 4)
         self.assertEqual(section_locs[0].count_all, 45)
         self.assertEqual(section_locs[1].count_full, 2)
+
+    def test_add_piglets_by_tours(self):
+        ws3 = Location.objects.filter(workshop__number=3).add_piglets_by_tours()
+        print(ws3.first().tour)

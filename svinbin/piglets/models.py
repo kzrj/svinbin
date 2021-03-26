@@ -76,6 +76,11 @@ class PigletsManager(CoreModelManager):
     def get_all(self):
         return PigletsQuerySet(self.model, using=self._db)
 
+    def aggregate_by_tour_in_ws(self, ws_number):
+        return self.get_queryset().all_in_workshop(workshop_number=ws_number) \
+            .values('metatour__week_tour__week_number', 'metatour__week_tour__year')\
+            .annotate(qnty=Sum('quantity'))
+
 
 class Piglets(CoreModel):
     location = models.ForeignKey('locations.Location', on_delete=models.SET_NULL,
