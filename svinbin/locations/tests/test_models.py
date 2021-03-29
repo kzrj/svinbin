@@ -11,8 +11,9 @@ import sows_events.utils as sows_events_testing
 
 from sows.models import Sow
 from locations.models import  Location, Section, WorkShop
-from sows_events.models import SowFarrow
+from sows_events.models import SowFarrow, CullingSow
 from piglets.models import Piglets
+from piglets_events.models import CullingPiglets
 from tours.models import Tour
 
 from locations.serializers import (
@@ -180,45 +181,45 @@ class LocationQsPopulationTest(TransactionTestCase):
 
         tour1 = Tour.objects.get_or_create_by_week_in_current_year(1)
 
-        sow1 = sows_testing.create_sow_with_location(location=self.ws3_cells[0])
-        sow1.change_status_to('Супорос 35')
+        self.sow1 = sows_testing.create_sow_with_location(location=self.ws3_cells[0])
+        self.sow1.change_status_to('Супорос 35')
 
-        sow2 = sows_testing.create_sow_with_location(location=self.ws3_cells[1])
-        sow2.change_status_to('Супорос 35')
+        self.sow2 = sows_testing.create_sow_with_location(location=self.ws3_cells[1])
+        self.sow2.change_status_to('Супорос 35')
 
-        sow3 = sows_testing.create_sow_with_location(location=self.ws3_cells[2])
-        sow3.change_status_to('Супорос 35')
+        self.sow3 = sows_testing.create_sow_with_location(location=self.ws3_cells[2])
+        self.sow3.change_status_to('Супорос 35')
 
-        sow4 = sows_testing.create_sow_with_location(location=self.ws3_cells[3])
-        sow4.change_status_to('Опоросилась')
+        self.sow4 = sows_testing.create_sow_with_location(location=self.ws3_cells[3])
+        self.sow4.change_status_to('Опоросилась')
 
-        sow5 = sows_testing.create_sow_with_location(location=self.ws3_cells[4])
-        sow5.change_status_to('Кормилица')
+        self.sow5 = sows_testing.create_sow_with_location(location=self.ws3_cells[4])
+        self.sow5.change_status_to('Кормилица')
 
-        sow6 = sows_testing.create_sow_with_location(location=self.ws3_cells[50])
-        sow6.change_status_to('Кормилица')
+        self.sow6 = sows_testing.create_sow_with_location(location=self.ws3_cells[50])
+        self.sow6.change_status_to('Кормилица')
 
-        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+        self.piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[0], quantity=15,
             birthday=(datetime.today() - timedelta(days=1))
             )
 
-        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+        self.piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[1], quantity=16,
             birthday=(datetime.today() - timedelta(days=5))
             )
 
-        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+        self.piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[2], quantity=17,
             birthday=(datetime.today() - timedelta(days=8))
             )
 
-        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+        self.piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[3], quantity=18,
             birthday=(datetime.today() - timedelta(days=20))
             )
 
-        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+        self.piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(
             tour=tour1, location=self.ws3_cells[46], quantity=19,
             birthday=(datetime.today() - timedelta(days=30))
             )
@@ -323,6 +324,7 @@ class LocationQsPopulationTest(TransactionTestCase):
         self.assertEqual(section_locs[0].count_all, 45)
         self.assertEqual(section_locs[1].count_full, 2)
 
-    def test_add_piglets_by_tours(self):
-        ws3 = Location.objects.filter(workshop__number=3).add_piglets_by_tours()
-        print(ws3.first().tour)
+    def test_add_sows_culls_count(self):
+        ws3 = Location.objects.filter(workshop__number=3).add_sows_culls_count()
+        CullingSow.objects.create_culling(sow=self.sow1, culling_type='padej')
+        print(ws3.first().count_sow_culls)

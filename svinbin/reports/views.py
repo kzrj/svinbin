@@ -525,7 +525,6 @@ class ReportWSInfoView(viewsets.ViewSet):
         data['ws567'] = LocationWSPopulationSerializer(ws567, many=True).data
 
         # to do:
-        # [1, 2020, 450] by tours
         # add cullings today by ws
 
         return Response(data)

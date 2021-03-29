@@ -159,7 +159,7 @@ class LocationQuerySet(models.QuerySet):
                         .values('all')
 
         alive_nurse_sows = Count('sow', filter=Q(sow__alive=True,
-             sow__status__title__in=['Кормилица']))
+             sow__status__title__in=['Кормилица', 'Отъем']))
         subquery_sows_nurse_count = self.get_workshop_location(OuterRef('workshop')) \
                         .annotate(flag=Value(0)) \
                         .values('flag') \
@@ -307,12 +307,17 @@ class LocationQuerySet(models.QuerySet):
             count_all=models.Subquery(subquery_all_cells),
             )
 
-    # def get(self):
-    #     subquery = self.values('piglets__metatour__week_tour')[:1]
-    #     return self.annotate(
-    #         tour=Subquery(subquery)
-    #         )
+    def add_sows_culls_count(self):
+        locs = self.get_workshop_location(OuterRef('workshop')) \
+            .annotate(flag=Value(0)) \
+            .values('flag') \
+            .annotate(count_sow_culls=Count('sow_cullings_here',
+                 filter=Q(sow_cullings_here__culling_type='padej')))\
+            .values('count_sow_culls')
 
+        return self.annotate(count_sow_culls_padej=Subquery(locs, output_field=models.IntegerField()))
+
+        
 
 class LocationManager(CoreModelManager):
     def get_queryset(self):
