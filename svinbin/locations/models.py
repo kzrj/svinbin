@@ -452,5 +452,6 @@ class Location(CoreModel):
     @property
     def ws_aggregate_piglets_by_tours(self):
         if self.workshop and self.workshop.number not in [1, 2]:
-            return self.piglets.aggregate_by_tour_in_ws(ws_number=self.workshop.number)
+            locs = Location.objects.all().get_workshop_location(workshop=self.workshop)
+            return self.piglets.aggregate_by_tour_in_ws(ws_number=self.workshop.number, locs=locs)
         return None

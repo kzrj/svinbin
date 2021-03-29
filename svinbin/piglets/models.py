@@ -76,13 +76,13 @@ class PigletsManager(CoreModelManager):
     def get_all(self):
         return PigletsQuerySet(self.model, using=self._db)
 
-    def aggregate_by_tour_in_ws(self, ws_number):
+    def aggregate_by_tour_in_ws(self, ws_number, locs):
         tours_pk = Piglets.objects.all().all_in_workshop(workshop_number=ws_number) \
             .values_list('metatour__week_tour__pk', flat=True).distinct()
         return Tour.objects.filter(pk__in=tours_pk).values('week_number', 'year')\
                 .order_by('year', '-week_number') \
                 .annotate(qnty=Sum('week_tours__piglets__quantity',
-                     filter=Q(week_tours__piglets__active=True)))
+                     filter=Q(week_tours__piglets__active=True, week_tours__piglets__location__in=locs)))
                 
 
 class Piglets(CoreModel):
