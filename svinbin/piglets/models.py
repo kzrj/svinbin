@@ -78,6 +78,7 @@ class PigletsManager(CoreModelManager):
 
     def aggregate_by_tour_in_ws(self, ws_number):
         tours_pk = Piglets.objects.all().all_in_workshop(workshop_number=ws_number) \
+            .order_by('year', '-week_number') \
             .values_list('metatour__week_tour__pk', flat=True).distinct()
         return Tour.objects.filter(pk__in=tours_pk).values('week_number', 'year')\
                 .annotate(qnty=Sum('week_tours__piglets__quantity',
