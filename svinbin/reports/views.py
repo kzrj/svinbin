@@ -515,13 +515,13 @@ class ReportWSInfoView(viewsets.ViewSet):
                 .add_pigs_count_by_workshop_by_age(date=today, 
                     age_intervals=[[21, 28], [29, 36], [37, 44], [44, 53], [53, None]])\
                 .add_pigs_count_by_workshop()
-        data['ws4'] = LocationWSPopulationSerializer(ws4, many=True).data
+        data['ws4'] = LocationWSPopulationSerializer(ws4, many=True).data[0]
 
         ws8 = Location.objects.filter(workshop__number__in=[8]) \
                 .add_pigs_count_by_workshop_by_age(date=today, 
                     age_intervals=[[48, 53], [54, 61], [62, 69], [70, 77], [77, None]])\
                 .add_pigs_count_by_workshop()
-        data['ws8'] = LocationWSPopulationSerializer(ws8, many=True).data
+        data['ws8'] = LocationWSPopulationSerializer(ws8, many=True).data[0]
 
         ws567 = Location.objects.filter(workshop__number__in=[5, 6, 7]) \
                 .add_pigs_count_by_workshop_by_age(date=today, 
