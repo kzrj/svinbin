@@ -310,7 +310,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                 data['end_sows_prov_count'] = None
                 data['end_sows_rem_count'] = None
                                          
-            dates = ReportDate.objects.filter(Q(date=start_date) | Q(date=end_date)) \
+            dates = ReportDate.objects.filter(Q(date=start_date) | Q(date=end_date+datetime.timedelta(days=1))) \
                         .add_count_boars() \
                         .add_ws3_count_piglets_start_day(ws_locs=ws3_locs) \
                         .add_ws_count_piglets_start_day(ws_locs=ws48_locs, ws_numbers=[4, 8]) \
@@ -336,11 +336,11 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
             # 4. total born alive
             data['total_born_alive'] = SowFarrow.objects.filter(date__date__gte=start_date,
-                date__date__lt=end_date).aggregate(qnty=Sum('alive_quantity'))['qnty']
+                date__date__lte=end_date).aggregate(qnty=Sum('alive_quantity'))['qnty']
 
             # 5. 3\4 8\otkorm weighing
             data['count_doros_otkorm_in_out'] = WeighingPiglets.objects \
-                .filter(date__date__gte=start_date, date__date__lt=end_date) \
+                .filter(date__date__gte=start_date, date__date__lt=end_date+datetime.timedelta(days=1)) \
                 .count_doros_otkorm_in_out()
 
             # 6. culls sows + rem
@@ -349,15 +349,15 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
             # 7. culls piglets by ws
             data['ws3_culls'] = CullingPiglets.objects.filter(date__date__gte=start_date,
-                date__date__lt=end_date).count_at_loc(locs=ws3_locs, label='_ws3')
+                date__date__lte=end_date).count_at_loc(locs=ws3_locs, label='_ws3')
             data['ws48_culls'] = CullingPiglets.objects.filter(date__date__gte=start_date,
-                date__date__lt=end_date).count_at_loc(locs=ws48_locs, label='_ws48')
+                date__date__lte=end_date).count_at_loc(locs=ws48_locs, label='_ws48')
             data['ws567_culls'] = CullingPiglets.objects.filter(date__date__gte=start_date,
-                date__date__lt=end_date).count_at_loc(locs=ws567_locs, label='_ws567')
+                date__date__lte=end_date).count_at_loc(locs=ws567_locs, label='_ws567')
 
             # 8. culls boars
             data['boars_culls'] = CullingBoar.objects.filter(date__date__gte=start_date,
-                date__date__lt=end_date).count_by_groups()
+                date__date__lte=end_date).count_by_groups()
             return Response(data)
         else:
             return Response({'message': 'Неверные даты.'}, status=status.HTTP_400_BAD_REQUEST)
