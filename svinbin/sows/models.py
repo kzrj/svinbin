@@ -46,7 +46,7 @@ class SowGroup(CoreModel):
 class SowGroupRecordQuerySet(models.QuerySet):
     def count_group_tranfer_in_daterange(self, start_date, end_date):
         return self.filter(date__date__gte=start_date,
-                    date__date__lt=end_date,
+                    date__date__lte=end_date,
                     ) \
             .aggregate(
                 count_prov_to_osn=Count('id', filter=Q(group_before__title='Проверяемая',

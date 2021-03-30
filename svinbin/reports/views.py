@@ -332,7 +332,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
                 start_date=start_date, end_date=end_date)
             # 3. to rem
             data['sow_group_transfer']['to_rem'] = PigletsToSowsEvent.objects.filter(
-                date__date__gte=start_date, date__date__lt=end_date).aggregate(qnty=Sum('quantity'))['qnty']
+                date__date__gte=start_date, date__date__lte=end_date).aggregate(qnty=Sum('quantity'))['qnty']
 
             # 4. total born alive
             data['total_born_alive'] = SowFarrow.objects.filter(date__date__gte=start_date,
@@ -345,7 +345,7 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
             # 6. culls sows + rem
             data['culls_sows'] = CullingSow.objects.filter(date__date__gte=start_date,
-                date__date__lt=end_date).count_by_groups()
+                date__date__lte=end_date).count_by_groups()
 
             # 7. culls piglets by ws
             data['ws3_culls'] = CullingPiglets.objects.filter(date__date__gte=start_date,
