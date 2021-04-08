@@ -203,19 +203,19 @@ def export_to_excel_ws(data, ws_number, header_filename='../data/ws567header.xls
         tr_out_aka_weight_in_qnty = f"({record['tr_out_aka_weight_in_qnty']})" if record['tr_out_aka_weight_in_qnty'] else ''
         Sheet1.cell(row, col + 11).value = f"{tr_out_qnty}{tr_out_aka_weight_in_qnty}"
 
-        Sheet1.cell(row, col + 15).value = record['padej_qnty']
-        Sheet1.cell(row, col + 16).value = record['padej_total_weight']
+        Sheet1.cell(row, col + 15).value = record['ws_padej_qnty']
+        Sheet1.cell(row, col + 16).value = record['ws_padej_total_weight']
 
         if ws_number in [5, 6, 7]:
-            Sheet1.cell(row, col + 20).value = record['spec_qnty']
-            Sheet1.cell(row, col + 21).value = record['spec_total_weight']
+            Sheet1.cell(row, col + 20).value = record['ws_spec_qnty']
+            Sheet1.cell(row, col + 21).value = record['ws_spec_total_weight']
 
-        Sheet1.cell(row, col + 25).value = record['vinuzhd_qnty']
-        Sheet1.cell(row, col + 26).value = record['vinuzhd_total_weight']
+        Sheet1.cell(row, col + 25).value = record['ws_vinuzhd_qnty']
+        Sheet1.cell(row, col + 26).value = record['ws_vinuzhd_total_weight']
 
         if ws_number in [4, 8]:
-            Sheet1.cell(row, col + 29).value = record['prirezka_qnty']
-            Sheet1.cell(row, col + 30).value = record['prirezka_total_weight']
+            Sheet1.cell(row, col + 29).value = record['ws_prirezka_qnty']
+            Sheet1.cell(row, col + 30).value = record['ws_prirezka_total_weight']
 
         if idx < len(data['results']) - 1:
             Sheet1.cell(row, col + 31).value = data['results'][idx + 1]['count_piglets_at_start']
