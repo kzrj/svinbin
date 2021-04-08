@@ -120,7 +120,7 @@ class LocationViewSet(viewsets.ModelViewSet):
                 .add_sows_count_by_workshop() \
                 .add_pigs_count_by_workshop() \
                 .add_pigs_count_by_workshop_by_age(date=today,
-                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]]) \
+                    age_intervals=[[0, 7], [7, 14], [14, 21], [21, 28], [28, None]]) \
                 .first()
 
         section_locs = Location.objects.filter(section__workshop__number=3,
@@ -129,7 +129,7 @@ class LocationViewSet(viewsets.ModelViewSet):
                 .add_sows_count_by_sections() \
                 .add_pigs_count_by_sections() \
                 .add_pigs_count_by_ws_sections_by_age(date=today,
-                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]])
+                    age_intervals=[[0, 7], [7, 14], [14, 21], [21, 28], [28, None]])
 
         data = dict()
         data['ws'] = {
@@ -137,9 +137,9 @@ class LocationViewSet(viewsets.ModelViewSet):
             'sows_sup_count': ws3.sows_sup_count,
             'pigs_count': ws3.pigs_count,
             'count_piglets_0_7': ws3.count_piglets_0_7,
-            'count_piglets_8_14': ws3.count_piglets_8_14,
-            'count_piglets_15_21': ws3.count_piglets_15_21,
-            'count_piglets_22_28': ws3.count_piglets_22_28,
+            'count_piglets_7_14': ws3.count_piglets_7_14,
+            'count_piglets_14_21': ws3.count_piglets_14_21,
+            'count_piglets_21_28': ws3.count_piglets_21_28,
             'count_piglets_28_plus': ws3.count_piglets_28_plus,
             }
 
@@ -152,9 +152,9 @@ class LocationViewSet(viewsets.ModelViewSet):
                 'sows_sup_count': section.sows_sup_count,
                 'piglets_count': section.pigs_count,
                 'count_piglets_0_7': section.count_piglets_0_7,
-                'count_piglets_8_14': section.count_piglets_8_14,
-                'count_piglets_15_21': section.count_piglets_15_21,
-                'count_piglets_22_28': section.count_piglets_22_28,
+                'count_piglets_7_14': section.count_piglets_7_14,
+                'count_piglets_14_21': section.count_piglets_14_21,
+                'count_piglets_21_28': section.count_piglets_21_28,
                 'count_piglets_28_plus': section.count_piglets_28_plus,
             })
 

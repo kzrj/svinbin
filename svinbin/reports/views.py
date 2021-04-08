@@ -507,25 +507,25 @@ class ReportWSInfoView(viewsets.ViewSet):
         ws3 = Location.objects.filter(workshop__number=3) \
                 .add_sows_count_by_workshop() \
                 .add_pigs_count_by_workshop_by_age(date=today, 
-                    age_intervals=[[0, 7], [8, 14], [15, 21], [22, 28], [28, None]]) \
+                    age_intervals=[[0, 7], [7, 14], [14, 21], [21, 28], [28, None]]) \
                 .add_pigs_count_by_workshop()
         data['ws3'] = LocationWSPopulationSerializer(ws3, many=True).data[0]
 
         ws4 = Location.objects.filter(workshop__number__in=[4]) \
                 .add_pigs_count_by_workshop_by_age(date=today, 
-                    age_intervals=[[21, 28], [29, 36], [37, 44], [44, 53], [53, None]])\
+                    age_intervals=[[21, 28], [28, 36], [36, 44], [44, 53], [53, None]])\
                 .add_pigs_count_by_workshop()
         data['ws4'] = LocationWSPopulationSerializer(ws4, many=True).data[0]
 
         ws8 = Location.objects.filter(workshop__number__in=[8]) \
                 .add_pigs_count_by_workshop_by_age(date=today, 
-                    age_intervals=[[48, 53], [54, 61], [62, 69], [70, 77], [77, None]])\
+                    age_intervals=[[48, 53], [53, 61], [61, 69], [69, 77], [77, None]])\
                 .add_pigs_count_by_workshop()
         data['ws8'] = LocationWSPopulationSerializer(ws8, many=True).data[0]
 
         ws567 = Location.objects.filter(workshop__number__in=[5, 6, 7]) \
                 .add_pigs_count_by_workshop_by_age(date=today, 
-                    age_intervals=[[70, 77], [78, 85], [86, 93], [94, 101], [102, None]])\
+                    age_intervals=[[70, 77], [77, 85], [85, 93], [93, 101], [101, None]])\
                 .add_pigs_count_by_workshop()
         data['ws567'] = LocationWSPopulationSerializer(ws567, many=True).data
 
