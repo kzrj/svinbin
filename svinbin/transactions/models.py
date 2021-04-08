@@ -48,6 +48,7 @@ class SowTransactionManager(CoreModelManager):
 
         if transaction.is_weaning_transaction_from_ws3_to_ws1():
             sow.tour = None
+            sow.change_group_to(group_title='С опоросом', date=date)
             sow.change_status_to('Ожидает осеменения')
 
         if sow.status and sow.status.title != 'Супорос 35' and to_location.workshop: 
