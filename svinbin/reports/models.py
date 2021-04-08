@@ -559,9 +559,9 @@ class ReportDateQuerySet(models.QuerySet):
         additional_count = 0
         if add_live:
             if 4 in ws_numbers:
-                additional_count = additional_count + 2892
+                additional_count = additional_count + 2956
             if 8 in ws_numbers:
-                additional_count = additional_count + 4137
+                additional_count = additional_count + 4161
             if 5 in ws_numbers:
                 additional_count = additional_count + 118
             if 6 in ws_numbers:
