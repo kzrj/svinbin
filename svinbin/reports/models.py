@@ -565,9 +565,9 @@ class ReportDateQuerySet(models.QuerySet):
             if 5 in ws_numbers:
                 additional_count = additional_count + 118
             if 6 in ws_numbers:
-                additional_count = additional_count + 1099
+                additional_count = additional_count + 1495
             if 7 in ws_numbers:
-                additional_count = additional_count + 131
+                additional_count = additional_count + 566
 
         return trs_in_qnty, trs_out_qnty, culling_qnty, additional_count
 
