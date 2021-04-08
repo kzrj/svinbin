@@ -424,7 +424,7 @@ class ReportDateQuerySet(models.QuerySet):
         # - count init piglets 3715
         additional_count = 0 
         if add_live:
-            additional_count = 3715 + 2167 + 38
+            additional_count = 3715 + 2167 + 38 + 11
 
         return self.annotate(count_piglets_at_start=ExpressionWrapper(
             additional_count + total_alive - trs_out_qnty + trs_in_qnty - culling_qnty, output_field=models.IntegerField()))
