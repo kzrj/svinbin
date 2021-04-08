@@ -111,11 +111,11 @@ def export_to_excel_ws3(data, filename='../data/ws3header.xlsx'):
         Sheet1.cell(row, col + 22).value = record['tr_out_aka_weight_total']
         Sheet1.cell(row, col + 23).value = record['tr_out_aka_weight_avg']
 
-        Sheet1.cell(row, col + 24).value = record['piglets_padej_qnty']
-        Sheet1.cell(row, col + 25).value = record['piglets_padej_weight']
+        Sheet1.cell(row, col + 24).value = record['ws3_piglets_padej_qnty']
+        Sheet1.cell(row, col + 25).value = record['ws3_piglets_padej_weight']
 
-        Sheet1.cell(row, col + 26).value = record['piglets_vinuzhd_qnty']
-        Sheet1.cell(row, col + 27).value = record['piglets_vinuzhd_weight']
+        Sheet1.cell(row, col + 26).value = record['ws3_piglets_vinuzhd_qnty']
+        Sheet1.cell(row, col + 27).value = record['ws3_piglets_vinuzhd_weight']
 
         Sheet1.cell(row, col + 28).value = ''
         Sheet1.cell(row, col + 29).value = ''

@@ -511,11 +511,11 @@ class ReportDateQuerySet(models.QuerySet):
                 total_tr_out_aka_weight_total=Sum('tr_out_aka_weight_total'),
                 avg_tr_out_weight=Avg('tr_out_aka_weight_avg'),
 
-                total_piglets_padej_qnty=Sum('piglets_padej_qnty'),
-                total_piglets_padej_weight=Sum('piglets_padej_weight'),
+                total_piglets_padej_qnty=Sum('ws3_piglets_padej_qnty'),
+                total_piglets_padej_weight=Sum('ws3_piglets_padej_weight'),
 
-                total_piglets_vinuzhd_qnty=Sum('piglets_vinuzhd_qnty'),
-                total_piglets_vinuzhd_weight=Sum('piglets_vinuzhd_weight'),
+                total_piglets_vinuzhd_qnty=Sum('ws3_piglets_vinuzhd_qnty'),
+                total_piglets_vinuzhd_weight=Sum('ws3_piglets_vinuzhd_weight'),
                 )
 
     @staticmethod
