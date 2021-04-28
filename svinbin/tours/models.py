@@ -263,9 +263,9 @@ class TourQuerySet(models.QuerySet):
             ws_numbers.remove(3)
 
         for ws_number, place_number in zip(ws_numbers, places):
-        	if ws_numbers == 3:
-        		continue
-        		
+            if ws_numbers == 3:
+                continue
+                
             lookup1 = {f'week_weight_qnty_{place_number}__isnull': True, }
             lookup2 = {f'week_weight_qnty_{place_number}': 0, }
             lookup3 = {f'week_weight_qnty_{place_number}__gt': 0, }
