@@ -245,7 +245,7 @@ class TourQuerySet(models.QuerySet):
         if 3 in ws_numbers:
             data['ws3_padej_percentage'] = Case(
                     When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
-                    When(total_born_alive__gt=0.0, 
+                    When(total_born_alive__gt=0, 
                             then=ExpressionWrapper(
                                 F('ws3_padej_quantity') * 100.0 / F('total_born_alive'),
                                 output_field=models.FloatField())
@@ -254,7 +254,7 @@ class TourQuerySet(models.QuerySet):
 
             data['ws3_prirezka_percentage'] = Case(
                     When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
-                    When(total_born_alive__gt=0.0, 
+                    When(total_born_alive__gt=0, 
                             then=ExpressionWrapper(
                                 F('ws3_prirezka_quantity') * 100.0 / F('total_born_alive'),
                                 output_field=models.FloatField())
@@ -263,6 +263,9 @@ class TourQuerySet(models.QuerySet):
             ws_numbers.remove(3)
 
         for ws_number, place_number in zip(ws_numbers, places):
+        	if ws_numbers == 3:
+        		continue
+        		
             lookup1 = {f'week_weight_qnty_{place_number}__isnull': True, }
             lookup2 = {f'week_weight_qnty_{place_number}': 0, }
             lookup3 = {f'week_weight_qnty_{place_number}__gt': 0, }
