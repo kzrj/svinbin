@@ -138,7 +138,8 @@ class VeterinarPermissions(permissions.BasePermission):
                 return True
             if not hasattr(request.user, 'employee'):
                 return False
-            return request.user.employee.is_veterinar
+            return request.user.employee.is_veterinar \
+                or request.user.employee.is_veterinar.workshop.number == 4
 
     def has_object_permission(self, request, view, obj):
         if request.method in permissions.SAFE_METHODS:
@@ -148,7 +149,8 @@ class VeterinarPermissions(permissions.BasePermission):
                 return True
             if not hasattr(request.user, 'employee'):
                 return False
-            return request.user.employee.is_veterinar
+            return request.user.employee.is_veterinar \
+                or request.user.employee.is_veterinar.workshop.number == 4
 
 
 class OfficerOnlyPermissions(permissions.BasePermission):

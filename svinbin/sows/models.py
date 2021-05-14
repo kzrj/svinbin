@@ -242,13 +242,13 @@ class SowManager(CoreModelManager):
     def create_or_return_then_assing_farm_id(self, farm_id, birth_id=None, initiator=None):
         sow = self.get_queryset_with_not_alive().filter(farm_id=farm_id).first()
         if not sow:
-            sow = self.filter(farm_id__isnull=True, location__workshop__number__in=[1]).first()
+            sow = self.filter(farm_id__isnull=True, location__workshop__number__in=[1, 2]).first()
             if sow:
                 sow.assing_farm_id(farm_id=farm_id, birth_id=birth_id)
                 AssingFarmIdEvent.objects.create_event(sow=sow, assing_type='gilt',
                     farm_id=farm_id, birth_id=sow.birth_id)
             else:
-                raise DjangoValidationError(message=f'Больше нет ремонтных свинок в Цехе 1. Переведите из Цеха 2')
+                raise DjangoValidationError(message=f'Больше нет ремонтных свинок в Цехе 1-2')
         else:
             if not sow.birth_id:
                 sow.birth_id = birth_id
