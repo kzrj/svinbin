@@ -18,7 +18,7 @@ class Recipe(CoreModel):
         ('prev', 'Профилактика'),]
     MED_METHODS = [
         ('feed', 'Корм'), ('inj', 'Инъекция'),
-        ('water', 'Вода'),]
+        ('water', 'Вода'), ('opr', 'Опрыскивание'),]
 
     med_type = models.CharField(max_length=50, choices=MED_TYPES)
     med_method = models.CharField(max_length=30, choices=MED_METHODS)
