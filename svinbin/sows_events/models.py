@@ -222,7 +222,7 @@ class SowFarrowManager(SowEventManager):
                 )
 
         sow.change_status_to(status_title='Опоросилась', date=date)
-        # sow.change_group_to(group_title='С опоросом', date=date)
+        # sow.change_group_to(group_title='С опоросом', date=date) moved to transaction
 
         if alive_quantity <= 0:
             piglets.deactivate()

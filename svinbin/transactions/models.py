@@ -46,7 +46,7 @@ class SowTransactionManager(CoreModelManager):
                 sow_group=sow.sow_group
                 )
 
-        if transaction.is_weaning_transaction_from_ws3_to_ws1():
+        if transaction.is_weaning_transaction_from_ws3_to_ws12():
             sow.tour = None
             sow.change_group_to(group_title='С опоросом', date=date)
             sow.change_status_to('Ожидает осеменения')
@@ -115,10 +115,10 @@ class SowTransaction(Transaction):
 
     objects = SowTransactionManager()
 
-    def is_weaning_transaction_from_ws3_to_ws1(self):
+    def is_weaning_transaction_from_ws3_to_ws12(self):
         if self.sow_status \
           and (self.sow_status.title == 'Опоросилась' or self.sow_status.title == 'Отъем') \
-          and self.to_location.workshop and self.to_location.workshop.number == 1 \
+          and self.to_location.workshop and self.to_location.workshop.number in [1, 2] \
           and self.from_location.sowAndPigletsCell:
                 return True
         return False
