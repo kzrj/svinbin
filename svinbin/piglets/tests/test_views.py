@@ -68,6 +68,7 @@ class PigletsViewSetTest(APITestCase):
         self.brig8 = User.objects.get(username='brigadir8')
 
         self.admin = User.objects.get(username='test_admin1')
+        self.shmigina = User.objects.get(username='shmigina')
         self.veterinar = User.objects.get(username='veterinar')
 
     def test_create_from_merging_list(self):
@@ -392,6 +393,12 @@ class PigletsViewSetTest(APITestCase):
         response = self.client.post('/api/piglets/%s/recount_piglets/' % piglets.pk, 
             {'new_quantity': 105, 'comment': 'xz'})
         self.assertEqual(response.status_code, 403)
+        self.client.logout()
+
+        self.client.force_authenticate(user=self.shmigina)
+        response = self.client.post('/api/piglets/%s/recount_piglets/' % piglets.pk, 
+            {'new_quantity': 105, 'comment': 'xz'})
+        self.assertEqual(response.status_code, 200)
         self.client.logout()
 
     def test_create_gilt(self):

@@ -21,7 +21,7 @@ import veterinary.models as veterinary_models
 
 from piglets.filters import PigletsFilter
 from core.permissions import ObjAndUserSameLocationPermissions, WS3Permissions, ReadOrAdminOnlyPermissions, \
-    VeterinarPermissions
+    VeterinarPermissions, OfficerOnlyPermissions
 
 
 class PigletsViewSet(viewsets.ModelViewSet):
@@ -224,7 +224,7 @@ class PigletsViewSet(viewsets.ModelViewSet):
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['post'], detail=True, permission_classes=[ObjAndUserSameLocationPermissions])
+    @action(methods=['post'], detail=True, permission_classes=[OfficerOnlyPermissions])
     def recount_piglets(self, request, pk=None):        
         serializer = piglets_events_serializers.RecountPigletsSerializer(data=request.data)
         if serializer.is_valid():
