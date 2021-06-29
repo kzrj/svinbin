@@ -3,8 +3,8 @@ import datetime
 from django.db.models import CharField, Value, Q, Sum
 from django.utils import timezone
 from django.http import HttpResponse
-from rest_framework.permissions import IsAuthenticated, OfficerOnlyPermissions
 
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets, views, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -13,6 +13,7 @@ from rest_framework.decorators import action
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from core.utils import export_to_excel_ws3, export_to_excel_ws
+from core.permissions import OfficerOnlyPermissions
 
 from tours.filters import TourFilter
 
