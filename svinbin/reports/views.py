@@ -19,7 +19,7 @@ from tours.filters import TourFilter
 
 from tours.models import Tour
 from reports.models import ReportDate, gen_operations_dict, gen_megadict
-from locations.models import Location
+from locations.models import Location, Section
 from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt,
     CullingBoar, PigletsToSowsEvent, SowFarrow)
 from piglets_events.models import CullingPiglets, WeighingPiglets, Recount
