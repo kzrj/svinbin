@@ -69,7 +69,7 @@ router.register(r'reports/tours_v2', reports_views.TourReportV2ViewSet,
  basename='report-tours-v2')
 router.register(r'reports/director', reports_views.ReportDateViewSet,
  basename='report-director')
-router.register(r'reports/recounts', piglets_events_views.RecountViewSet,
+router.register(r'reports/recounts', reports_views.RecountViewSet,
  basename='report-recounts')
 router.register(r'reports/sows_downtime', reports_views.ReportSowsDowntimeByStatusesView,
  basename='report-sowsdowntime')

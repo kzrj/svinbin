@@ -3,12 +3,14 @@ import datetime
 from django.db.models import CharField, Value, Q, Sum
 from django.utils import timezone
 from django.http import HttpResponse
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, OfficerOnlyPermissions
 
 from rest_framework import viewsets, views, status
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.decorators import action
+from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 
 from core.utils import export_to_excel_ws3, export_to_excel_ws
 
@@ -19,7 +21,7 @@ from reports.models import ReportDate, gen_operations_dict, gen_megadict
 from locations.models import Location
 from sows_events.models import ( Semination, Ultrasound, AbortionSow, CullingSow, MarkAsNurse, MarkAsGilt,
     CullingBoar, PigletsToSowsEvent, SowFarrow)
-from piglets_events.models import CullingPiglets, WeighingPiglets
+from piglets_events.models import CullingPiglets, WeighingPiglets, Recount
 from transactions.models import SowTransaction, PigletsTransaction
 from sows.models import Sow, SowGroupRecord
 from piglets.models import Piglets
@@ -531,5 +533,27 @@ class ReportWSInfoView(viewsets.ViewSet):
 
         # to do:
         # add cullings today by ws
+
+        return Response(data)
+
+
+class RecountViewSet(viewsets.ViewSet):
+    permission_classes = [OfficerOnlyPermissions]
+
+    @action(methods=['get'], detail=False)
+    def ws_balance(self, request):
+        ws_number = request.GET.get('ws_number')
+        data = dict()
+
+        ws_locations = Location.objects.all().get_workshop_location_by_number(workshop_number=ws_number)
+        data['ws_balance'] = Recount.objects.sum_balances_by_locations(locations=ws_locations)
+        data['sections'] = list()
+
+        for section in Section.objects.filter(workshop__number=ws_number):
+            sec_locations = Location.objects.all().get_locations_in_section(section=section)
+            data['sections'].append(
+                {'number': section.number,
+                 'balance': Recount.objects.sum_balances_by_locations(locations=sec_locations)}
+                )
 
         return Response(data)
