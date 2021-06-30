@@ -592,7 +592,7 @@ class RecountViewSet(viewsets.ViewSet):
                     .add_ws_recounts_balance_in_daterange(
                         start_date=serializer.validated_data.get('start_date'),
                         end_date=serializer.validated_data.get('end_date')
-                        ).filter(recounts_balance_count__gt=0)
+                        )
             return Response(self.WsRecountsSerializer(wss, many=True).data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -600,15 +600,14 @@ class RecountViewSet(viewsets.ViewSet):
     @action(methods=['get'], detail=False)
     def detail_ws_balance(self, request):
         serializer = self.DateRangeSerializer(data=request.GET)
-        data = dict()
-        data['sections'] = list()
+        sections = list()
         if serializer.is_valid():
             for section in Section.objects.filter(
               workshop__number=serializer.validated_data['ws_number']):
                 sec_locations = Location.objects.all().get_locations_in_section(section=section)
                 recounts = Recount.objects.filter(location__in=sec_locations)
                 if recounts.count() > 0:
-                    data['sections'].append(
+                    sections.append(
                         {
                          'number': section.number,
                          'balance': recounts.sum_balances_by_locations(locations=sec_locations),
@@ -616,6 +615,6 @@ class RecountViewSet(viewsets.ViewSet):
                         }
                     )
             
-            return Response(data)
+            return Response(sections)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
