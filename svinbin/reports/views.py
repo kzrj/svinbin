@@ -612,7 +612,7 @@ class RecountViewSet(viewsets.ViewSet):
                         {
                          'number': section.number,
                          'balance': recounts.sum_balances_by_locations(locations=sec_locations),
-                         'recounts': self.RecountReadSerializer(recounts, many=True).data
+                         'recounts': self.RecountReadSerializer(recounts.order_by('-date'), many=True).data
                         }
                     )
             
