@@ -550,12 +550,13 @@ class RecountViewSet(viewsets.ViewSet):
 
     class WsRecountsSerializer(serializers.ModelSerializer):
         ws_number = serializers.ReadOnlyField(source='workshop.number')
+        ws_name = serializers.ReadOnlyField(source='workshop.title')
         recounts_balance_count = serializers.ReadOnlyField()
         recounts_balance_sum = serializers.ReadOnlyField()
 
         class Meta:
             model = Location
-            fields = ['ws_number', 'recounts_balance_count', 'recounts_balance_sum']
+            fields = ['ws_number', 'ws_name', 'recounts_balance_count', 'recounts_balance_sum']
 
 
     class RecountReadSerializer(serializers.ModelSerializer):
