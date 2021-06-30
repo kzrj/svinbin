@@ -604,10 +604,17 @@ class RecountViewSet(viewsets.ViewSet):
         serializer = self.DateRangeSerializer(data=request.GET)
         sections = list()
         if serializer.is_valid():
+            filters = dict()
+            if serializer.validated_data.get('start_date'):
+                filters['recounts__date__date__gte'] = serializer.validated_data.get('start_date')
+            if serializer.validated_data.get('end_date'):
+                filters['recounts__date__date__lte'] = serializer.validated_data.get('end_date')
+
             for section in Section.objects.filter(
               workshop__number=serializer.validated_data['ws_number']):
                 sec_locations = Location.objects.all().get_locations_in_section(section=section)
-                recounts = Recount.objects.filter(location__in=sec_locations)
+                filters['location__in'] = sec_locations
+                recounts = Recount.objects.filter(**filters)
                 if recounts.count() > 0:
                     sections.append(
                         {
