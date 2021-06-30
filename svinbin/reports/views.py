@@ -606,9 +606,9 @@ class RecountViewSet(viewsets.ViewSet):
         if serializer.is_valid():
             filters = dict()
             if serializer.validated_data.get('start_date'):
-                filters['recounts__date__date__gte'] = serializer.validated_data.get('start_date')
+                filters['date__date__gte'] = serializer.validated_data.get('start_date')
             if serializer.validated_data.get('end_date'):
-                filters['recounts__date__date__lte'] = serializer.validated_data.get('end_date')
+                filters['date__date__lte'] = serializer.validated_data.get('end_date')
 
             for section in Section.objects.filter(
               workshop__number=serializer.validated_data['ws_number']):
