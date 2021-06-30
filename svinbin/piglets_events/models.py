@@ -401,7 +401,8 @@ class CullingPiglets(PigletsEvent):
 
 
 class RecountQuerySet(models.QuerySet):
-    pass
+    def sum_balances_by_locations(self, locations):
+        return self.filter(location__in=locations).aggregate(total_balance=models.Sum('balance'))['total_balance']
 
 
 class RecountManager(CoreModelManager):
@@ -422,7 +423,7 @@ class RecountManager(CoreModelManager):
         return recount
 
     def sum_balances_by_locations(self, locations):
-        return self.filter(location__in=locations).aggregate(total_balance=models.Sum('balance'))['total_balance']
+        return self.get_queryset().sum_balances_by_locations(locations=locations)
 
 
 class Recount(PigletsEvent):

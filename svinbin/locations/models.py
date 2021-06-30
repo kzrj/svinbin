@@ -317,6 +317,59 @@ class LocationQuerySet(models.QuerySet):
 
         return self.annotate(count_sow_culls_padej=Subquery(locs, output_field=models.IntegerField()))
 
+    def add_ws_recounts_balance_in_daterange(self, start_date=None, end_date=None):
+        filters = dict()
+        if start_date:
+            filters['recounts__date__date__gte'] = start_date
+        if end_date:
+            filters['recounts__date__date__lte'] = end_date
+
+        recounts_balance_sum = self.get_workshop_location(OuterRef('workshop')) \
+            .annotate(flag=Value(0)) \
+            .values('flag') \
+            .annotate(recounts_balance_sum=Sum('recounts__balance', 
+                        filter=Q(**filters)))\
+            .values('recounts_balance_sum')
+
+        recounts_balance_count = self.get_workshop_location(OuterRef('workshop')) \
+            .annotate(flag=Value(0)) \
+            .values('flag') \
+            .annotate(recounts_balance_count=Count('recounts', 
+                        filter=Q(**filters)))\
+            .values('recounts_balance_count')
+
+        return self.annotate(
+            recounts_balance_sum=Subquery(recounts_balance_sum, output_field=models.IntegerField()),
+            recounts_balance_count=Subquery(recounts_balance_count, output_field=models.IntegerField()),
+        )
+
+    # def add_sections_recounts_in_daterange(self, ws_number, start_date=None, end_date=None):
+    #     filters = dict()
+    #     if start_date:
+    #         filters['recounts__date__date__gte'] = start_date
+    #     if end_date:
+    #         filters['recounts__date__date__lte'] = end_date
+
+    #     get_locations_in_section
+
+    #     recounts_balance_sum = self.get_workshop_location(OuterRef('workshop')) \
+    #         .annotate(flag=Value(0)) \
+    #         .values('flag') \
+    #         .annotate(recounts_balance_sum=Sum('recounts__balance', 
+    #                     filter=Q(**filters)))\
+    #         .values('recounts_balance_sum')
+
+    #     recounts_balance_count = self.get_workshop_location(OuterRef('workshop')) \
+    #         .annotate(flag=Value(0)) \
+    #         .values('flag') \
+    #         .annotate(recounts_balance_count=Count('recounts', 
+    #                     filter=Q(**filters)))\
+    #         .values('recounts_balance_count')
+
+    #     return self.annotate(
+    #         recounts_balance_sum=Subquery(recounts_balance_sum, output_field=models.IntegerField()),
+    #         recounts_balance_count=Subquery(recounts_balance_count, output_field=models.IntegerField()),
+    #     )
         
 
 class LocationManager(CoreModelManager):

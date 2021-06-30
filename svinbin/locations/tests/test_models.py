@@ -1,19 +1,22 @@
 # -*- coding: utf-8 -*-
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
+from freezegun import freeze_time
 
 from django.test import TransactionTestCase
 from django.db import models
+from django.contrib.auth.models import User
 
 import locations.testing_utils as locations_testing
 import sows.testing_utils as sows_testing
 import piglets.testing_utils as piglets_testing
 import sows_events.utils as sows_events_testing
+import staff.testing_utils as staff_testing
 
 from sows.models import Sow
 from locations.models import  Location, Section, WorkShop
 from sows_events.models import SowFarrow, CullingSow
 from piglets.models import Piglets
-from piglets_events.models import CullingPiglets
+from piglets_events.models import CullingPiglets, Recount
 from tours.models import Tour
 
 from locations.serializers import (
@@ -328,3 +331,55 @@ class LocationQsPopulationTest(TransactionTestCase):
         ws3 = Location.objects.filter(workshop__number=3).add_sows_culls_count()
         CullingSow.objects.create_culling(sow=self.sow1, culling_type='padej')
         print(ws3.first().count_sow_culls)
+
+
+class LocationRecountsTest(TransactionTestCase):
+    def setUp(self):
+        locations_testing.create_workshops_sections_and_cells()
+        piglets_testing.create_piglets_statuses()
+        staff_testing.create_svinbin_users()
+
+        self.brig8 = User.objects.get(username='brigadir8')
+        self.admin = User.objects.get(username='test_admin1')
+        self.shmigina = User.objects.get(username='shmigina')
+
+        self.tour1 = Tour.objects.get_or_create_by_week_in_current_year(week_number=1)
+        self.locs_ws3 = Location.objects.filter(sowAndPigletsCell__isnull=False)
+        self.locs_ws5 = Location.objects.filter(pigletsGroupCell__workshop__number=5)
+
+        self.piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.locs_ws3[0], 10)
+        self.piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(self.tour1,
+            self.locs_ws5[0], 100)
+
+    def test_add_ws_recounts_balance_in_daterange(self):
+        with freeze_time("2021-02-25"):
+            Recount.objects.create_recount(piglets=self.piglets1, new_quantity=12)
+            Recount.objects.create_recount(piglets=self.piglets2, new_quantity=105)
+
+        date1 = date(2021,1,1)
+        date2 = date(2021,2,28)
+
+        wss = Location.objects.filter(workshop__number__in=[3,4,5,6,7,8]) \
+                    .add_ws_recounts_balance_in_daterange(start_date=date1, end_date=date2)
+        
+        self.assertEqual(wss.get(workshop__number=3).recounts_balance_sum, -2)
+        self.assertEqual(wss.get(workshop__number=3).recounts_balance_count, 1)
+        self.assertEqual(wss.get(workshop__number=5).recounts_balance_sum, -5)
+        self.assertEqual(wss.get(workshop__number=5).recounts_balance_count, 1)
+
+        wss = Location.objects.filter(workshop__number__in=[3,4,5,6,7,8]) \
+                    .add_ws_recounts_balance_in_daterange(start_date=date2)
+        
+        self.assertEqual(wss.get(workshop__number=3).recounts_balance_sum, None)
+        self.assertEqual(wss.get(workshop__number=3).recounts_balance_count, 0)
+        self.assertEqual(wss.get(workshop__number=5).recounts_balance_sum, None)
+        self.assertEqual(wss.get(workshop__number=5).recounts_balance_count, 0)
+
+        wss = Location.objects.filter(workshop__number__in=[3,4,5,6,7,8]) \
+                    .add_ws_recounts_balance_in_daterange()
+        
+        self.assertEqual(wss.get(workshop__number=3).recounts_balance_sum, -2)
+        self.assertEqual(wss.get(workshop__number=3).recounts_balance_count, 1)
+        self.assertEqual(wss.get(workshop__number=5).recounts_balance_sum, -5)
+        self.assertEqual(wss.get(workshop__number=5).recounts_balance_count, 1)

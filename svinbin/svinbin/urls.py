@@ -22,7 +22,6 @@ from piglets import views as piglets_views
 from workshoponetwo import views as workshoponetwo_views
 from workshopthree import views as workshopthree_views
 from reports import views as reports_views
-from piglets_events import views as piglets_events_views
 from rollbacks.views import RollbackViewSet
 from veterinary import views as veterinary_views
 

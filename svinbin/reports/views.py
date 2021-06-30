@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.http import HttpResponse
 
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import viewsets, views, status
+from rest_framework import viewsets, views, status, serializers
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.pagination import LimitOffsetPagination
@@ -541,6 +541,31 @@ class ReportWSInfoView(viewsets.ViewSet):
 class RecountViewSet(viewsets.ViewSet):
     permission_classes = [OfficerOnlyPermissions]
 
+
+    class DateRangeSerializer(serializers.Serializer):
+        start_date = serializers.DateField(format="%Y-%m-%d", required=False)
+        end_date = serializers.DateField(format="%Y-%m-%d", required=False)
+        ws_number = serializers.IntegerField(required=False)
+
+
+    class WsRecountsSerializer(serializers.ModelSerializer):
+        ws_number = serializers.ReadOnlyField(source='workshop.number')
+        recounts_balance_count = serializers.ReadOnlyField()
+        recounts_balance_sum = serializers.ReadOnlyField()
+
+        class Meta:
+            model = Location
+            fields = ['ws_number', 'recounts_balance_count', 'recounts_balance_sum']
+
+
+    class RecountReadSerializer(serializers.ModelSerializer):
+        cell = serializers.ReadOnlyField(source='location.get_cell_number')
+
+        class Meta:
+            model = Recount
+            exclude = ['created_at', 'modified_at', 'location', 'piglets']
+
+
     @action(methods=['get'], detail=False)
     def ws_balance(self, request):
         ws_number = request.GET.get('ws_number')
@@ -558,3 +583,39 @@ class RecountViewSet(viewsets.ViewSet):
                 )
 
         return Response(data)
+
+    @action(methods=['get'], detail=False)
+    def all_ws_balance(self, request):
+        serializer = self.DateRangeSerializer(data=request.GET)
+        if serializer.is_valid():
+            wss = Location.objects.filter(workshop__number__in=[3, 4, 5, 6, 7, 8]) \
+                    .add_ws_recounts_balance_in_daterange(
+                        start_date=serializer.validated_data.get('start_date'),
+                        end_date=serializer.validated_data.get('end_date')
+                        ).filter(recounts_balance_count__gt=0)
+            return Response(self.WsRecountsSerializer(wss, many=True).data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(methods=['get'], detail=False)
+    def detail_ws_balance(self, request):
+        serializer = self.DateRangeSerializer(data=request.GET)
+        data = dict()
+        data['sections'] = list()
+        if serializer.is_valid():
+            for section in Section.objects.filter(
+              workshop__number=serializer.validated_data['ws_number']):
+                sec_locations = Location.objects.all().get_locations_in_section(section=section)
+                recounts = Recount.objects.filter(location__in=sec_locations)
+                if recounts.count() > 0:
+                    data['sections'].append(
+                        {
+                         'number': section.number,
+                         'balance': recounts.sum_balances_by_locations(locations=sec_locations),
+                         'recounts': self.RecountReadSerializer(recounts, many=True).data
+                        }
+                    )
+            
+            return Response(data)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
