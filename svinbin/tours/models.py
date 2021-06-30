@@ -122,19 +122,19 @@ class TourQuerySet(models.QuerySet):
             weights_subquery_total_weight = weights_subquery.annotate(weight=Sum('total_weight')) \
                 .values('weight')
             data[f'week_weight_{place_formatted}'] = Coalesce(Subquery(weights_subquery_total_weight,
-                 output_field=models.FloatField()), 0)
+                 output_field=models.FloatField()), 0.0)
 
             # avg weights
             weights_subquery_avg_weight = weights_subquery.annotate(avg_weight=Avg('average_weight')) \
                 .values('avg_weight')
             data[f'week_weight_avg_{place_formatted}'] = Coalesce(Subquery(weights_subquery_avg_weight,
-                 output_field=models.FloatField()), 0)
+                 output_field=models.FloatField()), 0.0)
 
             # qnty weights
             weights_subquery_qnty_weight = weights_subquery.annotate(qnty_weight=Sum('piglets_quantity')) \
                 .values('qnty_weight')
             data[f'week_weight_qnty_{place_formatted}'] = Coalesce(Subquery(weights_subquery_qnty_weight,
-                 output_field=models.FloatField()), 0)
+                 output_field=models.FloatField()), 0.0)
 
             weights_subquery_count_weight = weights_subquery.annotate(count_weight=Count('*')) \
                 .values('count_weight')
