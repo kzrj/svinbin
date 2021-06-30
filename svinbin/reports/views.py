@@ -561,6 +561,7 @@ class RecountViewSet(viewsets.ViewSet):
 
     class RecountReadSerializer(serializers.ModelSerializer):
         cell = serializers.ReadOnlyField(source='location.get_cell_number')
+        initiator = serializers.ReadOnlyField(source='initiator.username')
 
         class Meta:
             model = Recount
