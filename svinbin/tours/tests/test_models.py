@@ -1252,7 +1252,123 @@ class TourQuerysetAddDataByWs(TestCase):
         self.assertEqual(tours[1].ws4_padej_percentage, 2.5)
         self.assertEqual(tours[1].ws4_vinuzhd_percentage, 8)
 
+    def test_add_culling_percentage_otkorm(self):
+        piglets1 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws5_cells[0],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets2 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour2,
+            location=self.loc_ws5_cells[1],
+            quantity=100,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
 
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets1, total_weight=120,
+            place='8/5', )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets2, total_weight=360,
+            place='8/5', )
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1,
+         culling_type='padej', quantity=20, total_weight=400)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1,
+         culling_type='vinuzhd', quantity=12, total_weight=250)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2,
+         culling_type='padej', quantity=5, total_weight=120)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2,
+         culling_type='vinuzhd', quantity=16, total_weight=250)
+
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws6_cells[0],
+            quantity=200,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour2,
+            location=self.loc_ws6_cells[1],
+            quantity=200,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=120,
+            place='8/6', )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets4, total_weight=360,
+            place='8/6', )
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3,
+         culling_type='padej', quantity=20, total_weight=400)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3,
+         culling_type='vinuzhd', quantity=12, total_weight=250)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets4,
+         culling_type='padej', quantity=5, total_weight=120)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets4,
+         culling_type='vinuzhd', quantity=16, total_weight=250)
+
+        piglets5 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws4_cells[0],
+            quantity=200,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets6 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour2,
+            location=self.loc_ws4_cells[1],
+            quantity=200,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets5, total_weight=120,
+            place='3/4', )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets6, total_weight=360,
+            place='3/4', )
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets5,
+         culling_type='padej', quantity=20, total_weight=400)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets5,
+         culling_type='vinuzhd', quantity=12, total_weight=250)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets6,
+         culling_type='padej', quantity=5, total_weight=120)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets6,
+         culling_type='vinuzhd', quantity=16, total_weight=250)
+
+        tours = Tour.objects.all() \
+            .add_week_weight(places=['3/4','8/5', '8/6', '8/7']) \
+            .add_week_weight_ws8_v2() \
+            .add_culling_data_by_week_tour(ws_numbers=[4, 5, 6, 7]) \
+            .add_culling_percentage_by_ws_exclude_ws3(ws_number=4, place_number='3_4') \
+            .add_culling_percentage_by_ws_exclude_ws3(ws_number=5, place_number='8_5') \
+            .add_culling_percentage_by_ws_exclude_ws3(ws_number=6, place_number='8_6') \
+            .add_culling_percentage_by_ws_exclude_ws3(ws_number=7, place_number='8_7') \
+            .add_culling_percentage_otkorm()
+
+        self.assertEqual(tours[0].week_weight_qnty_ws8, 300)
+
+        self.assertEqual(tours[0].otkorm_padej_qnty, 40)
+        self.assertEqual(round(tours[0].otkorm_padej_percentage, 2), 13.33)
+        self.assertEqual(tours[0].otkorm_vinuzhd_qnty, 24)
+        self.assertEqual(round(tours[0].otkorm_vinuzhd_percentage, 2), 8.0)
+
+        self.assertEqual(tours[1].otkorm_padej_qnty, 10)
+        self.assertEqual(round(tours[1].otkorm_padej_percentage, 2), 3.33)
+        self.assertEqual(tours[1].otkorm_vinuzhd_qnty, 32)
+        self.assertEqual(round(tours[1].otkorm_vinuzhd_percentage, 2), 10.67)
+
+       
 class TourQuerysetAddRemont(TestCase):
     def setUp(self):
         locations_testing.create_workshops_sections_and_cells()

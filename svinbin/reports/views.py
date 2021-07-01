@@ -59,6 +59,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
             .add_culling_percentage_by_ws_exclude_ws3(ws_number=5, place_number='8_5') \
             .add_culling_percentage_by_ws_exclude_ws3(ws_number=6, place_number='8_6') \
             .add_culling_percentage_by_ws_exclude_ws3(ws_number=7, place_number='8_7') \
+            .add_culling_percentage_otkorm() \
             .add_prives() \
             .add_prives_na_1g() \
             .order_by('-year','-week_number', ) \

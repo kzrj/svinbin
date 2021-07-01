@@ -205,8 +205,8 @@ class TourQuerySet(models.QuerySet):
                     .annotate(culling_qnty=Sum('quantity')) \
                     .values('culling_qnty')
 
-                data[f'ws{ws_number}_{c_type}_quantity'] = Subquery(culling_subquery_qnty,
-                     output_field=models.IntegerField())
+                data[f'ws{ws_number}_{c_type}_quantity'] = Coalesce(
+                    Subquery(culling_subquery_qnty, output_field=models.IntegerField()), 0)
 
                 if ws_number in [5, 6, 7]:
                     if c_type == 'prirezka':
@@ -324,7 +324,7 @@ class TourQuerySet(models.QuerySet):
                         output_field=models.FloatField())
                 ), output_field=models.FloatField()
             )
-            
+
         if ws_number in [4, 8]:
             data[f'ws{ws_number}_prirezka_percentage'] = Case(
                 When(Q(**lookup1) | Q(**lookup2), then=0.0),
@@ -336,6 +336,22 @@ class TourQuerySet(models.QuerySet):
                 )
 
         return self.annotate(**data)
+
+    def add_culling_percentage_otkorm(self):
+        return self.annotate(
+            otkorm_padej_qnty=F('ws5_padej_quantity') + F('ws6_padej_quantity') + \
+                F('ws7_padej_quantity'),
+            otkorm_vinuzhd_qnty=F('ws5_vinuzhd_quantity') + F('ws6_vinuzhd_quantity') + \
+                F('ws7_vinuzhd_quantity'),
+            otkorm_padej_percentage=ExpressionWrapper(
+                    (F('ws5_padej_quantity') + F('ws6_padej_quantity') + F('ws7_padej_quantity')) \
+                    * 100.0 / F('week_weight_qnty_ws8'), output_field=models.FloatField()
+                ),
+            otkorm_vinuzhd_percentage=ExpressionWrapper(
+                    (F('ws5_vinuzhd_quantity') + F('ws6_vinuzhd_quantity') + F('ws7_vinuzhd_quantity')) \
+                    * 100.0 / F('week_weight_qnty_ws8'), output_field=models.FloatField()
+                ),
+            )
 
 
     def add_sow_events(self, sow):
