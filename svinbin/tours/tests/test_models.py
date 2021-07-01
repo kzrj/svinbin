@@ -1050,15 +1050,52 @@ class TourQuerysetAddDataByWs(TestCase):
         CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2,
          culling_type='vinuzhd', quantity=16, total_weight=250)
 
+        piglets3 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour1,
+            location=self.loc_ws6_cells[0],
+            quantity=200,
+            birthday=datetime.datetime(2020,5,5,0,0)
+            )
+        piglets4 = piglets_testing.create_new_group_with_metatour_by_one_tour(
+            tour=self.tour2,
+            location=self.loc_ws6_cells[1],
+            quantity=200,
+            birthday=datetime.datetime(2020,5,8,0,0)
+            )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets3, total_weight=120,
+            place='8/6', )
+
+        WeighingPiglets.objects.create_weighing(piglets_group=piglets4, total_weight=360,
+            place='8/6', )
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3,
+         culling_type='padej', quantity=20, total_weight=400)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets3,
+         culling_type='vinuzhd', quantity=12, total_weight=250)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets4,
+         culling_type='padej', quantity=5, total_weight=120)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets4,
+         culling_type='vinuzhd', quantity=16, total_weight=250)
+
         tours = Tour.objects.all() \
-            .add_week_weight(places=['8/5']) \
-            .add_culling_data_by_week_tour(ws_numbers=[5]) \
-            .add_culling_percentage(ws_numbers=[5, ])
+            .add_week_weight(places=['3/4', '4/8','8/5', '8/6', '8/7']) \
+            .add_week_weight_ws8_v2() \
+            .add_culling_data_by_week_tour(ws_numbers=[4, 8, 5, 6, 7]) \
+            .add_culling_percentage(ws_numbers=[4, 8, 5, 6, 7])
 
         self.assertEqual(tours[0].ws5_padej_percentage, 20)
         self.assertEqual(tours[0].ws5_vinuzhd_percentage, 12)
         self.assertEqual(tours[1].ws5_padej_percentage, 5)
         self.assertEqual(tours[1].ws5_vinuzhd_percentage, 16)
+
+        self.assertEqual(tours[0].ws6_padej_percentage, 10)
+        self.assertEqual(tours[0].ws6_vinuzhd_percentage, 6)
+        self.assertEqual(tours[1].ws6_padej_percentage, 2.5)
+        self.assertEqual(tours[1].ws6_vinuzhd_percentage, 8)
 
 
 class TourQuerysetAddRemont(TestCase):

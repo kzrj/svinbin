@@ -134,12 +134,12 @@ class TourQuerySet(models.QuerySet):
             weights_subquery_qnty_weight = weights_subquery.annotate(qnty_weight=Sum('piglets_quantity')) \
                 .values('qnty_weight')
             data[f'week_weight_qnty_{place_formatted}'] = Coalesce(Subquery(weights_subquery_qnty_weight,
-                 output_field=models.FloatField()), 0.0)
+                 output_field=models.IntegerField()), 0)
 
             weights_subquery_count_weight = weights_subquery.annotate(count_weight=Count('*')) \
                 .values('count_weight')
             data[f'week_weight_count_{place_formatted}'] = Subquery(weights_subquery_count_weight,
-                 output_field=models.FloatField())
+                 output_field=models.IntegerField())
 
         return self.annotate(**data)
 
@@ -157,7 +157,7 @@ class TourQuerySet(models.QuerySet):
             week_weight_qnty_ws8=F('week_weight_qnty_8_5') + F('week_weight_qnty_8_6') + \
                 F('week_weight_qnty_8_7'),
             week_weight_avg_ws8=Coalesce(Subquery(weights_subquery_avg_weight,
-                 output_field=models.FloatField()), 0)
+                 output_field=models.FloatField()), 0.0)
             )
 
     def add_weighing_first_dates(self):
@@ -238,7 +238,7 @@ class TourQuerySet(models.QuerySet):
             places.append('8_7')
         return places
 
-    def add_culling_percentage(self, ws_numbers=[3, 4, 5, 6, 7, 8]):
+    def add_culling_percentage(self, ws_numbers=[3, 5, 4, 6, 7, 8]):
         data = dict()
         places = self.gen_places_from_ws_number(ws_numbers=ws_numbers)
 
@@ -263,6 +263,7 @@ class TourQuerySet(models.QuerySet):
             ws_numbers.remove(3)
 
         for ws_number, place_number in zip(ws_numbers, places):
+            print(ws_number, place_number)
             if ws_numbers == 3:
                 continue
                 
