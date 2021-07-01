@@ -218,8 +218,9 @@ class TourQuerySet(models.QuerySet):
                             .annotate(culling_avg_weight=Avg(F('total_weight') / F('quantity'), output_field=models.FloatField())) \
                             .values('culling_avg_weight')
 
-                        data[f'ws{ws_number}_{c_type}_avg_weight'] = Subquery(culling_subquery_avg_weight,
-                         output_field=models.FloatField())
+                        data[f'ws{ws_number}_{c_type}_avg_weight'] = Coalesce(
+                            Subquery(culling_subquery_avg_weight,
+                             output_field=models.FloatField()), 0.0)
 
         return self.annotate(**data)
 
