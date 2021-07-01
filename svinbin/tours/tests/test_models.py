@@ -947,6 +947,7 @@ class TourQuerysetAddDataByWs(TestCase):
         self.tour2 = Tour.objects.get_or_create_by_week_in_current_year(week_number=2)
 
         self.loc_ws4 = Location.objects.get(workshop__number=4)
+        self.loc_ws3_cells = Location.objects.filter(sowAndPigletsCell__isnull=False)
         self.loc_ws4_cells = Location.objects.filter(pigletsGroupCell__workshop__number=4)
         self.loc_ws5_cells = Location.objects.filter(pigletsGroupCell__workshop__number=5)
         self.loc_ws6_cells = Location.objects.filter(pigletsGroupCell__workshop__number=6)
@@ -1367,6 +1368,42 @@ class TourQuerysetAddDataByWs(TestCase):
         self.assertEqual(round(tours[1].otkorm_padej_percentage, 2), 3.33)
         self.assertEqual(tours[1].otkorm_vinuzhd_qnty, 32)
         self.assertEqual(round(tours[1].otkorm_vinuzhd_percentage, 2), 10.67)
+
+    def test_add_culling_percentage_by_ws3(self):
+        piglets1 = piglets_testing.create_from_sow_farrow(tour=self.tour1, 
+            location=self.loc_ws3_cells[0], quantity=15)
+
+        piglets2 = piglets_testing.create_from_sow_farrow(tour=self.tour2, 
+            location=self.loc_ws3_cells[1], quantity=17)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1,
+         culling_type='padej', quantity=1, total_weight=4)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets1,
+         culling_type='prirezka', quantity=3, total_weight=10)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2,
+         culling_type='padej', quantity=2, total_weight=8)
+
+        CullingPiglets.objects.create_culling_piglets(piglets_group=piglets2,
+         culling_type='prirezka', quantity=3, total_weight=10)
+
+        tours = Tour.objects.all() \
+            .add_farrow_data() \
+            .add_week_weight(places=['3/4','8/5', '8/6', '8/7']) \
+            .add_culling_data_by_week_tour(ws_numbers=[3, 5, 6, 7]) \
+            .add_culling_percentage_by_ws3()
+
+        self.assertEqual(tours[0].ws3_padej_quantity, 1)
+        self.assertEqual(round(tours[0].ws3_padej_percentage, 2), 6.67)
+        self.assertEqual(tours[0].ws3_prirezka_quantity, 3)
+        self.assertEqual(round(tours[0].ws3_prirezka_percentage, 2), 20.0)
+
+        self.assertEqual(tours[1].ws3_padej_quantity, 2)
+        self.assertEqual(round(tours[1].ws3_padej_percentage, 2), 11.76)
+        self.assertEqual(tours[1].ws3_prirezka_quantity, 3)
+        self.assertEqual(round(tours[1].ws3_prirezka_percentage, 2), 17.65)
+            
 
        
 class TourQuerysetAddRemont(TestCase):

@@ -300,6 +300,29 @@ class TourQuerySet(models.QuerySet):
 
         return self.annotate(**data)
 
+    def add_culling_percentage_by_ws3(self):
+        data = dict()
+
+        data['ws3_padej_percentage'] = Case(
+                When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
+                When(total_born_alive__gt=0, 
+                        then=ExpressionWrapper(
+                            F('ws3_padej_quantity') * 100.0 / F('total_born_alive'),
+                            output_field=models.FloatField())
+                    ), output_field=models.FloatField()
+                )
+
+        data['ws3_prirezka_percentage'] = Case(
+                When(Q(total_born_alive__isnull=True) | Q(total_born_alive=0), then=0.0),
+                When(total_born_alive__gt=0, 
+                        then=ExpressionWrapper(
+                            F('ws3_prirezka_quantity') * 100.0 / F('total_born_alive'),
+                            output_field=models.FloatField())
+                    ), output_field=models.FloatField()
+                )
+
+        return self.annotate(**data)
+
     def add_culling_percentage_by_ws_exclude_ws3(self, ws_number, place_number):
         lookup1 = {f'week_weight_qnty_{place_number}__isnull': True, }
         lookup2 = {f'week_weight_qnty_{place_number}': 0, }
