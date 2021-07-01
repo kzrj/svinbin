@@ -362,18 +362,32 @@ class TourQuerySet(models.QuerySet):
         return self.annotate(**data)
 
     def add_culling_percentage_otkorm(self):
+        lookup1 = {f'week_weight_qnty_ws8__isnull': True, }
+        lookup2 = {f'week_weight_qnty_ws8': 0, }
+        lookup3 = {f'week_weight_qnty_ws8__gt': 0, }
+
         return self.annotate(
             otkorm_padej_qnty=F('ws5_padej_quantity') + F('ws6_padej_quantity') + \
                 F('ws7_padej_quantity'),
             otkorm_vinuzhd_qnty=F('ws5_vinuzhd_quantity') + F('ws6_vinuzhd_quantity') + \
                 F('ws7_vinuzhd_quantity'),
-            otkorm_padej_percentage=ExpressionWrapper(
-                    (F('ws5_padej_quantity') + F('ws6_padej_quantity') + F('ws7_padej_quantity')) \
-                    * 100.0 / F('week_weight_qnty_ws8'), output_field=models.FloatField()
+            otkorm_padej_percentage=Case(
+                When(Q(**lookup1) | Q(**lookup2), then=0.0),
+                When(**lookup3, 
+                    then=ExpressionWrapper(
+                        (F('ws5_padej_quantity') + F('ws6_padej_quantity') + F('ws7_padej_quantity')) \
+                        * 100.0 / F('week_weight_qnty_ws8'), output_field=models.FloatField()
+                        )
+                    )
                 ),
-            otkorm_vinuzhd_percentage=ExpressionWrapper(
-                    (F('ws5_vinuzhd_quantity') + F('ws6_vinuzhd_quantity') + F('ws7_vinuzhd_quantity')) \
-                    * 100.0 / F('week_weight_qnty_ws8'), output_field=models.FloatField()
+            otkorm_vinuzhd_percentage=Case(
+                When(Q(**lookup1) | Q(**lookup2), then=0.0),
+                When(**lookup3, 
+                    then=ExpressionWrapper(
+                        (F('ws5_vinuzhd_quantity') + F('ws6_vinuzhd_quantity') + F('ws7_vinuzhd_quantity')) \
+                        * 100.0 / F('week_weight_qnty_ws8'), output_field=models.FloatField()
+                        )
+                    )
                 ),
             )
 
