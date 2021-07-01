@@ -54,7 +54,7 @@ class TourReportViewSet(viewsets.ModelViewSet):
             .add_week_weight() \
             .add_week_weight_ws8_v2() \
             .add_culling_data_by_week_tour() \
-            ..add_culling_percentage_by_ws3() \
+            .add_culling_percentage_by_ws3() \
             .add_culling_percentage_by_ws_exclude_ws3(ws_number=4, place_number='3_4') \
             .add_culling_percentage_by_ws_exclude_ws3(ws_number=8, place_number='4_8') \
             .add_culling_percentage_by_ws_exclude_ws3(ws_number=5, place_number='8_5') \
