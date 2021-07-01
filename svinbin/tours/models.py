@@ -238,7 +238,7 @@ class TourQuerySet(models.QuerySet):
             places.append('8_7')
         return places
 
-    def add_culling_percentage(self, ws_numbers=[3, 5, 4, 6, 7, 8]):
+    def add_culling_percentage(self, ws_numbers=[3, 4, 5, 6, 7, 8]):
         data = dict()
         places = self.gen_places_from_ws_number(ws_numbers=ws_numbers)
 
@@ -263,7 +263,6 @@ class TourQuerySet(models.QuerySet):
             ws_numbers.remove(3)
 
         for ws_number, place_number in zip(ws_numbers, places):
-            print(ws_number, place_number)
             if ws_numbers == 3:
                 continue
                 
@@ -300,6 +299,44 @@ class TourQuerySet(models.QuerySet):
                     )
 
         return self.annotate(**data)
+
+    def add_culling_percentage_by_ws_exclude_ws3(self, ws_number, place_number):
+        lookup1 = {f'week_weight_qnty_{place_number}__isnull': True, }
+        lookup2 = {f'week_weight_qnty_{place_number}': 0, }
+        lookup3 = {f'week_weight_qnty_{place_number}__gt': 0, }
+
+        data = dict()
+
+        data[f'ws{ws_number}_padej_percentage'] = Case(
+                When(Q(**lookup1) | Q(**lookup2), then=0.0),
+                When(**lookup3, 
+                        then=ExpressionWrapper(
+                            F(f'ws{ws_number}_padej_quantity') * 100.0 / F(f'week_weight_qnty_{place_number}'),
+                            output_field=models.FloatField())
+                    ), output_field=models.FloatField()
+                )
+
+        data[f'ws{ws_number}_vinuzhd_percentage'] = Case(
+            When(Q(**lookup1) | Q(**lookup2), then=0.0),
+            When(**lookup3, 
+                    then=ExpressionWrapper(
+                        F(f'ws{ws_number}_vinuzhd_quantity') * 100.0 / F(f'week_weight_qnty_{place_number}'),
+                        output_field=models.FloatField())
+                ), output_field=models.FloatField()
+            )
+            
+        if ws_number in [4, 8]:
+            data[f'ws{ws_number}_prirezka_percentage'] = Case(
+                When(Q(**lookup1) | Q(**lookup2), then=0.0),
+                When(**lookup3, 
+                        then=ExpressionWrapper(
+                            F(f'ws{ws_number}_prirezka_quantity') * 100.0 / F(f'week_weight_qnty_{place_number}'),
+                            output_field=models.FloatField())
+                    ), output_field=models.FloatField()
+                )
+
+        return self.annotate(**data)
+
 
     def add_sow_events(self, sow):
         return self.prefetch_related(
