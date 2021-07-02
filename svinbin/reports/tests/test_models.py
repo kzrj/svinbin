@@ -11,9 +11,9 @@ from django.test import TestCase, TransactionTestCase
 from django.core.exceptions import ValidationError
 
 from reports.models import ReportDate, gen_operations_dict, gen_megadict
-from sows.models import Sow
+from sows.models import Sow, Boar
 from sows_events.models import CullingSow, SowFarrow, Semination, Ultrasound, SeminationQuerySet, \
-    PigletsToSowsEvent
+    PigletsToSowsEvent, CullingBoar
 from piglets.models import Piglets
 from piglets_events.models import CullingPiglets
 from tours.models import Tour
@@ -840,3 +840,46 @@ class Report24fReportTest(TransactionTestCase):
 
         day1_rd = rds.filter(date=date(2020, 6, 7)).first()
         self.assertEqual(day1_rd.rem_qnty, 10)
+
+    def test_count_boars(self):
+        with freeze_time("2020-06-7"):
+            boar1 = sows_testings.create_boar()
+            boar2 = sows_testings.create_boar()
+            boar3 = sows_testings.create_boar()
+
+        with freeze_time("2020-06-12"):
+            CullingBoar.objects.create_culling_boar(boar=boar1, culling_type='padej')
+
+        with freeze_time("2020-06-17"):
+            rem_boar1 = sows_testings.create_rem_boar()
+            rem_boar2 = sows_testings.create_rem_boar()
+            rem_boar3 = sows_testings.create_rem_boar()
+
+        with freeze_time("2020-06-29"):
+            CullingBoar.objects.create_culling_boar(boar=rem_boar1, culling_type='padej')
+
+        rds = ReportDate.objects.all().add_count_boars()
+
+        day0_rd = rds.filter(date=date(2020, 6, 3)).first()
+        self.assertEqual(day0_rd.count_boars, 0)
+
+        day1_rd = rds.filter(date=date(2020, 6, 8)).first()
+        self.assertEqual(day1_rd.count_boars, 3)
+
+        day2_rd = rds.filter(date=date(2020, 6, 12)).first()
+        self.assertEqual(day2_rd.count_boars, 3)
+
+        day3_rd = rds.filter(date=date(2020, 6, 13)).first()
+        self.assertEqual(day3_rd.count_boars, 2)
+
+        day4_rd = rds.filter(date=date(2020, 6, 17)).first()
+        self.assertEqual(day4_rd.count_boars, 2)
+        self.assertEqual(day4_rd.count_rem_boars, 0)
+
+        day5_rd = rds.filter(date=date(2020, 6, 18)).first()
+        self.assertEqual(day5_rd.count_boars, 2)
+        self.assertEqual(day5_rd.count_rem_boars, 3)
+
+        day6_rd = rds.filter(date=date(2020, 6, 30)).first()
+        self.assertEqual(day6_rd.count_boars, 2)
+        self.assertEqual(day6_rd.count_rem_boars, 2)

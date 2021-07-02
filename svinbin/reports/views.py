@@ -329,10 +329,12 @@ class ReportDateViewSet(viewsets.ModelViewSet):
             data['start_ws48_piglets_count'] = dates[0].ws48_count_piglets_at_start
             data['start_ws567_piglets_count'] = dates[0].ws567_count_piglets_at_start
             data['start_boars_count'] = dates[0].count_boars
+            data['start_rem_boars_count'] = dates[0].count_rem_boars
             data['end_ws3_piglets_count'] = dates[1].count_piglets_at_start
             data['end_ws48_piglets_count'] = dates[1].ws48_count_piglets_at_start
             data['end_ws567_piglets_count'] = dates[1].ws567_count_piglets_at_start
             data['end_boars_count'] = dates[1].count_boars
+            data['end_rem_boars_count'] = dates[1].count_rem_boars
 
             # aggregates. calc between start and end
             # 1. prov to osn
@@ -366,7 +368,9 @@ class ReportDateViewSet(viewsets.ModelViewSet):
 
             # 8. culls boars
             data['boars_culls'] = CullingBoar.objects.filter(date__date__gte=start_date,
-                date__date__lte=end_date).count_by_groups()
+                date__date__lte=end_date, boar__is_rem=False).count_by_groups()
+            data['rem_boars_culls'] = CullingBoar.objects.filter(date__date__gte=start_date,
+                date__date__lte=end_date, boar__is_rem=True).count_by_groups()
             return Response(data)
         else:
             return Response({'message': 'Неверные даты.'}, status=status.HTTP_400_BAD_REQUEST)

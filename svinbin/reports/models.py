@@ -776,21 +776,36 @@ class ReportDateQuerySet(models.QuerySet):
         data = dict()
 
         all_created_boars = Coalesce(Subquery(Boar.objects \
-                        .filter(created_at__lt=OuterRef('date')) \
+                        .filter(created_at__lt=OuterRef('date'), is_rem=False) \
                         .annotate(flag_group=Value(0)) \
                         .values('flag_group') \
                         .annotate(total=Count('*')) \
                         .values('total')), 0)
 
         culls = Coalesce(Subquery(CullingBoar.objects \
-                        .filter(date__date__lt=OuterRef('date')) \
+                        .filter(date__date__lt=OuterRef('date'), boar__is_rem=False) \
                         .values('location') \
                         .annotate(total=Count('*')) \
                         .values('total')), 0)      
 
-        count_sows = ExpressionWrapper(all_created_boars - culls, output_field=models.IntegerField())
+        count_boars = ExpressionWrapper(all_created_boars - culls, output_field=models.IntegerField())
+
+        rem_boars = Coalesce(Subquery(Boar.objects \
+                        .filter(created_at__lt=OuterRef('date'), is_rem=True) \
+                        .annotate(flag_group=Value(0)) \
+                        .values('flag_group') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)
+
+        rem_culls = Coalesce(Subquery(CullingBoar.objects \
+                        .filter(date__date__lt=OuterRef('date'), boar__is_rem=True) \
+                        .values('location') \
+                        .annotate(total=Count('*')) \
+                        .values('total')), 0)      
+
+        count_rem_boars = ExpressionWrapper(rem_boars - rem_culls, output_field=models.IntegerField())
         
-        return self.annotate(count_boars=count_sows)
+        return self.annotate(count_boars=count_boars, count_rem_boars=count_rem_boars)
 
     def add_ws12_sow_cullings_data(self, ws_locs, ws_number):
         data = dict()

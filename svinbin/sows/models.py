@@ -510,14 +510,15 @@ class BoarBreed(CoreModel):
 
 
 class BoarManager(CoreModelManager):
-    def create_boar(self, farm_id, birth_id=None, breed=None):
-        if self.filter(farm_id=farm_id).first():
+    def create_boar(self, farm_id, birth_id=None, breed=None, is_rem=False):
+        if farm_id  and self.filter(farm_id=farm_id).first():
             raise DjangoValidationError(message=f'Хряк с номером {farm_id} уже существует или уже забракован')
 
-        return self.create(farm_id=farm_id, birth_id=birth_id, location=Location.objects.get(workshop__number=1), breed=breed)
+        return self.create(farm_id=farm_id, birth_id=birth_id,
+         location=Location.objects.get(workshop__number=1), breed=breed, is_rem=is_rem)
 
-    def get_or_create_boar(self, farm_id, breed=None):
-        boar, created = self.get_or_create(farm_id=farm_id)
+    def get_or_create_boar(self, farm_id=None, breed=None, is_rem=False):
+        boar, created = self.get_or_create(farm_id=farm_id, is_rem=is_rem)
         if created:
             boar.location = Location.objects.get(workshop__number=1)
             boar.breed = breed

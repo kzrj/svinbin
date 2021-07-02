@@ -12,10 +12,21 @@ from sows_events.models import Semination, SowFarrow, Ultrasound
 FARM_ID_COUNT = 100000
 
 def create_boar():
+    if BoarBreed.objects.all().count() < 1:
+        BoarBreed.objects.create(title='first breed')
+
     breed = BoarBreed.objects.all().first()
 
     return Boar.objects.get_or_create_boar(farm_id=random.randint(1, FARM_ID_COUNT),
          breed=breed)
+
+def create_rem_boar():
+    if BoarBreed.objects.all().count() < 1:
+        BoarBreed.objects.create(title='first breed')
+            
+    breed = BoarBreed.objects.all().first()
+
+    return Boar.objects.create_boar(farm_id=None, is_rem=True, breed=breed)
 
 def create_statuses():
     if SowStatus.objects.all().count() < 1:
