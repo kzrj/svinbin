@@ -100,6 +100,7 @@ class BoarCreateSerializer(serializers.Serializer):
     farm_id = serializers.CharField()
     birth_id = serializers.CharField()
     breed = serializers.PrimaryKeyRelatedField(queryset=BoarBreed.objects.all())
+    is_rem = serializers.BooleanField(default=False)
 
 
 class BoarBreedSerializer(serializers.ModelSerializer):

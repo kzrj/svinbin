@@ -213,8 +213,9 @@ class BoarViewSet(viewsets.ModelViewSet):
         serializer = sows_serializers.BoarCreateSerializer(data=request.data)
         if serializer.is_valid():
             boar = sows_models.Boar.objects.create_boar(
-                farm_id=serializer.validated_data['farm_id'],
-                birth_id=serializer.validated_data['birth_id'],
+                farm_id=serializer.validated_data.get('farm_id'),
+                birth_id=serializer.validated_data.get('birth_id'),
+                is_rem=serializer.validated_data.get('is_rem'),
                 breed=serializer.validated_data['breed'],
                 )
             return Response(
