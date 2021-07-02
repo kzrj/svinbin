@@ -540,6 +540,8 @@ class Boar(Pig):
     farm_id = models.IntegerField(null=True, unique=True)
     breed = models.ForeignKey(BoarBreed, on_delete=models.SET_NULL, null=True)
     active = models.BooleanField(default=True)
+    is_rem = models.BooleanField(default=False)
+    
     objects = BoarManager()
 
     def __str__(self):
