@@ -93,7 +93,7 @@ class BoarSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Boar
-        fields = ['id', 'farm_id', 'birth_id', 'location', 'breed']
+        fields = ['id', 'farm_id', 'birth_id', 'location', 'breed', 'is_rem']
 
 
 class BoarCreateSerializer(serializers.Serializer):
