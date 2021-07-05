@@ -327,11 +327,6 @@ class LocationQsPopulationTest(TransactionTestCase):
         self.assertEqual(section_locs[0].count_all, 45)
         self.assertEqual(section_locs[1].count_full, 2)
 
-    def test_add_sows_culls_count(self):
-        ws3 = Location.objects.filter(workshop__number=3).add_sows_culls_count()
-        CullingSow.objects.create_culling(sow=self.sow1, culling_type='padej')
-        print(ws3.first().count_sow_culls)
-
 
 class LocationRecountsTest(TransactionTestCase):
     def setUp(self):

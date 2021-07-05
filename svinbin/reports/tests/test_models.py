@@ -311,6 +311,7 @@ class ReportDatePigletsQsTest(TransactionTestCase):
                     .add_piglets_quantity_at_date_start() \
                     .add_piglets_quantity_at_date_end() \
                     .filter(date=target_date)
+
             bool(rds)
             self.assertEqual(rds[0].piglets_today_qnty,  200)
             self.assertEqual(rds[0].piglets_qnty_start_date,  194)

@@ -184,11 +184,13 @@ class ReportDateQuerySet(models.QuerySet):
                                                 .values('today_born_alive'), output_field=models.IntegerField()),
                                         0 )
 
-        today_count_piglets = count_piglets + piglets_today_padej_subquery + piglets_today_prirezka_subquery + \
-                piglets_today_vinuzhd_subquery + piglets_today_spec_subquery - today_born_alive_subquery
+        # today_count_piglets = count_piglets + piglets_today_padej_subquery + piglets_today_prirezka_subquery + \
+        #         piglets_today_vinuzhd_subquery + piglets_today_spec_subquery - today_born_alive_subquery
 
         # + cull qnty today - born today
-        return self.annotate(piglets_today_qnty=today_count_piglets)
+        return self.annotate(piglets_today_qnty=ExpressionWrapper(count_piglets + piglets_today_padej_subquery + piglets_today_prirezka_subquery + \
+                piglets_today_vinuzhd_subquery + piglets_today_spec_subquery - today_born_alive_subquery,
+                output_field=models.IntegerField()))
 
     def add_piglets_quantity_at_date_start(self):
         today = timezone.now().date()
@@ -243,7 +245,7 @@ class ReportDateQuerySet(models.QuerySet):
                                     .values('culling_type') \
                                     .annotate(all_total_weight=Sum('total_weight')) \
                                     .values('all_total_weight'), output_field=models.FloatField()),
-                        0 )
+                        0.0 )
         return self.annotate(piglets_spec_total_weight=total_weight)
 
     def add_priplod_by_sow(self):

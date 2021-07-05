@@ -248,7 +248,7 @@ class RollbackManager(CoreModelManager):
         transaction = SowTransaction.objects.get(pk=event_pk)
         self.check_sow_permission(sow=transaction.sow, created_at=transaction.created_at)
 
-        if transaction.is_weaning_transaction_from_ws3_to_ws1():
+        if transaction.is_weaning_transaction_from_ws3_to_ws12():
             transaction.sow.tour = transaction.tour
             transaction.sow.change_status_to_previous_delete_current_status_record()
 

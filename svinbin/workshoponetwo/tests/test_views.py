@@ -122,7 +122,7 @@ class WorkshopOneTwoSowViewSetTest(APITestCase):
         response = self.client.post('/api/workshoponetwo/sows/mass_culling/',
             { 
               'sows': [sow1.pk, sow2.pk, sow3.pk], 'culling_type': 'padej', 
-              'reason': 'test_reason', 'weight': 0
+              'reason': 'test_reason', 'weight': 0,
             })
 
         sow1.refresh_from_db()
@@ -358,7 +358,6 @@ class WS12SowViewSetPermissionsTest(APITestCase):
         response = self.client.post('/api/workshoponetwo/sows/mass_semination/',
          {'week': 5, 'sows': [sow1.pk, sow2.pk, sow3.pk], 
          'semination_employee': self.brig1.pk, 'boar': self.boar.pk})
-        print(response.data)
         self.assertEqual(response.status_code, 200)
         self.client.logout()
 

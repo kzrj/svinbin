@@ -621,7 +621,7 @@ class RecountViewSet(viewsets.ViewSet):
                 filters['date__date__lte'] = serializer.validated_data.get('end_date')
 
             for section in Section.objects.filter(
-              workshop__number=serializer.validated_data['ws_number']):
+              workshop__number=serializer.validated_data['ws_number']).order_by('number'):
                 sec_locations = Location.objects.all().get_locations_in_section(section=section)
                 filters['location__in'] = sec_locations
                 recounts = Recount.objects.filter(**filters)
