@@ -95,13 +95,16 @@ class CreateCullingSowSerializer(serializers.ModelSerializer):
 
 
 class CreateCullingSowPkSerializer(serializers.ModelSerializer):
+    date = serializers.DateTimeField(format="%Y-%m-%dT00:00")
+
     class Meta:
         model = CullingSow
-        fields = ('culling_type', 'reason' , 'weight')        
+        fields = ('culling_type', 'reason' , 'weight', 'date')        
  
 
 class CreateSowFarrowSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(format="%Y-%m-%dT00:00")
+    # date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M")
 
     class Meta:
         model = SowFarrow
@@ -159,10 +162,11 @@ class SemenBoarSerializer(serializers.ModelSerializer):
 
 class SowsMassCullingSerializer(serializers.ModelSerializer):
     sows = serializers.ListField(child=serializers.IntegerField())
+    date = serializers.DateTimeField(format="%Y-%m-%dT%H:%M")
 
     class Meta:
         model = CullingSow
-        fields = ('sows', 'culling_type', 'reason' , 'weight')
+        fields = ('sows', 'culling_type', 'reason' , 'weight', 'date')
 
 
 class SimpleWeaningSowSerializer(serializers.ModelSerializer):

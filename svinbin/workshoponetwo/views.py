@@ -101,7 +101,8 @@ class WorkShopOneTwoSowViewSet(WorkShopSowViewSet):
                 culling_type=serializer.validated_data['culling_type'],
                 reason=serializer.validated_data['reason'],
                 weight=serializer.validated_data['weight'],
-                initiator=request.user
+                initiator=request.user,
+                date=serializer.validated_data.get('date')
                 )
 
             return Response(

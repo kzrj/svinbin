@@ -157,7 +157,7 @@ class WorkShopSowViewSet(SowViewSet):
                 reason=serializer.validated_data['reason'],
                 weight=serializer.validated_data['weight'],
                 initiator=request.user,
-                date=timezone.now())
+                date=serializer.validated_data.get('date'))
             return Response(
                 {
                     "culling": sows_events_serializers.CullingSowSerializer(culling).data,
