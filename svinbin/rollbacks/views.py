@@ -59,7 +59,8 @@ class RollbackViewSet(viewsets.ModelViewSet):
             rollback = Rollback.objects.create_abort_rollback(event_pk=event_pk,
               initiator=request.user, operation_name=operation_name)
 
-        if 'sow_culling' in operation_name:
+        if 'sow_culling' in operation_name or operation_name == 'ws1_culling' \
+          or operation_name == 'ws2_culling':
             rollback = Rollback.objects.create_sow_culling_rollback(event_pk=event_pk,
               initiator=request.user, operation_name=operation_name)
 
