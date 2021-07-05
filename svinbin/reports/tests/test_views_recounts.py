@@ -56,5 +56,5 @@ class ReportDateViewSetTest(APITestCase):
         self.client.force_authenticate(self.shmigina)
         response = self.client.get(
             '/api/reports/recounts/detail_ws_balance/?ws_number=3&start_date=2021-01-05')
-        self.assertEqual(response.data[0]['number'], 1)
+        self.assertEqual(response.data[0]['number'], 6)
         self.assertEqual(response.data[0]['recounts'][0]['cell'], '1/1')

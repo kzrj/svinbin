@@ -244,7 +244,7 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         sow1.change_sow_current_location(location1)
         response = self.client.post('/api/workshopthree/sows/%s/culling/' % sow1.pk,
-         {'culling_type': 'padej', 'reason': 'test', 'weight': 150, 'date': None})
+         {'culling_type': 'padej', 'reason': 'test', 'weight': 150, })
         self.assertEqual(response.status_code, 200)
         self.client.logout()
 
@@ -253,7 +253,7 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         sow1.change_sow_current_location(location1)
         response = self.client.post('/api/workshopthree/sows/%s/culling/' % sow1.pk,
-         {'culling_type': 'padej', 'reason': 'test', 'weight': 150, 'date': None})
+         {'culling_type': 'padej', 'reason': 'test', 'weight': 150,})
         self.assertEqual(response.status_code, 401)
 
     def test_culling_permissions_403(self):
@@ -262,7 +262,7 @@ class WorkshopThreeSowsViewSetTest(APITestCase):
         sow1 = sows_testing.create_sow_and_put_in_workshop_one()
         sow1.change_sow_current_location(location1)
         response = self.client.post('/api/workshopthree/sows/%s/culling/' % sow1.pk,
-         {'culling_type': 'padej', 'reason': 'test', 'weight': 150, 'date': None})
+         {'culling_type': 'padej', 'reason': 'test', 'weight': 150,})
         self.assertEqual(response.status_code, 403)
         self.client.logout()
 
