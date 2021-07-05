@@ -84,10 +84,10 @@ class PigletsModelManagerTest(TestCase):
     def test_aggregate_by_tour_in_ws(self):
         locs = Location.objects.all().get_workshop_location_by_number(workshop_number=3)
         data = Piglets.objects.aggregate_by_tour_in_ws(ws_number=3, locs=locs)
-        self.assertEqual(data[0]['qnty'], 101)
-        self.assertEqual(data[1]['qnty'], 237)
-        self.assertEqual(data[0]['week_number'], 1)
-        self.assertEqual(data[1]['week_number'], 2)
+        self.assertEqual(data[0]['qnty'], 237)
+        self.assertEqual(data[1]['qnty'], 101)
+        self.assertEqual(data[0]['week_number'], 2)
+        self.assertEqual(data[1]['week_number'], 1)
         self.assertEqual(data[0]['year'], 2021)
         self.assertEqual(data[1]['year'], 2021)
 
